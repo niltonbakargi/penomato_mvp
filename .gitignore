@@ -1,0 +1,66 @@
+# ================================
+# XAMPP / Ambiente de Desenvolvimento
+# ================================
+/xampp/
+/xampplite/
+/xampp-control.ini
+*/logs/*
+*/tmp/*
+*.log
+error_log
+
+# ================================
+# Dependências
+# ================================
+/vendor/
+/node_modules/
+/composer.lock
+package-lock.json
+yarn.lock
+
+# ================================
+# Ambiente e Configurações
+# ================================
+.env
+.env.local
+.env.*.local
+!.env.example
+config/database.php
+
+# ================================
+# IDE e Editores
+# ================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ================================
+# Sistema Operacional
+# ================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ================================
+# Backup e Runtime
+# ================================
+*.backup
+*.bak
+*.tmp
+.cache/
+
+# ================================
+# Uploads e Dados do Usuário
+# ================================
+/public/uploads/
+/storage/*
+!/storage/.gitkeep
+
+# ================================
+# SSL e Certificados
+# ================================
+*.pem
+*.crt
+*.key

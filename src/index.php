@@ -1,0 +1,3 @@
+<?php
+// Ponto de entrada da aplicação
+echo 'Penomato MVP - Em desenvolvimento!';
