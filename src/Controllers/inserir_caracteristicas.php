@@ -133,7 +133,7 @@ ob_end_clean();
 
 <h1>Cadastro Completo de Características</h1>
 
-<form action="cadastro_caracteristicas.php" method="post">
+<form action="../Views/cadastro_caracteristicas.php" method="post">
 
   <!-- Espécie / Nome Científico -->
   <div class="input-group">

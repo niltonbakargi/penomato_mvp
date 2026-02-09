@@ -186,6 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 4. REDIRECIONAR PARA PÁGINA DE SUCESSO
     // ===============================
     header("Location: sucesso_cadastro.php?id=$id_especie");
+// Já está correto se sucesso_cadastro.php está na MESMA pasta (Views/)
     exit;
 }
 
