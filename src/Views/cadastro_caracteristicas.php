@@ -12,7 +12,7 @@ $pdo = new PDO(
 );
 
 /* ==========================================================
-   MODO POST → SALVAR CARACTERÍSTICAS (seu formulário completo)
+   MODO POST → SALVAR CARACTERÍSTICAS (com todas as referências)
 ========================================================== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ===============================
     $sql = "
         INSERT INTO especies_caracteristicas (
+            -- Dados principais
             especie_id,
             nome_popular,
             familia,
@@ -71,8 +72,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             possui_resina,
             referencias,
             versao_dados,
-            data_cadastro_botanico
+            data_cadastro_botanico,
+            
+            -- REFERÊNCIAS (35 campos)
+            familia_ref,
+            forma_folha_ref,
+            filotaxia_folha_ref,
+            tipo_folha_ref,
+            tamanho_folha_ref,
+            textura_folha_ref,
+            margem_folha_ref,
+            venacao_folha_ref,
+            cor_flores_ref,
+            simetria_floral_ref,
+            numero_petalas_ref,
+            disposicao_flores_ref,
+            aroma_ref,
+            tamanho_flor_ref,
+            tipo_fruto_ref,
+            tamanho_fruto_ref,
+            cor_fruto_ref,
+            textura_fruto_ref,
+            dispersao_fruto_ref,
+            aroma_fruto_ref,
+            tipo_semente_ref,
+            tamanho_semente_ref,
+            cor_semente_ref,
+            textura_semente_ref,
+            quantidade_sementes_ref,
+            tipo_caule_ref,
+            estrutura_caule_ref,
+            textura_caule_ref,
+            cor_caule_ref,
+            forma_caule_ref,
+            modificacao_caule_ref,
+            possui_espinhos_ref,
+            possui_latex_ref,
+            possui_seiva_ref,
+            possui_resina_ref
         ) VALUES (
+            -- Dados principais
             :especie_id,
             :nome_popular,
             :familia,
@@ -114,7 +153,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             :possui_resina,
             :referencias,
             1,
-            NOW()
+            NOW(),
+            
+            -- REFERÊNCIAS
+            :familia_ref,
+            :forma_folha_ref,
+            :filotaxia_folha_ref,
+            :tipo_folha_ref,
+            :tamanho_folha_ref,
+            :textura_folha_ref,
+            :margem_folha_ref,
+            :venacao_folha_ref,
+            :cor_flores_ref,
+            :simetria_floral_ref,
+            :numero_petalas_ref,
+            :disposicao_flores_ref,
+            :aroma_ref,
+            :tamanho_flor_ref,
+            :tipo_fruto_ref,
+            :tamanho_fruto_ref,
+            :cor_fruto_ref,
+            :textura_fruto_ref,
+            :dispersao_fruto_ref,
+            :aroma_fruto_ref,
+            :tipo_semente_ref,
+            :tamanho_semente_ref,
+            :cor_semente_ref,
+            :textura_semente_ref,
+            :quantidade_sementes_ref,
+            :tipo_caule_ref,
+            :estrutura_caule_ref,
+            :textura_caule_ref,
+            :cor_caule_ref,
+            :forma_caule_ref,
+            :modificacao_caule_ref,
+            :possui_espinhos_ref,
+            :possui_latex_ref,
+            :possui_seiva_ref,
+            :possui_resina_ref
         )
     ";
 
@@ -122,6 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Mapeamento dos campos do formulário para os parâmetros
     $stmt->execute([
+        // Dados principais (42)
         ':especie_id' => $id_especie,
         ':nome_popular' => $_POST['nome_popular'] ?? null,
         ':familia' => $_POST['familia'] ?? null,
@@ -161,7 +238,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':possui_latex' => $_POST['possui_latex'] ?? null,
         ':possui_seiva' => $_POST['possui_seiva'] ?? null,
         ':possui_resina' => $_POST['possui_resina'] ?? null,
-        ':referencias' => $_POST['referencias'] ?? null
+        ':referencias' => $_POST['referencias'] ?? null,
+        
+        // Referências (35) - Correção dos nomes dos campos
+        ':familia_ref' => $_POST['familia_ref'] ?? null,
+        ':forma_folha_ref' => $_POST['forma_folha_ref'] ?? null,
+        ':filotaxia_folha_ref' => $_POST['filotaxia_folha_ref'] ?? null,
+        ':tipo_folha_ref' => $_POST['tipo_folha_ref'] ?? null,
+        ':tamanho_folha_ref' => $_POST['tamanho_folha_ref'] ?? null,
+        ':textura_folha_ref' => $_POST['textura_folha_ref'] ?? null,
+        ':margem_folha_ref' => $_POST['margem_folha_ref'] ?? null,
+        ':venacao_folha_ref' => $_POST['venacao_folha_ref'] ?? null,
+        ':cor_flores_ref' => $_POST['cor_flores_ref'] ?? null,
+        ':simetria_floral_ref' => $_POST['simetria_floral_ref'] ?? null,
+        ':numero_petalas_ref' => $_POST['numero_petalas_ref'] ?? null,
+        ':disposicao_flores_ref' => $_POST['disposicao_flores_ref'] ?? null,
+        ':aroma_ref' => $_POST['aroma_ref'] ?? null,
+        ':tamanho_flor_ref' => $_POST['tamanho_flor_ref'] ?? null,
+        ':tipo_fruto_ref' => $_POST['tipo_fruto_ref'] ?? null,
+        ':tamanho_fruto_ref' => $_POST['tamanho_fruto_ref'] ?? null,
+        ':cor_fruto_ref' => $_POST['cor_fruto_ref'] ?? null,
+        ':textura_fruto_ref' => $_POST['textura_fruto_ref'] ?? null,
+        ':dispersao_fruto_ref' => $_POST['dispersao_fruto_ref'] ?? null,
+        ':aroma_fruto_ref' => $_POST['aroma_fruto_ref'] ?? null,
+        ':tipo_semente_ref' => $_POST['tipo_semente_ref'] ?? null,
+        ':tamanho_semente_ref' => $_POST['tamanho_semente_ref'] ?? null,
+        ':cor_semente_ref' => $_POST['cor_semente_ref'] ?? null,
+        ':textura_semente_ref' => $_POST['textura_semente_ref'] ?? null,
+        ':quantidade_sementes_ref' => $_POST['quantidade_sementes_ref'] ?? null,
+        ':tipo_caule_ref' => $_POST['tipo_caule_ref'] ?? null,
+        ':estrutura_caule_ref' => $_POST['estrutura_caule_ref'] ?? null,
+        ':textura_caule_ref' => $_POST['textura_caule_ref'] ?? null,
+        ':cor_caule_ref' => $_POST['cor_caule_ref'] ?? null,
+        ':forma_caule_ref' => $_POST['forma_caule_ref'] ?? null,
+        ':modificacao_caule_ref' => $_POST['modificacao_caule_ref'] ?? null,
+        ':possui_espinhos_ref' => $_POST['possui_espinhos_ref'] ?? null,
+        ':possui_latex_ref' => $_POST['possui_latex_ref'] ?? null,
+        ':possui_seiva_ref' => $_POST['possui_seiva_ref'] ?? null,
+        ':possui_resina_ref' => $_POST['possui_resina_ref'] ?? null
     ]);
 
     // ===============================
@@ -186,7 +300,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // 4. REDIRECIONAR PARA PÁGINA DE SUCESSO
     // ===============================
     header("Location: sucesso_cadastro.php?id=$id_especie");
-// Já está correto se sucesso_cadastro.php está na MESMA pasta (Views/)
     exit;
 }
 
