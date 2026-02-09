@@ -32,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         INSERT INTO especies_caracteristicas (
             -- Dados principais
             especie_id,
+            nome_cientifico_completo,
+            nome_cientifico_completo_ref,
             nome_popular,
             familia,
             forma_folha,
@@ -113,6 +115,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ) VALUES (
             -- Dados principais
             :especie_id,
+            :nome_cientifico_completo,
+            :nome_cientifico_completo_ref,
             :nome_popular,
             :familia,
             :forma_folha,
@@ -198,8 +202,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Mapeamento dos campos do formulário para os parâmetros
     $stmt->execute([
-        // Dados principais (42)
+        // Dados principais (44 campos - 2 novos)
         ':especie_id' => $id_especie,
+        ':nome_cientifico_completo' => $_POST['nome_cientifico_completo'] ?? null,
+        ':nome_cientifico_completo_ref' => $_POST['nome_cientifico_completo_ref'] ?? null,
         ':nome_popular' => $_POST['nome_popular'] ?? null,
         ':familia' => $_POST['familia'] ?? null,
         ':forma_folha' => $_POST['forma_folha'] ?? null,
@@ -240,7 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':possui_resina' => $_POST['possui_resina'] ?? null,
         ':referencias' => $_POST['referencias'] ?? null,
         
-        // Referências (35) - Correção dos nomes dos campos
+        // Referências (35)
         ':familia_ref' => $_POST['familia_ref'] ?? null,
         ':forma_folha_ref' => $_POST['forma_folha_ref'] ?? null,
         ':filotaxia_folha_ref' => $_POST['filotaxia_folha_ref'] ?? null,

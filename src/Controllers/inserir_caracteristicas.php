@@ -164,7 +164,27 @@ ob_end_clean();
       <?php endif; ?>
     </div>
   </div>
-    
+
+  <!-- Campo para nome científico completo -->
+  <div class="input-group">
+    <div class="main-input">
+      <label for="nome_cientifico_completo">Nome Científico Completo</label>
+      <input 
+        type="text" 
+        id="nome_cientifico_completo" 
+        name="nome_cientifico_completo" 
+        placeholder="Ex: Acca sellowiana (O. Berg) Burret">
+    </div>
+    <div class="ref-input">
+      <label for="nome_cientifico_completo_ref">Referência</label>
+      <input 
+        type="text" 
+        id="nome_cientifico_completo_ref" 
+        name="nome_cientifico_completo_ref" 
+        placeholder="Ref. nome científico">
+    </div>
+  </div>
+  
 <!-- Nome Popular -->
 <div class="input-group">
   <div class="main-input">
