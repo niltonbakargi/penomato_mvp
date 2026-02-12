@@ -1,0 +1,4435 @@
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 1,
+    "ano_referencia": 2026,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 20
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6248.50,
+    "cargo_comissionado": 0.00,
+    "símbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "01/2026",
+        "valor": 6248.50
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "01/2026",
+        "valor": 937.28
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "01/2026",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "01/2026",
+        "valor": 768.84,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "01/2026",
+        "valor": 143.72,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "01/2026",
+        "valor": 301.80,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "01/2026",
+        "valor": 109.12,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "01/2026",
+        "valor": 107.79,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "01/2026",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "01/2026",
+        "valor": 1006.01,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "01/2026",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "01/2026",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "01/2026",
+        "valor": 287.43,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7665.64,
+    "descontos": 3111.71,
+    "liquido": 4553.93
+  },
+  "consignados": {
+    "total_consignados": 387.00,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 806.14,
+    "detalhes": {
+      "contribuicao": 301.80,
+      "assistencia": 109.12,
+      "dependentes": 107.79,
+      "conjuge": 287.43
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 1006.01
+  }
+}
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 12,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "símbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "12/2025",
+        "valor": 6125.99
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "12/2025",
+        "valor": 918.90
+      },
+      {
+        "codigo": 22,
+        "descricao": "ABONO DE FERIAS",
+        "mes_ano_direito": "12/2025",
+        "valor": 2348.30
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "12/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "12/2025",
+        "valor": 757.39,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "12/2025",
+        "valor": 140.90,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "12/2025",
+        "valor": 295.89,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "12/2025",
+        "valor": 195.78,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "12/2025",
+        "valor": 105.67,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "12/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "12/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "12/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "12/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "12/2025",
+        "valor": 281.80,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 9873.05,
+    "descontos": 3150.71,
+    "liquido": 6722.34
+  },
+  "consignados": {
+    "total_consignados": 387.00,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 879.14,
+    "detalhes": {
+      "contribuicao": 295.89,
+      "assistencia": 195.78,
+      "dependentes": 105.67,
+      "conjuge": 281.80
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 986.28
+  },
+  "verbas_eventuais": {
+    "abono_ferias": 2348.30,
+    "descricao": "ABONO DE FERIAS"
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 12,
+    "ano_referencia": 2025,
+    "codigo_folha": 371,
+    "tipo_folha": "13º Salário",
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 1327,
+        "descricao": "13 SALARIO",
+        "mes_ano_direito": "12/2025",
+        "valor": 7044.89,
+        "categoria": "DecimoTerceiro"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 1350,
+        "descricao": "IMPOSTO DE RENDA _13 SALARIO",
+        "mes_ano_direito": "12/2025",
+        "valor": 757.39,
+        "categoria": "Tributo",
+        "incidencia": "13º Salario"
+      },
+      {
+        "codigo": 1378,
+        "descricao": "IMPCG_13 SALARIO",
+        "mes_ano_direito": "12/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia",
+        "incidencia": "13º Salario"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7044.89,
+    "descontos": 1743.67,
+    "liquido": 5301.22
+  },
+  "decimo_terceiro": {
+    "valor_bruto": 7044.89,
+    "desconto_irrf": 757.39,
+    "desconto_previdenciario": 986.28,
+    "total_descontos": 1743.67,
+    "valor_liquido": 5301.22,
+    "base_calculo": 6125.99,
+    "proporcional": null
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao_13": 986.28
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 11,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "11/2025",
+        "valor": 6125.99
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "11/2025",
+        "valor": 918.90
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "11/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "11/2025",
+        "valor": 757.39,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "11/2025",
+        "valor": 140.90,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "11/2025",
+        "valor": 295.89,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "11/2025",
+        "valor": 328.38,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "11/2025",
+        "valor": 105.67,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "11/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "11/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "11/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "11/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "11/2025",
+        "valor": 281.80,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7524.75,
+    "descontos": 3283.31,
+    "liquido": 4241.44
+  },
+  "consignados": {
+    "total_consignados": 387.00,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 1011.74,
+    "detalhes": {
+      "contribuicao": 295.89,
+      "assistencia": 328.38,
+      "dependentes": 105.67,
+      "conjuge": 281.80
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 986.28
+  },
+  "analise_comparativa": {
+    "mes_anterior": "10/2025",
+    "variacao_rendimentos": null,
+    "variacao_descontos": null,
+    "variacao_liquido": null
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 10,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "10/2025",
+        "valor": 6125.99
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "10/2025",
+        "valor": 918.90
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "10/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "10/2025",
+        "valor": 757.39,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "10/2025",
+        "valor": 140.90,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "10/2025",
+        "valor": 295.89,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "10/2025",
+        "valor": 767.37,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "10/2025",
+        "valor": 105.67,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "10/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "10/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "10/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "10/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "10/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "10/2025",
+        "valor": 281.80,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7524.75,
+    "descontos": 3897.50,
+    "liquido": 3627.25
+  },
+  "consignados": {
+    "total_consignados": 562.20,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 1450.73,
+    "detalhes": {
+      "contribuicao": 295.89,
+      "assistencia": 767.37,
+      "dependentes": 105.67,
+      "conjuge": 281.80
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 986.28
+  },
+  "analise_comparativa": {
+    "mes_anterior": "09/2025",
+    "variacao_rendimentos": null,
+    "variacao_descontos": null,
+    "variacao_liquido": null
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 9,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "09/2025",
+        "valor": 6125.99
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "09/2025",
+        "valor": 918.90
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "09/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "09/2025",
+        "valor": 757.39,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "09/2025",
+        "valor": 140.90,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "09/2025",
+        "valor": 295.89,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "09/2025",
+        "valor": 1225.20,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "09/2025",
+        "valor": 105.67,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "09/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "09/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "09/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "09/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "09/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "09/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "09/2025",
+        "valor": 281.80,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7524.75,
+    "descontos": 4438.76,
+    "liquido": 3085.99
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 1908.56,
+    "detalhes": {
+      "contribuicao": 295.89,
+      "assistencia": 1225.20,
+      "dependentes": 105.67,
+      "conjuge": 281.80
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 986.28
+  },
+  "analise_comparativa": {
+    "mes_anterior": "08/2025",
+    "variacao_rendimentos": null,
+    "variacao_descontos": null,
+    "variacao_liquido": null
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 58.99,
+    "consignados_percentual": 8.58,
+    "plano_saude_percentual": 25.37,
+    "previdencia_percentual": 13.11,
+    "imposto_renda_percentual": 10.07
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 8,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "08/2025",
+        "valor": 6125.99
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "08/2025",
+        "valor": 918.90
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "08/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "08/2025",
+        "valor": 757.39,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "08/2025",
+        "valor": 140.90,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "08/2025",
+        "valor": 295.89,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "08/2025",
+        "valor": 313.29,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "08/2025",
+        "valor": 105.67,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "08/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "08/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "08/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "08/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "08/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "08/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "08/2025",
+        "valor": 281.80,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7524.75,
+    "descontos": 3526.85,
+    "liquido": 3997.90
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 996.65,
+    "detalhes": {
+      "contribuicao": 295.89,
+      "assistencia": 313.29,
+      "dependentes": 105.67,
+      "conjuge": 281.80
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 986.28
+  },
+  "analise_comparativa": {
+    "mes_anterior": "07/2025",
+    "variacao_rendimentos": 0.00,
+    "variacao_descontos": null,
+    "variacao_liquido": null
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 46.87,
+    "consignados_percentual": 8.58,
+    "plano_saude_percentual": 13.25,
+    "previdencia_percentual": 13.11,
+    "imposto_renda_percentual": 10.07
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 7,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "07/2025",
+        "valor": 6125.99
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "07/2025",
+        "valor": 918.90
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "07/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "07/2025",
+        "valor": 757.39,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "07/2025",
+        "valor": 140.90,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "07/2025",
+        "valor": 295.89,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "07/2025",
+        "valor": 10.00,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "07/2025",
+        "valor": 105.67,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "07/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "07/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "07/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "07/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "07/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "07/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "07/2025",
+        "valor": 281.80,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7524.75,
+    "descontos": 3223.56,
+    "liquido": 4301.19
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 693.36,
+    "detalhes": {
+      "contribuicao": 295.89,
+      "assistencia": 10.00,
+      "dependentes": 105.67,
+      "conjuge": 281.80
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 986.28
+  },
+  "analise_comparativa": {
+    "mes_anterior": "06/2025",
+    "variacao_rendimentos": 0.00,
+    "variacao_descontos": null,
+    "variacao_liquido": null
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 42.84,
+    "consignados_percentual": 8.58,
+    "plano_saude_percentual": 9.21,
+    "previdencia_percentual": 13.11,
+    "imposto_renda_percentual": 10.07
+  },
+  "anomalias": {
+    "assistencia_saude_atipica": true,
+    "valor_assistencia": 10.00,
+    "media_meses_anteriores": null
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 6,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "06/2025",
+        "valor": 6125.99
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "06/2025",
+        "valor": 918.90
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "06/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "06/2025",
+        "valor": 757.39,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "06/2025",
+        "valor": 140.90,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "06/2025",
+        "valor": 295.89,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "06/2025",
+        "valor": 59.13,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "06/2025",
+        "valor": 105.67,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "06/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "06/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "06/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "06/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "06/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "06/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "06/2025",
+        "valor": 281.80,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7524.75,
+    "descontos": 3272.69,
+    "liquido": 4252.06
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 742.49,
+    "detalhes": {
+      "contribuicao": 295.89,
+      "assistencia": 59.13,
+      "dependentes": 105.67,
+      "conjuge": 281.80
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 986.28
+  },
+  "analise_comparativa": {
+    "mes_anterior": "05/2025",
+    "variacao_rendimentos": 0.00,
+    "variacao_descontos": null,
+    "variacao_liquido": null
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 43.50,
+    "consignados_percentual": 8.58,
+    "plano_saude_percentual": 9.87,
+    "previdencia_percentual": 13.11,
+    "imposto_renda_percentual": 10.07
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 5,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 6125.99,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "05/2025",
+        "valor": 6125.99,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "05/2025",
+        "valor": 918.90,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "05/2025",
+        "valor": 479.86,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "05/2025",
+        "valor": 757.39,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "05/2025",
+        "valor": 140.90,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "05/2025",
+        "valor": 295.89,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "05/2025",
+        "valor": 94.68,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "05/2025",
+        "valor": 105.67,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "05/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "05/2025",
+        "valor": 986.28,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "05/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "05/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "05/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "05/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "05/2025",
+        "valor": 281.80,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7524.75,
+    "descontos": 3308.24,
+    "liquido": 4216.51
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 777.04,
+    "detalhes": {
+      "contribuicao": 295.89,
+      "assistencia": 94.68,
+      "dependentes": 105.67,
+      "conjuge": 281.80
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 986.28
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 43.97,
+    "consignados_percentual": 8.58,
+    "plano_saude_percentual": 10.33,
+    "previdencia_percentual": 13.11,
+    "imposto_renda_percentual": 10.07
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 4,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true,
+    "duplicidade": true,
+    "observacao": "Documento duplicado do mês 04/2025"
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5764.56,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "04/2025",
+        "valor": 5764.56
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "04/2025",
+        "valor": 864.68
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "04/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "04/2025",
+        "valor": 671.82,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "04/2025",
+        "valor": 132.58,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "04/2025",
+        "valor": 278.43,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "04/2025",
+        "valor": 99.44,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "04/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "04/2025",
+        "valor": 928.09,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "04/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "04/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "04/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "04/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "04/2025",
+        "valor": 265.17,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7109.10,
+    "descontos": 3021.16,
+    "liquido": 4087.94
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 643.04,
+    "detalhes": {
+      "contribuicao": 278.43,
+      "assistencia": 0.00,
+      "dependentes": 99.44,
+      "conjuge": 265.17
+    },
+    "observacao": "Rubrica 293 (SERVIMED/ASSISTENCIA) não registrada neste mês"
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 928.09
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 42.50,
+    "consignados_percentual": 9.08,
+    "plano_saude_percentual": 9.05,
+    "previdencia_percentual": 13.06,
+    "imposto_renda_percentual": 9.45
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 3,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5764.56,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "03/2025",
+        "valor": 5764.56,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "03/2025",
+        "valor": 864.68,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "03/2025",
+        "valor": 479.86,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "03/2025",
+        "valor": 671.82,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "03/2025",
+        "valor": 132.58,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "03/2025",
+        "valor": 278.43,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "03/2025",
+        "valor": 137.97,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "03/2025",
+        "valor": 99.44,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "03/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "03/2025",
+        "valor": 928.09,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "03/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "03/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "03/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "03/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "03/2025",
+        "valor": 265.17,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7109.10,
+    "descontos": 3159.13,
+    "liquido": 3949.97
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 781.01,
+    "detalhes": {
+      "contribuicao": 278.43,
+      "assistencia": 137.97,
+      "dependentes": 99.44,
+      "conjuge": 265.17
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 928.09
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 44.44,
+    "consignados_percentual": 9.08,
+    "plano_saude_percentual": 10.99,
+    "previdencia_percentual": 13.06,
+    "imposto_renda_percentual": 9.45
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 2,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true,
+    "duplicidade": true,
+    "observacao": "Documento duplicado do mês 02/2025"
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5764.56,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "02/2025",
+        "valor": 5764.56
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "02/2025",
+        "valor": 864.68
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "02/2025",
+        "valor": 479.86
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "02/2025",
+        "valor": 671.82,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "02/2025",
+        "valor": 132.58,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "02/2025",
+        "valor": 278.43,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "02/2025",
+        "valor": 295.95,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "02/2025",
+        "valor": 99.44,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "02/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "02/2025",
+        "valor": 928.09,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "02/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "02/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "02/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "02/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "02/2025",
+        "valor": 265.17,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 7109.10,
+    "descontos": 3317.11,
+    "liquido": 3791.99
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 938.99,
+    "detalhes": {
+      "contribuicao": 278.43,
+      "assistencia": 295.95,
+      "dependentes": 99.44,
+      "conjuge": 265.17
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 928.09
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 46.66,
+    "consignados_percentual": 9.08,
+    "plano_saude_percentual": 13.21,
+    "previdencia_percentual": 13.06,
+    "imposto_renda_percentual": 9.45
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 1,
+    "ano_referencia": 2025,
+    "codigo_folha": 71,
+    "documento_valido": true,
+    "tipo_folha": "Complementar",
+    "observacao": "Folha com pagamentos retroativos de 12/2024"
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 19
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5764.56,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "01/2025",
+        "valor": 5764.56,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "12/2024",
+        "valor": 60.41,
+        "categoria": "Retroativo",
+        "observacao": "Diferença de exercício anterior"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "01/2025",
+        "valor": 864.68,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "12/2024",
+        "valor": 579.47,
+        "categoria": "Retroativo"
+      },
+      {
+        "codigo": 22,
+        "descricao": "ABONO DE FERIAS",
+        "mes_ano_direito": "12/2024",
+        "valor": 213.30,
+        "categoria": "Retroativo"
+      },
+      {
+        "codigo": 27,
+        "descricao": "13 SALARIO",
+        "mes_ano_direito": "12/2024",
+        "valor": 639.88,
+        "categoria": "Retroativo"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "01/2025",
+        "valor": 479.86,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "01/2025",
+        "valor": 823.15,
+        "categoria": "Tributo",
+        "incidencia": "Mensal + Retroativo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "01/2025",
+        "valor": 132.58,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "12/2024",
+        "valor": 12.79,
+        "categoria": "Associacao",
+        "observacao": "Retroativo"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "01/2025",
+        "valor": 278.43,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "12/2024",
+        "valor": 26.88,
+        "categoria": "Saude",
+        "observacao": "Retroativo"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "01/2025",
+        "valor": 44.91,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "01/2025",
+        "valor": 99.44,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "12/2024",
+        "valor": 9.60,
+        "categoria": "Saude",
+        "observacao": "Retroativo"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "01/2025",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "01/2025",
+        "valor": 928.09,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "12/2024",
+        "valor": 89.58,
+        "categoria": "Previdencia",
+        "observacao": "Retroativo"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "01/2025",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "01/2025",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "01/2025",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "01/2025",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "01/2025",
+        "valor": 265.17,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "12/2024",
+        "valor": 25.60,
+        "categoria": "Saude",
+        "observacao": "Retroativo"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 8602.16,
+    "descontos": 3381.85,
+    "liquido": 5220.31
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 750.03,
+    "detalhes": {
+      "contribuicao": 305.31,
+      "assistencia": 44.91,
+      "dependentes": 109.04,
+      "conjuge": 290.77
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao_ordinaria": 928.09,
+    "contribuicao_retroativa": 89.58,
+    "contribuicao_total": 1017.67
+  },
+  "retroativos": {
+    "mes_competencia": "12/2024",
+    "total_vantagens_retroativas": 1493.06,
+    "total_descontos_retroativos": 164.45,
+    "total_liquido_retroativo": 1328.61,
+    "detalhes_vantagens": {
+      "vencimento_base": 60.41,
+      "adicional_tempo_servico": 579.47,
+      "abono_ferias": 213.30,
+      "decimo_terceiro": 639.88
+    },
+    "detalhes_descontos": {
+      "associacao_acp": 12.79,
+      "servimed_contribuicao": 26.88,
+      "servimed_dependentes": 9.60,
+      "prev_camp": 89.58,
+      "servimed_conjuge": 25.60
+    }
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 39.32,
+    "consignados_percentual": 7.51,
+    "plano_saude_percentual": 8.72,
+    "previdencia_percentual": 11.83,
+    "imposto_renda_percentual": 9.57
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 12,
+    "ano_referencia": 2024,
+    "codigo_folha": 71,
+    "documento_valido": true,
+    "tipo_folha": "Complementar",
+    "observacao": "Folha com pagamentos retroativos de 11/2024"
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5704.15,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "12/2024",
+        "valor": 5704.15,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "11/2024",
+        "valor": 511.23,
+        "categoria": "Retroativo"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "12/2024",
+        "valor": 285.21,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "11/2024",
+        "valor": 25.56,
+        "categoria": "Retroativo"
+      },
+      {
+        "codigo": 22,
+        "descricao": "ABONO DE FERIAS",
+        "mes_ano_direito": "12/2024",
+        "valor": 1996.45,
+        "categoria": "Eventual"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "12/2024",
+        "valor": 479.86,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "11/2024",
+        "valor": 43.62,
+        "categoria": "Retroativo"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "12/2024",
+        "valor": 647.43,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "12/2024",
+        "valor": 119.79,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "11/2024",
+        "valor": 10.74,
+        "categoria": "Associacao",
+        "observacao": "Retroativo"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "12/2024",
+        "valor": 251.55,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "11/2024",
+        "valor": 22.54,
+        "categoria": "Saude",
+        "observacao": "Retroativo"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "12/2024",
+        "valor": 11.68,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "12/2024",
+        "valor": 89.84,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "11/2024",
+        "valor": 8.05,
+        "categoria": "Saude",
+        "observacao": "Retroativo"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "12/2024",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "12/2024",
+        "valor": 838.51,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "11/2024",
+        "valor": 75.15,
+        "categoria": "Previdencia",
+        "observacao": "Retroativo"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "12/2024",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "12/2024",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "12/2024",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "12/2024",
+        "valor": 83.43,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "12/2024",
+        "valor": 239.57,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "11/2024",
+        "valor": 21.47,
+        "categoria": "Saude",
+        "observacao": "Retroativo"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 9046.08,
+    "descontos": 2981.95,
+    "liquido": 6064.13
+  },
+  "consignados": {
+    "total_consignados": 645.63,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 83.43
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 644.70,
+    "detalhes": {
+      "contribuicao": 274.09,
+      "assistencia": 11.68,
+      "dependentes": 97.89,
+      "conjuge": 261.04
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao_ordinaria": 838.51,
+    "contribuicao_retroativa": 75.15,
+    "contribuicao_total": 913.66
+  },
+  "retroativos": {
+    "mes_competencia": "11/2024",
+    "total_vantagens_retroativas": 580.41,
+    "total_descontos_retroativos": 137.95,
+    "total_liquido_retroativo": 442.46,
+    "detalhes_vantagens": {
+      "vencimento_base": 511.23,
+      "adicional_tempo_servico": 25.56,
+      "verba_inden_magisterio": 43.62
+    },
+    "detalhes_descontos": {
+      "associacao_acp": 10.74,
+      "servimed_contribuicao": 22.54,
+      "servimed_dependentes": 8.05,
+      "prev_camp": 75.15,
+      "servimed_conjuge": 21.47
+    }
+  },
+  "verbas_eventuais": {
+    "abono_ferias": 1996.45
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 32.96,
+    "consignados_percentual": 7.14,
+    "plano_saude_percentual": 7.13,
+    "previdencia_percentual": 10.10,
+    "imposto_renda_percentual": 7.16
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 12,
+    "ano_referencia": 2024,
+    "codigo_folha": 371,
+    "tipo_folha": "13º Salário",
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH3",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5764.56,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 27,
+        "descricao": "13 SALARIO",
+        "mes_ano_direito": "12/2024",
+        "valor": 5989.36,
+        "categoria": "DecimoTerceiro"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 50,
+        "descricao": "IMPOSTO DE RENDA 13 SALARIO",
+        "mes_ano_direito": "12/2024",
+        "valor": 520.48,
+        "categoria": "Tributo",
+        "incidencia": "13º Salario"
+      },
+      {
+        "codigo": 478,
+        "descricao": "PREVI CAMP IMPCG 13 SALARIO",
+        "mes_ano_direito": "12/2024",
+        "valor": 838.51,
+        "categoria": "Previdencia",
+        "incidencia": "13º Salario"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 5989.36,
+    "descontos": 1358.99,
+    "liquido": 4630.37
+  },
+  "decimo_terceiro": {
+    "valor_bruto": 5989.36,
+    "desconto_irrf": 520.48,
+    "desconto_previdenciario": 838.51,
+    "total_descontos": 1358.99,
+    "valor_liquido": 4630.37,
+    "base_calculo": 5764.56,
+    "proporcional": null
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao_13": 838.51
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 22.69,
+    "previdencia_percentual": 14.00,
+    "imposto_renda_percentual": 8.69
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 11,
+    "ano_referencia": 2024,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH2",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5112.36,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "11/2024",
+        "valor": 5112.36,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "11/2024",
+        "valor": 255.62,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "11/2024",
+        "valor": 436.24,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "11/2024",
+        "valor": 375.93,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "11/2024",
+        "valor": 107.36,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "11/2024",
+        "valor": 225.46,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "11/2024",
+        "valor": 125.32,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "11/2024",
+        "valor": 80.52,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "11/2024",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "11/2024",
+        "valor": 751.52,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "11/2024",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "11/2024",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "11/2024",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "11/2024",
+        "valor": 1006.25,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "11/2024",
+        "valor": 214.72,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 5804.22,
+    "descontos": 3449.28,
+    "liquido": 2354.94
+  },
+  "consignados": {
+    "total_consignados": 1568.45,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 1006.25
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 646.02,
+    "detalhes": {
+      "contribuicao": 225.46,
+      "assistencia": 125.32,
+      "dependentes": 80.52,
+      "conjuge": 214.72
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 751.52
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 59.43,
+    "consignados_percentual": 27.03,
+    "plano_saude_percentual": 11.13,
+    "previdencia_percentual": 12.95,
+    "imposto_renda_percentual": 6.48
+  },
+  "evolucao_funcional": {
+    "classe_anterior": "PH2",
+    "classe_atual": "PH2",
+    "proxima_classe": "PH3",
+    "observacao": "Promoção para PH3 ocorreu entre 11/2024 e 12/2024"
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 10,
+    "ano_referencia": 2024,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH2",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5112.36,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "10/2024",
+        "valor": 5112.36,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "10/2024",
+        "valor": 255.62,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "10/2024",
+        "valor": 436.24,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "10/2024",
+        "valor": 375.93,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "10/2024",
+        "valor": 107.36,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "10/2024",
+        "valor": 225.46,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "10/2024",
+        "valor": 107.92,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "10/2024",
+        "valor": 80.52,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "10/2024",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "10/2024",
+        "valor": 751.52,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "10/2024",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "10/2024",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "10/2024",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "10/2024",
+        "valor": 1006.25,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "10/2024",
+        "valor": 214.72,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 5804.22,
+    "descontos": 3431.88,
+    "liquido": 2372.34
+  },
+  "consignados": {
+    "total_consignados": 1568.45,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 1006.25
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 628.62,
+    "detalhes": {
+      "contribuicao": 225.46,
+      "assistencia": 107.92,
+      "dependentes": 80.52,
+      "conjuge": 214.72
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 751.52
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 59.13,
+    "consignados_percentual": 27.03,
+    "plano_saude_percentual": 10.83,
+    "previdencia_percentual": 12.95,
+    "imposto_renda_percentual": 6.48
+  },
+  "analise_comparativa": {
+    "mes_anterior": "09/2024",
+    "variacao_rendimentos": 0.00,
+    "variacao_descontos": 1.64,
+    "variacao_liquido": 17.40,
+    "observacao": "Pequena redução no desconto do plano de saúde em relação ao mês anterior"
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 9,
+    "ano_referencia": 2024,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH2",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5112.36,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "09/2024",
+        "valor": 5112.36,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "09/2024",
+        "valor": 255.62,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "09/2024",
+        "valor": 436.24,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "09/2024",
+        "valor": 375.93,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "09/2024",
+        "valor": 107.36,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "09/2024",
+        "valor": 225.46,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "09/2024",
+        "valor": 30.00,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "09/2024",
+        "valor": 80.52,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "09/2024",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "09/2024",
+        "valor": 751.52,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "09/2024",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "09/2024",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "09/2024",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "09/2024",
+        "valor": 1006.25,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "09/2024",
+        "valor": 214.72,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 5804.22,
+    "descontos": 3353.96,
+    "liquido": 2450.26
+  },
+  "consignados": {
+    "total_consignados": 1568.45,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 1006.25
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 550.70,
+    "detalhes": {
+      "contribuicao": 225.46,
+      "assistencia": 30.00,
+      "dependentes": 80.52,
+      "conjuge": 214.72
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 751.52
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 57.79,
+    "consignados_percentual": 27.03,
+    "plano_saude_percentual": 9.49,
+    "previdencia_percentual": 12.95,
+    "imposto_renda_percentual": 6.48
+  },
+  "anomalias": {
+    "assistencia_saude_atipica": true,
+    "valor_assistencia": 30.00,
+    "media_meses_anteriores": 116.62,
+    "diferenca_percentual": -74.28,
+    "observacao": "Valor de assistência médica muito abaixo da média histórica"
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 9,
+    "ano_referencia": 2024,
+    "codigo_folha": 71,
+    "documento_valido": true,
+    "duplicidade": true,
+    "observacao": "Documento duplicado do mês 09/2024"
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH2",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5112.36,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "09/2024",
+        "valor": 5112.36,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "09/2024",
+        "valor": 255.62,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "09/2024",
+        "valor": 436.24,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "09/2024",
+        "valor": 375.93,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "09/2024",
+        "valor": 107.36,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "09/2024",
+        "valor": 225.46,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "09/2024",
+        "valor": 30.00,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "09/2024",
+        "valor": 80.52,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "09/2024",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "09/2024",
+        "valor": 751.52,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "09/2024",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "09/2024",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "09/2024",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "09/2024",
+        "valor": 1006.25,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "09/2024",
+        "valor": 214.72,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 5804.22,
+    "descontos": 3353.96,
+    "liquido": 2450.26
+  },
+  "consignados": {
+    "total_consignados": 1568.45,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 1006.25
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 550.70,
+    "detalhes": {
+      "contribuicao": 225.46,
+      "assistencia": 30.00,
+      "dependentes": 80.52,
+      "conjuge": 214.72
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 751.52
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 57.79,
+    "consignados_percentual": 27.03,
+    "plano_saude_percentual": 9.49,
+    "previdencia_percentual": 12.95,
+    "imposto_renda_percentual": 6.48
+  },
+  "anomalias": {
+    "assistencia_saude_atipica": true,
+    "valor_assistencia": 30.00,
+    "media_meses_anteriores": 116.62,
+    "diferenca_percentual": -74.28,
+    "observacao": "Valor de assistência médica muito abaixo da média histórica"
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 8,
+    "ano_referencia": 2024,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH2",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5057.44,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "08/2024",
+        "valor": 5057.44,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "08/2024",
+        "valor": 252.87,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "08/2024",
+        "valor": 436.24,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "08/2024",
+        "valor": 364.78,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "08/2024",
+        "valor": 106.21,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "08/2024",
+        "valor": 223.03,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "08/2024",
+        "valor": 51.03,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "08/2024",
+        "valor": 79.65,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "08/2024",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "08/2024",
+        "valor": 743.44,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "08/2024",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "08/2024",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "08/2024",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "08/2024",
+        "valor": 1006.25,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "08/2024",
+        "valor": 212.41,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 5746.55,
+    "descontos": 3349.00,
+    "liquido": 2397.55
+  },
+  "consignados": {
+    "total_consignados": 1568.45,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 1006.25
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 566.12,
+    "detalhes": {
+      "contribuicao": 223.03,
+      "assistencia": 51.03,
+      "dependentes": 79.65,
+      "conjuge": 212.41
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 743.44
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 58.28,
+    "consignados_percentual": 27.29,
+    "plano_saude_percentual": 9.85,
+    "previdencia_percentual": 12.94,
+    "imposto_renda_percentual": 6.35
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 7,
+    "ano_referencia": 2024,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH2",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5057.44,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "07/2024",
+        "valor": 5057.44,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "07/2024",
+        "valor": 252.87,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "07/2024",
+        "valor": 436.24,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "07/2024",
+        "valor": 364.78,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "07/2024",
+        "valor": 106.21,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "07/2024",
+        "valor": 223.03,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "07/2024",
+        "valor": 60.00,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "07/2024",
+        "valor": 79.65,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "07/2024",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "07/2024",
+        "valor": 743.44,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "07/2024",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "07/2024",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "07/2024",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "07/2024",
+        "valor": 1006.25,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "07/2024",
+        "valor": 212.41,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 5746.55,
+    "descontos": 3357.97,
+    "liquido": 2388.58
+  },
+  "consignados": {
+    "total_consignados": 1568.45,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 1006.25
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 575.09,
+    "detalhes": {
+      "contribuicao": 223.03,
+      "assistencia": 60.00,
+      "dependentes": 79.65,
+      "conjuge": 212.41
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 743.44
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 58.44,
+    "consignados_percentual": 27.29,
+    "plano_saude_percentual": 10.01,
+    "previdencia_percentual": 12.94,
+    "imposto_renda_percentual": 6.35
+  }
+}
+
+{
+  "metadados": {
+    "municipio": "Campo Grande",
+    "uf": "MS",
+    "orgao": "Prefeitura Municipal de Campo Grande",
+    "secretaria": "SECRETARIA MUNICIPAL DE EDUCACAO",
+    "unidade_lotacao": "CEDENCIA EXTERNA PARA OUTROS ORGAOS / SEMED",
+    "cnpj": "03.501.509/0001-06",
+    "mes_referencia": 6,
+    "ano_referencia": 2024,
+    "codigo_folha": 71,
+    "documento_valido": true
+  },
+  "servidor": {
+    "nome": "NILTON DOBES BAKARGI",
+    "cadastro": "372613/10",
+    "cargo": "PROFESSOR",
+    "classe": "PH2",
+    "nivel": "D",
+    "data_admissao": "2006-02-03",
+    "tempo_servico_anos": 18
+  },
+  "dados_bancarios": {
+    "banco_codigo": 237,
+    "banco_nome": "Santander",
+    "agencia": "6340",
+    "conta": "529303"
+  },
+  "vencimento_base": {
+    "cargo_efetivo": 5057.44,
+    "cargo_comissionado": 0.00,
+    "simbolo_comissionado": null
+  },
+  "rubricas": {
+    "vantagens": [
+      {
+        "codigo": 4,
+        "descricao": "VENCIMENTO BASE DO CARGO",
+        "mes_ano_direito": "06/2024",
+        "valor": 5057.44,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 19,
+        "descricao": "ADICIONAL TEMPO SERVICO",
+        "mes_ano_direito": "06/2024",
+        "valor": 252.87,
+        "categoria": "Ordinario"
+      },
+      {
+        "codigo": 1058,
+        "descricao": "VERBA INDEN MAGISTERIO",
+        "mes_ano_direito": "06/2024",
+        "valor": 436.24,
+        "categoria": "Ordinario"
+      }
+    ],
+    "descontos": [
+      {
+        "codigo": 46,
+        "descricao": "IMPOSTO DE RENDA",
+        "mes_ano_direito": "06/2024",
+        "valor": 364.78,
+        "categoria": "Tributo"
+      },
+      {
+        "codigo": 71,
+        "descricao": "ASSOCIACAO ACP",
+        "mes_ano_direito": "06/2024",
+        "valor": 106.21,
+        "categoria": "Associacao"
+      },
+      {
+        "codigo": 292,
+        "descricao": "SERVIMED/CONTRIBUICAO",
+        "mes_ano_direito": "06/2024",
+        "valor": 223.03,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 293,
+        "descricao": "SERVIMED/ASSISTENCIA",
+        "mes_ano_direito": "06/2024",
+        "valor": 45.00,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 296,
+        "descricao": "SERVIMED/DEPENDENTES",
+        "mes_ano_direito": "06/2024",
+        "valor": 79.65,
+        "categoria": "Saude"
+      },
+      {
+        "codigo": 346,
+        "descricao": "BANCO SANTANDER BRASIL S/A",
+        "mes_ano_direito": "06/2024",
+        "valor": 69.29,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 379,
+        "descricao": "PREVI-CAMP/IMPCG",
+        "mes_ano_direito": "06/2024",
+        "valor": 743.44,
+        "categoria": "Previdencia"
+      },
+      {
+        "codigo": 443,
+        "descricao": "BRADESCO FINANC",
+        "mes_ano_direito": "06/2024",
+        "valor": 175.20,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 465,
+        "descricao": "BANCO DAYCOVAL S/A",
+        "mes_ano_direito": "06/2024",
+        "valor": 155.90,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 509,
+        "descricao": "BMG CARD",
+        "mes_ano_direito": "06/2024",
+        "valor": 161.81,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 597,
+        "descricao": "BANCO BRADESCO",
+        "mes_ano_direito": "06/2024",
+        "valor": 1006.25,
+        "categoria": "Consignado"
+      },
+      {
+        "codigo": 666,
+        "descricao": "SERVIMED/CONJUGE/COMPANH",
+        "mes_ano_direito": "06/2024",
+        "valor": 212.41,
+        "categoria": "Saude"
+      }
+    ]
+  },
+  "totais": {
+    "rendimentos": 5746.55,
+    "descontos": 3342.97,
+    "liquido": 2403.58
+  },
+  "consignados": {
+    "total_consignados": 1568.45,
+    "instituicoes": [
+      {
+        "nome": "Banco Santander",
+        "valor": 69.29
+      },
+      {
+        "nome": "Bradesco Financ",
+        "valor": 175.20
+      },
+      {
+        "nome": "Banco Daycoval",
+        "valor": 155.90
+      },
+      {
+        "nome": "BMG Card",
+        "valor": 161.81
+      },
+      {
+        "nome": "Banco Bradesco",
+        "valor": 1006.25
+      }
+    ]
+  },
+  "plano_saude": {
+    "operadora": "SERVIMED",
+    "total_contribuicao": 560.09,
+    "detalhes": {
+      "contribuicao": 223.03,
+      "assistencia": 45.00,
+      "dependentes": 79.65,
+      "conjuge": 212.41
+    }
+  },
+  "previdencia": {
+    "regime": "PREVI-CAMP/IMPCG",
+    "contribuicao": 743.44
+  },
+  "comprometimento_renda": {
+    "total_descontos_percentual": 58.18,
+    "consignados_percentual": 27.29,
+    "plano_saude_percentual": 9.75,
+    "previdencia_percentual": 12.94,
+    "imposto_renda_percentual": 6.35
+  }
+}
