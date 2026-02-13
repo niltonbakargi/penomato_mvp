@@ -1,6 +1,6 @@
 <?php
 // controlador_painel_revisor.php
-// Local: C:\xampp\htdocs\penomato_mvp\src\Controladores\controlador_painel_revisor.php
+// Local: C:\xampp\htdocs\penomato_mvp\src\Controllers\controlador_painel_revisor.php
 
 // Iniciar sessão
 session_start();
@@ -27,8 +27,8 @@ class ControladorPainelRevisor {
             exit;
         }
         
-        // Carregar a view
-        include __DIR__ . '/../Visualizacoes/revisao/entrada_revisor.php';
+        // Carregar a view (CORRIGIDO: Views no plural)
+        include __DIR__ . '/../Views/entrada_revisor.php';
     }
     
     /**
@@ -99,9 +99,12 @@ class ControladorPainelRevisor {
         $stmt->bind_param('ii', $usuario_id, $especie_id);
         
         if ($stmt->execute() && $stmt->affected_rows > 0) {
+            // REDIRECT CORRIGIDO: Views/revisao.php
+            $redirect_url = "../Views/revisao.php?id=$especie_id";
+            
             echo json_encode([
                 'sucesso' => true, 
-                'redirect' => "artigo_revisao.php?id=$especie_id"
+                'redirect' => $redirect_url
             ]);
         } else {
             echo json_encode(['erro' => 'Não foi possível iniciar a revisão']);
