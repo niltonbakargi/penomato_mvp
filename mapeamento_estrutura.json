@@ -1,0 +1,2264 @@
+{
+    "data_mapeamento": "2026-02-13 13:10:37",
+    "diretorio_raiz": "C:\\xampp\\htdocs\\penomato_mvp",
+    "estatisticas": {
+        "total_pastas": 109,
+        "total_arquivos": 152,
+        "total_tamanho": 870694,
+        "extensoes": {
+            "": 98,
+            "sample": 14,
+            "php": 14,
+            "json": 13,
+            "gitkeep": 3,
+            "sql": 3,
+            "md": 2,
+            "jpeg": 2,
+            "example": 1,
+            "gitignore": 1,
+            "htaccess": 1
+        },
+        "tipos_arquivo": {
+            "Outro": 118,
+            "Markdown": 2,
+            "JSON": 13,
+            "Código PHP": 14,
+            "SQL": 3,
+            "Imagem": 2
+        }
+    },
+    "estrutura": [
+        {
+            "tipo": "📄",
+            "nivel": 0,
+            "nome": ".env.example",
+            "caminho": ".env.example",
+            "extensao": "example",
+            "tamanho": "342 B",
+            "modificado": "09\/02\/2026 15:51"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": ".git",
+            "caminho": ".git",
+            "tamanho": "184.63 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "COMMIT_EDITMSG",
+            "caminho": ".git\\COMMIT_EDITMSG",
+            "extensao": "",
+            "tamanho": "5.67 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "FETCH_HEAD",
+            "caminho": ".git\\FETCH_HEAD",
+            "extensao": "",
+            "tamanho": "105 B",
+            "modificado": "13\/02\/2026 13:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "HEAD",
+            "caminho": ".git\\HEAD",
+            "extensao": "",
+            "tamanho": "21 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "ORIG_HEAD",
+            "caminho": ".git\\ORIG_HEAD",
+            "extensao": "",
+            "tamanho": "41 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "config",
+            "caminho": ".git\\config",
+            "extensao": "",
+            "tamanho": "365 B",
+            "modificado": "08\/02\/2026 17:46"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "description",
+            "caminho": ".git\\description",
+            "extensao": "",
+            "tamanho": "73 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "hooks",
+            "caminho": ".git\\hooks",
+            "tamanho": "25.22 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "applypatch-msg.sample",
+            "caminho": ".git\\hooks\\applypatch-msg.sample",
+            "extensao": "sample",
+            "tamanho": "478 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "commit-msg.sample",
+            "caminho": ".git\\hooks\\commit-msg.sample",
+            "extensao": "sample",
+            "tamanho": "896 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "fsmonitor-watchman.sample",
+            "caminho": ".git\\hooks\\fsmonitor-watchman.sample",
+            "extensao": "sample",
+            "tamanho": "4.62 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "post-update.sample",
+            "caminho": ".git\\hooks\\post-update.sample",
+            "extensao": "sample",
+            "tamanho": "189 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "pre-applypatch.sample",
+            "caminho": ".git\\hooks\\pre-applypatch.sample",
+            "extensao": "sample",
+            "tamanho": "424 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "pre-commit.sample",
+            "caminho": ".git\\hooks\\pre-commit.sample",
+            "extensao": "sample",
+            "tamanho": "1.61 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "pre-merge-commit.sample",
+            "caminho": ".git\\hooks\\pre-merge-commit.sample",
+            "extensao": "sample",
+            "tamanho": "416 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "pre-push.sample",
+            "caminho": ".git\\hooks\\pre-push.sample",
+            "extensao": "sample",
+            "tamanho": "1.34 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "pre-rebase.sample",
+            "caminho": ".git\\hooks\\pre-rebase.sample",
+            "extensao": "sample",
+            "tamanho": "4.78 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "pre-receive.sample",
+            "caminho": ".git\\hooks\\pre-receive.sample",
+            "extensao": "sample",
+            "tamanho": "544 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "prepare-commit-msg.sample",
+            "caminho": ".git\\hooks\\prepare-commit-msg.sample",
+            "extensao": "sample",
+            "tamanho": "1.46 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "push-to-checkout.sample",
+            "caminho": ".git\\hooks\\push-to-checkout.sample",
+            "extensao": "sample",
+            "tamanho": "2.72 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "sendemail-validate.sample",
+            "caminho": ".git\\hooks\\sendemail-validate.sample",
+            "extensao": "sample",
+            "tamanho": "2.25 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "update.sample",
+            "caminho": ".git\\hooks\\update.sample",
+            "extensao": "sample",
+            "tamanho": "3.56 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "index",
+            "caminho": ".git\\index",
+            "extensao": "",
+            "tamanho": "3.79 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "info",
+            "caminho": ".git\\info",
+            "tamanho": "240 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "exclude",
+            "caminho": ".git\\info\\exclude",
+            "extensao": "",
+            "tamanho": "240 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "logs",
+            "caminho": ".git\\logs",
+            "tamanho": "4.74 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "HEAD",
+            "caminho": ".git\\logs\\HEAD",
+            "extensao": "",
+            "tamanho": "2.18 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "refs",
+            "caminho": ".git\\logs\\refs",
+            "tamanho": "2.56 KB",
+            "modificado": "08\/02\/2026 17:46"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 3,
+            "nome": "heads",
+            "caminho": ".git\\logs\\refs\\heads",
+            "tamanho": "1.54 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 4,
+            "nome": "main",
+            "caminho": ".git\\logs\\refs\\heads\\main",
+            "extensao": "",
+            "tamanho": "1.54 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 3,
+            "nome": "remotes",
+            "caminho": ".git\\logs\\refs\\remotes",
+            "tamanho": "1.02 KB",
+            "modificado": "08\/02\/2026 17:46"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 4,
+            "nome": "origin",
+            "caminho": ".git\\logs\\refs\\remotes\\origin",
+            "tamanho": "1.02 KB",
+            "modificado": "08\/02\/2026 17:46"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 5,
+            "nome": "main",
+            "caminho": ".git\\logs\\refs\\remotes\\origin\\main",
+            "extensao": "",
+            "tamanho": "1.02 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "objects",
+            "caminho": ".git\\objects",
+            "tamanho": "144.3 KB",
+            "modificado": "13\/02\/2026 13:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "08",
+            "caminho": ".git\\objects\\08",
+            "tamanho": "1.23 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "60b202fc5bc5353d323473f755bc2f02033f82",
+            "caminho": ".git\\objects\\08\\60b202fc5bc5353d323473f755bc2f02033f82",
+            "extensao": "",
+            "tamanho": "149 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "f629add90a8e5d10a560e6a145cb9cb0038a03",
+            "caminho": ".git\\objects\\08\\f629add90a8e5d10a560e6a145cb9cb0038a03",
+            "extensao": "",
+            "tamanho": "1.08 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "0c",
+            "caminho": ".git\\objects\\0c",
+            "tamanho": "313 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "4a726d36bb6204eea355e571bcd564c77ff67e",
+            "caminho": ".git\\objects\\0c\\4a726d36bb6204eea355e571bcd564c77ff67e",
+            "extensao": "",
+            "tamanho": "313 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "0d",
+            "caminho": ".git\\objects\\0d",
+            "tamanho": "61 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "d8b5372073617c304a80bcda9cf487380a5016",
+            "caminho": ".git\\objects\\0d\\d8b5372073617c304a80bcda9cf487380a5016",
+            "extensao": "",
+            "tamanho": "61 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "10",
+            "caminho": ".git\\objects\\10",
+            "tamanho": "1.61 KB",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "22ddf8be1433ba91f39e47025ad00b8fdc11a0",
+            "caminho": ".git\\objects\\10\\22ddf8be1433ba91f39e47025ad00b8fdc11a0",
+            "extensao": "",
+            "tamanho": "1.61 KB",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "11",
+            "caminho": ".git\\objects\\11",
+            "tamanho": "717 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "1d26ad5660463b7aec7288f8217ae4a1633e83",
+            "caminho": ".git\\objects\\11\\1d26ad5660463b7aec7288f8217ae4a1633e83",
+            "extensao": "",
+            "tamanho": "717 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "1b",
+            "caminho": ".git\\objects\\1b",
+            "tamanho": "93 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "6edc481bce9a378fcd628d1ec7d5ed1d4e7fa3",
+            "caminho": ".git\\objects\\1b\\6edc481bce9a378fcd628d1ec7d5ed1d4e7fa3",
+            "extensao": "",
+            "tamanho": "93 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "1d",
+            "caminho": ".git\\objects\\1d",
+            "tamanho": "395 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "941e86f32673df86a9914e325632cc1b856f73",
+            "caminho": ".git\\objects\\1d\\941e86f32673df86a9914e325632cc1b856f73",
+            "extensao": "",
+            "tamanho": "395 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "20",
+            "caminho": ".git\\objects\\20",
+            "tamanho": "225 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "5c606458de31a8343c1c4f8e27186d227cf0d9",
+            "caminho": ".git\\objects\\20\\5c606458de31a8343c1c4f8e27186d227cf0d9",
+            "extensao": "",
+            "tamanho": "225 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "22",
+            "caminho": ".git\\objects\\22",
+            "tamanho": "8.88 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "406d4d75fed69e453fd22b29bacbdb59989652",
+            "caminho": ".git\\objects\\22\\406d4d75fed69e453fd22b29bacbdb59989652",
+            "extensao": "",
+            "tamanho": "8.88 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "23",
+            "caminho": ".git\\objects\\23",
+            "tamanho": "178 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "1a352500260869687043652d68030bd7de4f7e",
+            "caminho": ".git\\objects\\23\\1a352500260869687043652d68030bd7de4f7e",
+            "extensao": "",
+            "tamanho": "70 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "3b1dcf4ca2bcdba64cba28f76cc87cc5b34f9e",
+            "caminho": ".git\\objects\\23\\3b1dcf4ca2bcdba64cba28f76cc87cc5b34f9e",
+            "extensao": "",
+            "tamanho": "108 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "26",
+            "caminho": ".git\\objects\\26",
+            "tamanho": "419 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "6bac1a312a1a013dd802e108d9d8795e759713",
+            "caminho": ".git\\objects\\26\\6bac1a312a1a013dd802e108d9d8795e759713",
+            "extensao": "",
+            "tamanho": "419 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "2f",
+            "caminho": ".git\\objects\\2f",
+            "tamanho": "1.43 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "579b409298593b7ab3f2937312fecb27cea28d",
+            "caminho": ".git\\objects\\2f\\579b409298593b7ab3f2937312fecb27cea28d",
+            "extensao": "",
+            "tamanho": "1.43 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "30",
+            "caminho": ".git\\objects\\30",
+            "tamanho": "122 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "ddfab0bc3d1fcb5d0ea86c38794c9293a5595b",
+            "caminho": ".git\\objects\\30\\ddfab0bc3d1fcb5d0ea86c38794c9293a5595b",
+            "extensao": "",
+            "tamanho": "122 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "42",
+            "caminho": ".git\\objects\\42",
+            "tamanho": "3.19 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "a57e0a05c1f453f73f77b529cfa95685f397b4",
+            "caminho": ".git\\objects\\42\\a57e0a05c1f453f73f77b529cfa95685f397b4",
+            "extensao": "",
+            "tamanho": "1.43 KB",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "bbe5f27cb5532983b256cf73301773f285c320",
+            "caminho": ".git\\objects\\42\\bbe5f27cb5532983b256cf73301773f285c320",
+            "extensao": "",
+            "tamanho": "1.76 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "45",
+            "caminho": ".git\\objects\\45",
+            "tamanho": "54 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "49617ad104936ece8bf22251248ea4c6a762f1",
+            "caminho": ".git\\objects\\45\\49617ad104936ece8bf22251248ea4c6a762f1",
+            "extensao": "",
+            "tamanho": "54 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "46",
+            "caminho": ".git\\objects\\46",
+            "tamanho": "6.35 KB",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "689d2228c6203a2762f3bc833930a447c772cb",
+            "caminho": ".git\\objects\\46\\689d2228c6203a2762f3bc833930a447c772cb",
+            "extensao": "",
+            "tamanho": "6.35 KB",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "49",
+            "caminho": ".git\\objects\\49",
+            "tamanho": "337 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "fb6d555bb6ce8223cfcc92c019fbded96ec7b7",
+            "caminho": ".git\\objects\\49\\fb6d555bb6ce8223cfcc92c019fbded96ec7b7",
+            "extensao": "",
+            "tamanho": "337 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "4a",
+            "caminho": ".git\\objects\\4a",
+            "tamanho": "70 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "6260aac7271f71ead8e54ca471d15e7a058ceb",
+            "caminho": ".git\\objects\\4a\\6260aac7271f71ead8e54ca471d15e7a058ceb",
+            "extensao": "",
+            "tamanho": "70 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "4e",
+            "caminho": ".git\\objects\\4e",
+            "tamanho": "108 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "61854b5dac00f383144451bd9059ce38f927ca",
+            "caminho": ".git\\objects\\4e\\61854b5dac00f383144451bd9059ce38f927ca",
+            "extensao": "",
+            "tamanho": "108 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "56",
+            "caminho": ".git\\objects\\56",
+            "tamanho": "622 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "65eaecb4328d6ce71591620c969d57028cac6a",
+            "caminho": ".git\\objects\\56\\65eaecb4328d6ce71591620c969d57028cac6a",
+            "extensao": "",
+            "tamanho": "622 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "59",
+            "caminho": ".git\\objects\\59",
+            "tamanho": "2.17 KB",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "874d25e2c12ec315ca65eb25494dee55c60b39",
+            "caminho": ".git\\objects\\59\\874d25e2c12ec315ca65eb25494dee55c60b39",
+            "extensao": "",
+            "tamanho": "2.07 KB",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "8bfa74ad9dcccbd72986aea4f6283837e989cc",
+            "caminho": ".git\\objects\\59\\8bfa74ad9dcccbd72986aea4f6283837e989cc",
+            "extensao": "",
+            "tamanho": "109 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "5b",
+            "caminho": ".git\\objects\\5b",
+            "tamanho": "53 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "fad2b3f8e483b6b173d8aaff19597e84626f15",
+            "caminho": ".git\\objects\\5b\\fad2b3f8e483b6b173d8aaff19597e84626f15",
+            "extensao": "",
+            "tamanho": "53 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "5f",
+            "caminho": ".git\\objects\\5f",
+            "tamanho": "122 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "933cdc0ba9a9b6ad78630b08d5b8b608879421",
+            "caminho": ".git\\objects\\5f\\933cdc0ba9a9b6ad78630b08d5b8b608879421",
+            "extensao": "",
+            "tamanho": "122 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "67",
+            "caminho": ".git\\objects\\67",
+            "tamanho": "1.65 KB",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "cd742b980162847f1c77ee42738aa70d80d667",
+            "caminho": ".git\\objects\\67\\cd742b980162847f1c77ee42738aa70d80d667",
+            "extensao": "",
+            "tamanho": "1.65 KB",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "6b",
+            "caminho": ".git\\objects\\6b",
+            "tamanho": "286 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "b8b840ca5b3b688c7b0ae614a7d88e568c4f9c",
+            "caminho": ".git\\objects\\6b\\b8b840ca5b3b688c7b0ae614a7d88e568c4f9c",
+            "extensao": "",
+            "tamanho": "286 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "71",
+            "caminho": ".git\\objects\\71",
+            "tamanho": "10.31 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "eac556adb48f25e1ce35f48559e27eb61edea1",
+            "caminho": ".git\\objects\\71\\eac556adb48f25e1ce35f48559e27eb61edea1",
+            "extensao": "",
+            "tamanho": "10.31 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "72",
+            "caminho": ".git\\objects\\72",
+            "tamanho": "7.28 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "061464aa21d51f758f04fd69434486e9e6d5f8",
+            "caminho": ".git\\objects\\72\\061464aa21d51f758f04fd69434486e9e6d5f8",
+            "extensao": "",
+            "tamanho": "5.74 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "85c73cdafdd4160edcd7aebfbfdb0adbc3ffdf",
+            "caminho": ".git\\objects\\72\\85c73cdafdd4160edcd7aebfbfdb0adbc3ffdf",
+            "extensao": "",
+            "tamanho": "1.54 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "74",
+            "caminho": ".git\\objects\\74",
+            "tamanho": "51 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "db711d7e96297afbb5cff13b6dfe8c6f816887",
+            "caminho": ".git\\objects\\74\\db711d7e96297afbb5cff13b6dfe8c6f816887",
+            "extensao": "",
+            "tamanho": "51 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "75",
+            "caminho": ".git\\objects\\75",
+            "tamanho": "70 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "cc8efaebca4ff9faca25cdba079761797608b6",
+            "caminho": ".git\\objects\\75\\cc8efaebca4ff9faca25cdba079761797608b6",
+            "extensao": "",
+            "tamanho": "70 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "78",
+            "caminho": ".git\\objects\\78",
+            "tamanho": "4.21 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "38aff7f3115e40961ab5c73aea8923de7bef6e",
+            "caminho": ".git\\objects\\78\\38aff7f3115e40961ab5c73aea8923de7bef6e",
+            "extensao": "",
+            "tamanho": "4.21 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "7a",
+            "caminho": ".git\\objects\\7a",
+            "tamanho": "108 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "54b7efdbcd18fc8aa1e9a20faf5c07b45ae4b3",
+            "caminho": ".git\\objects\\7a\\54b7efdbcd18fc8aa1e9a20faf5c07b45ae4b3",
+            "extensao": "",
+            "tamanho": "108 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "7f",
+            "caminho": ".git\\objects\\7f",
+            "tamanho": "121 B",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "8ba9c93ff0ea0f6d995ae152df62910cdb5486",
+            "caminho": ".git\\objects\\7f\\8ba9c93ff0ea0f6d995ae152df62910cdb5486",
+            "extensao": "",
+            "tamanho": "121 B",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "8b",
+            "caminho": ".git\\objects\\8b",
+            "tamanho": "16 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "137891791fe96927ad78e64b0aad7bded08bdc",
+            "caminho": ".git\\objects\\8b\\137891791fe96927ad78e64b0aad7bded08bdc",
+            "extensao": "",
+            "tamanho": "16 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "8d",
+            "caminho": ".git\\objects\\8d",
+            "tamanho": "9.09 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "19ff97a833ecbe9c1b9fa8d2f2e1af8296731e",
+            "caminho": ".git\\objects\\8d\\19ff97a833ecbe9c1b9fa8d2f2e1af8296731e",
+            "extensao": "",
+            "tamanho": "9.09 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "8e",
+            "caminho": ".git\\objects\\8e",
+            "tamanho": "1.6 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "607b7f008ad3106164351f103970800b0565b8",
+            "caminho": ".git\\objects\\8e\\607b7f008ad3106164351f103970800b0565b8",
+            "extensao": "",
+            "tamanho": "1.6 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "8f",
+            "caminho": ".git\\objects\\8f",
+            "tamanho": "398 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "64c7f7c3767ecc0dd0cdd230257a5d50bce272",
+            "caminho": ".git\\objects\\8f\\64c7f7c3767ecc0dd0cdd230257a5d50bce272",
+            "extensao": "",
+            "tamanho": "398 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "91",
+            "caminho": ".git\\objects\\91",
+            "tamanho": "6.22 KB",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "2da3109f18223d2d1654d59c1a16733c846002",
+            "caminho": ".git\\objects\\91\\2da3109f18223d2d1654d59c1a16733c846002",
+            "extensao": "",
+            "tamanho": "6.22 KB",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "97",
+            "caminho": ".git\\objects\\97",
+            "tamanho": "313 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "076503d6e4fe7f55318472e78f25c9a3f17319",
+            "caminho": ".git\\objects\\97\\076503d6e4fe7f55318472e78f25c9a3f17319",
+            "extensao": "",
+            "tamanho": "313 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "9a",
+            "caminho": ".git\\objects\\9a",
+            "tamanho": "218 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "94c9deee0c833c6dedd1d5b11cfa040f4a8433",
+            "caminho": ".git\\objects\\9a\\94c9deee0c833c6dedd1d5b11cfa040f4a8433",
+            "extensao": "",
+            "tamanho": "218 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "a0",
+            "caminho": ".git\\objects\\a0",
+            "tamanho": "2.43 KB",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "b34de6932cbcf718a13a4caad7ecf063a68c31",
+            "caminho": ".git\\objects\\a0\\b34de6932cbcf718a13a4caad7ecf063a68c31",
+            "extensao": "",
+            "tamanho": "2.43 KB",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "a5",
+            "caminho": ".git\\objects\\a5",
+            "tamanho": "312 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "b09a93ebaabeaa7bac489029bec4326371ad60",
+            "caminho": ".git\\objects\\a5\\b09a93ebaabeaa7bac489029bec4326371ad60",
+            "extensao": "",
+            "tamanho": "312 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "a7",
+            "caminho": ".git\\objects\\a7",
+            "tamanho": "3.5 KB",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "2af45707b1eb8afdec2b185962798b93f11233",
+            "caminho": ".git\\objects\\a7\\2af45707b1eb8afdec2b185962798b93f11233",
+            "extensao": "",
+            "tamanho": "150 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "754772578d65a4e711b451c24dad8cac7d07ea",
+            "caminho": ".git\\objects\\a7\\754772578d65a4e711b451c24dad8cac7d07ea",
+            "extensao": "",
+            "tamanho": "3.35 KB",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "a9",
+            "caminho": ".git\\objects\\a9",
+            "tamanho": "102 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "d4d6599229a071906cf90b7879857d65c3448b",
+            "caminho": ".git\\objects\\a9\\d4d6599229a071906cf90b7879857d65c3448b",
+            "extensao": "",
+            "tamanho": "102 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "aa",
+            "caminho": ".git\\objects\\aa",
+            "tamanho": "187 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "42cf183fe389eb4044aaccd6d265fff56780a7",
+            "caminho": ".git\\objects\\aa\\42cf183fe389eb4044aaccd6d265fff56780a7",
+            "extensao": "",
+            "tamanho": "65 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "cc449ff0bc4270d44bddfd5b81c7f1a9ed8561",
+            "caminho": ".git\\objects\\aa\\cc449ff0bc4270d44bddfd5b81c7f1a9ed8561",
+            "extensao": "",
+            "tamanho": "122 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "ad",
+            "caminho": ".git\\objects\\ad",
+            "tamanho": "93 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "986e045e18d75e34b95054a82d705f03bcb0a9",
+            "caminho": ".git\\objects\\ad\\986e045e18d75e34b95054a82d705f03bcb0a9",
+            "extensao": "",
+            "tamanho": "93 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "ae",
+            "caminho": ".git\\objects\\ae",
+            "tamanho": "65 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "691b5e9a7ef8f3fb06df5515e0608e9d35c539",
+            "caminho": ".git\\objects\\ae\\691b5e9a7ef8f3fb06df5515e0608e9d35c539",
+            "extensao": "",
+            "tamanho": "65 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "b1",
+            "caminho": ".git\\objects\\b1",
+            "tamanho": "2.91 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "29cea4d1464b7057646b2c39f5f1ee79c0176b",
+            "caminho": ".git\\objects\\b1\\29cea4d1464b7057646b2c39f5f1ee79c0176b",
+            "extensao": "",
+            "tamanho": "2.91 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "b2",
+            "caminho": ".git\\objects\\b2",
+            "tamanho": "313 B",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "9ec8810e0df6c11d3fedb534e0161f3806931b",
+            "caminho": ".git\\objects\\b2\\9ec8810e0df6c11d3fedb534e0161f3806931b",
+            "extensao": "",
+            "tamanho": "313 B",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "b7",
+            "caminho": ".git\\objects\\b7",
+            "tamanho": "121 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "f978ba09d1b021060b7149dca6cb478edc2fa1",
+            "caminho": ".git\\objects\\b7\\f978ba09d1b021060b7149dca6cb478edc2fa1",
+            "extensao": "",
+            "tamanho": "121 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "b8",
+            "caminho": ".git\\objects\\b8",
+            "tamanho": "2.38 KB",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "cf5e8570774c9269878a60d8ddb5336ca9c7ee",
+            "caminho": ".git\\objects\\b8\\cf5e8570774c9269878a60d8ddb5336ca9c7ee",
+            "extensao": "",
+            "tamanho": "2.38 KB",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "ba",
+            "caminho": ".git\\objects\\ba",
+            "tamanho": "4.38 KB",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "34841ec8b5b2e886ea5325c731ee6d4bcb5e2f",
+            "caminho": ".git\\objects\\ba\\34841ec8b5b2e886ea5325c731ee6d4bcb5e2f",
+            "extensao": "",
+            "tamanho": "4.38 KB",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "be",
+            "caminho": ".git\\objects\\be",
+            "tamanho": "477 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "22cee5395f53d686d1fd54ec8067f3079b7b07",
+            "caminho": ".git\\objects\\be\\22cee5395f53d686d1fd54ec8067f3079b7b07",
+            "extensao": "",
+            "tamanho": "477 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "bf",
+            "caminho": ".git\\objects\\bf",
+            "tamanho": "109 B",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "e0cd560b078cc753f31f4db258f71839296795",
+            "caminho": ".git\\objects\\bf\\e0cd560b078cc753f31f4db258f71839296795",
+            "extensao": "",
+            "tamanho": "109 B",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "c1",
+            "caminho": ".git\\objects\\c1",
+            "tamanho": "12.29 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "a4e34433486c9c9e730e69fc7742d9da71fa79",
+            "caminho": ".git\\objects\\c1\\a4e34433486c9c9e730e69fc7742d9da71fa79",
+            "extensao": "",
+            "tamanho": "109 B",
+            "modificado": "09\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "e0677f6cadb286d3260dd248519f438f73efd3",
+            "caminho": ".git\\objects\\c1\\e0677f6cadb286d3260dd248519f438f73efd3",
+            "extensao": "",
+            "tamanho": "10.3 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "ff4812412b9f84f27db1f1f0fe131a1b523d98",
+            "caminho": ".git\\objects\\c1\\ff4812412b9f84f27db1f1f0fe131a1b523d98",
+            "extensao": "",
+            "tamanho": "1.88 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "c5",
+            "caminho": ".git\\objects\\c5",
+            "tamanho": "343 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "7fb6d9e4e37cf2a1c24912ebb9613f83f50dda",
+            "caminho": ".git\\objects\\c5\\7fb6d9e4e37cf2a1c24912ebb9613f83f50dda",
+            "extensao": "",
+            "tamanho": "343 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "d1",
+            "caminho": ".git\\objects\\d1",
+            "tamanho": "4.32 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "b6bd27189c73e1ba476557ed7e59ddd8e87e95",
+            "caminho": ".git\\objects\\d1\\b6bd27189c73e1ba476557ed7e59ddd8e87e95",
+            "extensao": "",
+            "tamanho": "4.32 KB",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "d5",
+            "caminho": ".git\\objects\\d5",
+            "tamanho": "11.26 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "9986452761db27524632cc2b9066379375d2df",
+            "caminho": ".git\\objects\\d5\\9986452761db27524632cc2b9066379375d2df",
+            "extensao": "",
+            "tamanho": "11.26 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "d6",
+            "caminho": ".git\\objects\\d6",
+            "tamanho": "54 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "98d0eb27a3b4d5747dbcbf385874b4f3df2ef1",
+            "caminho": ".git\\objects\\d6\\98d0eb27a3b4d5747dbcbf385874b4f3df2ef1",
+            "extensao": "",
+            "tamanho": "54 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "d7",
+            "caminho": ".git\\objects\\d7",
+            "tamanho": "3.43 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "330404d9e4e587fb919af6d76e8f9696c132ee",
+            "caminho": ".git\\objects\\d7\\330404d9e4e587fb919af6d76e8f9696c132ee",
+            "extensao": "",
+            "tamanho": "1.74 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "d9e3ba0cdeec7904fc40892268e70c9a3de113",
+            "caminho": ".git\\objects\\d7\\d9e3ba0cdeec7904fc40892268e70c9a3de113",
+            "extensao": "",
+            "tamanho": "1.69 KB",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "dc",
+            "caminho": ".git\\objects\\dc",
+            "tamanho": "4.34 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "0be991e00c7882203d374c6a8ade91b4ca6406",
+            "caminho": ".git\\objects\\dc\\0be991e00c7882203d374c6a8ade91b4ca6406",
+            "extensao": "",
+            "tamanho": "4.06 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "99c269f418153f2d35517bd66ad546d9893f44",
+            "caminho": ".git\\objects\\dc\\99c269f418153f2d35517bd66ad546d9893f44",
+            "extensao": "",
+            "tamanho": "286 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "de",
+            "caminho": ".git\\objects\\de",
+            "tamanho": "66 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "53d23d7136ac1c1ab11945aef6b9db8752099e",
+            "caminho": ".git\\objects\\de\\53d23d7136ac1c1ab11945aef6b9db8752099e",
+            "extensao": "",
+            "tamanho": "66 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "e1",
+            "caminho": ".git\\objects\\e1",
+            "tamanho": "6.22 KB",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "5d3ad80c3bc28e3e1822650de6b5a864f69f0f",
+            "caminho": ".git\\objects\\e1\\5d3ad80c3bc28e3e1822650de6b5a864f69f0f",
+            "extensao": "",
+            "tamanho": "6.22 KB",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "e2",
+            "caminho": ".git\\objects\\e2",
+            "tamanho": "105 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "dd4fc9742c83a6e61c4b0aff26e283508271b0",
+            "caminho": ".git\\objects\\e2\\dd4fc9742c83a6e61c4b0aff26e283508271b0",
+            "extensao": "",
+            "tamanho": "105 B",
+            "modificado": "08\/02\/2026 18:17"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "e5",
+            "caminho": ".git\\objects\\e5",
+            "tamanho": "86 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "935d26624a96d5adaf8f3a6e8568fd0be7aa29",
+            "caminho": ".git\\objects\\e5\\935d26624a96d5adaf8f3a6e8568fd0be7aa29",
+            "extensao": "",
+            "tamanho": "86 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "e9",
+            "caminho": ".git\\objects\\e9",
+            "tamanho": "151 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "72d5c1e7efd9f7d64f2ac1f7dfb527938e5393",
+            "caminho": ".git\\objects\\e9\\72d5c1e7efd9f7d64f2ac1f7dfb527938e5393",
+            "extensao": "",
+            "tamanho": "151 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "ed",
+            "caminho": ".git\\objects\\ed",
+            "tamanho": "10 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "14e18140c144466ba2e5e230349a484f709e98",
+            "caminho": ".git\\objects\\ed\\14e18140c144466ba2e5e230349a484f709e98",
+            "extensao": "",
+            "tamanho": "8.46 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "7f23cc9b243a3f889d16365d60c1817b469f0d",
+            "caminho": ".git\\objects\\ed\\7f23cc9b243a3f889d16365d60c1817b469f0d",
+            "extensao": "",
+            "tamanho": "121 B",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "dd6413e4b26dd29e74d3aaa8b90af6d5e2df2f",
+            "caminho": ".git\\objects\\ed\\dd6413e4b26dd29e74d3aaa8b90af6d5e2df2f",
+            "extensao": "",
+            "tamanho": "1.42 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "f4",
+            "caminho": ".git\\objects\\f4",
+            "tamanho": "259 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "477bee0b9dae918ddd8cf503e6f276193f4cfd",
+            "caminho": ".git\\objects\\f4\\477bee0b9dae918ddd8cf503e6f276193f4cfd",
+            "extensao": "",
+            "tamanho": "259 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "f7",
+            "caminho": ".git\\objects\\f7",
+            "tamanho": "1.43 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "ad16949fcc8ecf4555d46c4bf0b01628d47726",
+            "caminho": ".git\\objects\\f7\\ad16949fcc8ecf4555d46c4bf0b01628d47726",
+            "extensao": "",
+            "tamanho": "1.43 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "f8",
+            "caminho": ".git\\objects\\f8",
+            "tamanho": "205 B",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "71267e39e15ab41437140dd98b52b1b8e98987",
+            "caminho": ".git\\objects\\f8\\71267e39e15ab41437140dd98b52b1b8e98987",
+            "extensao": "",
+            "tamanho": "205 B",
+            "modificado": "09\/02\/2026 20:55"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "fb",
+            "caminho": ".git\\objects\\fb",
+            "tamanho": "1.38 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "873f2a5b70473c243b9657eabc8d077c24e9eb",
+            "caminho": ".git\\objects\\fb\\873f2a5b70473c243b9657eabc8d077c24e9eb",
+            "extensao": "",
+            "tamanho": "1.38 KB",
+            "modificado": "12\/02\/2026 16:52"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "fe",
+            "caminho": ".git\\objects\\fe",
+            "tamanho": "231 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "aa5f55ab67406ab495fbb99800da4109f091c8",
+            "caminho": ".git\\objects\\fe\\aa5f55ab67406ab495fbb99800da4109f091c8",
+            "extensao": "",
+            "tamanho": "231 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "ff",
+            "caminho": ".git\\objects\\ff",
+            "tamanho": "267 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "911d27d048ef0c74f6b19ff2a65e8010e4c178",
+            "caminho": ".git\\objects\\ff\\911d27d048ef0c74f6b19ff2a65e8010e4c178",
+            "extensao": "",
+            "tamanho": "267 B",
+            "modificado": "09\/02\/2026 16:09"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "info",
+            "caminho": ".git\\objects\\info",
+            "tamanho": "0 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "pack",
+            "caminho": ".git\\objects\\pack",
+            "tamanho": "0 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "refs",
+            "caminho": ".git\\refs",
+            "tamanho": "82 B",
+            "modificado": "08\/02\/2026 17:46"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "heads",
+            "caminho": ".git\\refs\\heads",
+            "tamanho": "41 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "main",
+            "caminho": ".git\\refs\\heads\\main",
+            "extensao": "",
+            "tamanho": "41 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "remotes",
+            "caminho": ".git\\refs\\remotes",
+            "tamanho": "41 B",
+            "modificado": "08\/02\/2026 17:46"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 3,
+            "nome": "origin",
+            "caminho": ".git\\refs\\remotes\\origin",
+            "tamanho": "41 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 4,
+            "nome": "main",
+            "caminho": ".git\\refs\\remotes\\origin\\main",
+            "extensao": "",
+            "tamanho": "41 B",
+            "modificado": "12\/02\/2026 23:05"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "tags",
+            "caminho": ".git\\refs\\tags",
+            "tamanho": "0 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 0,
+            "nome": ".gitignore",
+            "caminho": ".gitignore",
+            "extensao": "gitignore",
+            "tamanho": "1.15 KB",
+            "modificado": "09\/02\/2026 15:51"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 0,
+            "nome": ".htaccess",
+            "caminho": ".htaccess",
+            "extensao": "htaccess",
+            "tamanho": "432 B",
+            "modificado": "09\/02\/2026 15:51"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 0,
+            "nome": "README.md",
+            "caminho": "README.md",
+            "extensao": "md",
+            "tamanho": "788 B",
+            "modificado": "09\/02\/2026 15:51"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 0,
+            "nome": "composer.json",
+            "caminho": "composer.json",
+            "extensao": "json",
+            "tamanho": "425 B",
+            "modificado": "09\/02\/2026 15:51"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "config",
+            "caminho": "config",
+            "tamanho": "177 B",
+            "modificado": "09\/02\/2026 12:14"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "database.php",
+            "caminho": "config\\database.php",
+            "extensao": "php",
+            "tamanho": "177 B",
+            "modificado": "09\/02\/2026 12:14"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "database",
+            "caminho": "database",
+            "tamanho": "127.53 KB",
+            "modificado": "12\/02\/2026 23:19"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "migrations",
+            "caminho": "database\\migrations",
+            "tamanho": "2 B",
+            "modificado": "09\/02\/2026 15:38"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": ".gitkeep",
+            "caminho": "database\\migrations\\.gitkeep",
+            "extensao": "gitkeep",
+            "tamanho": "2 B",
+            "modificado": "09\/02\/2026 15:38"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "penomato (18).sql",
+            "caminho": "database\\penomato (18).sql",
+            "extensao": "sql",
+            "tamanho": "33.07 KB",
+            "modificado": "09\/02\/2026 15:38"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "penomato (19).sql",
+            "caminho": "database\\penomato (19).sql",
+            "extensao": "sql",
+            "tamanho": "37.16 KB",
+            "modificado": "12\/02\/2026 14:08"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "penomato (20).sql",
+            "caminho": "database\\penomato (20).sql",
+            "extensao": "sql",
+            "tamanho": "57.3 KB",
+            "modificado": "12\/02\/2026 23:18"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "seeds",
+            "caminho": "database\\seeds",
+            "tamanho": "2 B",
+            "modificado": "09\/02\/2026 15:38"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": ".gitkeep",
+            "caminho": "database\\seeds\\.gitkeep",
+            "extensao": "gitkeep",
+            "tamanho": "2 B",
+            "modificado": "09\/02\/2026 15:38"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "docs",
+            "caminho": "docs",
+            "tamanho": "0 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "logs",
+            "caminho": "logs",
+            "tamanho": "2 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "tmp",
+            "caminho": "logs\\tmp",
+            "tamanho": "2 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": ".gitkeep",
+            "caminho": "logs\\tmp\\.gitkeep",
+            "extensao": "gitkeep",
+            "tamanho": "2 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "public",
+            "caminho": "public",
+            "tamanho": "95 B",
+            "modificado": "09\/02\/2026 15:40"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "index.php",
+            "caminho": "public\\index.php",
+            "extensao": "php",
+            "tamanho": "95 B",
+            "modificado": "09\/02\/2026 15:40"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "scripts",
+            "caminho": "scripts",
+            "tamanho": "0 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "src",
+            "caminho": "src",
+            "tamanho": "286.88 KB",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "Controllers",
+            "caminho": "src\\Controllers",
+            "tamanho": "100.16 KB",
+            "modificado": "12\/02\/2026 22:38"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "busca_caracteristicas.php",
+            "caminho": "src\\Controllers\\busca_caracteristicas.php",
+            "extensao": "php",
+            "tamanho": "47.56 KB",
+            "modificado": "12\/02\/2026 16:45"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "inserir_caracteristicas.php",
+            "caminho": "src\\Controllers\\inserir_caracteristicas.php",
+            "extensao": "php",
+            "tamanho": "37.18 KB",
+            "modificado": "09\/02\/2026 22:08"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "upload_imagem_controller.php",
+            "caminho": "src\\Controllers\\upload_imagem_controller.php",
+            "extensao": "php",
+            "tamanho": "15.43 KB",
+            "modificado": "12\/02\/2026 22:45"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "Views",
+            "caminho": "src\\Views",
+            "tamanho": "186.63 KB",
+            "modificado": "12\/02\/2026 22:36"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "cadastro_caracteristicas.php",
+            "caminho": "src\\Views\\cadastro_caracteristicas.php",
+            "extensao": "php",
+            "tamanho": "11.78 KB",
+            "modificado": "09\/02\/2026 22:16"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "especie_detalhes.php",
+            "caminho": "src\\Views\\especie_detalhes.php",
+            "extensao": "php",
+            "tamanho": "50.19 KB",
+            "modificado": "12\/02\/2026 16:37"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "sucesso_cadastro.php",
+            "caminho": "src\\Views\\sucesso_cadastro.php",
+            "extensao": "php",
+            "tamanho": "6.38 KB",
+            "modificado": "09\/02\/2026 15:40"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "upload_imagem.php",
+            "caminho": "src\\Views\\upload_imagem.php",
+            "extensao": "php",
+            "tamanho": "59.11 KB",
+            "modificado": "12\/02\/2026 19:36"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "upload_imagem_views.php",
+            "caminho": "src\\Views\\upload_imagem_views.php",
+            "extensao": "php",
+            "tamanho": "59.17 KB",
+            "modificado": "12\/02\/2026 22:52"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "index.php",
+            "caminho": "src\\index.php",
+            "extensao": "php",
+            "tamanho": "85 B",
+            "modificado": "09\/02\/2026 15:40"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "tests",
+            "caminho": "tests",
+            "tamanho": "0 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "Feature",
+            "caminho": "tests\\Feature",
+            "tamanho": "0 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "Unit",
+            "caminho": "tests\\Unit",
+            "tamanho": "0 B",
+            "modificado": "08\/02\/2026 17:39"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "tmp",
+            "caminho": "tmp",
+            "tamanho": "229.8 KB",
+            "modificado": "12\/02\/2026 15:26"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Acca sellowiana.json",
+            "caminho": "tmp\\Acca sellowiana.json",
+            "extensao": "json",
+            "tamanho": "2.86 KB",
+            "modificado": "09\/02\/2026 22:28"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Acrocomia aculeata.json",
+            "caminho": "tmp\\Acrocomia aculeata.json",
+            "extensao": "json",
+            "tamanho": "3.69 KB",
+            "modificado": "12\/02\/2026 14:11"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Anadenanthera colubrina.json",
+            "caminho": "tmp\\Anadenanthera colubrina.json",
+            "extensao": "json",
+            "tamanho": "3.55 KB",
+            "modificado": "12\/02\/2026 15:12"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Anadenanthera macrocarpa.json",
+            "caminho": "tmp\\Anadenanthera macrocarpa.json",
+            "extensao": "json",
+            "tamanho": "3.55 KB",
+            "modificado": "12\/02\/2026 15:13"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Lithraea molleoides.json",
+            "caminho": "tmp\\Lithraea molleoides.json",
+            "extensao": "json",
+            "tamanho": "4.05 KB",
+            "modificado": "12\/02\/2026 15:19"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Myracrodruon urundeuva.json",
+            "caminho": "tmp\\Myracrodruon urundeuva.json",
+            "extensao": "json",
+            "tamanho": "4.3 KB",
+            "modificado": "12\/02\/2026 15:22"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Oenocarpus bacaba.json",
+            "caminho": "tmp\\Oenocarpus bacaba.json",
+            "extensao": "json",
+            "tamanho": "3.58 KB",
+            "modificado": "12\/02\/2026 15:23"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Oenocarpus distichus.json",
+            "caminho": "tmp\\Oenocarpus distichus.json",
+            "extensao": "json",
+            "tamanho": "3.4 KB",
+            "modificado": "12\/02\/2026 15:24"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "Schinus terebinthifolius.json",
+            "caminho": "tmp\\Schinus terebinthifolius.json",
+            "extensao": "json",
+            "tamanho": "4.55 KB",
+            "modificado": "12\/02\/2026 15:14"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "dados_especies.json",
+            "caminho": "tmp\\dados_especies.json",
+            "extensao": "json",
+            "tamanho": "42.57 KB",
+            "modificado": "12\/02\/2026 15:19"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "especies json",
+            "caminho": "tmp\\especies json",
+            "tamanho": "3.87 KB",
+            "modificado": "12\/02\/2026 15:26"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": "Mauritia flexuosa.json",
+            "caminho": "tmp\\especies json\\Mauritia flexuosa.json",
+            "extensao": "json",
+            "tamanho": "3.87 KB",
+            "modificado": "13\/02\/2026 13:06"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "evolução rendimentos prefeitura.json",
+            "caminho": "tmp\\evolução rendimentos prefeitura.json",
+            "extensao": "json",
+            "tamanho": "108.41 KB",
+            "modificado": "11\/02\/2026 19:38"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "inserir dados json especies.php",
+            "caminho": "tmp\\inserir dados json especies.php",
+            "extensao": "php",
+            "tamanho": "17.72 KB",
+            "modificado": "12\/02\/2026 15:06"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "php importar_especies.php",
+            "caminho": "tmp\\php importar_especies.php",
+            "extensao": "php",
+            "tamanho": "19.07 KB",
+            "modificado": "12\/02\/2026 12:20"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 1,
+            "nome": "preencher_formulario.php",
+            "caminho": "tmp\\preencher_formulario.php",
+            "extensao": "php",
+            "tamanho": "4.63 KB",
+            "modificado": "09\/02\/2026 13:45"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 0,
+            "nome": "uploads",
+            "caminho": "uploads",
+            "tamanho": "18.09 KB",
+            "modificado": "12\/02\/2026 19:14"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 1,
+            "nome": "exsicatas",
+            "caminho": "uploads\\exsicatas",
+            "tamanho": "18.09 KB",
+            "modificado": "12\/02\/2026 22:57"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 2,
+            "nome": ".htaccess.md",
+            "caminho": "uploads\\exsicatas\\.htaccess.md",
+            "extensao": "md",
+            "tamanho": "324 B",
+            "modificado": "12\/02\/2026 19:18"
+        },
+        {
+            "tipo": "📁",
+            "nivel": 2,
+            "nome": "102",
+            "caminho": "uploads\\exsicatas\\102",
+            "tamanho": "17.77 KB",
+            "modificado": "12\/02\/2026 23:02"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "102_folha_20260212_225752_688.jpeg",
+            "caminho": "uploads\\exsicatas\\102\\102_folha_20260212_225752_688.jpeg",
+            "extensao": "jpeg",
+            "tamanho": "8.88 KB",
+            "modificado": "12\/02\/2026 22:57"
+        },
+        {
+            "tipo": "📄",
+            "nivel": 3,
+            "nome": "102_folha_20260212_230238_606.jpeg",
+            "caminho": "uploads\\exsicatas\\102\\102_folha_20260212_230238_606.jpeg",
+            "extensao": "jpeg",
+            "tamanho": "8.88 KB",
+            "modificado": "12\/02\/2026 23:02"
+        }
+    ]
+}
