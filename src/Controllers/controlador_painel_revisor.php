@@ -1,6 +1,8 @@
 <?php
 // controlador_painel_revisor.php
 // Local: C:\xampp\htdocs\penomato_mvp\src\Controllers\controlador_painel_revisor.php
+// VERSÃO ATUALIZADA - 15/02/2026
+// Adaptado para nova estrutura do banco com status único
 
 // Iniciar sessão
 session_start();
@@ -27,33 +29,38 @@ class ControladorPainelRevisor {
             exit;
         }
         
-        // Carregar a view (CORRIGIDO: Views no plural)
+        // Carregar a view
         include __DIR__ . '/../Views/entrada_revisor.php';
     }
     
     /**
      * API: Listar espécies disponíveis para revisão
+     * Agora usa: status = 'registrada' (pronto para revisão)
      */
     public function listarPendentesModal() {
         header('Content-Type: application/json');
         
         try {
-            // Buscar espécies com status 'completo' e revisão 'aguardando'
+            // Buscar espécies com status 'registrada' (prontas para revisão)
+            // e que ainda não foram revisadas (data_revisada IS NULL)
             $sql = "SELECT 
                         id,
                         nome_cientifico,
-                        nome_popular,
-                        familia,
+                        (SELECT nome_popular FROM especies_caracteristicas WHERE especie_id = e.id LIMIT 1) as nome_popular,
+                        (SELECT familia FROM especies_caracteristicas WHERE especie_id = e.id LIMIT 1) as familia,
                         prioridade
-                    FROM especies_administrativo 
-                    WHERE status_caracteristicas = 'completo' 
-                    AND status_revisao = 'aguardando'
+                    FROM especies_administrativo e
+                    WHERE status = 'registrada' 
+                    AND data_revisada IS NULL
                     ORDER BY 
                         CASE prioridade 
-                            WHEN 'alta' THEN 1 
-                            WHEN 'media' THEN 2 
-                            WHEN 'baixa' THEN 3 
-                        END
+                            WHEN 'urgente' THEN 1
+                            WHEN 'alta' THEN 2 
+                            WHEN 'media' THEN 3 
+                            WHEN 'baixa' THEN 4
+                            ELSE 5
+                        END,
+                        data_ultima_atualizacao ASC
                     LIMIT 20";
             
             $result = $this->conn->query($sql);
@@ -74,6 +81,7 @@ class ControladorPainelRevisor {
     
     /**
      * API: Iniciar nova revisão
+     * Agora muda status para 'em_revisao' e registra quem está revisando
      */
     public function iniciarRevisao() {
         header('Content-Type: application/json');
@@ -86,20 +94,35 @@ class ControladorPainelRevisor {
             return;
         }
         
-        // Atualizar status da espécie
+        // Verificar se espécie ainda está disponível (status = 'registrada')
+        $check = $this->conn->prepare("SELECT id FROM especies_administrativo 
+                                       WHERE id = ? AND status = 'registrada' 
+                                       AND data_revisada IS NULL");
+        $check->bind_param('i', $especie_id);
+        $check->execute();
+        $result = $check->get_result();
+        
+        if ($result->num_rows === 0) {
+            echo json_encode(['erro' => 'Espécie não está mais disponível para revisão']);
+            return;
+        }
+        
+        // Atualizar status da espécie para 'em_revisao'
+        // Nota: Não preenchemos autor_revisada_id ainda (só quando finalizar)
         $sql = "UPDATE especies_administrativo 
-                SET status_revisao = 'em_andamento', 
-                    id_revisor_atual = ?,
-                    data_revisao = CURDATE()
+                SET status = 'em_revisao',
+                    data_ultima_atualizacao = NOW()
                 WHERE id = ? 
-                AND status_caracteristicas = 'completo' 
-                AND status_revisao = 'aguardando'";
+                AND status = 'registrada'";
         
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('ii', $usuario_id, $especie_id);
+        $stmt->bind_param('i', $especie_id);
         
         if ($stmt->execute() && $stmt->affected_rows > 0) {
-            // REDIRECT CORRIGIDO: Views/revisao.php
+            // Opcional: Registrar em log ou tabela auxiliar quem iniciou (para debug)
+            // Por enquanto, só mudamos o status
+            
+            // REDIRECT para tela de revisão
             $redirect_url = "../Views/revisao.php?id=$especie_id";
             
             echo json_encode([
@@ -108,6 +131,76 @@ class ControladorPainelRevisor {
             ]);
         } else {
             echo json_encode(['erro' => 'Não foi possível iniciar a revisão']);
+        }
+    }
+    
+    /**
+     * API: Finalizar revisão (aprovar)
+     */
+    public function aprovarRevisao() {
+        header('Content-Type: application/json');
+        
+        $especie_id = $_POST['especie_id'] ?? 0;
+        $usuario_id = $_SESSION['usuario_id'] ?? 0;
+        $observacoes = $_POST['observacoes'] ?? null;
+        
+        if (!$especie_id || !$usuario_id) {
+            echo json_encode(['erro' => 'Dados inválidos']);
+            return;
+        }
+        
+        // Atualizar para 'revisada' com autor e data
+        $sql = "UPDATE especies_administrativo 
+                SET status = 'revisada',
+                    data_revisada = NOW(),
+                    autor_revisada_id = ?,
+                    observacoes = CONCAT(IFNULL(observacoes,''), '\n[REVISÃO APROVADA em ' , NOW() , ']: ', ?),
+                    data_ultima_atualizacao = NOW()
+                WHERE id = ? 
+                AND status = 'em_revisao'";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('isi', $usuario_id, $observacoes, $especie_id);
+        
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            echo json_encode(['sucesso' => true, 'mensagem' => 'Espécie aprovada com sucesso']);
+        } else {
+            echo json_encode(['erro' => 'Erro ao aprovar revisão']);
+        }
+    }
+    
+    /**
+     * API: Finalizar revisão (contestar/rejeitar)
+     */
+    public function contestarRevisao() {
+        header('Content-Type: application/json');
+        
+        $especie_id = $_POST['especie_id'] ?? 0;
+        $usuario_id = $_SESSION['usuario_id'] ?? 0;
+        $motivo = $_POST['motivo'] ?? '';
+        
+        if (!$especie_id || !$usuario_id || empty($motivo)) {
+            echo json_encode(['erro' => 'Dados inválidos ou motivo não informado']);
+            return;
+        }
+        
+        // Atualizar para 'contestado' com autor, motivo e data
+        $sql = "UPDATE especies_administrativo 
+                SET status = 'contestado',
+                    data_contestado = NOW(),
+                    autor_contestado_id = ?,
+                    motivo_contestado = ?,
+                    data_ultima_atualizacao = NOW()
+                WHERE id = ? 
+                AND status = 'em_revisao'";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('isi', $usuario_id, $motivo, $especie_id);
+        
+        if ($stmt->execute() && $stmt->affected_rows > 0) {
+            echo json_encode(['sucesso' => true, 'mensagem' => 'Espécie contestada com sucesso']);
+        } else {
+            echo json_encode(['erro' => 'Erro ao contestar espécie']);
         }
     }
 }
@@ -123,9 +216,16 @@ if (isset($_GET['acao'])) {
         case 'iniciar':
             $controlador->iniciarRevisao();
             break;
+        case 'aprovar':
+            $controlador->aprovarRevisao();
+            break;
+        case 'contestar':
+            $controlador->contestarRevisao();
+            break;
         default:
             $controlador->index();
     }
 } else {
     $controlador->index();
 }
+?>

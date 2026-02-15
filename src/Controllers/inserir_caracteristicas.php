@@ -1,6 +1,6 @@
 <?php
 // ================================================
-// CONEXÃO E BUSCA NO BANCO - FAZER ANTES DO HTML
+// CONEXÃO E BUSCA NO BANCO - VERSÃO CORRIGIDA
 // ================================================
 
 // Iniciar buffer de saída para evitar problemas
@@ -24,10 +24,16 @@ if (!$conexao) {
 } else {
     mysqli_set_charset($conexao, "utf8mb4");
     
+    // CORRIGIDO: Agora busca espécies com status 'sem_dados' OU 'dados_internet'
     $sql = "SELECT id, nome_cientifico 
             FROM especies_administrativo 
-            WHERE status_caracteristicas = 'sem_dados'
-            ORDER BY nome_cientifico";
+            WHERE status IN ('sem_dados', 'dados_internet')
+            ORDER BY 
+                CASE status 
+                    WHEN 'dados_internet' THEN 1
+                    WHEN 'sem_dados' THEN 2
+                END,
+                nome_cientifico";
     
     $resultado = mysqli_query($conexao, $sql);
     

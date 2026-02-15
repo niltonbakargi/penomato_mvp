@@ -2,6 +2,11 @@
 session_start();
 
 // ===============================
+// USUÁRIO FIXO PARA MVP (ID 1)
+// ===============================
+$usuario_id = 1; // Usuário padrão para testes
+
+// ===============================
 // CONEXÃO COM O BANCO
 // ===============================
 $pdo = new PDO(
@@ -26,7 +31,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // ===============================
-    // 2. INSERIR CARACTERÍSTICAS NA TABELA especies_caracteristicas
+    // 2. VERIFICAR SE ESPÉCIE PODE SER CADASTRADA
+    // ===============================
+    $check = $pdo->prepare("SELECT status FROM especies_administrativo WHERE id = ?");
+    $check->execute([$id_especie]);
+    $especie = $check->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$especie) {
+        die("Erro: espécie não encontrada.");
+    }
+    
+    // Só permite cadastrar se status for 'sem_dados' ou 'dados_internet'
+    if (!in_array($especie['status'], ['sem_dados', 'dados_internet'])) {
+        die("Erro: esta espécie já possui dados e não pode ser alterada.");
+    }
+
+    // ===============================
+    // 3. INSERIR CARACTERÍSTICAS NA TABELA especies_caracteristicas
     // ===============================
     $sql = "
         INSERT INTO especies_caracteristicas (
@@ -202,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Mapeamento dos campos do formulário para os parâmetros
     $stmt->execute([
-        // Dados principais (44 campos - 2 novos)
+        // Dados principais
         ':especie_id' => $id_especie,
         ':nome_cientifico_completo' => $_POST['nome_cientifico_completo'] ?? null,
         ':nome_cientifico_completo_ref' => $_POST['nome_cientifico_completo_ref'] ?? null,
@@ -246,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':possui_resina' => $_POST['possui_resina'] ?? null,
         ':referencias' => $_POST['referencias'] ?? null,
         
-        // Referências (35)
+        // Referências
         ':familia_ref' => $_POST['familia_ref'] ?? null,
         ':forma_folha_ref' => $_POST['forma_folha_ref'] ?? null,
         ':filotaxia_folha_ref' => $_POST['filotaxia_folha_ref'] ?? null,
@@ -285,25 +306,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 
     // ===============================
-    // 3. ATUALIZAR STATUS DA ESPÉCIE NA TABELA especies_administrativo
+    // 4. ATUALIZAR STATUS DA ESPÉCIE (NOVA ESTRUTURA)
     // ===============================
     $sql_update = "
         UPDATE especies_administrativo
         SET
-            status_caracteristicas = 'completo',
-            status_identificacao = 'identificada',
-            data_identificacao = NOW(),
+            status = 'dados_internet',
+            data_dados_internet = NOW(),
+            autor_dados_internet_id = :autor_id,
             data_ultima_atualizacao = NOW()
         WHERE id = :id_especie
     ";
 
     $stmt = $pdo->prepare($sql_update);
     $stmt->execute([
-        ':id_especie' => $id_especie
+        ':id_especie' => $id_especie,
+        ':autor_id' => $usuario_id
     ]);
 
     // ===============================
-    // 4. REDIRECIONAR PARA PÁGINA DE SUCESSO
+    // 5. REDIRECIONAR PARA PÁGINA DE SUCESSO
     // ===============================
     header("Location: sucesso_cadastro.php?id=$id_especie");
     exit;

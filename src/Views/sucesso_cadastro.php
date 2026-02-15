@@ -5,8 +5,9 @@ ini_set('display_errors', 1);
 
 $id = $_GET['id'] ?? null;
 $nome_cientifico = '';
+$status = '';
 
-// Se houver ID, buscar nome científico
+// Se houver ID, buscar nome científico e status
 if ($id) {
     try {
         $pdo = new PDO(
@@ -16,18 +17,34 @@ if ($id) {
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
         
-        $stmt = $pdo->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT nome_cientifico, status FROM especies_administrativo WHERE id = ?");
         $stmt->execute([$id]);
         $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($resultado) {
             $nome_cientifico = htmlspecialchars($resultado['nome_cientifico']);
+            $status = $resultado['status'];
         }
     } catch (PDOException $e) {
         // Em caso de erro, apenas não mostra o nome
         $nome_cientifico = '';
+        $status = '';
     }
 }
+
+// Mapear status para exibição amigável
+$status_amigavel = [
+    'sem_dados' => 'Sem dados',
+    'dados_internet' => 'Dados da internet (não verificados)',
+    'descrita' => 'Descrita (dados próprios)',
+    'registrada' => 'Registrada (com imagens)',
+    'em_revisao' => 'Em revisão',
+    'revisada' => 'Revisada',
+    'contestado' => 'Contestada',
+    'publicado' => 'Publicada'
+];
+
+$status_texto = $status_amigavel[$status] ?? $status;
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -35,6 +52,7 @@ if ($id) {
     <meta charset="UTF-8">
     <title>Cadastro realizado com sucesso</title>
     <style>
+        /* MESMO CSS (manter igual) */
         * {
             margin: 0;
             padding: 0;
@@ -188,7 +206,9 @@ if ($id) {
     
     <div class="message">
         As características morfológicas foram salvas no banco de dados.
-        Agora a espécie está identificada e disponível para consulta.
+        <?php if ($status == 'dados_internet'): ?>
+            <br><small style="color: #856404;">(Dados marcados como "internet" - aguardando verificação)</small>
+        <?php endif; ?>
     </div>
     
     <div class="details-box">
@@ -208,7 +228,7 @@ if ($id) {
         
         <div class="detail-item">
             <span class="detail-label">Status Atual:</span>
-            <span class="detail-value">Identificada ✓</span>
+            <span class="detail-value"><?= $status_texto ?></span>
         </div>
         
         <div class="detail-item">
@@ -218,16 +238,16 @@ if ($id) {
     </div>
     
     <div class="buttons-container">
-        <a href="formulario_caracteristicas.php" class="btn btn-primary">
+        <a href="inserir_caracteristicas.php" class="btn btn-primary">
             Cadastrar Nova Espécie
         </a>
         
-        <a href="lista_especies.php" class="btn btn-secondary">
+        <a href="busca_caracteristicas.php" class="btn btn-secondary">
             Ver Todas as Espécies
         </a>
         
         <?php if ($id): ?>
-            <a href="detalhes_especie.php?id=<?= $id ?>" class="btn btn-view">
+            <a href="especie_detalhes.php?id=<?= $id ?>" class="btn btn-view">
                 Ver Detalhes Desta Espécie
             </a>
         <?php endif; ?>

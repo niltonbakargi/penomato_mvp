@@ -1,6 +1,6 @@
 <?php
 // ================================================
-// CONEXÃO E BUSCA NO BANCO - VERSÃO MÍNIMA
+// CONEXÃO E BUSCA NO BANCO - VERSÃO CORRIGIDA (MÍNIMA)
 // ================================================
 
 // Configurações do banco
@@ -21,21 +21,26 @@ if (!$conexao) {
 } else {
     mysqli_set_charset($conexao, "utf8mb4");
     
-    // Buscar espécies - APENAS COLUNAS QUE CERTAMENTE EXISTEM
+    // BUSCAR ESPÉCIES - CORRIGIDO PARA NOVA ESTRUTURA
     $sql = "SELECT 
-                id,
-                nome_cientifico,
-                prioridade
-            FROM especies_administrativo 
-            WHERE status_caracteristicas = 'completo' 
-            AND status_revisao = 'aguardando'
+                e.id,
+                e.nome_cientifico,
+                e.prioridade,
+                c.nome_popular,
+                c.familia
+            FROM especies_administrativo e
+            LEFT JOIN especies_caracteristicas c ON e.id = c.especie_id
+            WHERE e.status = 'registrada' 
+            AND e.data_revisada IS NULL
             ORDER BY 
-                CASE prioridade 
-                    WHEN 'alta' THEN 1 
-                    WHEN 'media' THEN 2 
-                    WHEN 'baixa' THEN 3 
+                CASE e.prioridade 
+                    WHEN 'urgente' THEN 1
+                    WHEN 'alta' THEN 2 
+                    WHEN 'media' THEN 3 
+                    WHEN 'baixa' THEN 4
+                    ELSE 5
                 END,
-                nome_cientifico
+                e.nome_cientifico
             LIMIT 50";
     
     $resultado = mysqli_query($conexao, $sql);

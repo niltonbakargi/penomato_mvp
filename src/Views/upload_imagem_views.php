@@ -1,7 +1,8 @@
 <?php
 // ================================================
 // INTERFACE DE ENVIO DE IMAGENS - IDENTIFICADOR
-// VERSÃO CORRIGIDA
+// VERSÃO CORRIGIDA - 15/02/2026
+// Adaptada para nova estrutura do banco (status único)
 // ================================================
 
 session_start();
@@ -23,56 +24,48 @@ if (!$conexao) {
 mysqli_set_charset($conexao, "utf8mb4");
 
 // ================================================
-// USUÁRIO LOGADO (SIMULAÇÃO - VIRÁ DA SESSÃO)
+// USUÁRIO LOGADO (DA SESSÃO)
 // ================================================
-$id_usuario_logado = 1;
-$nome_usuario_logado = "João Silva";
+$id_usuario_logado = $_SESSION['usuario_id'] ?? 1; // Fallback para 1 durante testes
+$nome_usuario_logado = "Usuário";
+
+// Buscar nome do usuário se possível
+if ($id_usuario_logado) {
+    $sql_user = "SELECT nome FROM usuarios WHERE id = ?";
+    $stmt = mysqli_prepare($conexao, $sql_user);
+    mysqli_stmt_bind_param($stmt, "i", $id_usuario_logado);
+    mysqli_stmt_execute($stmt);
+    $result_user = mysqli_stmt_get_result($stmt);
+    $user_data = mysqli_fetch_assoc($result_user);
+    if ($user_data) {
+        $nome_usuario_logado = $user_data['nome'];
+    }
+    mysqli_stmt_close($stmt);
+}
 
 // ================================================
 // FUNÇÕES
 // ================================================
 
-function getEspeciesPorStatus($conexao, $status) {
-    $sql = "SELECT id, nome_cientifico, status_imagens, prioridade
+/**
+ * Busca espécies que precisam de imagens (status = dados_internet ou descrita)
+ */
+function getEspeciesQuePrecisamImagens($conexao) {
+    $sql = "SELECT id, nome_cientifico, status, prioridade
             FROM especies_administrativo 
-            WHERE status_imagens = ?
+            WHERE status IN ('dados_internet', 'descrita')
             ORDER BY 
-                CASE 
-                    WHEN prioridade = 'alta' THEN 1
-                    WHEN prioridade = 'media' THEN 2
-                    WHEN prioridade = 'baixa' THEN 3
-                    ELSE 4
-                END ASC,
-                nome_cientifico ASC
+                CASE prioridade 
+                    WHEN 'urgente' THEN 1
+                    WHEN 'alta' THEN 2 
+                    WHEN 'media' THEN 3 
+                    WHEN 'baixa' THEN 4
+                    ELSE 5
+                END,
+                nome_cientifico
             LIMIT 50";
     
-    $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $status);
-    mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
-    
-    $especies = [];
-    while ($linha = mysqli_fetch_assoc($resultado)) {
-        $especies[] = $linha;
-    }
-    mysqli_stmt_close($stmt);
-    return $especies;
-}
-
-function getTodasEspecies($conexao) {
-    $sql = "SELECT id, nome_cientifico, status_imagens, prioridade
-            FROM especies_administrativo 
-            ORDER BY 
-                CASE 
-                    WHEN status_imagens = 'sem_imagens' THEN 1
-                    WHEN status_imagens = 'parcial' THEN 2
-                    WHEN status_imagens = 'completo' THEN 3
-                    ELSE 4
-                END ASC,
-                nome_cientifico ASC";
-    
     $resultado = mysqli_query($conexao, $sql);
-    
     $especies = [];
     while ($linha = mysqli_fetch_assoc($resultado)) {
         $especies[] = $linha;
@@ -81,17 +74,63 @@ function getTodasEspecies($conexao) {
     return $especies;
 }
 
+/**
+ * Busca espécies que já estão completas (status = registrada ou superior)
+ */
+function getEspeciesCompletas($conexao) {
+    $sql = "SELECT id, nome_cientifico, status, prioridade
+            FROM especies_administrativo 
+            WHERE status IN ('registrada', 'em_revisao', 'revisada', 'publicado')
+            ORDER BY nome_cientifico
+            LIMIT 30";
+    
+    $resultado = mysqli_query($conexao, $sql);
+    $especies = [];
+    while ($linha = mysqli_fetch_assoc($resultado)) {
+        $especies[] = $linha;
+    }
+    mysqli_free_result($resultado);
+    return $especies;
+}
+
+/**
+ * Busca todas as espécies (para fallback)
+ */
+function getTodasEspecies($conexao) {
+    $sql = "SELECT id, nome_cientifico, status, prioridade
+            FROM especies_administrativo 
+            ORDER BY 
+                CASE status
+                    WHEN 'dados_internet' THEN 1
+                    WHEN 'descrita' THEN 2
+                    WHEN 'sem_dados' THEN 3
+                    WHEN 'registrada' THEN 4
+                    WHEN 'em_revisao' THEN 5
+                    WHEN 'revisada' THEN 6
+                    WHEN 'publicado' THEN 7
+                    ELSE 8
+                END,
+                nome_cientifico
+            LIMIT 100";
+    
+    $resultado = mysqli_query($conexao, $sql);
+    $especies = [];
+    while ($linha = mysqli_fetch_assoc($resultado)) {
+        $especies[] = $linha;
+    }
+    mysqli_free_result($resultado);
+    return $especies;
+}
+
+/**
+ * Busca resumo das imagens por espécie
+ */
 function getResumoImagensPorEspecie($conexao, $especie_id) {
-    // CORRIGIDO: Adicionado 'habito' e removido 'exsicata' (ajuste conforme sua tabela)
     $partes = ['folha', 'flor', 'fruto', 'caule', 'semente', 'habito'];
     $resumo = [];
     
     foreach ($partes as $parte) {
-        $sql = "SELECT 
-                    COUNT(*) as total,
-                    SUM(CASE WHEN status_validacao = 'validado' THEN 1 ELSE 0 END) as validados,
-                    SUM(CASE WHEN status_validacao = 'pendente' THEN 1 ELSE 0 END) as pendentes,
-                    SUM(CASE WHEN status_validacao = 'rejeitado' THEN 1 ELSE 0 END) as rejeitados
+        $sql = "SELECT COUNT(*) as total
                 FROM imagens_especies 
                 WHERE especie_id = ? AND parte = ?";
         
@@ -104,17 +143,18 @@ function getResumoImagensPorEspecie($conexao, $especie_id) {
         
         $resumo[$parte] = [
             'total' => $dados['total'] ?? 0,
-            'validados' => $dados['validados'] ?? 0,
-            'pendentes' => $dados['pendentes'] ?? 0,
-            'rejeitados' => $dados['rejeitados'] ?? 0
+            'tem_imagem' => ($dados['total'] ?? 0) > 0
         ];
     }
     
     return $resumo;
 }
 
+/**
+ * Busca dados de uma espécie específica
+ */
 function getEspeciePorId($conexao, $especie_id) {
-    $sql = "SELECT id, nome_cientifico, status_imagens, status_caracteristicas, prioridade
+    $sql = "SELECT id, nome_cientifico, status, prioridade
             FROM especies_administrativo 
             WHERE id = ?";
     
@@ -128,20 +168,24 @@ function getEspeciePorId($conexao, $especie_id) {
     return $especie;
 }
 
+/**
+ * Busca contribuições do usuário logado
+ */
 function getMinhasContribuicoes($conexao, $id_usuario) {
     $sql = "SELECT 
                 i.id,
                 i.especie_id,
                 i.parte,
-                i.status_validacao,
                 i.data_upload,
                 i.descricao,
-                e.nome_cientifico
+                i.caminho_imagem,
+                e.nome_cientifico,
+                e.status as status_especie
             FROM imagens_especies i
             INNER JOIN especies_administrativo e ON i.especie_id = e.id
             WHERE i.id_usuario_identificador = ?
             ORDER BY i.data_upload DESC
-            LIMIT 20";
+            LIMIT 15";
     
     $stmt = mysqli_prepare($conexao, $sql);
     mysqli_stmt_bind_param($stmt, "i", $id_usuario);
@@ -160,13 +204,12 @@ function getMinhasContribuicoes($conexao, $id_usuario) {
 // PROCESSAR PARÂMETROS
 // ================================================
 
-$aba_ativa = isset($_GET['aba']) ? $_GET['aba'] : 'prioritarias';
 $especie_id_selecionada = isset($_GET['especie_id']) ? (int)$_GET['especie_id'] : 0;
 
 // Limpar seleção
 if (isset($_GET['limpar'])) {
     $especie_id_selecionada = 0;
-    header("Location: upload_imagens.php");
+    header("Location: upload_imagem_views.php");
     exit;
 }
 
@@ -174,10 +217,9 @@ if (isset($_GET['limpar'])) {
 // BUSCAR DADOS
 // ================================================
 
+$especies_prioritarias = getEspeciesQuePrecisamImagens($conexao);
+$especies_completas = getEspeciesCompletas($conexao);
 $todas_especies = getTodasEspecies($conexao);
-$especies_sem_imagens = getEspeciesPorStatus($conexao, 'sem_imagens');
-$especies_parciais = getEspeciesPorStatus($conexao, 'parcial');
-$especies_completas = getEspeciesPorStatus($conexao, 'completo');
 
 $especie_selecionada = null;
 $resumo_imagens = [];
@@ -186,6 +228,8 @@ if ($especie_id_selecionada > 0) {
     $especie_selecionada = getEspeciePorId($conexao, $especie_id_selecionada);
     if ($especie_selecionada) {
         $resumo_imagens = getResumoImagensPorEspecie($conexao, $especie_id_selecionada);
+    } else {
+        $especie_id_selecionada = 0;
     }
 }
 
@@ -334,12 +378,12 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             text-transform: uppercase;
         }
 
-        .badge-sem_imagens { background: var(--vermelho-claro); color: var(--vermelho); border: 1px solid var(--vermelho); }
-        .badge-parcial { background: var(--amarelo-claro); color: #92400e; border: 1px solid var(--amarelo); }
-        .badge-completo { background: var(--verde-sucesso-claro); color: #065f46; border: 1px solid var(--verde-sucesso); }
-        .badge-pendente { background: #fef3c7; color: #92400e; }
-        .badge-validado { background: var(--verde-sucesso-claro); color: #065f46; }
-        .badge-rejeitado { background: var(--vermelho-claro); color: var(--vermelho); }
+        .badge-dados_internet { background: var(--azul-claro); color: #1e40af; border: 1px solid var(--azul); }
+        .badge-descrita { background: var(--verde-claro); color: #065f46; border: 1px solid var(--verde-penomato); }
+        .badge-registrada { background: var(--verde-sucesso-claro); color: #065f46; border: 1px solid var(--verde-sucesso); }
+        .badge-em_revisao { background: var(--amarelo-claro); color: #92400e; border: 1px solid var(--amarelo); }
+        .badge-revisada { background: var(--verde-sucesso-claro); color: #065f46; border: 1px solid var(--verde-sucesso); }
+        .badge-publicado { background: #f3e8ff; color: #6b21a8; border: 1px solid #a855f7; }
 
         /* ========== LAYOUT ========== */
         .grid-dashboard {
@@ -386,7 +430,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         /* ========== CARDS DE PARTES ========== */
         .partes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
@@ -433,7 +477,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
 
         .preview-area {
             width: 100%;
-            height: 100px;
+            height: 80px;
             background: var(--cinza-fundo);
             border-radius: 12px;
             margin-bottom: 15px;
@@ -442,6 +486,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             justify-content: center;
             color: var(--cinza-texto);
             border: 1px solid var(--cinza-borda);
+            font-size: 0.9rem;
         }
 
         /* ========== ÁREA DE UPLOAD ========== */
@@ -492,6 +537,15 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             color: #1e293b;
         }
 
+        .btn-outline:hover {
+            border-color: var(--verde-penomato);
+        }
+
+        .btn-success {
+            background: var(--verde-sucesso);
+            color: white;
+        }
+
         /* ========== CONTRIBUIÇÕES ========== */
         .contribuicao-item {
             display: flex;
@@ -515,6 +569,12 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         .contribuicao-titulo {
             font-weight: 600;
             color: #1e293b;
+        }
+
+        .contribuicao-meta {
+            font-size: 0.8rem;
+            color: var(--cinza-texto);
+            margin-top: 4px;
         }
 
         /* ========== FORMULÁRIO ========== */
@@ -541,6 +601,12 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         .campo input:focus, .campo textarea:focus {
             border-color: var(--verde-penomato);
             outline: none;
+        }
+
+        .campo-obrigatorio::after {
+            content: " *";
+            color: var(--vermelho);
+            font-weight: bold;
         }
 
         .especie-header {
@@ -587,6 +653,36 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             font-weight: 700;
             margin-top: 5px;
         }
+
+        .progresso-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--verde-claro);
+            border-radius: 12px;
+        }
+
+        .barra-progresso {
+            height: 8px;
+            background: var(--cinza-borda);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .barra-progresso-preenchimento {
+            height: 100%;
+            background: var(--verde-penomato);
+            transition: width 0.3s ease;
+        }
+
+        .info-importante {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
@@ -597,8 +693,8 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                 <h1>📸 ENVIO DE EXSICATAS</h1>
                 <?php if ($especie_selecionada): ?>
-                <span class="badge-status badge-<?php echo $especie_selecionada['status_imagens']; ?>">
-                    <?php echo strtoupper($especie_selecionada['status_imagens']); ?>
+                <span class="badge-status badge-<?php echo $especie_selecionada['status']; ?>">
+                    <?php echo strtoupper($especie_selecionada['status']); ?>
                 </span>
                 <?php endif; ?>
             </div>
@@ -634,29 +730,19 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                 <select name="especie_id" class="select-grande" onchange="this.form.submit()">
                     <option value="">-- Selecione uma espécie para enviar imagens --</option>
                     
-                    <?php if (count($especies_sem_imagens) > 0): ?>
-                    <optgroup label="🔴 PRIORITÁRIAS (sem imagens)">
-                        <?php foreach ($especies_sem_imagens as $especie): ?>
+                    <?php if (count($especies_prioritarias) > 0): ?>
+                    <optgroup label="🔴 PRIORITÁRIAS (precisam de imagens)">
+                        <?php foreach ($especies_prioritarias as $especie): ?>
                         <option value="<?php echo $especie['id']; ?>" <?php echo $especie_id_selecionada == $especie['id'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($especie['nome_cientifico']); ?>
-                            <?php if (!empty($especie['prioridade'])): ?>[<?php echo strtoupper($especie['prioridade']); ?>]<?php endif; ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </optgroup>
-                    <?php endif; ?>
-                    
-                    <?php if (count($especies_parciais) > 0): ?>
-                    <optgroup label="🟡 EM ANDAMENTO (parcial)">
-                        <?php foreach ($especies_parciais as $especie): ?>
-                        <option value="<?php echo $especie['id']; ?>" <?php echo $especie_id_selecionada == $especie['id'] ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($especie['nome_cientifico']); ?>
+                            <?php if ($especie['prioridade'] == 'urgente'): ?>[URGENTE]<?php endif; ?>
                         </option>
                         <?php endforeach; ?>
                     </optgroup>
                     <?php endif; ?>
                     
                     <?php if (count($especies_completas) > 0): ?>
-                    <optgroup label="✅ COMPLETAS">
+                    <optgroup label="✅ COMPLETAS (já tem imagens)">
                         <?php foreach ($especies_completas as $especie): ?>
                         <option value="<?php echo $especie['id']; ?>" <?php echo $especie_id_selecionada == $especie['id'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($especie['nome_cientifico']); ?>
@@ -664,14 +750,22 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                         <?php endforeach; ?>
                     </optgroup>
                     <?php endif; ?>
+                    
+                    <optgroup label="📋 TODAS AS ESPÉCIES">
+                        <?php foreach ($todas_especies as $especie): ?>
+                        <option value="<?php echo $especie['id']; ?>" <?php echo $especie_id_selecionada == $especie['id'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($especie['nome_cientifico']); ?> 
+                            (<?php echo $especie['status']; ?>)
+                        </option>
+                        <?php endforeach; ?>
+                    </optgroup>
                 </select>
             </form>
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 15px;">
                 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <div><span style="color: var(--vermelho); font-weight: 600;">🔴</span> Sem imagens: <strong><?php echo count($especies_sem_imagens); ?></strong></div>
-                    <div><span style="color: #92400e; font-weight: 600;">🟡</span> Parcial: <strong><?php echo count($especies_parciais); ?></strong></div>
-                    <div><span style="color: #065f46; font-weight: 600;">✅</span> Completo: <strong><?php echo count($especies_completas); ?></strong></div>
+                    <div><span style="color: var(--azul); font-weight: 600;">🔵</span> Prioritárias: <strong><?php echo count($especies_prioritarias); ?></strong></div>
+                    <div><span style="color: #065f46; font-weight: 600;">✅</span> Completas: <strong><?php echo count($especies_completas); ?></strong></div>
                 </div>
                 <a href="?limpar=1" style="color: var(--cinza-texto); text-decoration: none; padding: 6px 16px; border: 1px solid var(--cinza-borda); border-radius: 30px; font-size: 0.9rem;">
                     🧹 Limpar seleção
@@ -691,15 +785,21 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                     <?php if ($especie_selecionada['prioridade']): ?>
                     <span>🎯 Prioridade: <span style="font-weight: 600; color: var(--verde-penomato);"><?php echo strtoupper($especie_selecionada['prioridade']); ?></span></span>
                     <?php endif; ?>
-                    <span>📊 Status: <?php echo strtoupper($especie_selecionada['status_imagens'] ?? 'SEM IMAGENS'); ?></span>
                 </div>
             </div>
             <div>
-                <span class="badge-status badge-<?php echo $especie_selecionada['status_imagens']; ?>" style="font-size: 0.9rem; padding: 8px 20px;">
-                    <?php echo strtoupper($especie_selecionada['status_imagens']); ?>
+                <span class="badge-status badge-<?php echo $especie_selecionada['status']; ?>" style="font-size: 0.9rem; padding: 8px 20px;">
+                    <?php echo strtoupper($especie_selecionada['status']); ?>
                 </span>
             </div>
         </div>
+
+        <?php if (in_array($especie_selecionada['status'], ['registrada', 'em_revisao', 'revisada', 'publicado'])): ?>
+        <div class="info-importante">
+            <strong>ℹ️ Esta espécie já está em estágio avançado.</strong> 
+            Você ainda pode enviar mais imagens, mas elas serão adicionadas ao acervo existente.
+        </div>
+        <?php endif; ?>
 
         <!-- ========== GRID PRINCIPAL ========== -->
         <div class="grid-dashboard">
@@ -708,42 +808,53 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                 <h2>📸 2. ESCOLHA A PARTE E ENVIE AS IMAGENS</h2>
                 
                 <div class="partes-grid">
-                    <!-- FOLHA -->
+                    <?php
+                    $partes = [
+                        'folha' => ['icone' => '🍃', 'nome' => 'Folha'],
+                        'flor' => ['icone' => '🌸', 'nome' => 'Flor'],
+                        'fruto' => ['icone' => '🍎', 'nome' => 'Fruto'],
+                        'caule' => ['icone' => '🌿', 'nome' => 'Caule'],
+                        'semente' => ['icone' => '🌱', 'nome' => 'Semente'],
+                        'habito' => ['icone' => '🌳', 'nome' => 'Hábito']
+                    ];
+                    
+                    foreach ($partes as $parte_key => $parte_info):
+                        $dados_parte = $resumo_imagens[$parte_key] ?? ['total' => 0, 'tem_imagem' => false];
+                    ?>
                     <div class="parte-card">
                         <div class="parte-header">
-                            <span class="parte-icone">🍃</span>
-                            <span class="parte-nome">Folha</span>
+                            <span class="parte-icone"><?php echo $parte_info['icone']; ?></span>
+                            <span class="parte-nome"><?php echo $parte_info['nome']; ?></span>
                         </div>
-                        <?php $folha = $resumo_imagens['folha'] ?? ['validados' => 0, 'pendentes' => 0, 'rejeitados' => 0]; ?>
+                        
                         <div class="parte-stats">
-                            <span>✅ <strong><?php echo $folha['validados']; ?></strong> validados</span>
-                            <span>⏳ <strong><?php echo $folha['pendentes']; ?></strong> pendentes</span>
-                            <?php if ($folha['rejeitados'] > 0): ?>
-                            <span style="color: var(--vermelho);">❌ <strong><?php echo $folha['rejeitados']; ?></strong> rejeitados</span>
+                            <span>📸 <strong><?php echo $dados_parte['total']; ?></strong> imagens</span>
+                            <?php if ($dados_parte['tem_imagem']): ?>
+                            <span style="color: var(--verde-penomato);">✅ possui imagem</span>
                             <?php endif; ?>
                         </div>
+                        
                         <div class="preview-area">
-                            <?php if ($folha['validados'] > 0): ?>
-                            <span style="color: var(--verde-penomato); font-weight: 500;">✅ Imagem validada</span>
+                            <?php if ($dados_parte['tem_imagem']): ?>
+                            <span style="color: var(--verde-penomato);">✅ Já possui <?php echo $dados_parte['total']; ?> imagem(ns)</span>
                             <?php else: ?>
-                            <span style="color: var(--cinza-texto);">📸 Nenhuma imagem validada</span>
+                            <span style="color: var(--cinza-texto);">📸 Nenhuma imagem ainda</span>
                             <?php endif; ?>
                         </div>
                         
                         <form method="POST" enctype="multipart/form-data" action="../Controllers/upload_imagem_controller.php">
                             <input type="hidden" name="especie_id" value="<?php echo $especie_selecionada['id']; ?>">
-                            <input type="hidden" name="parte" value="folha">
-                            <input type="hidden" name="id_usuario_identificador" value="<?php echo $id_usuario_logado; ?>">
+                            <input type="hidden" name="parte" value="<?php echo $parte_key; ?>">
                             
-                            <div class="upload-area" onclick="document.getElementById('file_folha').click();">
+                            <div class="upload-area" onclick="document.getElementById('file_<?php echo $parte_key; ?>').click();">
                                 <span style="font-size: 1.5rem;">📂</span>
                                 <p style="font-weight: 500; margin-top: 5px;">Clique para selecionar</p>
                                 <p style="font-size: 0.75rem; color: var(--cinza-texto);">JPG, PNG · Máx 10MB</p>
-                                <input type="file" id="file_folha" name="imagem" accept="image/*" style="display: none;" required>
+                                <input type="file" id="file_<?php echo $parte_key; ?>" name="imagem" accept="image/*" style="display: none;" required>
                             </div>
                             
-                            <div class="campo" style="margin-top: 10px;">
-                                <label>Legenda descritiva *</label>
+                            <div class="campo">
+                                <label class="campo-obrigatorio">Legenda descritiva</label>
                                 <input type="text" name="descricao" placeholder="Ex: Face adaxial da folha" required>
                             </div>
                             
@@ -763,215 +874,11 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                             </div>
                             
                             <button type="submit" name="acao_upload" class="btn btn-primary" style="margin-top: 10px;">
-                                <?php echo $folha['validados'] > 0 ? '➕ ADICIONAR MAIS' : '📤 ENVIAR PRIMEIRA IMAGEM'; ?>
+                                <?php echo $dados_parte['tem_imagem'] ? '➕ ADICIONAR MAIS' : '📤 ENVIAR PRIMEIRA IMAGEM'; ?>
                             </button>
                         </form>
                     </div>
-                    
-                    <!-- FLOR -->
-                    <div class="parte-card">
-                        <div class="parte-header">
-                            <span class="parte-icone">🌸</span>
-                            <span class="parte-nome">Flor</span>
-                        </div>
-                        <?php $flor = $resumo_imagens['flor'] ?? ['validados' => 0, 'pendentes' => 0, 'rejeitados' => 0]; ?>
-                        <div class="parte-stats">
-                            <span>✅ <strong><?php echo $flor['validados']; ?></strong> validados</span>
-                            <span>⏳ <strong><?php echo $flor['pendentes']; ?></strong> pendentes</span>
-                        </div>
-                        <div class="preview-area">
-                            <?php if ($flor['validados'] > 0): ?>
-                            <span style="color: var(--verde-penomato);">✅ Imagem validada</span>
-                            <?php else: ?>
-                            <span style="color: var(--cinza-texto);">📸 Nenhuma imagem</span>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <form method="POST" enctype="multipart/form-data" action="../Controllers/upload_imagem_controller.php">
-                            <input type="hidden" name="especie_id" value="<?php echo $especie_selecionada['id']; ?>">
-                            <input type="hidden" name="parte" value="flor">
-                            <input type="hidden" name="id_usuario_identificador" value="<?php echo $id_usuario_logado; ?>">
-                            
-                            <div class="upload-area" onclick="document.getElementById('file_flor').click();">
-                                <span style="font-size: 1.5rem;">📂</span>
-                                <p style="font-weight: 500;">Selecionar arquivo</p>
-                                <input type="file" id="file_flor" name="imagem" accept="image/*" style="display: none;" required>
-                            </div>
-                            
-                            <div class="campo" style="margin-top: 10px;">
-                                <label>Legenda descritiva *</label>
-                                <input type="text" name="descricao" placeholder="Ex: Vista frontal da flor" required>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                                <?php echo $flor['validados'] > 0 ? '➕ ADICIONAR MAIS' : '📤 ENVIAR'; ?>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <!-- FRUTO -->
-                    <div class="parte-card">
-                        <div class="parte-header">
-                            <span class="parte-icone">🍎</span>
-                            <span class="parte-nome">Fruto</span>
-                        </div>
-                        <?php $fruto = $resumo_imagens['fruto'] ?? ['validados' => 0, 'pendentes' => 0, 'rejeitados' => 0]; ?>
-                        <div class="parte-stats">
-                            <span>✅ <strong><?php echo $fruto['validados']; ?></strong> validados</span>
-                            <span>⏳ <strong><?php echo $fruto['pendentes']; ?></strong> pendentes</span>
-                        </div>
-                        <div class="preview-area">
-                            <?php if ($fruto['validados'] > 0): ?>
-                            <span style="color: var(--verde-penomato);">✅ Imagem validada</span>
-                            <?php else: ?>
-                            <span style="color: var(--cinza-texto);">📸 Nenhuma imagem</span>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <form method="POST" enctype="multipart/form-data" action="../Controllers/upload_imagem_controller.php">
-                            <input type="hidden" name="especie_id" value="<?php echo $especie_selecionada['id']; ?>">
-                            <input type="hidden" name="parte" value="fruto">
-                            <input type="hidden" name="id_usuario_identificador" value="<?php echo $id_usuario_logado; ?>">
-                            
-                            <div class="upload-area" onclick="document.getElementById('file_fruto').click();">
-                                <span style="font-size: 1.5rem;">📂</span>
-                                <p style="font-weight: 500;">Selecionar arquivo</p>
-                                <input type="file" id="file_fruto" name="imagem" accept="image/*" style="display: none;" required>
-                            </div>
-                            
-                            <div class="campo" style="margin-top: 10px;">
-                                <label>Legenda descritiva *</label>
-                                <input type="text" name="descricao" placeholder="Ex: Fruto inteiro" required>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                                <?php echo $fruto['validados'] > 0 ? '➕ ADICIONAR MAIS' : '📤 ENVIAR'; ?>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <!-- CAULE -->
-                    <div class="parte-card">
-                        <div class="parte-header">
-                            <span class="parte-icone">🌿</span>
-                            <span class="parte-nome">Caule</span>
-                        </div>
-                        <?php $caule = $resumo_imagens['caule'] ?? ['validados' => 0, 'pendentes' => 0, 'rejeitados' => 0]; ?>
-                        <div class="parte-stats">
-                            <span>✅ <strong><?php echo $caule['validados']; ?></strong> validados</span>
-                            <?php if ($caule['pendentes'] > 0): ?>
-                            <span>⏳ <strong><?php echo $caule['pendentes']; ?></strong> pendentes</span>
-                            <?php endif; ?>
-                        </div>
-                        <div class="preview-area">
-                            <?php if ($caule['validados'] > 0): ?>
-                            <span style="color: var(--verde-penomato);">✅ Imagem validada</span>
-                            <?php else: ?>
-                            <span style="color: var(--cinza-texto);">📸 Nenhuma imagem</span>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <form method="POST" enctype="multipart/form-data" action="../Controllers/upload_imagem_controller.php">
-                            <input type="hidden" name="especie_id" value="<?php echo $especie_selecionada['id']; ?>">
-                            <input type="hidden" name="parte" value="caule">
-                            <input type="hidden" name="id_usuario_identificador" value="<?php echo $id_usuario_logado; ?>">
-                            
-                            <div class="upload-area" onclick="document.getElementById('file_caule').click();">
-                                <span style="font-size: 1.5rem;">📂</span>
-                                <p style="font-weight: 500;">Selecionar arquivo</p>
-                                <input type="file" id="file_caule" name="imagem" accept="image/*" style="display: none;" required>
-                            </div>
-                            
-                            <div class="campo" style="margin-top: 10px;">
-                                <label>Legenda descritiva *</label>
-                                <input type="text" name="descricao" placeholder="Ex: Detalhe da casca" required>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                                <?php echo $caule['validados'] > 0 ? '➕ ADICIONAR MAIS' : '📤 ENVIAR'; ?>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <!-- SEMENTE -->
-                    <div class="parte-card">
-                        <div class="parte-header">
-                            <span class="parte-icone">🌱</span>
-                            <span class="parte-nome">Semente</span>
-                        </div>
-                        <?php $semente = $resumo_imagens['semente'] ?? ['validados' => 0, 'pendentes' => 0, 'rejeitados' => 0]; ?>
-                        <div class="parte-stats">
-                            <span>✅ <strong><?php echo $semente['validados']; ?></strong> validados</span>
-                        </div>
-                        <div class="preview-area">
-                            <?php if ($semente['validados'] > 0): ?>
-                            <span style="color: var(--verde-penomato);">✅ Imagem validada</span>
-                            <?php else: ?>
-                            <span style="color: var(--cinza-texto);">📸 Nenhuma imagem</span>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <form method="POST" enctype="multipart/form-data" action="../Controllers/upload_imagem_controller.php">
-                            <input type="hidden" name="especie_id" value="<?php echo $especie_selecionada['id']; ?>">
-                            <input type="hidden" name="parte" value="semente">
-                            <input type="hidden" name="id_usuario_identificador" value="<?php echo $id_usuario_logado; ?>">
-                            
-                            <div class="upload-area" onclick="document.getElementById('file_semente').click();">
-                                <span style="font-size: 1.5rem;">📂</span>
-                                <p style="font-weight: 500;">Selecionar arquivo</p>
-                                <input type="file" id="file_semente" name="imagem" accept="image/*" style="display: none;" required>
-                            </div>
-                            
-                            <div class="campo" style="margin-top: 10px;">
-                                <label>Legenda descritiva *</label>
-                                <input type="text" name="descricao" placeholder="Ex: Sementes" required>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                                <?php echo $semente['validados'] > 0 ? '➕ ADICIONAR MAIS' : '📤 ENVIAR'; ?>
-                            </button>
-                        </form>
-                    </div>
-                    
-                    <!-- HÁBITO (ADICIONADO - ESTAVA FALTANDO) -->
-                    <div class="parte-card">
-                        <div class="parte-header">
-                            <span class="parte-icone">🌳</span>
-                            <span class="parte-nome">Hábito</span>
-                        </div>
-                        <?php $habito = $resumo_imagens['habito'] ?? ['validados' => 0, 'pendentes' => 0, 'rejeitados' => 0]; ?>
-                        <div class="parte-stats">
-                            <span>✅ <strong><?php echo $habito['validados']; ?></strong> validados</span>
-                        </div>
-                        <div class="preview-area">
-                            <?php if ($habito['validados'] > 0): ?>
-                            <span style="color: var(--verde-penomato);">✅ Imagem validada</span>
-                            <?php else: ?>
-                            <span style="color: var(--cinza-texto);">📸 Nenhuma imagem</span>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <form method="POST" enctype="multipart/form-data" action="../Controllers/upload_imagem_controller.php">
-                            <input type="hidden" name="especie_id" value="<?php echo $especie_selecionada['id']; ?>">
-                            <input type="hidden" name="parte" value="habito">
-                            <input type="hidden" name="id_usuario_identificador" value="<?php echo $id_usuario_logado; ?>">
-                            
-                            <div class="upload-area" onclick="document.getElementById('file_habito').click();">
-                                <span style="font-size: 1.5rem;">📂</span>
-                                <p style="font-weight: 500;">Selecionar arquivo</p>
-                                <input type="file" id="file_habito" name="imagem" accept="image/*" style="display: none;" required>
-                            </div>
-                            
-                            <div class="campo" style="margin-top: 10px;">
-                                <label>Legenda descritiva *</label>
-                                <input type="text" name="descricao" placeholder="Ex: Planta inteira" required>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                                <?php echo $habito['validados'] > 0 ? '➕ ADICIONAR MAIS' : '📤 ENVIAR'; ?>
-                            </button>
-                        </form>
-                    </div>
+                    <?php endforeach; ?>
                 </div> <!-- FIM partes-grid -->
             </div> <!-- FIM COLUNA 1 -->
             
@@ -1004,13 +911,9 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                                 <div class="contribuicao-titulo">
                                     <?php echo htmlspecialchars($contrib['nome_cientifico']); ?>
                                 </div>
-                                <div style="display: flex; gap: 8px; align-items: center; margin-top: 5px; flex-wrap: wrap;">
-                                    <span class="badge-status badge-<?php echo $contrib['status_validacao']; ?>">
-                                        <?php echo $contrib['status_validacao']; ?>
-                                    </span>
-                                    <span style="font-size: 0.8rem; color: var(--cinza-texto);">
-                                        <?php echo date('d/m/Y', strtotime($contrib['data_upload'])); ?>
-                                    </span>
+                                <div class="contribuicao-meta">
+                                    <span><?php echo ucfirst($contrib['parte']); ?></span> · 
+                                    <span><?php echo date('d/m/Y H:i', strtotime($contrib['data_upload'])); ?></span>
                                 </div>
                                 <?php if ($contrib['descricao']): ?>
                                 <div style="font-size: 0.8rem; color: var(--cinza-texto); margin-top: 5px;">
@@ -1033,133 +936,85 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                 <!-- PROGRESSO DA ESPÉCIE -->
                 <div class="card">
                     <h2>📊 PROGRESSO DA ESPÉCIE</h2>
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                        <!-- FOLHA -->
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-weight: 600;">🍃 Folha</span>
-                                <span style="color: var(--verde-penomato); font-weight: 600;">
-                                    <?php echo $resumo_imagens['folha']['validados'] ?? 0; ?> validados
-                                </span>
-                            </div>
-                            <div style="height: 8px; background: var(--cinza-borda); border-radius: 4px; overflow: hidden;">
-                                <div style="height: 100%; width: <?php echo min(100, ($resumo_imagens['folha']['validados'] ?? 0) * 20); ?>%; background: var(--verde-penomato);"></div>
-                            </div>
-                            <?php if (($resumo_imagens['folha']['pendentes'] ?? 0) > 0 || ($resumo_imagens['folha']['rejeitados'] ?? 0) > 0): ?>
-                            <div style="display: flex; gap: 15px; margin-top: 6px; font-size: 0.8rem;">
-                                <?php if (($resumo_imagens['folha']['pendentes'] ?? 0) > 0): ?>
-                                <span style="color: #92400e;">⏳ <?php echo $resumo_imagens['folha']['pendentes']; ?> pendentes</span>
-                                <?php endif; ?>
-                                <?php if (($resumo_imagens['folha']['rejeitados'] ?? 0) > 0): ?>
-                                <span style="color: var(--vermelho);">❌ <?php echo $resumo_imagens['folha']['rejeitados']; ?> rejeitados</span>
-                                <?php endif; ?>
-                            </div>
-                            <?php endif; ?>
+                    
+                    <?php
+                    $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
+                    $total_partes = count($partes_obrigatorias);
+                    $partes_com_imagem = 0;
+                    
+                    foreach ($partes_obrigatorias as $p) {
+                        if ($resumo_imagens[$p]['tem_imagem']) {
+                            $partes_com_imagem++;
+                        }
+                    }
+                    
+                    $percentual = round(($partes_com_imagem / $total_partes) * 100);
+                    ?>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-weight: 600;">Partes obrigatórias</span>
+                            <span style="color: var(--verde-penomato); font-weight: 600;">
+                                <?php echo $partes_com_imagem; ?>/<?php echo $total_partes; ?>
+                            </span>
                         </div>
-                        
-                        <!-- FLOR -->
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-weight: 600;">🌸 Flor</span>
-                                <span style="color: var(--verde-penomato); font-weight: 600;">
-                                    <?php echo $resumo_imagens['flor']['validados'] ?? 0; ?> validados
-                                </span>
-                            </div>
-                            <div style="height: 8px; background: var(--cinza-borda); border-radius: 4px; overflow: hidden;">
-                                <div style="height: 100%; width: <?php echo min(100, ($resumo_imagens['flor']['validados'] ?? 0) * 20); ?>%; background: var(--verde-penomato);"></div>
-                            </div>
+                        <div class="barra-progresso">
+                            <div class="barra-progresso-preenchimento" style="width: <?php echo $percentual; ?>%;"></div>
                         </div>
-                        
-                        <!-- FRUTO -->
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-weight: 600;">🍎 Fruto</span>
-                                <span style="color: var(--verde-penomato); font-weight: 600;">
-                                    <?php echo $resumo_imagens['fruto']['validados'] ?? 0; ?> validados
-                                </span>
-                            </div>
-                            <div style="height: 8px; background: var(--cinza-borda); border-radius: 4px; overflow: hidden;">
-                                <div style="height: 100%; width: <?php echo min(100, ($resumo_imagens['fruto']['validados'] ?? 0) * 20); ?>%; background: var(--verde-penomato);"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- CAULE -->
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-weight: 600;">🌿 Caule</span>
-                                <span style="color: var(--verde-penomato); font-weight: 600;">
-                                    <?php echo $resumo_imagens['caule']['validados'] ?? 0; ?> validados
-                                </span>
-                            </div>
-                            <div style="height: 8px; background: var(--cinza-borda); border-radius: 4px; overflow: hidden;">
-                                <div style="height: 100%; width: <?php echo min(100, ($resumo_imagens['caule']['validados'] ?? 0) * 20); ?>%; background: var(--verde-penomato);"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- SEMENTE -->
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-weight: 600;">🌱 Semente</span>
-                                <span style="color: var(--verde-penomato); font-weight: 600;">
-                                    <?php echo $resumo_imagens['semente']['validados'] ?? 0; ?> validados
-                                </span>
-                            </div>
-                            <div style="height: 8px; background: var(--cinza-borda); border-radius: 4px; overflow: hidden;">
-                                <div style="height: 100%; width: <?php echo min(100, ($resumo_imagens['semente']['validados'] ?? 0) * 20); ?>%; background: var(--verde-penomato);"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- HÁBITO -->
-                        <div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-weight: 600;">🌳 Hábito</span>
-                                <span style="color: var(--verde-penomato); font-weight: 600;">
-                                    <?php echo $resumo_imagens['habito']['validados'] ?? 0; ?> validados
-                                </span>
-                            </div>
-                            <div style="height: 8px; background: var(--cinza-borda); border-radius: 4px; overflow: hidden;">
-                                <div style="height: 100%; width: <?php echo min(100, ($resumo_imagens['habito']['validados'] ?? 0) * 20); ?>%; background: var(--verde-penomato);"></div>
-                            </div>
+                        <div style="margin-top: 5px; font-size: 0.85rem; color: var(--cinza-texto);">
+                            Progresso: <?php echo $percentual; ?>%
                         </div>
                     </div>
                     
-                    <!-- STATUS PARA PUBLICAÇÃO -->
-                    <div style="margin-top: 30px; padding: 20px; background: var(--verde-claro); border-radius: 12px;">
-                        <div style="display: flex; align-items: flex-start; gap: 12px;">
-                            <span style="font-size: 1.8rem;">🏆</span>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 700; color: var(--verde-penomato); margin-bottom: 8px;">Status para publicação</div>
-                                <div style="font-size: 0.95rem; color: var(--cinza-texto);">
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <?php foreach ($partes_obrigatorias as $p): ?>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span style="font-weight: 500;">
                                     <?php 
-                                    // CORRIGIDO: Cálculo correto do progresso
-                                    $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
-                                    $total_partes = count($partes_obrigatorias);
-                                    $partes_validadas = 0;
-                                    
-                                    foreach ($partes_obrigatorias as $p) {
-                                        if (($resumo_imagens[$p]['validados'] ?? 0) > 0) {
-                                            $partes_validadas++;
-                                        }
-                                    }
-                                    
-                                    $percentual = round(($partes_validadas / $total_partes) * 100);
+                                        $nomes = ['folha' => '🍃 Folha', 'flor' => '🌸 Flor', 'fruto' => '🍎 Fruto', 
+                                                  'caule' => '🌿 Caule', 'habito' => '🌳 Hábito'];
+                                        echo $nomes[$p];
                                     ?>
-                                    <strong><?php echo $partes_validadas; ?> de <?php echo $total_partes; ?> partes obrigatórias</strong> com imagem validada
+                                </span>
+                                <span style="color: <?php echo $resumo_imagens[$p]['tem_imagem'] ? 'var(--verde-penomato)' : 'var(--cinza-texto)'; ?>; font-weight: 600;">
+                                    <?php echo $resumo_imagens[$p]['total']; ?> imagens
+                                </span>
+                            </div>
+                            <div class="barra-progresso" style="height: 6px;">
+                                <div class="barra-progresso-preenchimento" 
+                                     style="width: <?php echo $resumo_imagens[$p]['tem_imagem'] ? '100%' : '0%'; ?>; 
+                                            background: <?php echo $resumo_imagens[$p]['tem_imagem'] ? 'var(--verde-penomato)' : 'var(--cinza-borda)'; ?>;">
                                 </div>
-                                <div style="height: 8px; background: var(--cinza-borda); border-radius: 4px; margin-top: 12px; overflow: hidden;">
-                                    <div style="height: 100%; width: <?php echo $percentual; ?>%; background: var(--verde-penomato);"></div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    
+                    <?php if ($partes_com_imagem == $total_partes): ?>
+                    <div class="progresso-container" style="margin-top: 25px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 2rem;">🏆</span>
+                            <div>
+                                <div style="font-weight: 700; color: var(--verde-penomato); margin-bottom: 5px;">
+                                    Todas as partes têm imagens!
                                 </div>
-                                <div style="margin-top: 8px; font-size: 0.85rem; color: var(--cinza-texto);">
-                                    Progresso: <?php echo $percentual; ?>%
+                                <div style="font-size: 0.9rem; color: var(--cinza-texto);">
+                                    Esta espécie está pronta para revisão.
+                                    <?php if ($especie_selecionada['status'] == 'dados_internet' || $especie_selecionada['status'] == 'descrita'): ?>
+                                    O sistema vai avançar automaticamente para "registrada".
+                                    <?php endif; ?>
                                 </div>
-                                <?php if ($percentual == 100): ?>
-                                <div style="margin-top: 15px; background: var(--verde-sucesso-claro); color: #065f46; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600;">
-                                    ✅ Esta espécie está pronta para publicação!
-                                </div>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($especie_selecionada['status'] == 'dados_internet'): ?>
+                    <div class="info-importante" style="margin-top: 20px;">
+                        <strong>ℹ️ Dados da internet</strong> - As características desta espécie vieram de fontes não verificadas. As imagens que você enviar ajudarão na validação.
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div> <!-- FIM COLUNA 2 -->
         </div> <!-- FIM grid-dashboard -->
@@ -1172,32 +1027,29 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             <h2 style="margin-top: 20px; color: var(--verde-penomato);">Nenhuma espécie selecionada</h2>
             <p style="margin-top: 10px; color: var(--cinza-texto); max-width: 500px; margin-left: auto; margin-right: auto;">
                 Selecione uma espécie na lista acima para começar a enviar imagens. 
-                Dê prioridade às espécies com status <span style="background: var(--vermelho-claro); color: var(--vermelho); padding: 4px 12px; border-radius: 30px; font-weight: 600;">SEM_IMAGENS</span>.
+                Dê prioridade às espécies com status <span style="background: var(--azul-claro); color: #1e40af; padding: 4px 12px; border-radius: 30px; font-weight: 600;">DADOS_INTERNET</span> ou <span style="background: var(--verde-claro); color: #065f46; padding: 4px 12px; border-radius: 30px; font-weight: 600;">DESCRITA</span>.
             </p>
             
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">🔴</div>
-                    <div style="font-weight: 600;">Prioritárias</div>
-                    <div style="font-size: 0.9rem; color: var(--cinza-texto);">Nunca enviaram</div>
-                    <div class="stat-value" style="color: var(--vermelho);">
-                        <?php echo count($especies_sem_imagens); ?>
-                    </div>
-                </div>
-                <div class="stat-item">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">🟡</div>
-                    <div style="font-weight: 600;">Em andamento</div>
-                    <div style="font-size: 0.9rem; color: var(--cinza-texto);">Parcial</div>
-                    <div class="stat-value" style="color: #92400e;">
-                        <?php echo count($especies_parciais); ?>
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🔵</div>
+                    <div style="font-weight: 600;">Precisam de imagens</div>
+                    <div class="stat-value" style="color: var(--azul);">
+                        <?php echo count($especies_prioritarias); ?>
                     </div>
                 </div>
                 <div class="stat-item">
                     <div style="font-size: 2rem; margin-bottom: 10px;">✅</div>
-                    <div style="font-weight: 600;">Completas</div>
-                    <div style="font-size: 0.9rem; color: var(--cinza-texto);">Acervo completo</div>
-                    <div class="stat-value" style="color: #065f46;">
+                    <div style="font-weight: 600;">Já completas</div>
+                    <div class="stat-value" style="color: var(--verde-penomato);">
                         <?php echo count($especies_completas); ?>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📋</div>
+                    <div style="font-weight: 600;">Total no sistema</div>
+                    <div class="stat-value">
+                        <?php echo count($todas_especies); ?>
                     </div>
                 </div>
             </div>

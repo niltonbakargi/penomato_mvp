@@ -2,6 +2,7 @@
 // ================================================
 // CONTROLLER DE UPLOAD DE IMAGENS
 // Processa o envio das imagens e salva no banco
+// VERSÃO CORRIGIDA - 15/02/2026
 // ================================================
 
 session_start();
@@ -150,20 +151,32 @@ function redimensionarImagem($caminho_origem, $caminho_destino, $largura_max = 1
 }
 
 /**
- * Atualiza o status_imagens na tabela especies_administrativo
+ * ATUALIZADO: Verifica se espécie pode avançar para 'registrada'
  */
-function atualizarStatusImagens($conexao, $especie_id) {
-    // Define partes obrigatórias
-    $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
-    $total_obrigatorias = count($partes_obrigatorias);
-    $partes_validadas = 0;
+function verificarEAvancarStatus($conexao, $especie_id) {
+    // 1. Verificar status atual da espécie
+    $sql = "SELECT status FROM especies_administrativo WHERE id = ?";
+    $stmt = mysqli_prepare($conexao, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $especie_id);
+    mysqli_stmt_execute($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
+    $dados = mysqli_fetch_assoc($resultado);
+    mysqli_stmt_close($stmt);
     
-    // Verifica cada parte obrigatória
+    $status_atual = $dados['status'] ?? '';
+    
+    // 2. Se não está em status que pode avançar, mantém
+    if (!in_array($status_atual, ['dados_internet', 'descrita'])) {
+        return $status_atual;
+    }
+    
+    // 3. Verificar se tem imagens de todas as partes obrigatórias
+    $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
+    $todas_as_partes = true;
+    
     foreach ($partes_obrigatorias as $parte) {
-        $sql = "SELECT COUNT(*) as total 
-                FROM imagens_especies 
-                WHERE especie_id = ? AND parte = ? AND status_validacao = 'validado'";
-        
+        $sql = "SELECT COUNT(*) as total FROM imagens_especies 
+                WHERE especie_id = ? AND parte = ?";
         $stmt = mysqli_prepare($conexao, $sql);
         mysqli_stmt_bind_param($stmt, "is", $especie_id, $parte);
         mysqli_stmt_execute($stmt);
@@ -171,40 +184,30 @@ function atualizarStatusImagens($conexao, $especie_id) {
         $dados = mysqli_fetch_assoc($resultado);
         mysqli_stmt_close($stmt);
         
-        if ($dados['total'] > 0) {
-            $partes_validadas++;
+        if ($dados['total'] == 0) {
+            $todas_as_partes = false;
+            break;
         }
     }
     
-    // Verifica se tem pelo menos UMA imagem (qualquer status)
-    $sql_qualquer = "SELECT COUNT(*) as total FROM imagens_especies WHERE especie_id = ?";
-    $stmt = mysqli_prepare($conexao, $sql_qualquer);
-    mysqli_stmt_bind_param($stmt, "i", $especie_id);
-    mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
-    $dados_qualquer = mysqli_fetch_assoc($resultado);
-    mysqli_stmt_close($stmt);
-    
-    // Define novo status
-    if ($dados_qualquer['total'] == 0) {
-        $novo_status = 'sem_imagens';
-    } elseif ($partes_validadas >= $total_obrigatorias) {
-        $novo_status = 'completo';
-    } else {
-        $novo_status = 'parcial';
+    // 4. Se tem todas as partes, avança para 'registrada'
+    if ($todas_as_partes) {
+        $novo_status = 'registrada';
+        
+        $sql_update = "UPDATE especies_administrativo 
+                       SET status = ?,
+                           data_registrada = NOW()
+                       WHERE id = ?";
+        
+        $stmt = mysqli_prepare($conexao, $sql_update);
+        mysqli_stmt_bind_param($stmt, "si", $novo_status, $especie_id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        
+        return $novo_status;
     }
     
-    // Atualiza a espécie
-    $sql_update = "UPDATE especies_administrativo 
-                   SET status_imagens = ? 
-                   WHERE id = ?";
-    
-    $stmt = mysqli_prepare($conexao, $sql_update);
-    mysqli_stmt_bind_param($stmt, "si", $novo_status, $especie_id);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-    
-    return $novo_status;
+    return $status_atual;
 }
 
 // ================================================
@@ -215,14 +218,24 @@ function atualizarStatusImagens($conexao, $especie_id) {
 $erro = '';
 $sucesso = '';
 
+// Pega usuário da sessão
+$id_usuario = $_SESSION['usuario_id'] ?? 0;
+
 // Log para depuração
 error_log("=== INÍCIO DO PROCESSAMENTO DE UPLOAD ===");
 error_log("Método: " . $_SERVER['REQUEST_METHOD']);
+error_log("Usuário da sessão: " . $id_usuario);
 error_log("POST: " . print_r($_POST, true));
 error_log("FILES: " . print_r($_FILES, true));
 
+// Verifica se usuário está logado
+if ($id_usuario == 0) {
+    $erro = 'Usuário não está logado. Faça login para enviar imagens.';
+    error_log("ERRO: Usuário não logado");
+}
+
 // Verifica se é POST e tem arquivo
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['imagem'])) {
+elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['imagem'])) {
     
     // Valida campos obrigatórios
     if (empty($_POST['especie_id'])) {
@@ -234,15 +247,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['imagem'])) {
     } elseif (empty($_POST['descricao'])) {
         $erro = 'Legenda descritiva é obrigatória.';
         error_log("ERRO: descricao vazia");
-    } elseif (empty($_POST['id_usuario_identificador'])) {
-        $erro = 'Usuário identificador não informado.';
-        error_log("ERRO: id_usuario_identificador vazio");
     } else {
         
         $especie_id = (int)$_POST['especie_id'];
         $parte = $_POST['parte'];
         $descricao = trim($_POST['descricao']);
-        $id_usuario = (int)$_POST['id_usuario_identificador'];
         $localizacao = !empty($_POST['localizacao']) ? $_POST['localizacao'] : null;
         $data_coleta = !empty($_POST['data_coleta']) ? $_POST['data_coleta'] : null;
         $observacoes = !empty($_POST['observacoes']) ? $_POST['observacoes'] : null;
@@ -259,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['imagem'])) {
             mysqli_set_charset($conexao, "utf8mb4");
             
             // Valida se a espécie existe
-            $sql_check = "SELECT id, nome_cientifico FROM especies_administrativo WHERE id = ?";
+            $sql_check = "SELECT id, nome_cientifico, status FROM especies_administrativo WHERE id = ?";
             $stmt = mysqli_prepare($conexao, $sql_check);
             mysqli_stmt_bind_param($stmt, "i", $especie_id);
             mysqli_stmt_execute($stmt);
@@ -295,67 +304,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['imagem'])) {
                     // Redimensiona e salva a imagem
                     if (redimensionarImagem($arquivo['tmp_name'], $caminho_completo)) {
                         
-                        // Verifica se as colunas existem na tabela
-                        $sql_check_col = "SHOW COLUMNS FROM imagens_especies LIKE 'descricao'";
-                        $check_result = mysqli_query($conexao, $sql_check_col);
-                        $tem_descricao = mysqli_num_rows($check_result) > 0;
+                        // Insere no banco (assumindo que todos os campos existem)
+                        $sql_insert = "INSERT INTO imagens_especies (
+                            especie_id,
+                            parte,
+                            caminho_imagem,
+                            id_usuario_identificador,
+                            data_upload,
+                            descricao,
+                            localizacao,
+                            data_coleta,
+                            observacoes
+                        ) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)";
                         
-                        if ($tem_descricao) {
-                            // Insere no banco com os campos novos
-                            $sql_insert = "INSERT INTO imagens_especies (
-                                especie_id,
-                                parte,
-                                caminho_imagem,
-                                id_usuario_identificador,
-                                status_validacao,
-                                data_upload,
-                                descricao,
-                                localizacao,
-                                data_coleta,
-                                observacoes
-                            ) VALUES (?, ?, ?, ?, 'pendente', NOW(), ?, ?, ?, ?)";
-                            
-                            $stmt = mysqli_prepare($conexao, $sql_insert);
-                            mysqli_stmt_bind_param($stmt, 
-                                "ississss", 
-                                $especie_id,
-                                $parte,
-                                $caminho_relativo,
-                                $id_usuario,
-                                $descricao,
-                                $localizacao,
-                                $data_coleta,
-                                $observacoes
-                            );
-                        } else {
-                            // Insere no banco sem os campos novos
-                            $sql_insert = "INSERT INTO imagens_especies (
-                                especie_id,
-                                parte,
-                                caminho_imagem,
-                                id_usuario_identificador,
-                                status_validacao,
-                                data_upload
-                            ) VALUES (?, ?, ?, ?, 'pendente', NOW())";
-                            
-                            $stmt = mysqli_prepare($conexao, $sql_insert);
-                            mysqli_stmt_bind_param($stmt, 
-                                "issi", 
-                                $especie_id,
-                                $parte,
-                                $caminho_relativo,
-                                $id_usuario
-                            );
-                        }
+                        $stmt = mysqli_prepare($conexao, $sql_insert);
+                        mysqli_stmt_bind_param($stmt, 
+                            "ississss", 
+                            $especie_id,
+                            $parte,
+                            $caminho_relativo,
+                            $id_usuario,
+                            $descricao,
+                            $localizacao,
+                            $data_coleta,
+                            $observacoes
+                        );
                         
                         if (mysqli_stmt_execute($stmt)) {
                             $imagem_id = mysqli_insert_id($conexao);
                             
-                            // Atualiza status_imagens da espécie
-                            $novo_status = atualizarStatusImagens($conexao, $especie_id);
+                            // Verifica se pode avançar para 'registrada'
+                            $novo_status = verificarEAvancarStatus($conexao, $especie_id);
                             
                             $sucesso = "Imagem enviada com sucesso! ID: {$imagem_id}";
-                            error_log("SUCESSO: Imagem {$imagem_id} salva. Novo status da espécie: {$novo_status}");
+                            error_log("SUCESSO: Imagem {$imagem_id} salva. Status da espécie: {$novo_status}");
                             
                         } else {
                             $erro = "Erro ao salvar dados no banco: " . mysqli_error($conexao);
@@ -405,3 +387,4 @@ error_log("Redirecionando para: " . $redirect);
 header("Location: {$redirect}");
 ob_end_clean();
 exit;
+?>
