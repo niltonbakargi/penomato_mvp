@@ -1,18 +1,7 @@
-# Ativar rewrite engine
+# .htaccess SIMPLIFICADO - PENOMATO MVP
 RewriteEngine On
 
-# Redirecionar tudo para public/index.php
+# Redirecionar tudo para index.php (menos arquivos reais)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ public/index.php?url= [QSA,L]
-
-# Proteger arquivos sensíveis
-<FilesMatch "^\.">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# Proteger diretórios
-RedirectMatch 403 ^/config/
-RedirectMatch 403 ^/database/
-RedirectMatch 403 ^/src/
+RewriteRule ^(.*)$ index.php [L]
