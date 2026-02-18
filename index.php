@@ -345,7 +345,7 @@ $tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
                         <!-- OPÇÕES PRINCIPAIS -->
                         <div class="main-options">
                             <!-- Card PESQUISAR -->
-                            <div class="option-card" onclick="window.location.href='/penomato_mvp/src/Views/busca_caracteristicas.php'">
+                            <div class="option-card" onclick="window.location.href='/penomato_mvp/src/Views/publico/busca_caracteristicas.php'">
                                 <div class="option-icon">
                                     <i class="fas fa-search"></i>
                                 </div>
