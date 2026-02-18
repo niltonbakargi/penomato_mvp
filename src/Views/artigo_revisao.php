@@ -1,26 +1,27 @@
 <?php
 // artigo_revisao.php
-// Local: C:\xampp\htdocs\penomato_mvp\src\Views\artigo_revisao.php
-// VERSÃO CORRIGIDA - 15/02/2026
-// Integrada com o controlador e nova estrutura do banco
+// MVP - Versão corrigida e integrada com PDO
 
 session_start();
 
 // ================================================
-// VERIFICAÇÕES INICIAIS
+// CARREGAR CONFIGURAÇÃO
 // ================================================
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
-// Verificar se usuário está logado
+// ================================================
+// VERIFICAÇÕES DE ACESSO
+// ================================================
 $usuario_id = $_SESSION['usuario_id'] ?? 0;
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Revisor';
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? '';
 
 if (!$usuario_id) {
-    header('Location: ../../login.php');
+    header('Location: /penomato_mvp/index.php');
     exit;
 }
 
-// Verificar se é revisor (pode ser gestor também)
+// Apenas revisores e gestores podem acessar
 if ($usuario_tipo !== 'revisor' && $usuario_tipo !== 'gestor') {
     die('Acesso negado. Apenas revisores podem acessar esta página.');
 }
@@ -28,128 +29,114 @@ if ($usuario_tipo !== 'revisor' && $usuario_tipo !== 'gestor') {
 // ================================================
 // PARÂMETROS
 // ================================================
-
 $especie_id = $_GET['id'] ?? 0;
 if (!$especie_id) {
-    header('Location: ../Controllers/controlador_painel_revisor.php');
+    header('Location: /penomato_mvp/src/Controllers/controlador_painel_revisor.php');
     exit;
 }
-
-// ================================================
-// CONEXÃO COM O BANCO
-// ================================================
-
-$conn = mysqli_connect("127.0.0.1", "root", "", "penomato");
-if (!$conn) {
-    die("Erro de conexão: " . mysqli_connect_error());
-}
-mysqli_set_charset($conn, "utf8mb4");
 
 // ================================================
 // VERIFICAR SE ESPÉCIE ESTÁ EM REVISÃO
 // ================================================
-
-$sql_check = "SELECT status FROM especies_administrativo WHERE id = ?";
-$stmt = mysqli_prepare($conn, $sql_check);
-mysqli_stmt_bind_param($stmt, "i", $especie_id);
-mysqli_stmt_execute($stmt);
-$result_check = mysqli_stmt_get_result($stmt);
-$status_data = mysqli_fetch_assoc($result_check);
-mysqli_stmt_close($stmt);
-
-if (!$status_data) {
-    die("Espécie não encontrada");
-}
-
-if ($status_data['status'] !== 'em_revisao') {
-    // Se não está em revisão, redireciona
-    header('Location: ../Controllers/controlador_painel_revisor.php?erro=nao_em_revisao');
-    exit;
+try {
+    // Primeiro, verificar se o usuário já está revisando esta espécie
+    // (por segurança, mas como não temos campo, apenas verificamos status)
+    $sql_check = "SELECT status FROM especies_administrativo WHERE id = ?";
+    $stmt = $pdo->prepare($sql_check);
+    $stmt->execute([$especie_id]);
+    $status_data = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$status_data) {
+        die("Espécie não encontrada");
+    }
+    
+    // Se não estiver em revisão, tentar bloquear para este revisor
+    if ($status_data['status'] !== 'em_revisao') {
+        // Tenta atualizar para 'em_revisao' se ainda estiver disponível
+        $sql_lock = "UPDATE especies_administrativo 
+                     SET status = 'em_revisao', 
+                         data_ultima_atualizacao = NOW() 
+                     WHERE id = ? AND status = 'registrada'";
+        $stmt_lock = $pdo->prepare($sql_lock);
+        $stmt_lock->execute([$especie_id]);
+        
+        if ($stmt_lock->rowCount() === 0) {
+            // Não conseguiu travar - redireciona
+            header('Location: /penomato_mvp/src/Controllers/controlador_painel_revisor.php?erro=indisponivel');
+            exit;
+        }
+    }
+    
+} catch (Exception $e) {
+    die("Erro ao verificar espécie: " . $e->getMessage());
 }
 
 // ================================================
 // BUSCAR DADOS DA ESPÉCIE
 // ================================================
-
-// Buscar informações básicas da espécie
-$sql_especie = "SELECT 
-                    id,
-                    nome_cientifico,
-                    status,
-                    prioridade,
-                    data_registrada,
-                    data_revisada,
-                    autor_revisada_id,
-                    motivo_contestado
-                FROM especies_administrativo 
-                WHERE id = ?";
-
-$stmt = mysqli_prepare($conn, $sql_especie);
-mysqli_stmt_bind_param($stmt, "i", $especie_id);
-mysqli_stmt_execute($stmt);
-$result_especie = mysqli_stmt_get_result($stmt);
-$especie = mysqli_fetch_assoc($result_especie);
-mysqli_stmt_close($stmt);
-
-// Buscar características da espécie
-$sql_caracteristicas = "SELECT * FROM especies_caracteristicas WHERE especie_id = ?";
-$stmt = mysqli_prepare($conn, $sql_caracteristicas);
-mysqli_stmt_bind_param($stmt, "i", $especie_id);
-mysqli_stmt_execute($stmt);
-$result_caracteristicas = mysqli_stmt_get_result($stmt);
-$caracteristicas = mysqli_fetch_assoc($result_caracteristicas);
-mysqli_stmt_close($stmt);
-
-// ================================================
-// BUSCAR IMAGENS DA ESPÉCIE
-// ================================================
-
-$imagens = [];
-$partes = ['folha', 'flor', 'fruto', 'caule', 'semente', 'habito'];
-
-foreach ($partes as $parte) {
-    $sql_imagens = "SELECT 
+try {
+    // Dados administrativos
+    $sql_especie = "SELECT 
+                        id,
+                        nome_cientifico,
+                        status,
+                        prioridade,
+                        data_registrada,
+                        data_revisada,
+                        autor_revisada_id,
+                        motivo_contestado
+                    FROM especies_administrativo 
+                    WHERE id = ?";
+    $stmt = $pdo->prepare($sql_especie);
+    $stmt->execute([$especie_id]);
+    $especie = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$especie) {
+        die("Espécie não encontrada");
+    }
+    
+    // Características (com nomes de campos corrigidos)
+    $sql_carac = "SELECT * FROM especies_caracteristicas WHERE especie_id = ?";
+    $stmt = $pdo->prepare($sql_carac);
+    $stmt->execute([$especie_id]);
+    $carac = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Imagens por parte
+    $partes = ['folha', 'flor', 'fruto', 'caule', 'semente', 'habito'];
+    $imagens = [];
+    
+    foreach ($partes as $parte) {
+        $sql_img = "SELECT 
                         id,
                         caminho_imagem,
                         descricao,
-                        data_upload,
-                        id_usuario_identificador
+                        data_upload
                     FROM imagens_especies 
                     WHERE especie_id = ? AND parte = ?
                     ORDER BY data_upload DESC";
-    
-    $stmt = mysqli_prepare($conn, $sql_imagens);
-    mysqli_stmt_bind_param($stmt, "is", $especie_id, $parte);
-    mysqli_stmt_execute($stmt);
-    $result_imagens = mysqli_stmt_get_result($stmt);
-    
-    $imagens[$parte] = [];
-    while ($img = mysqli_fetch_assoc($result_imagens)) {
-        $imagens[$parte][] = $img;
+        $stmt = $pdo->prepare($sql_img);
+        $stmt->execute([$especie_id, $parte]);
+        $imagens[$parte] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    mysqli_stmt_close($stmt);
-}
-
-// ================================================
-// PROCESSAR REFERÊNCIAS
-// ================================================
-
-$referencias = [];
-if ($caracteristicas && !empty($caracteristicas['referencias'])) {
-    $refs = explode("\n", $caracteristicas['referencias']);
-    foreach ($refs as $index => $ref) {
-        $referencias[$index + 1] = trim($ref);
+    
+    // Processar referências
+    $referencias = [];
+    if ($carac && !empty($carac['referencias'])) {
+        $refs = explode("\n", $carac['referencias']);
+        foreach ($refs as $index => $ref) {
+            $referencias[$index + 1] = trim($ref);
+        }
     }
+    
+} catch (Exception $e) {
+    die("Erro ao buscar dados: " . $e->getMessage());
 }
-
-mysqli_close($conn);
 
 // ================================================
 // FUNÇÃO AUXILIAR
 // ================================================
-
 function exibirCaracteristica($valor, $ref) {
-    if (empty($valor)) return '';
+    if (empty($valor) && $valor !== '0') return '';
     
     $html = htmlspecialchars($valor);
     if (!empty($ref)) {
@@ -163,6 +150,25 @@ function exibirCaracteristica($valor, $ref) {
     }
     return $html;
 }
+
+// Mapeamento de ícones
+$icones = [
+    'folha' => '🍃',
+    'flor' => '🌸', 
+    'fruto' => '🍎',
+    'caule' => '🌿',
+    'semente' => '🌱',
+    'habito' => '🌳'
+];
+
+$nomes_partes = [
+    'folha' => 'Folha',
+    'flor' => 'Flor',
+    'fruto' => 'Fruto',
+    'caule' => 'Caule',
+    'semente' => 'Semente',
+    'habito' => 'Hábito'
+];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -171,24 +177,15 @@ function exibirCaracteristica($valor, $ref) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Revisão: <?php echo htmlspecialchars($especie['nome_cientifico']); ?></title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             background-color: #f0f4f0;
             padding: 20px;
             color: #1e2e1e;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; }
+        
         .back-link {
             display: inline-block;
             margin-bottom: 15px;
@@ -196,11 +193,8 @@ function exibirCaracteristica($valor, $ref) {
             text-decoration: none;
             font-weight: bold;
         }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
+        .back-link:hover { text-decoration: underline; }
+        
         .header {
             background: #0b5e42;
             color: white;
@@ -212,18 +206,8 @@ function exibirCaracteristica($valor, $ref) {
             align-items: center;
             flex-wrap: wrap;
         }
-
-        .header h1 {
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
-
-        .header-meta {
-            font-size: 0.95em;
-            opacity: 0.9;
-            line-height: 1.5;
-        }
-
+        .header h1 { font-size: 1.8em; margin-bottom: 5px; }
+        .header-meta { font-size: 0.95em; opacity: 0.9; line-height: 1.5; }
         .badge-status {
             display: inline-block;
             padding: 6px 16px;
@@ -234,14 +218,14 @@ function exibirCaracteristica($valor, $ref) {
             background: rgba(255,255,255,0.2);
             color: white;
         }
-
+        
         .grid-2col {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 25px;
             margin-bottom: 25px;
         }
-
+        
         .card {
             background: white;
             border-radius: 12px;
@@ -249,7 +233,7 @@ function exibirCaracteristica($valor, $ref) {
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
-
+        
         .card-title {
             font-size: 1.3em;
             color: #0b5e42;
@@ -261,37 +245,40 @@ function exibirCaracteristica($valor, $ref) {
             border-bottom: 2px solid #e0e0e0;
             padding-bottom: 10px;
         }
-
+        
         .section {
             margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 1px solid #e0e0e0;
         }
-
+        
         .section-title {
             font-size: 1.2em;
             color: #0b5e42;
             margin-bottom: 15px;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-
+        
         .char-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
         }
-
+        
         .char-item {
             margin-bottom: 10px;
         }
-
+        
         .char-label {
             font-weight: bold;
             font-size: 0.8em;
             color: #666;
             text-transform: uppercase;
         }
-
+        
         .char-value {
             font-size: 1em;
             display: flex;
@@ -299,7 +286,7 @@ function exibirCaracteristica($valor, $ref) {
             gap: 5px;
             flex-wrap: wrap;
         }
-
+        
         .ref-link {
             background: #e9ecef;
             color: #0b5e42;
@@ -311,30 +298,26 @@ function exibirCaracteristica($valor, $ref) {
             cursor: pointer;
             display: inline-block;
         }
-
         .ref-link:hover {
             background: #0b5e42;
             color: white;
         }
-
+        
         .references {
             background: #f8f9fa;
             border-radius: 12px;
             padding: 20px;
             margin-top: 20px;
         }
-
         .references h3 {
             color: #0b5e42;
             margin-bottom: 15px;
         }
-
         .ref-item {
             padding: 8px 0;
             border-bottom: 1px dashed #ddd;
             font-size: 0.9em;
         }
-
         .ref-number {
             display: inline-block;
             background: #0b5e42;
@@ -347,22 +330,20 @@ function exibirCaracteristica($valor, $ref) {
             margin-right: 10px;
             line-height: 22px;
         }
-
-        /* ========== IMAGENS ========== */
+        
+        /* Imagens */
         .imagens-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
-
         .imagem-card {
             background: #f8f9fa;
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #ddd;
         }
-
         .imagem-preview {
             width: 100%;
             height: 120px;
@@ -374,25 +355,21 @@ function exibirCaracteristica($valor, $ref) {
             font-size: 2em;
             cursor: pointer;
         }
-
         .imagem-preview img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
         .imagem-info {
             padding: 8px;
             font-size: 0.8em;
         }
-
         .imagem-descricao {
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
         .sem-imagem {
             background: #f8f9fa;
             padding: 20px;
@@ -401,8 +378,8 @@ function exibirCaracteristica($valor, $ref) {
             border-radius: 8px;
             border: 2px dashed #ddd;
         }
-
-        /* ========== DECISÃO ========== */
+        
+        /* Decisão */
         .decision-box {
             background: white;
             padding: 25px;
@@ -410,20 +387,17 @@ function exibirCaracteristica($valor, $ref) {
             margin-top: 30px;
             border: 2px solid #0b5e42;
         }
-
         .decision-title {
             font-size: 1.3em;
             color: #0b5e42;
             margin-bottom: 20px;
             font-weight: bold;
         }
-
         .radio-group {
             display: flex;
             gap: 30px;
             margin-bottom: 20px;
         }
-
         .radio-group label {
             display: flex;
             align-items: center;
@@ -433,18 +407,16 @@ function exibirCaracteristica($valor, $ref) {
             border: 2px solid #ddd;
             border-radius: 8px;
             transition: all 0.2s;
+            flex: 1;
         }
-
         .radio-group label:hover {
             border-color: #0b5e42;
             background: #f0fdf4;
         }
-
         .radio-group input[type="radio"] {
             width: 18px;
             height: 18px;
         }
-
         textarea {
             width: 100%;
             padding: 15px;
@@ -455,19 +427,16 @@ function exibirCaracteristica($valor, $ref) {
             resize: vertical;
             font-size: 1em;
         }
-
         textarea:focus {
             border-color: #0b5e42;
             outline: none;
         }
-
         .action-bar {
             display: flex;
             gap: 15px;
             justify-content: flex-end;
             margin-top: 20px;
         }
-
         .btn {
             padding: 12px 30px;
             border: none;
@@ -480,37 +449,32 @@ function exibirCaracteristica($valor, $ref) {
             align-items: center;
             gap: 8px;
         }
-
         .btn-success {
             background: #28a745;
             color: white;
         }
-
         .btn-success:hover {
             background: #218838;
             transform: translateY(-2px);
         }
-
         .btn-danger {
             background: #dc3545;
             color: white;
         }
-
         .btn-danger:hover {
             background: #c82333;
             transform: translateY(-2px);
         }
-
         .btn-secondary {
             background: #6c757d;
             color: white;
         }
-
         .btn-secondary:hover {
             background: #5a6268;
             transform: translateY(-2px);
         }
-
+        
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -523,22 +487,16 @@ function exibirCaracteristica($valor, $ref) {
             align-items: center;
             justify-content: center;
         }
-
-        .modal.active {
-            display: flex;
-        }
-
+        .modal.active { display: flex; }
         .modal-content {
             max-width: 90%;
             max-height: 90%;
         }
-
         .modal-content img {
             max-width: 100%;
             max-height: 90vh;
             border-radius: 8px;
         }
-
         .modal-close {
             position: absolute;
             top: 20px;
@@ -547,7 +505,7 @@ function exibirCaracteristica($valor, $ref) {
             font-size: 2em;
             cursor: pointer;
         }
-
+        
         .info-box {
             background: #fff3cd;
             border-left: 4px solid #ffc107;
@@ -555,34 +513,28 @@ function exibirCaracteristica($valor, $ref) {
             border-radius: 8px;
             margin: 15px 0;
         }
-
+        
         @media (max-width: 768px) {
-            .grid-2col {
-                grid-template-columns: 1fr;
-            }
-            
-            .radio-group {
-                flex-direction: column;
-                gap: 10px;
-            }
+            .grid-2col { grid-template-columns: 1fr; }
+            .radio-group { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- LINK VOLTAR -->
-        <a href="../Controllers/controlador_painel_revisor.php" class="back-link">← Voltar ao painel</a>
+        <a href="/penomato_mvp/src/Controllers/controlador_painel_revisor.php" class="back-link">← Voltar ao painel</a>
 
         <!-- CABEÇALHO -->
         <div class="header">
             <div>
                 <h1><?php echo htmlspecialchars($especie['nome_cientifico']); ?></h1>
                 <div class="header-meta">
-                    <?php if (!empty($caracteristicas['familia'])): ?>
-                        <div>🌿 Família: <?php echo htmlspecialchars($caracteristicas['familia']); ?></div>
+                    <?php if (!empty($carac['familia'])): ?>
+                        <div>🌿 Família: <?php echo htmlspecialchars($carac['familia']); ?></div>
                     <?php endif; ?>
-                    <?php if (!empty($caracteristicas['nome_popular'])): ?>
-                        <div>🌳 Nome popular: <?php echo htmlspecialchars($caracteristicas['nome_popular']); ?></div>
+                    <?php if (!empty($carac['nome_popular'])): ?>
+                        <div>🌳 Nome popular: <?php echo htmlspecialchars($carac['nome_popular']); ?></div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -591,23 +543,23 @@ function exibirCaracteristica($valor, $ref) {
             </div>
         </div>
 
-        <!-- GRID PRINCIPAL: CARACTERÍSTICAS + IMAGENS -->
+        <!-- GRID PRINCIPAL -->
         <div class="grid-2col">
             <!-- COLUNA 1: CARACTERÍSTICAS -->
             <div>
                 <div class="card">
                     <div class="card-title">📋 CARACTERÍSTICAS MORFOLÓGICAS</div>
                     
-                    <?php if ($caracteristicas): ?>
+                    <?php if ($carac): ?>
 
                         <!-- Nome científico completo -->
-                        <?php if (!empty($caracteristicas['nome_cientifico_completo'])): ?>
+                        <?php if (!empty($carac['nome_cientifico_completo'])): ?>
                         <div class="section">
                             <div class="section-title">📋 Nome Científico Completo</div>
                             <div class="char-value">
                                 <?php echo exibirCaracteristica(
-                                    $caracteristicas['nome_cientifico_completo'],
-                                    $caracteristicas['nome_cientifico_completo_ref'] ?? ''
+                                    $carac['nome_cientifico_completo'],
+                                    $carac['nome_cientifico_completo_ref'] ?? ''
                                 ); ?>
                             </div>
                         </div>
@@ -615,62 +567,86 @@ function exibirCaracteristica($valor, $ref) {
 
                         <!-- FOLHA -->
                         <?php 
-                        $tem_folha = !empty($caracteristicas['forma_folha']) || 
-                                     !empty($caracteristicas['filotaxia_folha']) || 
-                                     !empty($caracteristicas['tipo_folha']) ||
-                                     !empty($caracteristicas['margem_folha']) ||
-                                     !empty($caracteristicas['textura_folha']) ||
-                                     !empty($caracteristicas['venacao_folha']) ||
-                                     !empty($caracteristicas['tamanho_folha']);
+                        $tem_folha = !empty($carac['forma_folha']) || 
+                                     !empty($carac['filotaxia']) || 
+                                     !empty($carac['tipo_folha']) ||
+                                     !empty($carac['margem_folha']) ||
+                                     !empty($carac['textura_folha']) ||
+                                     !empty($carac['venacao_folha']) ||
+                                     !empty($carac['tamanho_folha']);
                         
                         if ($tem_folha): 
                         ?>
                         <div class="section">
                             <div class="section-title">🍃 Folha</div>
                             <div class="char-grid">
-                                <?php if (!empty($caracteristicas['forma_folha'])): ?>
+                                <?php if (!empty($carac['forma_folha'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Forma</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['forma_folha'],
-                                            $caracteristicas['forma_folha_ref'] ?? ''
+                                            $carac['forma_folha'],
+                                            $carac['forma_folha_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($caracteristicas['filotaxia_folha'])): ?>
+                                <?php if (!empty($carac['filotaxia'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Filotaxia</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['filotaxia_folha'],
-                                            $caracteristicas['filotaxia_folha_ref'] ?? ''
+                                            $carac['filotaxia'],
+                                            $carac['filotaxia_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($caracteristicas['tipo_folha'])): ?>
+                                <?php if (!empty($carac['tipo_folha'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Tipo</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['tipo_folha'],
-                                            $caracteristicas['tipo_folha_ref'] ?? ''
+                                            $carac['tipo_folha'],
+                                            $carac['tipo_folha_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($caracteristicas['margem_folha'])): ?>
+                                <?php if (!empty($carac['margem_folha'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Margem</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['margem_folha'],
-                                            $caracteristicas['margem_folha_ref'] ?? ''
+                                            $carac['margem_folha'],
+                                            $carac['margem_folha_ref'] ?? ''
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($carac['textura_folha'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Textura</div>
+                                    <div class="char-value">
+                                        <?php echo exibirCaracteristica(
+                                            $carac['textura_folha'],
+                                            $carac['textura_folha_ref'] ?? ''
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($carac['tamanho_folha'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Tamanho</div>
+                                    <div class="char-value">
+                                        <?php echo exibirCaracteristica(
+                                            $carac['tamanho_folha'],
+                                            $carac['tamanho_folha_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
@@ -681,47 +657,61 @@ function exibirCaracteristica($valor, $ref) {
 
                         <!-- FLOR -->
                         <?php 
-                        $tem_flor = !empty($caracteristicas['cor_flores']) || 
-                                    !empty($caracteristicas['simetria_floral']) || 
-                                    !empty($caracteristicas['numero_petalas']) ||
-                                    !empty($caracteristicas['aroma']);
+                        $tem_flor = !empty($carac['cor_flor']) || 
+                                    !empty($carac['simetria_flor']) || 
+                                    !empty($carac['numero_petalas']) ||
+                                    !empty($carac['aroma_flor']) ||
+                                    !empty($carac['disposicao_flor']) ||
+                                    !empty($carac['tamanho_flor']);
                         
                         if ($tem_flor): 
                         ?>
                         <div class="section">
                             <div class="section-title">🌸 Flor</div>
                             <div class="char-grid">
-                                <?php if (!empty($caracteristicas['cor_flores'])): ?>
+                                <?php if (!empty($carac['cor_flor'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Cor</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['cor_flores'],
-                                            $caracteristicas['cor_flores_ref'] ?? ''
+                                            $carac['cor_flor'],
+                                            $carac['cor_flor_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($caracteristicas['aroma'])): ?>
+                                <?php if (!empty($carac['aroma_flor'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Aroma</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['aroma'],
-                                            $caracteristicas['aroma_ref'] ?? ''
+                                            $carac['aroma_flor'],
+                                            $carac['aroma_flor_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($caracteristicas['numero_petalas'])): ?>
+                                <?php if (!empty($carac['numero_petalas'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Nº pétalas</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['numero_petalas'],
-                                            $caracteristicas['numero_petalas_ref'] ?? ''
+                                            $carac['numero_petalas'],
+                                            $carac['numero_petalas_ref'] ?? ''
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($carac['simetria_flor'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Simetria</div>
+                                    <div class="char-value">
+                                        <?php echo exibirCaracteristica(
+                                            $carac['simetria_flor'],
+                                            $carac['simetria_flor_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
@@ -732,34 +722,48 @@ function exibirCaracteristica($valor, $ref) {
 
                         <!-- FRUTO -->
                         <?php 
-                        $tem_fruto = !empty($caracteristicas['tipo_fruto']) || 
-                                     !empty($caracteristicas['dispersao_fruto']) ||
-                                     !empty($caracteristicas['cor_fruto']);
+                        $tem_fruto = !empty($carac['tipo_fruto']) || 
+                                     !empty($carac['dispersao_fruto']) ||
+                                     !empty($carac['cor_fruto']) ||
+                                     !empty($carac['tamanho_fruto']) ||
+                                     !empty($carac['textura_fruto']);
                         
                         if ($tem_fruto): 
                         ?>
                         <div class="section">
                             <div class="section-title">🍎 Fruto</div>
                             <div class="char-grid">
-                                <?php if (!empty($caracteristicas['tipo_fruto'])): ?>
+                                <?php if (!empty($carac['tipo_fruto'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Tipo</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['tipo_fruto'],
-                                            $caracteristicas['tipo_fruto_ref'] ?? ''
+                                            $carac['tipo_fruto'],
+                                            $carac['tipo_fruto_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($caracteristicas['dispersao_fruto'])): ?>
+                                <?php if (!empty($carac['dispersao_fruto'])): ?>
                                 <div class="char-item">
                                     <div class="char-label">Dispersão</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['dispersao_fruto'],
-                                            $caracteristicas['dispersao_fruto_ref'] ?? ''
+                                            $carac['dispersao_fruto'],
+                                            $carac['dispersao_fruto_ref'] ?? ''
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($carac['cor_fruto'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Cor</div>
+                                    <div class="char-value">
+                                        <?php echo exibirCaracteristica(
+                                            $carac['cor_fruto'],
+                                            $carac['cor_fruto_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
@@ -768,35 +772,119 @@ function exibirCaracteristica($valor, $ref) {
                         </div>
                         <?php endif; ?>
 
-                        <!-- OUTRAS PARTES (resumo) -->
+                        <!-- SEMENTE -->
+                        <?php 
+                        $tem_semente = !empty($carac['tipo_semente']) || 
+                                       !empty($carac['cor_semente']) ||
+                                       !empty($carac['tamanho_semente']);
+                        
+                        if ($tem_semente): 
+                        ?>
                         <div class="section">
-                            <div class="section-title">📦 Outras Partes</div>
+                            <div class="section-title">🌱 Semente</div>
                             <div class="char-grid">
-                                <?php if (!empty($caracteristicas['tipo_semente'])): ?>
+                                <?php if (!empty($carac['tipo_semente'])): ?>
                                 <div class="char-item">
-                                    <div class="char-label">Semente</div>
+                                    <div class="char-label">Tipo</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['tipo_semente'],
-                                            $caracteristicas['tipo_semente_ref'] ?? ''
+                                            $carac['tipo_semente'],
+                                            $carac['tipo_semente_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($caracteristicas['tipo_caule'])): ?>
+                                <?php if (!empty($carac['cor_semente'])): ?>
                                 <div class="char-item">
-                                    <div class="char-label">Caule</div>
+                                    <div class="char-label">Cor</div>
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
-                                            $caracteristicas['tipo_caule'],
-                                            $caracteristicas['tipo_caule_ref'] ?? ''
+                                            $carac['cor_semente'],
+                                            $carac['cor_semente_ref'] ?? ''
                                         ); ?>
                                     </div>
                                 </div>
                                 <?php endif; ?>
                             </div>
                         </div>
+                        <?php endif; ?>
+
+                        <!-- CAULE -->
+                        <?php 
+                        $tem_caule = !empty($carac['tipo_caule']) || 
+                                     !empty($carac['textura_caule']) ||
+                                     !empty($carac['cor_caule']);
+                        
+                        if ($tem_caule): 
+                        ?>
+                        <div class="section">
+                            <div class="section-title">🌿 Caule</div>
+                            <div class="char-grid">
+                                <?php if (!empty($carac['tipo_caule'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Tipo</div>
+                                    <div class="char-value">
+                                        <?php echo exibirCaracteristica(
+                                            $carac['tipo_caule'],
+                                            $carac['tipo_caule_ref'] ?? ''
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($carac['textura_caule'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Textura</div>
+                                    <div class="char-value">
+                                        <?php echo exibirCaracteristica(
+                                            $carac['textura_caule'],
+                                            $carac['textura_caule_ref'] ?? ''
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- OUTRAS CARACTERÍSTICAS -->
+                        <?php 
+                        $tem_outras = !empty($carac['possui_espinhos']) || 
+                                      !empty($carac['possui_latex']) ||
+                                      !empty($carac['possui_resina']);
+                        
+                        if ($tem_outras): 
+                        ?>
+                        <div class="section">
+                            <div class="section-title">🔍 Outras Características</div>
+                            <div class="char-grid">
+                                <?php if (!empty($carac['possui_espinhos'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Espinhos</div>
+                                    <div class="char-value">
+                                        <?php echo $carac['possui_espinhos']; ?>
+                                        <?php if (!empty($carac['possui_espinhos_ref'])): ?>
+                                            <span class='ref-link' data-ref='<?php echo $carac['possui_espinhos_ref']; ?>'>[<?php echo $carac['possui_espinhos_ref']; ?>]</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($carac['possui_latex'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Látex</div>
+                                    <div class="char-value">
+                                        <?php echo $carac['possui_latex']; ?>
+                                        <?php if (!empty($carac['possui_latex_ref'])): ?>
+                                            <span class='ref-link' data-ref='<?php echo $carac['possui_latex_ref']; ?>'>[<?php echo $carac['possui_latex_ref']; ?>]</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
 
                         <!-- REFERÊNCIAS -->
                         <?php if (!empty($referencias)): ?>
@@ -824,40 +912,26 @@ function exibirCaracteristica($valor, $ref) {
                 <div class="card">
                     <div class="card-title">📸 IMAGENS ENVIADAS</div>
                     
-                    <?php foreach ($partes as $parte): 
-                        $icones = [
-                            'folha' => '🍃',
-                            'flor' => '🌸', 
-                            'fruto' => '🍎',
-                            'caule' => '🌿',
-                            'semente' => '🌱',
-                            'habito' => '🌳'
-                        ];
-                        $nomes = [
-                            'folha' => 'Folha',
-                            'flor' => 'Flor',
-                            'fruto' => 'Fruto',
-                            'caule' => 'Caule',
-                            'semente' => 'Semente',
-                            'habito' => 'Hábito'
-                        ];
-                    ?>
+                    <?php foreach ($partes as $parte): ?>
                         <div class="section">
-                            <div class="section-title"><?php echo $icones[$parte] . ' ' . $nomes[$parte]; ?></div>
+                            <div class="section-title"><?php echo $icones[$parte] . ' ' . $nomes_partes[$parte]; ?></div>
                             
                             <?php if (count($imagens[$parte]) > 0): ?>
                                 <div class="imagens-grid">
                                     <?php foreach ($imagens[$parte] as $img): ?>
                                     <div class="imagem-card">
-                                        <div class="imagem-preview" onclick="abrirImagem('<?php echo '../../' . $img['caminho_imagem']; ?>')">
-                                            <?php if (file_exists('../../' . $img['caminho_imagem'])): ?>
-                                                <img src="<?php echo '../../' . $img['caminho_imagem']; ?>" alt="Imagem">
+                                        <div class="imagem-preview" onclick="abrirImagem('<?php echo '/penomato_mvp/' . $img['caminho_imagem']; ?>')">
+                                            <?php 
+                                            $caminho_completo = $_SERVER['DOCUMENT_ROOT'] . '/penomato_mvp/' . $img['caminho_imagem'];
+                                            if (file_exists($caminho_completo)): 
+                                            ?>
+                                                <img src="<?php echo '/penomato_mvp/' . $img['caminho_imagem']; ?>" alt="Imagem">
                                             <?php else: ?>
                                                 <span>🖼️</span>
                                             <?php endif; ?>
                                         </div>
                                         <div class="imagem-info">
-                                            <div class="imagem-descricao"><?php echo htmlspecialchars($img['descricao']); ?></div>
+                                            <div class="imagem-descricao"><?php echo htmlspecialchars($img['descricao'] ?? 'Sem descrição'); ?></div>
                                             <div style="color: #666; margin-top: 4px;">
                                                 <?php echo date('d/m/Y', strtotime($img['data_upload'])); ?>
                                             </div>
@@ -881,7 +955,7 @@ function exibirCaracteristica($valor, $ref) {
         <div class="decision-box">
             <div class="decision-title">⚖️ DECISÃO DA REVISÃO</div>
             
-            <form id="formDecisao" method="POST" action="../Controllers/controlador_painel_revisor.php">
+            <form id="formDecisao" method="POST" action="/penomato_mvp/src/Controllers/controlador_painel_revisor.php">
                 <input type="hidden" name="especie_id" value="<?php echo $especie_id; ?>">
                 
                 <div class="radio-group">
@@ -906,7 +980,7 @@ function exibirCaracteristica($valor, $ref) {
                     <button type="submit" name="acao" value="contestar" class="btn btn-danger" onclick="return validarDecisao('contestar')">
                         ❌ CONFIRMAR REJEIÇÃO
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='../Controllers/controlador_painel_revisor.php'">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_painel_revisor.php'">
                         CANCELAR
                     </button>
                 </div>
@@ -954,7 +1028,7 @@ function exibirCaracteristica($valor, $ref) {
             if (acao === 'aprovar') {
                 return confirm('Confirmar aprovação desta espécie? Esta ação não pode ser desfeita.');
             } else {
-                return confirm('Confirmar rejeição? O motivo será registrado e o identificador será notificado.');
+                return confirm('Confirmar rejeição? O motivo será registrado.');
             }
         }
 

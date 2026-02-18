@@ -1,14 +1,14 @@
 <?php
 // ============================================================
-// LOGIN SIMPLES - MVP PENOMATO
+// LOGIN SIMPLES - MVP PENOMATO (CORRIGIDO)
 // ============================================================
 
 // Iniciar sessão
 session_start();
 
-// Se já estiver logado, redireciona
+// Se já estiver logado, redireciona para o painel do gestor (página principal)
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/perfil');
+    header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
     exit;
 }
 
@@ -136,11 +136,11 @@ unset($_SESSION['email_tentativa']);
         </form>
         
         <div class="link">
-            <a href="/penomato_mvp/cadastro">Criar nova conta</a>
+            <a href="/penomato_mvp/src/Views/auth/cadastro.php">Criar nova conta</a>
         </div>
         
         <div class="info">
-            <strong>Teste:</strong> nilton.bakargi@ufms.br / [sua senha]
+            <strong>Teste:</strong> admin@penomato.com / 123456
         </div>
     </div>
 </body>

@@ -1,61 +1,9 @@
 <?php
-// ================================================
-// CONEXÃO E BUSCA NO BANCO - VERSÃO CORRIGIDA (MÍNIMA)
-// ================================================
+// entrada_revisor.php
+// MVP - View integrada com o controlador
 
-// Configurações do banco
-$servidor = "127.0.0.1";
-$usuario = "root";
-$senha = "";
-$banco = "penomato";
-
-// Variáveis para as espécies
-$especies_disponiveis = [];
-$mensagem_erro = '';
-
-// Tentar conectar e buscar dados
-$conexao = mysqli_connect($servidor, $usuario, $senha, $banco);
-
-if (!$conexao) {
-    $mensagem_erro = 'Erro: Não foi possível conectar ao banco de dados';
-} else {
-    mysqli_set_charset($conexao, "utf8mb4");
-    
-    // BUSCAR ESPÉCIES - CORRIGIDO PARA NOVA ESTRUTURA
-    $sql = "SELECT 
-                e.id,
-                e.nome_cientifico,
-                e.prioridade,
-                c.nome_popular,
-                c.familia
-            FROM especies_administrativo e
-            LEFT JOIN especies_caracteristicas c ON e.id = c.especie_id
-            WHERE e.status = 'registrada' 
-            AND e.data_revisada IS NULL
-            ORDER BY 
-                CASE e.prioridade 
-                    WHEN 'urgente' THEN 1
-                    WHEN 'alta' THEN 2 
-                    WHEN 'media' THEN 3 
-                    WHEN 'baixa' THEN 4
-                    ELSE 5
-                END,
-                e.nome_cientifico
-            LIMIT 50";
-    
-    $resultado = mysqli_query($conexao, $sql);
-    
-    if (!$resultado) {
-        $mensagem_erro = 'Erro na consulta: ' . mysqli_error($conexao);
-    } else {
-        while ($linha = mysqli_fetch_assoc($resultado)) {
-            $especies_disponiveis[] = $linha;
-        }
-        mysqli_free_result($resultado);
-    }
-    
-    mysqli_close($conexao);
-}
+// O controlador já iniciou sessão e definiu:
+// $usuario_nome, $usuario_instituicao
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -64,24 +12,15 @@ if (!$conexao) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Revisor - Penomato</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f4f0;
             padding: 30px;
             color: #1e2e1e;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; }
+        
         .header {
             background: #0b5e42;
             color: white;
@@ -92,17 +31,13 @@ if (!$conexao) {
             justify-content: space-between;
             align-items: center;
         }
-
-        .header h1 {
-            font-size: 1.5em;
-        }
-
+        .header h1 { font-size: 1.5em; }
         .user-badge {
             background-color: rgba(255,255,255,0.2);
             padding: 8px 16px;
             border-radius: 40px;
         }
-
+        
         .btn {
             padding: 10px 20px;
             border: none;
@@ -112,17 +47,20 @@ if (!$conexao) {
             background-color: #0b5e42;
             color: white;
         }
-
         .btn-secondary {
             background-color: #e9ecef;
             color: #1e2e1e;
         }
-
         .btn-sm {
             padding: 5px 10px;
             font-size: 0.8em;
         }
-
+        .btn-outline {
+            background: white;
+            border: 1px solid #0b5e42;
+            color: #0b5e42;
+        }
+        
         .actions-bar {
             background: white;
             border-radius: 10px;
@@ -130,8 +68,52 @@ if (!$conexao) {
             margin-bottom: 25px;
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
-
+        
+        .main-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+        }
+        
+        .revisoes-lista {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .revisao-item {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .revisao-item:hover {
+            background-color: #f8f9fa;
+            border-color: #0b5e42;
+        }
+        
+        .badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        .badge-alta { background-color: #dc3545; color: white; }
+        .badge-media { background-color: #ffc107; color: #1e2e1e; }
+        .badge-baixa { background-color: #28a745; color: white; }
+        
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -144,11 +126,7 @@ if (!$conexao) {
             justify-content: center;
             z-index: 1000;
         }
-
-        .modal.active {
-            display: flex;
-        }
-
+        .modal.active { display: flex; }
         .modal-content {
             background: white;
             border-radius: 12px;
@@ -159,7 +137,6 @@ if (!$conexao) {
             display: flex;
             flex-direction: column;
         }
-
         .modal-header {
             padding: 15px 20px;
             border-bottom: 1px solid #e9ecef;
@@ -167,11 +144,6 @@ if (!$conexao) {
             justify-content: space-between;
             align-items: center;
         }
-
-        .modal-header h3 {
-            font-size: 1.2em;
-        }
-
         .modal-close {
             background: none;
             border: none;
@@ -179,13 +151,10 @@ if (!$conexao) {
             cursor: pointer;
             color: #6c757d;
         }
-
         .modal-body {
             padding: 20px;
             overflow-y: auto;
-            max-height: calc(80vh - 70px);
         }
-
         .modal-list-item {
             padding: 12px;
             border: 1px solid #e9ecef;
@@ -195,41 +164,11 @@ if (!$conexao) {
             justify-content: space-between;
             align-items: center;
         }
-
         .modal-list-item:hover {
             background-color: #f8f9fa;
             border-color: #0b5e42;
         }
-
-        .empty-message {
-            text-align: center;
-            padding: 30px;
-            color: #6c757d;
-        }
-
-        .badge {
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.7em;
-            font-weight: 600;
-            margin-left: 5px;
-        }
-
-        .badge-alta {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .badge-media {
-            background-color: #ffc107;
-            color: #1e2e1e;
-        }
-
-        .badge-baixa {
-            background-color: #28a745;
-            color: white;
-        }
-
+        
         input {
             width: 100%;
             padding: 10px;
@@ -237,80 +176,132 @@ if (!$conexao) {
             border: 1px solid #dee2e6;
             border-radius: 6px;
         }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+        
+        .info-text {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- HEADER com usuário dinâmico -->
         <div class="header">
             <h1>🔍 Painel do Revisor</h1>
-            <div class="user-badge">Dr. Norton · UEMS</div>
+            <div class="user-badge"><?php echo htmlspecialchars($usuario_nome); ?> · <?php echo htmlspecialchars($usuario_instituicao ?: 'Penomato'); ?></div>
         </div>
 
+        <!-- BARRA DE AÇÕES -->
         <div class="actions-bar">
-            <button class="btn" onclick="abrirModal()">➕ NOVA REVISÃO</button>
-            <button class="btn btn-secondary">📂 CONTINUAR</button>
+            <button class="btn" onclick="abrirModalNovaRevisao()">➕ NOVA REVISÃO</button>
+            <button class="btn btn-secondary" onclick="carregarRevisoesAndamento()">📂 CONTINUAR</button>
         </div>
 
-        <div style="background: white; border-radius: 10px; padding: 40px; text-align: center; color: #6c757d;">
-            <p style="font-size: 1.2em; margin-bottom: 10px;">Nenhuma espécie disponível</p>
-            <p>Clique em "NOVA REVISÃO" para começar</p>
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="main-content" id="mainContent">
+            <div class="empty-message">
+                <p style="font-size: 1.2em; margin-bottom: 10px;">Nenhuma revisão selecionada</p>
+                <p>Clique em "NOVA REVISÃO" para começar ou "CONTINUAR" para ver suas revisões em andamento</p>
+            </div>
         </div>
+    </div>
 
-        <!-- MODAL -->
-        <div id="modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Iniciar Nova Revisão</h3>
-                    <button class="modal-close" onclick="fecharModal()">✕</button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" id="buscaEspecie" placeholder="Buscar espécie..." onkeyup="filtrarEspecies()">
-                    
-                    <div id="listaEspecies">
-                        <?php if (!empty($mensagem_erro)): ?>
-                            <div class="empty-message"><?php echo $mensagem_erro; ?></div>
-                        <?php elseif (empty($especies_disponiveis)): ?>
-                            <div class="empty-message">Nenhuma espécie disponível para revisão</div>
-                        <?php else: ?>
-                            <?php foreach ($especies_disponiveis as $esp): 
-                                $badgeClass = 'badge-media';
-                                $badgeText = 'MÉDIA';
-                                
-                                if ($esp['prioridade'] === 'alta') {
-                                    $badgeClass = 'badge-alta';
-                                    $badgeText = 'ALTA';
-                                } else if ($esp['prioridade'] === 'baixa') {
-                                    $badgeClass = 'badge-baixa';
-                                    $badgeText = 'BAIXA';
-                                }
-                            ?>
-                                <div class="modal-list-item" data-nome="<?php echo strtolower(htmlspecialchars($esp['nome_cientifico'])); ?>">
-                                    <div>
-                                        <strong><i><?php echo htmlspecialchars($esp['nome_cientifico']); ?></i></strong>
-                                        <span class="badge <?php echo $badgeClass; ?>"><?php echo $badgeText; ?></span>
-                                    </div>
-                                    <button class="btn btn-sm" onclick="iniciarRevisao(<?php echo $esp['id']; ?>)">Selecionar</button>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
+    <!-- MODAL - NOVA REVISÃO -->
+    <div id="modalNovaRevisao" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Iniciar Nova Revisão</h3>
+                <button class="modal-close" onclick="fecharModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="buscaEspecie" placeholder="Buscar espécie..." onkeyup="filtrarModal()">
+                <div id="modalLista" class="loading">Carregando espécies...</div>
             </div>
         </div>
     </div>
 
     <script>
-        function abrirModal() {
-            document.getElementById('modal').classList.add('active');
+        // ============================================
+        // VARIÁVEIS GLOBAIS
+        // ============================================
+        let especiesPendentes = [];
+        let revisoesAndamento = [];
+
+        // ============================================
+        // MODAL - NOVA REVISÃO
+        // ============================================
+        function abrirModalNovaRevisao() {
+            document.getElementById('modalNovaRevisao').classList.add('active');
+            carregarEspeciesPendentes();
         }
 
         function fecharModal() {
-            document.getElementById('modal').classList.remove('active');
+            document.getElementById('modalNovaRevisao').classList.remove('active');
         }
 
-        function filtrarEspecies() {
+        // Carregar espécies via API
+        function carregarEspeciesPendentes() {
+            const lista = document.getElementById('modalLista');
+            lista.innerHTML = '<div class="loading">Carregando espécies...</div>';
+            
+            fetch('/penomato_mvp/src/Controllers/controlador_painel_revisor.php?acao=listar_pendentes')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        lista.innerHTML = '<div class="empty-message">Erro ao carregar</div>';
+                        return;
+                    }
+                    
+                    especiesPendentes = data;
+                    
+                    if (especiesPendentes.length === 0) {
+                        lista.innerHTML = '<div class="empty-message">Nenhuma espécie disponível para revisão</div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    especiesPendentes.forEach(esp => {
+                        let badgeClass = 'badge-media';
+                        let badgeText = 'MÉDIA';
+                        
+                        if (esp.prioridade === 'alta') {
+                            badgeClass = 'badge-alta';
+                            badgeText = 'ALTA';
+                        } else if (esp.prioridade === 'baixa') {
+                            badgeClass = 'badge-baixa';
+                            badgeText = 'BAIXA';
+                        }
+                        
+                        html += `
+                            <div class="modal-list-item" data-nome="${esp.nome_cientifico.toLowerCase()}">
+                                <div>
+                                    <strong><i>${esp.nome_cientifico}</i></strong>
+                                    <span class="badge ${badgeClass}">${badgeText}</span>
+                                    ${esp.nome_popular ? '<br><small>' + esp.nome_popular + '</small>' : ''}
+                                </div>
+                                <button class="btn btn-sm" onclick="iniciarRevisao(${esp.id})">Selecionar</button>
+                            </div>
+                        `;
+                    });
+                    
+                    lista.innerHTML = html;
+                })
+                .catch(() => {
+                    lista.innerHTML = '<div class="empty-message">Erro ao conectar com servidor</div>';
+                });
+        }
+
+        // Filtrar modal em tempo real
+        function filtrarModal() {
             const termo = document.getElementById('buscaEspecie').value.toLowerCase();
-            const itens = document.querySelectorAll('.modal-list-item');
+            const itens = document.querySelectorAll('#modalLista .modal-list-item');
             
             itens.forEach(item => {
                 const texto = item.getAttribute('data-nome') || '';
@@ -322,12 +313,105 @@ if (!$conexao) {
             });
         }
 
+        // Iniciar revisão (chama API)
         function iniciarRevisao(id) {
+            fetch('/penomato_mvp/src/Controllers/controlador_painel_revisor.php?acao=iniciar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'especie_id=' + id
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.erro) {
+                    alert(data.erro);
+                } else if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(() => {
+                alert('Erro ao iniciar revisão');
+            });
+        }
+
+        // ============================================
+        // CONTINUAR - Revisões em Andamento
+        // ============================================
+        function carregarRevisoesAndamento() {
+            const main = document.getElementById('mainContent');
+            main.innerHTML = '<div class="loading">Carregando revisões...</div>';
+            
+            fetch('/penomato_mvp/src/Controllers/controlador_painel_revisor.php?acao=listar_andamento')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        main.innerHTML = '<div class="empty-message">Erro ao carregar</div>';
+                        return;
+                    }
+                    
+                    revisoesAndamento = data;
+                    
+                    if (revisoesAndamento.length === 0) {
+                        main.innerHTML = `
+                            <div class="empty-message">
+                                <p style="font-size: 1.2em; margin-bottom: 10px;">Nenhuma revisão em andamento</p>
+                                <p>Clique em "NOVA REVISÃO" para começar</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    let html = '<h3 style="margin-bottom: 20px;">📂 Revisões em Andamento</h3>';
+                    html += '<div class="revisoes-lista">';
+                    
+                    revisoesAndamento.forEach(rev => {
+                        let badgeClass = 'badge-media';
+                        let badgeText = 'MÉDIA';
+                        
+                        if (rev.prioridade === 'alta') {
+                            badgeClass = 'badge-alta';
+                            badgeText = 'ALTA';
+                        } else if (rev.prioridade === 'baixa') {
+                            badgeClass = 'badge-baixa';
+                            badgeText = 'BAIXA';
+                        }
+                        
+                        const dataInicio = rev.data_inicio ? new Date(rev.data_inicio).toLocaleDateString() : 'Data desconhecida';
+                        
+                        html += `
+                            <div class="revisao-item">
+                                <div>
+                                    <strong><i>${rev.nome_cientifico}</i></strong>
+                                    <span class="badge ${badgeClass}">${badgeText}</span>
+                                    ${rev.nome_popular ? '<br><small>' + rev.nome_popular + '</small>' : ''}
+                                    <div class="info-text">Iniciada em: ${dataInicio}</div>
+                                </div>
+                                <button class="btn btn-sm btn-outline" onclick="continuarRevisao(${rev.id})">Continuar</button>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                    main.innerHTML = html;
+                })
+                .catch(() => {
+                    main.innerHTML = '<div class="empty-message">Erro ao conectar com servidor</div>';
+                });
+        }
+
+        function continuarRevisao(id) {
             window.location.href = 'artigo_revisao.php?id=' + id;
         }
 
+        // ============================================
+        // UTILITÁRIOS
+        // ============================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') fecharModal();
+        });
+
+        // Fechar modal clicando fora
+        document.getElementById('modalNovaRevisao').addEventListener('click', function(e) {
+            if (e.target === this) fecharModal();
         });
     </script>
 </body>

@@ -1,16 +1,14 @@
 <?php
 /**
  * PÁGINA DE CADASTRO - PENOMATO MVP
- * 
- * Formulário para novos usuários se registrarem.
+ * Versão simplificada para o MVP
  */
 
-// Incluir verificação de acesso
-require_once __DIR__ . '/../../Controllers/auth/verificar_acesso.php';
+session_start();
 
-// Proteger página para visitantes (se já logado, redireciona)
-if (estaLogado()) {
-    header('Location: /penomato_mvp/perfil');
+// Se já estiver logado, redireciona
+if (isset($_SESSION['usuario_id'])) {
+    header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
     exit;
 }
 
@@ -19,7 +17,6 @@ $mensagem_erro = $_SESSION['mensagem_erro'] ?? '';
 $mensagem_sucesso = $_SESSION['mensagem_sucesso'] ?? '';
 $dados_tentativa = $_SESSION['dados_cadastro'] ?? [];
 
-// Limpar mensagens da sessão
 unset($_SESSION['mensagem_erro']);
 unset($_SESSION['mensagem_sucesso']);
 unset($_SESSION['dados_cadastro']);
@@ -31,7 +28,6 @@ unset($_SESSION['dados_cadastro']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Penomato</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             background: linear-gradient(135deg, #0b5e42 0%, #1a7a5a 100%);
@@ -51,10 +47,6 @@ unset($_SESSION['dados_cadastro']);
             color: white;
             padding: 30px;
             text-align: center;
-        }
-        .card-header i {
-            font-size: 4rem;
-            margin-bottom: 15px;
         }
         .card-header h1 {
             font-size: 2rem;
@@ -78,8 +70,6 @@ unset($_SESSION['dados_cadastro']);
         }
         .btn-cadastrar:hover {
             background: #0a4c35;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(11,94,66,0.3);
         }
         .form-label {
             font-weight: 600;
@@ -95,7 +85,6 @@ unset($_SESSION['dados_cadastro']);
     <div class="container">
         <div class="card-cadastro">
             <div class="card-header">
-                <i class="fas fa-leaf"></i>
                 <h1>Criar Conta no Penomato</h1>
                 <p>Preencha os dados abaixo para se cadastrar</p>
             </div>
@@ -109,7 +98,7 @@ unset($_SESSION['dados_cadastro']);
                 <div class="alert alert-success"><?php echo $mensagem_sucesso; ?></div>
                 <?php endif; ?>
                 
-                <form action="/penomato_mvp/src/Controllers/auth/cadastro_controlador.php" method="POST" enctype="multipart/form-data">
+                <form action="/penomato_mvp/src/Controllers/auth/cadastro_controlador.php" method="POST">
                     
                     <!-- Dados básicos -->
                     <h4 class="mb-3 text-success">📋 Dados Básicos</h4>
@@ -138,7 +127,7 @@ unset($_SESSION['dados_cadastro']);
                     <h4 class="mb-3 mt-4 text-success">🔐 Segurança</h4>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">Senha * (mínimo 8 caracteres)</label>
+                            <label class="form-label">Senha *</label>
                             <input type="password" name="senha" class="form-control" required>
                         </div>
                         <div class="col-md-6">
@@ -154,50 +143,17 @@ unset($_SESSION['dados_cadastro']);
                             <label class="form-label">Tipo de Perfil *</label>
                             <select name="tipo" class="form-control" required>
                                 <option value="">Selecione...</option>
-                                <option value="gestor" <?php echo ($dados_tentativa['tipo'] ?? '') == 'gestor' ? 'selected' : ''; ?>>Gestor</option>
-                                <option value="colaborador" <?php echo ($dados_tentativa['tipo'] ?? '') == 'colaborador' ? 'selected' : ''; ?>>Colaborador</option>
-                                <option value="revisor" <?php echo ($dados_tentativa['tipo'] ?? '') == 'revisor' ? 'selected' : ''; ?>>Revisor</option>
-                                <option value="validador" <?php echo ($dados_tentativa['tipo'] ?? '') == 'validador' ? 'selected' : ''; ?>>Validador</option>
-                                <option value="visitante" <?php echo ($dados_tentativa['tipo'] ?? '') == 'visitante' ? 'selected' : ''; ?>>Visitante</option>
+                                <option value="gestor">Gestor</option>
+                                <option value="colaborador">Colaborador</option>
+                                <option value="revisor">Revisor</option>
+                                <option value="validador">Validador</option>
+                                <option value="visitante">Visitante</option>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Área (se colaborador)</label>
-                            <select name="subtipo" class="form-control">
-                                <option value="">Não se aplica</option>
-                                <option value="identificador">Identificador</option>
-                                <option value="coletor">Coletor</option>
-                                <option value="fotografo">Fotógrafo</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- Acadêmico -->
-                    <h4 class="mb-3 mt-4 text-success">🎓 Informações Acadêmicas (opcional)</h4>
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Instituição</label>
+                            <label class="form-label">Instituição (opcional)</label>
                             <input type="text" name="instituicao" class="form-control"
                                    value="<?php echo htmlspecialchars($dados_tentativa['instituicao'] ?? ''); ?>">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Lattes (URL)</label>
-                            <input type="url" name="lattes" class="form-control"
-                                   value="<?php echo htmlspecialchars($dados_tentativa['lattes'] ?? ''); ?>">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">ORCID</label>
-                            <input type="text" name="orcid" class="form-control" placeholder="0000-0002-1825-0097"
-                                   value="<?php echo htmlspecialchars($dados_tentativa['orcid'] ?? ''); ?>">
-                        </div>
-                    </div>
-                    
-                    <!-- Foto -->
-                    <h4 class="mb-3 mt-4 text-success">📸 Foto de Perfil (opcional)</h4>
-                    <div class="row mb-3">
-                        <div class="col-md-12">
-                            <input type="file" name="foto" class="form-control" accept="image/*">
-                            <small class="text-muted">Máximo 2MB. Formatos: JPG, PNG, GIF</small>
                         </div>
                     </div>
                     
@@ -207,8 +163,7 @@ unset($_SESSION['dados_cadastro']);
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="termos" id="termos" required>
                                 <label class="form-check-label texto-termos" for="termos">
-                                    Li e aceito os <a href="#" class="text-success">Termos de Uso</a> e a 
-                                    <a href="#" class="text-success">Política de Privacidade</a> *
+                                    Li e aceito os Termos de Uso *
                                 </label>
                             </div>
                         </div>
@@ -216,12 +171,12 @@ unset($_SESSION['dados_cadastro']);
                     
                     <!-- Botão -->
                     <button type="submit" class="btn-cadastrar">
-                        <i class="fas fa-user-plus me-2"></i>CRIAR MINHA CONTA
+                        CRIAR MINHA CONTA
                     </button>
                     
                     <!-- Link para login -->
                     <div class="text-center mt-4">
-                        Já tem uma conta? <a href="/penomato_mvp/login" class="text-success">Faça login</a>
+                        Já tem uma conta? <a href="/penomato_mvp/src/Views/auth/login.php" class="text-success">Faça login</a>
                     </div>
                     
                 </form>
