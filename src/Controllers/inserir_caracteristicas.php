@@ -103,12 +103,15 @@ ob_end_clean();
       font-weight: bold;
       margin-top: 10px;
     }
-    select, input[type="text"] {
+    select, input[type="text"], textarea {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
       border: 1px solid #ccc;
       border-radius: 4px;
+    }
+    textarea {
+      resize: vertical;
     }
     button.submit-button {
       width: 100%;
@@ -131,6 +134,18 @@ ob_end_clean();
       padding: 5px;
       background-color: #ffe6e6;
       border-radius: 4px;
+    }
+    .section-title {
+      background-color: #0b5e42;
+      color: white;
+      padding: 10px;
+      margin: 20px 0 10px 0;
+      border-radius: 4px;
+    }
+    .info-text {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 3px;
     }
   </style>
 </head>
@@ -190,33 +205,56 @@ ob_end_clean();
         placeholder="Ref. nome científico">
     </div>
   </div>
-  
-<!-- Nome Popular -->
-<div class="input-group">
-  <div class="main-input">
-    <label for="nome_popular">Nome Popular:</label>
-    <input type="text" id="nome_popular" name="nome_popular" placeholder="Digite o nome popular da espécie">
-  </div>
-  <div class="ref-input">
-    <label for="nome_popular_ref">Referência:</label>
-    <input type="text" id="nome_popular_ref" name="nome_popular_ref" placeholder="Nº da referência">
-  </div>
-</div>
 
-<!-- Família -->
-<div class="input-group">
-  <div class="main-input">
-    <label for="familia">Família:</label>
-    <input type="text" id="familia" name="familia" placeholder="Digite a família da espécie">
+  <!-- ================================================ -->
+  <!-- NOVO CAMPO: SINÔNIMOS (após nome científico)    -->
+  <!-- ================================================ -->
+  <div class="input-group">
+    <div class="main-input">
+      <label for="sinonimos">Sinônimos <span style="font-weight: normal; font-size: 0.85rem; color: #666;">(nomes científicos antigos)</span></label>
+      <input 
+        type="text" 
+        id="sinonimos" 
+        name="sinonimos" 
+        placeholder="Ex: Acacia colubrina, Mimosa colubrina (separados por vírgula)">
+      <div class="info-text">Liste os sinônimos separados por vírgula</div>
+    </div>
+    <div class="ref-input">
+      <label for="sinonimos_ref">Referência</label>
+      <input 
+        type="text" 
+        id="sinonimos_ref" 
+        name="sinonimos_ref" 
+        placeholder="Nº da referência">
+    </div>
   </div>
-  <div class="ref-input">
-    <label for="familia_ref">Referência:</label>
-    <input type="text" id="familia_ref" name="familia_ref" placeholder="Nº da referência">
+  
+  <!-- Nome Popular -->
+  <div class="input-group">
+    <div class="main-input">
+      <label for="nome_popular">Nome Popular:</label>
+      <input type="text" id="nome_popular" name="nome_popular" placeholder="Digite o nome popular da espécie">
+    </div>
+    <div class="ref-input">
+      <label for="nome_popular_ref">Referência:</label>
+      <input type="text" id="nome_popular_ref" name="nome_popular_ref" placeholder="Nº da referência">
+    </div>
   </div>
-</div>
+
+  <!-- Família -->
+  <div class="input-group">
+    <div class="main-input">
+      <label for="familia">Família:</label>
+      <input type="text" id="familia" name="familia" placeholder="Digite a família da espécie">
+    </div>
+    <div class="ref-input">
+      <label for="familia_ref">Referência:</label>
+      <input type="text" id="familia_ref" name="familia_ref" placeholder="Nº da referência">
+    </div>
+  </div>
 
     <!-- Seção: Características da Folha -->
-    <h3>Características da Folha</h3>
+    <div class="section-title">🍃 Características da Folha</div>
     
     <!-- Forma -->
     <div class="input-group">
@@ -370,7 +408,7 @@ ob_end_clean();
     </div>
 
     <!-- Seção: Características das Flores -->
-    <h3>Características das Flores</h3>
+    <div class="section-title">🌸 Características das Flores</div>
     
     <!-- Cor das Flores -->
     <div class="input-group">
@@ -497,7 +535,7 @@ ob_end_clean();
     </div>
 
     <!-- Seção: Características dos Frutos -->
-    <h3>Características dos Frutos</h3>
+    <div class="section-title">🍎 Características dos Frutos</div>
     
     <!-- Tipo de Fruto -->
     <div class="input-group">
@@ -621,7 +659,7 @@ ob_end_clean();
     </div>
     
     <!-- Seção: Características das Sementes -->
-    <h3>Características das Sementes</h3>
+    <div class="section-title">🌱 Características das Sementes</div>
     
     <!-- Tipo de Semente -->
     <div class="input-group">
@@ -714,7 +752,7 @@ ob_end_clean();
     </div>
 
     <!-- Seção: Características do Caule -->
-    <h3>Características do Caule</h3>
+    <div class="section-title">🌿 Características do Caule</div>
     
     <!-- Tipo de Caule -->
     <div class="input-group">
@@ -862,8 +900,9 @@ ob_end_clean();
         <input type="text" id="ramificacao_caule_ref" name="ramificacao_caule_ref" placeholder="Nº da referência">
       </div>
     </div>
-        <!-- Seção: Outras Características -->
-    <h3>Outras Características</h3>
+    
+    <!-- Seção: Outras Características -->
+    <div class="section-title">⚡ Outras Características</div>
     
     <!-- Possui Espinhos -->
     <div class="input-group">
@@ -929,15 +968,17 @@ ob_end_clean();
       </div>
     </div>
 
-        <!-- Seção: Referências -->
-        <h3>Referências</h3>
-        <div class="input-group">
-          <div class="main-input">
-            <label for="referencias">Adicione as Referências Completas:</label>
-            <textarea id="referencias" name="referencias" rows="10" placeholder="Digite aqui as referências utilizadas, uma por linha ou separadas por vírgula..."></textarea>
-          </div>
-        </div>
-        <!-- Botão de Envio -->
+    <!-- Seção: Referências -->
+    <div class="section-title">📚 Referências</div>
+    <div class="input-group">
+      <div class="main-input">
+        <label for="referencias">Lista Completa de Referências:</label>
+        <textarea id="referencias" name="referencias" rows="10" placeholder="Digite aqui as referências utilizadas, uma por linha ou separadas por vírgula...&#10;&#10;Exemplo:&#10;1. Lorenzi, H. (2002). Árvores Brasileiras Vol.1&#10;2. Souza, V.C. (2018). Flora Brasileira&#10;3. Coleta de campo - Norton (2024)"></textarea>
+        <div class="info-text">Use números [1], [2], etc. nos campos de referência para referenciar esta lista</div>
+      </div>
+    </div>
+    
+    <!-- Botão de Envio -->
     <button type="submit" class="submit-button">Salvar Características</button>
   </form>
 </body>

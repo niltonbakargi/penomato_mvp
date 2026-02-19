@@ -1,336 +1,569 @@
 <?php
+// ================================================
+// CADASTRO DE CARACTERÍSTICAS - CONTROLADOR
+// VERSÃO CORRIGIDA E OTIMIZADA
+// ================================================
+
+// Iniciar sessão
 session_start();
 
-// ===============================
-// USUÁRIO FIXO PARA MVP (ID 1)
-// ===============================
-$usuario_id = 1; // Usuário padrão para testes
+// ================================================
+// FUNÇÕES AUXILIARES
+// ================================================
 
-// ===============================
-// CONEXÃO COM O BANCO
-// ===============================
-$pdo = new PDO(
-    "mysql:host=localhost;dbname=penomato;charset=utf8mb4",
-    "root",
-    "",
-    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-);
+/**
+ * Função para escapar valores com segurança (evita SQL Injection)
+ */
+function esc($valor) {
+    global $conexao;
+    return mysqli_real_escape_string($conexao, $valor);
+}
 
-/* ==========================================================
-   MODO POST → SALVAR CARACTERÍSTICAS (com todas as referências)
-========================================================== */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+/**
+ * Verifica se o usuário está logado (proteção básica)
+ */
+function estaLogado() {
+    return isset($_SESSION['usuario_id']);
+}
 
-    // ===============================
-    // 1. ESPÉCIE SELECIONADA
-    // ===============================
-    $id_especie = intval($_POST['especie_id'] ?? 0);
-
-    if ($id_especie <= 0) {
-        die("Erro: espécie inválida.");
-    }
-
-    // ===============================
-    // 2. VERIFICAR SE ESPÉCIE PODE SER CADASTRADA
-    // ===============================
-    $check = $pdo->prepare("SELECT status FROM especies_administrativo WHERE id = ?");
-    $check->execute([$id_especie]);
-    $especie = $check->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$especie) {
-        die("Erro: espécie não encontrada.");
-    }
-    
-    // Só permite cadastrar se status for 'sem_dados' ou 'dados_internet'
-    if (!in_array($especie['status'], ['sem_dados', 'dados_internet'])) {
-        die("Erro: esta espécie já possui dados e não pode ser alterada.");
-    }
-
-    // ===============================
-    // 3. INSERIR CARACTERÍSTICAS NA TABELA especies_caracteristicas
-    // ===============================
-    $sql = "
-        INSERT INTO especies_caracteristicas (
-            -- Dados principais
-            especie_id,
-            nome_cientifico_completo,
-            nome_cientifico_completo_ref,
-            nome_popular,
-            familia,
-            forma_folha,
-            filotaxia_folha,
-            tipo_folha,
-            tamanho_folha,
-            textura_folha,
-            margem_folha,
-            venacao_folha,
-            cor_flores,
-            simetria_floral,
-            numero_petalas,
-            disposicao_flores,
-            aroma,
-            tamanho_flor,
-            tipo_fruto,
-            tamanho_fruto,
-            cor_fruto,
-            textura_fruto,
-            dispersao_fruto,
-            aroma_fruto,
-            tipo_semente,
-            tamanho_semente,
-            cor_semente,
-            textura_semente,
-            quantidade_sementes,
-            tipo_caule,
-            estrutura_caule,
-            textura_caule,
-            cor_caule,
-            forma_caule,
-            modificacao_caule,
-            diametro_caule,
-            ramificacao_caule,
-            possui_espinhos,
-            possui_latex,
-            possui_seiva,
-            possui_resina,
-            referencias,
-            versao_dados,
-            data_cadastro_botanico,
-            
-            -- REFERÊNCIAS (35 campos)
-            familia_ref,
-            forma_folha_ref,
-            filotaxia_folha_ref,
-            tipo_folha_ref,
-            tamanho_folha_ref,
-            textura_folha_ref,
-            margem_folha_ref,
-            venacao_folha_ref,
-            cor_flores_ref,
-            simetria_floral_ref,
-            numero_petalas_ref,
-            disposicao_flores_ref,
-            aroma_ref,
-            tamanho_flor_ref,
-            tipo_fruto_ref,
-            tamanho_fruto_ref,
-            cor_fruto_ref,
-            textura_fruto_ref,
-            dispersao_fruto_ref,
-            aroma_fruto_ref,
-            tipo_semente_ref,
-            tamanho_semente_ref,
-            cor_semente_ref,
-            textura_semente_ref,
-            quantidade_sementes_ref,
-            tipo_caule_ref,
-            estrutura_caule_ref,
-            textura_caule_ref,
-            cor_caule_ref,
-            forma_caule_ref,
-            modificacao_caule_ref,
-            possui_espinhos_ref,
-            possui_latex_ref,
-            possui_seiva_ref,
-            possui_resina_ref
-        ) VALUES (
-            -- Dados principais
-            :especie_id,
-            :nome_cientifico_completo,
-            :nome_cientifico_completo_ref,
-            :nome_popular,
-            :familia,
-            :forma_folha,
-            :filotaxia_folha,
-            :tipo_folha,
-            :tamanho_folha,
-            :textura_folha,
-            :margem_folha,
-            :venacao_folha,
-            :cor_flores,
-            :simetria_floral,
-            :numero_petalas,
-            :disposicao_flores,
-            :aroma,
-            :tamanho_flor,
-            :tipo_fruto,
-            :tamanho_fruto,
-            :cor_fruto,
-            :textura_fruto,
-            :dispersao_fruto,
-            :aroma_fruto,
-            :tipo_semente,
-            :tamanho_semente,
-            :cor_semente,
-            :textura_semente,
-            :quantidade_sementes,
-            :tipo_caule,
-            :estrutura_caule,
-            :textura_caule,
-            :cor_caule,
-            :forma_caule,
-            :modificacao_caule,
-            :diametro_caule,
-            :ramificacao_caule,
-            :possui_espinhos,
-            :possui_latex,
-            :possui_seiva,
-            :possui_resina,
-            :referencias,
-            1,
-            NOW(),
-            
-            -- REFERÊNCIAS
-            :familia_ref,
-            :forma_folha_ref,
-            :filotaxia_folha_ref,
-            :tipo_folha_ref,
-            :tamanho_folha_ref,
-            :textura_folha_ref,
-            :margem_folha_ref,
-            :venacao_folha_ref,
-            :cor_flores_ref,
-            :simetria_floral_ref,
-            :numero_petalas_ref,
-            :disposicao_flores_ref,
-            :aroma_ref,
-            :tamanho_flor_ref,
-            :tipo_fruto_ref,
-            :tamanho_fruto_ref,
-            :cor_fruto_ref,
-            :textura_fruto_ref,
-            :dispersao_fruto_ref,
-            :aroma_fruto_ref,
-            :tipo_semente_ref,
-            :tamanho_semente_ref,
-            :cor_semente_ref,
-            :textura_semente_ref,
-            :quantidade_sementes_ref,
-            :tipo_caule_ref,
-            :estrutura_caule_ref,
-            :textura_caule_ref,
-            :cor_caule_ref,
-            :forma_caule_ref,
-            :modificacao_caule_ref,
-            :possui_espinhos_ref,
-            :possui_latex_ref,
-            :possui_seiva_ref,
-            :possui_resina_ref
-        )
-    ";
-
-    $stmt = $pdo->prepare($sql);
-    
-    // Mapeamento dos campos do formulário para os parâmetros
-    $stmt->execute([
-        // Dados principais
-        ':especie_id' => $id_especie,
-        ':nome_cientifico_completo' => $_POST['nome_cientifico_completo'] ?? null,
-        ':nome_cientifico_completo_ref' => $_POST['nome_cientifico_completo_ref'] ?? null,
-        ':nome_popular' => $_POST['nome_popular'] ?? null,
-        ':familia' => $_POST['familia'] ?? null,
-        ':forma_folha' => $_POST['forma_folha'] ?? null,
-        ':filotaxia_folha' => $_POST['filotaxia_folha'] ?? null,
-        ':tipo_folha' => $_POST['tipo_folha'] ?? null,
-        ':tamanho_folha' => $_POST['tamanho_folha'] ?? null,
-        ':textura_folha' => $_POST['textura_folha'] ?? null,
-        ':margem_folha' => $_POST['margem_folha'] ?? null,
-        ':venacao_folha' => $_POST['venacao_folha'] ?? null,
-        ':cor_flores' => $_POST['cor_flores'] ?? null,
-        ':simetria_floral' => $_POST['simetria_floral'] ?? null,
-        ':numero_petalas' => $_POST['numero_petalas'] ?? null,
-        ':disposicao_flores' => $_POST['disposicao_flores'] ?? null,
-        ':aroma' => $_POST['aroma'] ?? null,
-        ':tamanho_flor' => $_POST['tamanho_flor'] ?? null,
-        ':tipo_fruto' => $_POST['tipo_fruto'] ?? null,
-        ':tamanho_fruto' => $_POST['tamanho_fruto'] ?? null,
-        ':cor_fruto' => $_POST['cor_fruto'] ?? null,
-        ':textura_fruto' => $_POST['textura_fruto'] ?? null,
-        ':dispersao_fruto' => $_POST['dispersao_fruto'] ?? null,
-        ':aroma_fruto' => $_POST['aroma_fruto'] ?? null,
-        ':tipo_semente' => $_POST['tipo_semente'] ?? null,
-        ':tamanho_semente' => $_POST['tamanho_semente'] ?? null,
-        ':cor_semente' => $_POST['cor_semente'] ?? null,
-        ':textura_semente' => $_POST['textura_semente'] ?? null,
-        ':quantidade_sementes' => $_POST['quantidade_sementes'] ?? null,
-        ':tipo_caule' => $_POST['tipo_caule'] ?? null,
-        ':estrutura_caule' => $_POST['estrutura_caule'] ?? null,
-        ':textura_caule' => $_POST['textura_caule'] ?? null,
-        ':cor_caule' => $_POST['cor_caule'] ?? null,
-        ':forma_caule' => $_POST['forma_caule'] ?? null,
-        ':modificacao_caule' => $_POST['modificacao_caule'] ?? null,
-        ':diametro_caule' => $_POST['diametro_caule'] ?? null,
-        ':ramificacao_caule' => $_POST['ramificacao_caule'] ?? null,
-        ':possui_espinhos' => $_POST['possui_espinhos'] ?? null,
-        ':possui_latex' => $_POST['possui_latex'] ?? null,
-        ':possui_seiva' => $_POST['possui_seiva'] ?? null,
-        ':possui_resina' => $_POST['possui_resina'] ?? null,
-        ':referencias' => $_POST['referencias'] ?? null,
-        
-        // Referências
-        ':familia_ref' => $_POST['familia_ref'] ?? null,
-        ':forma_folha_ref' => $_POST['forma_folha_ref'] ?? null,
-        ':filotaxia_folha_ref' => $_POST['filotaxia_folha_ref'] ?? null,
-        ':tipo_folha_ref' => $_POST['tipo_folha_ref'] ?? null,
-        ':tamanho_folha_ref' => $_POST['tamanho_folha_ref'] ?? null,
-        ':textura_folha_ref' => $_POST['textura_folha_ref'] ?? null,
-        ':margem_folha_ref' => $_POST['margem_folha_ref'] ?? null,
-        ':venacao_folha_ref' => $_POST['venacao_folha_ref'] ?? null,
-        ':cor_flores_ref' => $_POST['cor_flores_ref'] ?? null,
-        ':simetria_floral_ref' => $_POST['simetria_floral_ref'] ?? null,
-        ':numero_petalas_ref' => $_POST['numero_petalas_ref'] ?? null,
-        ':disposicao_flores_ref' => $_POST['disposicao_flores_ref'] ?? null,
-        ':aroma_ref' => $_POST['aroma_ref'] ?? null,
-        ':tamanho_flor_ref' => $_POST['tamanho_flor_ref'] ?? null,
-        ':tipo_fruto_ref' => $_POST['tipo_fruto_ref'] ?? null,
-        ':tamanho_fruto_ref' => $_POST['tamanho_fruto_ref'] ?? null,
-        ':cor_fruto_ref' => $_POST['cor_fruto_ref'] ?? null,
-        ':textura_fruto_ref' => $_POST['textura_fruto_ref'] ?? null,
-        ':dispersao_fruto_ref' => $_POST['dispersao_fruto_ref'] ?? null,
-        ':aroma_fruto_ref' => $_POST['aroma_fruto_ref'] ?? null,
-        ':tipo_semente_ref' => $_POST['tipo_semente_ref'] ?? null,
-        ':tamanho_semente_ref' => $_POST['tamanho_semente_ref'] ?? null,
-        ':cor_semente_ref' => $_POST['cor_semente_ref'] ?? null,
-        ':textura_semente_ref' => $_POST['textura_semente_ref'] ?? null,
-        ':quantidade_sementes_ref' => $_POST['quantidade_sementes_ref'] ?? null,
-        ':tipo_caule_ref' => $_POST['tipo_caule_ref'] ?? null,
-        ':estrutura_caule_ref' => $_POST['estrutura_caule_ref'] ?? null,
-        ':textura_caule_ref' => $_POST['textura_caule_ref'] ?? null,
-        ':cor_caule_ref' => $_POST['cor_caule_ref'] ?? null,
-        ':forma_caule_ref' => $_POST['forma_caule_ref'] ?? null,
-        ':modificacao_caule_ref' => $_POST['modificacao_caule_ref'] ?? null,
-        ':possui_espinhos_ref' => $_POST['possui_espinhos_ref'] ?? null,
-        ':possui_latex_ref' => $_POST['possui_latex_ref'] ?? null,
-        ':possui_seiva_ref' => $_POST['possui_seiva_ref'] ?? null,
-        ':possui_resina_ref' => $_POST['possui_resina_ref'] ?? null
-    ]);
-
-    // ===============================
-    // 4. ATUALIZAR STATUS DA ESPÉCIE (NOVA ESTRUTURA)
-    // ===============================
-    $sql_update = "
-        UPDATE especies_administrativo
-        SET
-            status = 'dados_internet',
-            data_dados_internet = NOW(),
-            autor_dados_internet_id = :autor_id,
-            data_ultima_atualizacao = NOW()
-        WHERE id = :id_especie
-    ";
-
-    $stmt = $pdo->prepare($sql_update);
-    $stmt->execute([
-        ':id_especie' => $id_especie,
-        ':autor_id' => $usuario_id
-    ]);
-
-    // ===============================
-    // 5. REDIRECIONAR PARA PÁGINA DE SUCESSO
-    // ===============================
-    header("Location: sucesso_cadastro.php?id=$id_especie");
+// ================================================
+// VERIFICAR AUTENTICAÇÃO
+// ================================================
+if (!estaLogado()) {
+    header('Location: /penomato_mvp/src/Views/auth/login.php');
     exit;
 }
 
-// Se não for POST, mostrar erro
-die("Método não permitido. Use o formulário para enviar os dados.");
+// ================================================
+// CONFIGURAÇÕES DO BANCO
+// ================================================
+$servidor = "127.0.0.1";
+$usuario = "root";
+$senha = "";
+$banco = "penomato";
+
+// Variáveis de controle
+$mensagem_erro = '';
+
+// ================================================
+// PROCESSAR FORMULÁRIO
+// ================================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    
+    // Conectar ao banco
+    $conexao = mysqli_connect($servidor, $usuario, $senha, $banco);
+    
+    if (!$conexao) {
+        die("Erro de conexão: " . mysqli_connect_error());
+    }
+    
+    mysqli_set_charset($conexao, "utf8mb4");
+    
+    // ================================================
+    // VALIDAÇÕES BÁSICAS
+    // ================================================
+    
+    // Verificar se a espécie foi selecionada
+    if (empty($_POST['especie_id'])) {
+        $mensagem_erro = "Selecione uma espécie para cadastrar as características.";
+    } else {
+        
+        // ================================================
+        // COLETAR DADOS DO FORMULÁRIO
+        // ================================================
+        
+        // Dados básicos
+        $especie_id = (int)$_POST['especie_id'];
+        $nome_cientifico_completo = esc($_POST['nome_cientifico_completo'] ?? '');
+        $nome_cientifico_completo_ref = esc($_POST['nome_cientifico_completo_ref'] ?? '');
+        
+        // Sinônimos
+        $sinonimos = esc($_POST['sinonimos'] ?? '');
+        $sinonimos_ref = esc($_POST['sinonimos_ref'] ?? '');
+        
+        $nome_popular = esc($_POST['nome_popular'] ?? '');
+        $nome_popular_ref = esc($_POST['nome_popular_ref'] ?? '');
+        $familia = esc($_POST['familia'] ?? '');
+        $familia_ref = esc($_POST['familia_ref'] ?? '');
+        
+        // Folha
+        $forma_folha = esc($_POST['forma_folha'] ?? '');
+        $forma_folha_ref = esc($_POST['forma_folha_ref'] ?? '');
+        $filotaxia_folha = esc($_POST['filotaxia_folha'] ?? '');
+        $filotaxia_folha_ref = esc($_POST['filotaxia_folha_ref'] ?? '');
+        $tipo_folha = esc($_POST['tipo_folha'] ?? '');
+        $tipo_folha_ref = esc($_POST['tipo_folha_ref'] ?? '');
+        $tamanho_folha = esc($_POST['tamanho_folha'] ?? '');
+        $tamanho_folha_ref = esc($_POST['tamanho_folha_ref'] ?? '');
+        $textura_folha = esc($_POST['textura_folha'] ?? '');
+        $textura_folha_ref = esc($_POST['textura_folha_ref'] ?? '');
+        $margem_folha = esc($_POST['margem_folha'] ?? '');
+        $margem_folha_ref = esc($_POST['margem_folha_ref'] ?? '');
+        $venacao_folha = esc($_POST['venacao_folha'] ?? '');
+        $venacao_folha_ref = esc($_POST['venacao_folha_ref'] ?? '');
+        
+        // ================================================
+        // FLORES - NOMES REAIS DA TABELA
+        // ================================================
+        $cor_flores = esc($_POST['cor_flores'] ?? '');
+        $cor_flores_ref = esc($_POST['cor_flores_ref'] ?? '');
+        
+        $simetria_floral = esc($_POST['simetria_floral'] ?? '');
+        $simetria_floral_ref = esc($_POST['simetria_floral_ref'] ?? '');
+        
+        $numero_petalas = esc($_POST['numero_petalas'] ?? '');
+        $numero_petalas_ref = esc($_POST['numero_petalas_ref'] ?? '');
+        
+        $tamanho_flor = esc($_POST['tamanho_flor'] ?? '');
+        $tamanho_flor_ref = esc($_POST['tamanho_flor_ref'] ?? '');
+        
+        $disposicao_flores = esc($_POST['disposicao_flores'] ?? '');
+        $disposicao_flores_ref = esc($_POST['disposicao_flores_ref'] ?? '');
+        
+        $aroma = esc($_POST['aroma'] ?? '');
+        $aroma_ref = esc($_POST['aroma_ref'] ?? '');
+        
+        // Frutos
+        $tipo_fruto = esc($_POST['tipo_fruto'] ?? '');
+        $tipo_fruto_ref = esc($_POST['tipo_fruto_ref'] ?? '');
+        $tamanho_fruto = esc($_POST['tamanho_fruto'] ?? '');
+        $tamanho_fruto_ref = esc($_POST['tamanho_fruto_ref'] ?? '');
+        $cor_fruto = esc($_POST['cor_fruto'] ?? '');
+        $cor_fruto_ref = esc($_POST['cor_fruto_ref'] ?? '');
+        $textura_fruto = esc($_POST['textura_fruto'] ?? '');
+        $textura_fruto_ref = esc($_POST['textura_fruto_ref'] ?? '');
+        $dispersao_fruto = esc($_POST['dispersao_fruto'] ?? '');
+        $dispersao_fruto_ref = esc($_POST['dispersao_fruto_ref'] ?? '');
+        $aroma_fruto = esc($_POST['aroma_fruto'] ?? '');
+        $aroma_fruto_ref = esc($_POST['aroma_fruto_ref'] ?? '');
+        
+        // Sementes
+        $tipo_semente = esc($_POST['tipo_semente'] ?? '');
+        $tipo_semente_ref = esc($_POST['tipo_semente_ref'] ?? '');
+        $tamanho_semente = esc($_POST['tamanho_semente'] ?? '');
+        $tamanho_semente_ref = esc($_POST['tamanho_semente_ref'] ?? '');
+        $cor_semente = esc($_POST['cor_semente'] ?? '');
+        $cor_semente_ref = esc($_POST['cor_semente_ref'] ?? '');
+        $textura_semente = esc($_POST['textura_semente'] ?? '');
+        $textura_semente_ref = esc($_POST['textura_semente_ref'] ?? '');
+        $quantidade_sementes = esc($_POST['quantidade_sementes'] ?? '');
+        $quantidade_sementes_ref = esc($_POST['quantidade_sementes_ref'] ?? '');
+        
+        // Caule
+        $tipo_caule = esc($_POST['tipo_caule'] ?? '');
+        $tipo_caule_ref = esc($_POST['tipo_caule_ref'] ?? '');
+        $estrutura_caule = esc($_POST['estrutura_caule'] ?? '');
+        $estrutura_caule_ref = esc($_POST['estrutura_caule_ref'] ?? '');
+        $textura_caule = esc($_POST['textura_caule'] ?? '');
+        $textura_caule_ref = esc($_POST['textura_caule_ref'] ?? '');
+        $cor_caule = esc($_POST['cor_caule'] ?? '');
+        $cor_caule_ref = esc($_POST['cor_caule_ref'] ?? '');
+        $forma_caule = esc($_POST['forma_caule'] ?? '');
+        $forma_caule_ref = esc($_POST['forma_caule_ref'] ?? '');
+        $modificacao_caule = esc($_POST['modificacao_caule'] ?? '');
+        $modificacao_caule_ref = esc($_POST['modificacao_caule_ref'] ?? '');
+        $diametro_caule = esc($_POST['diametro_caule'] ?? '');
+        $diametro_caule_ref = esc($_POST['diametro_caule_ref'] ?? '');
+        $ramificacao_caule = esc($_POST['ramificacao_caule'] ?? '');
+        $ramificacao_caule_ref = esc($_POST['ramificacao_caule_ref'] ?? '');
+        
+        // Outras
+        $possui_espinhos = esc($_POST['possui_espinhos'] ?? '');
+        $possui_espinhos_ref = esc($_POST['possui_espinhos_ref'] ?? '');
+        $possui_latex = esc($_POST['possui_latex'] ?? '');
+        $possui_latex_ref = esc($_POST['possui_latex_ref'] ?? '');
+        $possui_seiva = esc($_POST['possui_seiva'] ?? '');
+        $possui_seiva_ref = esc($_POST['possui_seiva_ref'] ?? '');
+        $possui_resina = esc($_POST['possui_resina'] ?? '');
+        $possui_resina_ref = esc($_POST['possui_resina_ref'] ?? '');
+        
+        // Referências completas
+        $referencias = esc($_POST['referencias'] ?? '');
+        
+        // ================================================
+        // VERIFICAR SE A ESPÉCIE JÁ TEM CARACTERÍSTICAS
+        // ================================================
+        $sql_check = "SELECT id FROM especies_caracteristicas WHERE especie_id = $especie_id";
+        $result_check = mysqli_query($conexao, $sql_check);
+        $ja_existe = mysqli_num_rows($result_check) > 0;
+        
+        if ($ja_existe) {
+            // UPDATE - Já existe, então atualiza
+            $sql = "UPDATE especies_caracteristicas SET
+                nome_cientifico_completo = '$nome_cientifico_completo',
+                nome_cientifico_completo_ref = '$nome_cientifico_completo_ref',
+                sinonimos = '$sinonimos',
+                sinonimos_ref = '$sinonimos_ref',
+                nome_popular = '$nome_popular',
+                nome_popular_ref = '$nome_popular_ref',
+                familia = '$familia',
+                familia_ref = '$familia_ref',
+                forma_folha = '$forma_folha',
+                forma_folha_ref = '$forma_folha_ref',
+                filotaxia_folha = '$filotaxia_folha',
+                filotaxia_folha_ref = '$filotaxia_folha_ref',
+                tipo_folha = '$tipo_folha',
+                tipo_folha_ref = '$tipo_folha_ref',
+                tamanho_folha = '$tamanho_folha',
+                tamanho_folha_ref = '$tamanho_folha_ref',
+                textura_folha = '$textura_folha',
+                textura_folha_ref = '$textura_folha_ref',
+                margem_folha = '$margem_folha',
+                margem_folha_ref = '$margem_folha_ref',
+                venacao_folha = '$venacao_folha',
+                venacao_folha_ref = '$venacao_folha_ref',
+                
+                -- FLORES
+                cor_flores = '$cor_flores',
+                cor_flores_ref = '$cor_flores_ref',
+                simetria_floral = '$simetria_floral',
+                simetria_floral_ref = '$simetria_floral_ref',
+                numero_petalas = '$numero_petalas',
+                numero_petalas_ref = '$numero_petalas_ref',
+                tamanho_flor = '$tamanho_flor',
+                tamanho_flor_ref = '$tamanho_flor_ref',
+                disposicao_flores = '$disposicao_flores',
+                disposicao_flores_ref = '$disposicao_flores_ref',
+                aroma = '$aroma',
+                aroma_ref = '$aroma_ref',
+                
+                -- FRUTOS
+                tipo_fruto = '$tipo_fruto',
+                tipo_fruto_ref = '$tipo_fruto_ref',
+                tamanho_fruto = '$tamanho_fruto',
+                tamanho_fruto_ref = '$tamanho_fruto_ref',
+                cor_fruto = '$cor_fruto',
+                cor_fruto_ref = '$cor_fruto_ref',
+                textura_fruto = '$textura_fruto',
+                textura_fruto_ref = '$textura_fruto_ref',
+                dispersao_fruto = '$dispersao_fruto',
+                dispersao_fruto_ref = '$dispersao_fruto_ref',
+                aroma_fruto = '$aroma_fruto',
+                aroma_fruto_ref = '$aroma_fruto_ref',
+                
+                -- SEMENTES
+                tipo_semente = '$tipo_semente',
+                tipo_semente_ref = '$tipo_semente_ref',
+                tamanho_semente = '$tamanho_semente',
+                tamanho_semente_ref = '$tamanho_semente_ref',
+                cor_semente = '$cor_semente',
+                cor_semente_ref = '$cor_semente_ref',
+                textura_semente = '$textura_semente',
+                textura_semente_ref = '$textura_semente_ref',
+                quantidade_sementes = '$quantidade_sementes',
+                quantidade_sementes_ref = '$quantidade_sementes_ref',
+                
+                -- CAULE
+                tipo_caule = '$tipo_caule',
+                tipo_caule_ref = '$tipo_caule_ref',
+                estrutura_caule = '$estrutura_caule',
+                estrutura_caule_ref = '$estrutura_caule_ref',
+                textura_caule = '$textura_caule',
+                textura_caule_ref = '$textura_caule_ref',
+                cor_caule = '$cor_caule',
+                cor_caule_ref = '$cor_caule_ref',
+                forma_caule = '$forma_caule',
+                forma_caule_ref = '$forma_caule_ref',
+                modificacao_caule = '$modificacao_caule',
+                modificacao_caule_ref = '$modificacao_caule_ref',
+                diametro_caule = '$diametro_caule',
+                diametro_caule_ref = '$diametro_caule_ref',
+                ramificacao_caule = '$ramificacao_caule',
+                ramificacao_caule_ref = '$ramificacao_caule_ref',
+                
+                -- OUTRAS
+                possui_espinhos = '$possui_espinhos',
+                possui_espinhos_ref = '$possui_espinhos_ref',
+                possui_latex = '$possui_latex',
+                possui_latex_ref = '$possui_latex_ref',
+                possui_seiva = '$possui_seiva',
+                possui_seiva_ref = '$possui_seiva_ref',
+                possui_resina = '$possui_resina',
+                possui_resina_ref = '$possui_resina_ref',
+                
+                -- REFERÊNCIAS
+                referencias = '$referencias',
+                data_atualizacao = NOW()
+            WHERE especie_id = $especie_id";
+            
+        } else {
+            // INSERT - Novo registro
+            $sql = "INSERT INTO especies_caracteristicas (
+                especie_id,
+                nome_cientifico_completo,
+                nome_cientifico_completo_ref,
+                sinonimos,
+                sinonimos_ref,
+                nome_popular,
+                nome_popular_ref,
+                familia,
+                familia_ref,
+                forma_folha,
+                forma_folha_ref,
+                filotaxia_folha,
+                filotaxia_folha_ref,
+                tipo_folha,
+                tipo_folha_ref,
+                tamanho_folha,
+                tamanho_folha_ref,
+                textura_folha,
+                textura_folha_ref,
+                margem_folha,
+                margem_folha_ref,
+                venacao_folha,
+                venacao_folha_ref,
+                
+                -- FLORES
+                cor_flores,
+                cor_flores_ref,
+                simetria_floral,
+                simetria_floral_ref,
+                numero_petalas,
+                numero_petalas_ref,
+                tamanho_flor,
+                tamanho_flor_ref,
+                disposicao_flores,
+                disposicao_flores_ref,
+                aroma,
+                aroma_ref,
+                
+                -- FRUTOS
+                tipo_fruto,
+                tipo_fruto_ref,
+                tamanho_fruto,
+                tamanho_fruto_ref,
+                cor_fruto,
+                cor_fruto_ref,
+                textura_fruto,
+                textura_fruto_ref,
+                dispersao_fruto,
+                dispersao_fruto_ref,
+                aroma_fruto,
+                aroma_fruto_ref,
+                
+                -- SEMENTES
+                tipo_semente,
+                tipo_semente_ref,
+                tamanho_semente,
+                tamanho_semente_ref,
+                cor_semente,
+                cor_semente_ref,
+                textura_semente,
+                textura_semente_ref,
+                quantidade_sementes,
+                quantidade_sementes_ref,
+                
+                -- CAULE
+                tipo_caule,
+                tipo_caule_ref,
+                estrutura_caule,
+                estrutura_caule_ref,
+                textura_caule,
+                textura_caule_ref,
+                cor_caule,
+                cor_caule_ref,
+                forma_caule,
+                forma_caule_ref,
+                modificacao_caule,
+                modificacao_caule_ref,
+                diametro_caule,
+                diametro_caule_ref,
+                ramificacao_caule,
+                ramificacao_caule_ref,
+                
+                -- OUTRAS
+                possui_espinhos,
+                possui_espinhos_ref,
+                possui_latex,
+                possui_latex_ref,
+                possui_seiva,
+                possui_seiva_ref,
+                possui_resina,
+                possui_resina_ref,
+                
+                -- REFERÊNCIAS
+                referencias
+            ) VALUES (
+                $especie_id,
+                '$nome_cientifico_completo',
+                '$nome_cientifico_completo_ref',
+                '$sinonimos',
+                '$sinonimos_ref',
+                '$nome_popular',
+                '$nome_popular_ref',
+                '$familia',
+                '$familia_ref',
+                '$forma_folha',
+                '$forma_folha_ref',
+                '$filotaxia_folha',
+                '$filotaxia_folha_ref',
+                '$tipo_folha',
+                '$tipo_folha_ref',
+                '$tamanho_folha',
+                '$tamanho_folha_ref',
+                '$textura_folha',
+                '$textura_folha_ref',
+                '$margem_folha',
+                '$margem_folha_ref',
+                '$venacao_folha',
+                '$venacao_folha_ref',
+                
+                -- FLORES
+                '$cor_flores',
+                '$cor_flores_ref',
+                '$simetria_floral',
+                '$simetria_floral_ref',
+                '$numero_petalas',
+                '$numero_petalas_ref',
+                '$tamanho_flor',
+                '$tamanho_flor_ref',
+                '$disposicao_flores',
+                '$disposicao_flores_ref',
+                '$aroma',
+                '$aroma_ref',
+                
+                -- FRUTOS
+                '$tipo_fruto',
+                '$tipo_fruto_ref',
+                '$tamanho_fruto',
+                '$tamanho_fruto_ref',
+                '$cor_fruto',
+                '$cor_fruto_ref',
+                '$textura_fruto',
+                '$textura_fruto_ref',
+                '$dispersao_fruto',
+                '$dispersao_fruto_ref',
+                '$aroma_fruto',
+                '$aroma_fruto_ref',
+                
+                -- SEMENTES
+                '$tipo_semente',
+                '$tipo_semente_ref',
+                '$tamanho_semente',
+                '$tamanho_semente_ref',
+                '$cor_semente',
+                '$cor_semente_ref',
+                '$textura_semente',
+                '$textura_semente_ref',
+                '$quantidade_sementes',
+                '$quantidade_sementes_ref',
+                
+                -- CAULE
+                '$tipo_caule',
+                '$tipo_caule_ref',
+                '$estrutura_caule',
+                '$estrutura_caule_ref',
+                '$textura_caule',
+                '$textura_caule_ref',
+                '$cor_caule',
+                '$cor_caule_ref',
+                '$forma_caule',
+                '$forma_caule_ref',
+                '$modificacao_caule',
+                '$modificacao_caule_ref',
+                '$diametro_caule',
+                '$diametro_caule_ref',
+                '$ramificacao_caule',
+                '$ramificacao_caule_ref',
+                
+                -- OUTRAS
+                '$possui_espinhos',
+                '$possui_espinhos_ref',
+                '$possui_latex',
+                '$possui_latex_ref',
+                '$possui_seiva',
+                '$possui_seiva_ref',
+                '$possui_resina',
+                '$possui_resina_ref',
+                
+                -- REFERÊNCIAS
+                '$referencias'
+            )";
+        }
+        
+        // Executar a query
+        if (mysqli_query($conexao, $sql)) {
+            
+            // ================================================
+            // ATUALIZAR STATUS DA ESPÉCIE
+            // ================================================
+            $sql_status = "UPDATE especies_administrativo 
+                          SET status = 'dados_internet', 
+                              data_ultima_atualizacao = NOW() 
+                          WHERE id = $especie_id";
+            mysqli_query($conexao, $sql_status);
+            
+            // Redirecionar para página de sucesso
+            header("Location: sucesso_cadastro.php?id=$especie_id");
+            exit;
+            
+        } else {
+            $mensagem_erro = "Erro ao salvar: " . mysqli_error($conexao);
+        }
+    }
+    
+    mysqli_close($conexao);
+}
+
+// ================================================
+// SE HOUVER ERRO, MOSTRA MENSAGEM
+// ================================================
+if (!empty($mensagem_erro)) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Erro no Cadastro</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: linear-gradient(135deg, #0b5e42 0%, #1a7a5a 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0;
+            }
+            .card {
+                background: white;
+                border-radius: 15px;
+                padding: 40px;
+                max-width: 500px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                text-align: center;
+            }
+            .error {
+                color: #dc3545;
+                font-size: 1.2rem;
+                margin: 20px 0;
+            }
+            .btn {
+                background: #0b5e42;
+                color: white;
+                padding: 12px 30px;
+                border: none;
+                border-radius: 40px;
+                font-size: 1.1rem;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                margin-top: 20px;
+            }
+            .btn:hover {
+                background: #0a4c35;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h2 style="color: #0b5e42;">❌ Erro no Cadastro</h2>
+            <div class="error"><?php echo $mensagem_erro; ?></div>
+            <a href="javascript:history.back()" class="btn">← Voltar e corrigir</a>
+        </div>
+    </body>
+    </html>
+    <?php
+}
 ?>
