@@ -351,8 +351,8 @@ ob_end_clean();
           <option value="Coriácea">Coriácea</option>
           <option value="Cartácea">Cartácea</option>
           <option value="Membranácea">Membranácea</option>
-          <option value="Súcuba">Súcuba</option>
-          <option value="Pilosas">Pilosas</option>
+          <option value="Suculenta">Suculenta</option> <!-- CORRIGIDO: Súcuba → Suculenta -->
+          <option value="Pilosa">Pilosa</option> <!-- CORRIGIDO: Pilosas → Pilosa -->
           <option value="Glabra">Glabra</option>
           <option value="Rugosa">Rugosa</option>
           <option value="Cerosa">Cerosa</option>
@@ -455,10 +455,10 @@ ob_end_clean();
         <label for="numero_petalas">Número de Pétalas:</label>
         <select id="numero_petalas" name="numero_petalas">
           <option value="" disabled selected>Selecione o número de pétalas</option>
-          <option value="3_petalas">3 pétalas</option>
-          <option value="4_petalas">4 pétalas</option>
-          <option value="5_petalas">5 pétalas</option>
-          <option value="Muitas_petalas">Muitas pétalas</option>
+          <option value="3 pétalas">3 pétalas</option> <!-- CORRIGIDO: 3_petalas → 3 pétalas -->
+          <option value="4 pétalas">4 pétalas</option> <!-- CORRIGIDO: 4_petalas → 4 pétalas -->
+          <option value="5 pétalas">5 pétalas</option> <!-- CORRIGIDO: 5_petalas → 5 pétalas -->
+          <option value="Muitas pétalas">Muitas pétalas</option> <!-- CORRIGIDO: Muitas_petalas → Muitas pétalas -->
         </select>
       </div>
       <div class="ref-input">
@@ -467,22 +467,7 @@ ob_end_clean();
       </div>
     </div>
     
-    <!-- Tamanho das Flores -->
-    <div class="input-group">
-      <div class="main-input">
-        <label for="tamanho_flores">Tamanho das Flores:</label>
-        <select id="tamanho_flores" name="tamanho_flores">
-          <option value="" disabled selected>Selecione o tamanho das flores</option>
-          <option value="Pequenas">Pequenas (&lt; 1 cm)</option>
-          <option value="Medias">Médias (1–5 cm)</option>
-          <option value="Grandes">Grandes (&gt; 5 cm)</option>
-        </select>
-      </div>
-      <div class="ref-input">
-        <label for="tamanho_flores_ref">Referência:</label>
-        <input type="text" id="tamanho_flores_ref" name="tamanho_flores_ref" placeholder="Nº da referência">
-      </div>
-    </div>
+    <!-- ESTE BLOCO FOI REMOVIDO - Campos tamanho_flores e tamanho_flores_ref não existem na tabela -->
     
     <!-- Disposição das Flores -->
     <div class="input-group">
@@ -491,7 +476,7 @@ ob_end_clean();
         <select id="disposicao_flores" name="disposicao_flores">
           <option value="" disabled selected>Selecione a disposição das flores</option>
           <option value="Isoladas">Isoladas</option>
-          <option value="Inflorescencia">Inflorescência (cacho, espiga, capítulo, umbela)</option>
+          <option value="Inflorescência">Inflorescência (cacho, espiga, capítulo, umbela)</option> <!-- CORRIGIDO: Inflorescencia → Inflorescência -->
         </select>
       </div>
       <div class="ref-input">
@@ -506,10 +491,10 @@ ob_end_clean();
         <label for="aroma">Aroma:</label>
         <select id="aroma" name="aroma">
           <option value="" disabled selected>Selecione o aroma das flores</option>
-          <option value="Sem_cheiro">Sem cheiro</option>
-          <option value="Aroma_suave">Aroma suave</option>
-          <option value="Aroma_forte">Aroma forte</option>
-          <option value="Aroma_desagradavel">Aroma desagradável</option>
+          <option value="Sem cheiro">Sem cheiro</option> <!-- CORRIGIDO: Sem_cheiro → Sem cheiro -->
+          <option value="Aroma suave">Aroma suave</option> <!-- CORRIGIDO: Aroma_suave → Aroma suave -->
+          <option value="Aroma forte">Aroma forte</option> <!-- CORRIGIDO: Aroma_forte → Aroma forte -->
+          <option value="Aroma desagradável">Aroma desagradável</option> <!-- CORRIGIDO: Aroma_desagradavel → Aroma desagradável -->
         </select>
       </div>
       <div class="ref-input">
