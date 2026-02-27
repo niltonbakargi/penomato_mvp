@@ -17,7 +17,12 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 // VERIFICAR SE JÁ ESTÁ LOGADO
 // ============================================================
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
+    // Redirecionar baseado no tipo de usuário
+    if ($_SESSION['usuario_tipo'] === 'gestor') {
+        header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
+    } else {
+        header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
+    }
     exit;
 }
 
@@ -26,6 +31,7 @@ if (isset($_SESSION['usuario_id'])) {
 // ============================================================
 $email = '';
 $erro = '';
+$redirect = $_POST['redirect'] ?? $_GET['redirect'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
@@ -40,33 +46,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erro = "Email inválido.";
     }
     else {
-        // Buscar usuário
-        $sql = "SELECT * FROM usuarios WHERE email = ? AND ativo = 1 LIMIT 1";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$email]);
-        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Buscar usuário (adaptado para mysqli, não PDO)
+        $conexao = new mysqli('127.0.0.1', 'root', '', 'penomato');
         
-        // Verificar senha
-        if ($usuario && password_verify($senha, $usuario['senha_hash'])) {
-            
-            // Atualizar último acesso
-            $sql = "UPDATE usuarios SET ultimo_acesso = NOW() WHERE id = ?";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$usuario['id']]);
-            
-            // Criar sessão
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['usuario_nome'] = $usuario['nome'];
-            $_SESSION['usuario_email'] = $usuario['email'];
-            $_SESSION['usuario_tipo'] = $usuario['tipo'];
-            $_SESSION['usuario_instituicao'] = $usuario['instituicao'] ?? '';
-            
-            // Redirecionar para o gestor (página principal)
-            header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
-            exit;
-            
+        if ($conexao->connect_error) {
+            $erro = "Erro de conexão com o banco de dados.";
         } else {
-            $erro = "Email ou senha incorretos.";
+            $sql = "SELECT * FROM usuarios WHERE email = ? AND ativo = 1 LIMIT 1";
+            $stmt = $conexao->prepare($sql);
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $resultado = $stmt->get_result();
+            $usuario = $resultado->fetch_assoc();
+            
+            // Verificar senha
+            if ($usuario && password_verify($senha, $usuario['senha_hash'])) {
+                
+                // Atualizar último acesso
+                $sql_update = "UPDATE usuarios SET ultimo_acesso = NOW() WHERE id = ?";
+                $stmt_update = $conexao->prepare($sql_update);
+                $stmt_update->bind_param("i", $usuario['id']);
+                $stmt_update->execute();
+                $stmt_update->close();
+                
+                // Criar sessão
+                $_SESSION['usuario_id'] = $usuario['id'];
+                $_SESSION['usuario_nome'] = $usuario['nome'];
+                $_SESSION['usuario_email'] = $usuario['email'];
+                $_SESSION['usuario_tipo'] = $usuario['categoria']; // Campo 'categoria' na tabela
+                $_SESSION['usuario_instituicao'] = $usuario['instituicao'] ?? '';
+                
+                // ================================================
+                // REDIRECIONAR BASEADO NO TIPO DE USUÁRIO
+                // ================================================
+                if ($usuario['categoria'] === 'gestor') {
+                    header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
+                } else {
+                    // Qualquer outro tipo (colaborador, revisor, validador, visitante)
+                    header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
+                }
+                exit;
+                
+            } else {
+                $erro = "Email ou senha incorretos.";
+            }
+            $conexao->close();
         }
     }
 }
@@ -79,5 +103,7 @@ if (!empty($erro)) {
     $_SESSION['email_tentativa'] = $email;
 }
 
-header('Location: /penomato_mvp/src/Views/auth/login.php');
+// Se tiver redirect, mantém na URL
+$redirect_param = $redirect ? '?redirect=' . urlencode($redirect) : '';
+header('Location: /penomato_mvp/src/Views/auth/login.php' . $redirect_param);
 exit;

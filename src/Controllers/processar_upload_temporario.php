@@ -10,25 +10,70 @@ error_reporting(E_ALL);
 session_start();
 ob_start();
 
-// ================================================
-// CONFIGURAÇÕES
-// ================================================
 $servidor = "127.0.0.1";
 $usuario_db = "root";
 $senha_db = "";
 $banco = "penomato";
 
+// ================================================
+// CONFIGURAÇÕES DE UPLOAD
+// ================================================
 $tamanho_maximo = 10 * 1024 * 1024; // 10MB
 $formatos_permitidos = ['image/jpeg', 'image/png', 'image/jpg'];
 $extensoes_permitidas = ['jpg', 'jpeg', 'png'];
 
 // ================================================
-// FUNÇÕES
+// VERIFICAR SE USUÁRIO ESTÁ LOGADO
 // ================================================
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: ../Views/auth/login.php?erro=" . urlencode("Faça login para continuar."));
+    exit;
+}
+$id_usuario = $_SESSION['usuario_id'];
 
-/**
- * Valida a imagem enviada
- */
+// ================================================
+// VERIFICAR SESSÃO TEMPORÁRIA
+// ================================================
+$temp_id = isset($_POST['temp_id']) ? $_POST['temp_id'] : '';
+
+if (empty($temp_id) || !isset($_SESSION['importacao_temporaria']) || $_SESSION['importacao_temporaria']['temp_id'] !== $temp_id) {
+    header("Location: ../Views/upload_imagens_internet.php?erro=" . urlencode("Sessão temporária inválida ou expirada."));
+    exit;
+}
+
+// Verificar se o usuário da sessão é o mesmo que iniciou a importação
+if ($_SESSION['importacao_temporaria']['usuario_id'] != $id_usuario) {
+    header("Location: ../Views/upload_imagens_internet.php?erro=" . urlencode("Você não tem permissão para modificar esta importação."));
+    exit;
+}
+
+// ================================================
+// VALIDAR CAMPOS OBRIGATÓRIOS
+// ================================================
+if (empty($_POST['parte_planta'])) {
+    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Parte da planta não informada."));
+    exit;
+}
+
+if (!isset($_FILES['imagens']) || empty($_FILES['imagens']['name'][0])) {
+    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&parte=" . urlencode($_POST['parte_planta']) . "&erro=" . urlencode("Nenhuma imagem selecionada."));
+    exit;
+}
+
+$parte_planta = $_POST['parte_planta'];
+
+// ================================================
+// DADOS DE METADADOS
+// ================================================
+$fonte_nome = $_POST['fonte_nome'] ?? null;
+$fonte_url = $_POST['fonte_url'] ?? null;
+$autor_imagem = $_POST['autor_imagem'] ?? null;
+$licenca = $_POST['licenca'] ?? null;
+$descricao = $_POST['descricao'] ?? null;
+
+// ================================================
+// FUNÇÕES DE VALIDAÇÃO
+// ================================================
 function validarImagem($arquivo, &$erro) {
     if ($arquivo['error'] !== UPLOAD_ERR_OK) {
         $erro = "Erro no upload do arquivo. Código: " . $arquivo['error'];
@@ -58,9 +103,9 @@ function validarImagem($arquivo, &$erro) {
     return true;
 }
 
-/**
- * Cria pasta temporária se não existir
- */
+// ================================================
+// FUNÇÕES DE ARQUIVO
+// ================================================
 function criarPastaTemporaria($temp_id) {
     $pasta_temp = dirname(dirname(__DIR__)) . '/uploads/temp/' . $temp_id . '/';
     if (!file_exists($pasta_temp)) {
@@ -69,48 +114,11 @@ function criarPastaTemporaria($temp_id) {
     return $pasta_temp;
 }
 
-/**
- * Gera nome único para arquivo temporário
- */
 function gerarNomeArquivoTemp($temp_id, $parte, $extensao) {
     $timestamp = date('Ymd_His');
     $random = rand(100, 999);
     return "{$parte}_{$timestamp}_{$random}.{$extensao}";
 }
-
-// ================================================
-// VERIFICAR SESSÃO TEMPORÁRIA
-// ================================================
-$temp_id = isset($_POST['temp_id']) ? $_POST['temp_id'] : '';
-
-if (empty($temp_id) || !isset($_SESSION['importacao_temporaria']) || $_SESSION['importacao_temporaria']['temp_id'] !== $temp_id) {
-    header("Location: ../Views/upload_imagens_internet.php?erro=" . urlencode("Sessão temporária inválida ou expirada."));
-    exit;
-}
-
-// ================================================
-// VALIDAR CAMPOS OBRIGATÓRIOS
-// ================================================
-if (empty($_POST['parte_planta'])) {
-    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Parte da planta não informada."));
-    exit;
-}
-
-if (!isset($_FILES['imagens']) || empty($_FILES['imagens']['name'][0])) {
-    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&parte=" . urlencode($_POST['parte_planta']) . "&erro=" . urlencode("Nenhuma imagem selecionada."));
-    exit;
-}
-
-$parte_planta = $_POST['parte_planta'];
-
-// ================================================
-// DADOS DE METADADOS
-// ================================================
-$fonte_nome = $_POST['fonte_nome'] ?? null;
-$fonte_url = $_POST['fonte_url'] ?? null;
-$autor_imagem = $_POST['autor_imagem'] ?? null;
-$licenca = $_POST['licenca'] ?? null;
-$descricao = $_POST['descricao'] ?? null;
 
 // ================================================
 // PROCESSAR ARQUIVOS
@@ -165,6 +173,7 @@ for ($i = 0; $i < $total_arquivos; $i++) {
             'autor_imagem' => $autor_imagem,
             'licenca' => $licenca,
             'descricao' => $descricao,
+            'usuario_id' => $id_usuario,
             'data_upload_temp' => time()
         ];
         
@@ -177,17 +186,23 @@ for ($i = 0; $i < $total_arquivos; $i++) {
 }
 
 // ================================================
+// ATUALIZAR TIMESTAMP DA SESSÃO
+// ================================================
+if ($sucessos > 0) {
+    $_SESSION['importacao_temporaria']['ultima_atualizacao'] = time();
+}
+
+// ================================================
 // REDIRECIONAMENTO
 // ================================================
 $mensagem = "$sucessos de $total_arquivos imagens adicionadas à sessão temporária.";
 
 if ($sucessos > 0) {
-    $_SESSION['importacao_temporaria']['ultima_atualizacao'] = time();
-    
     if (count($erros) > 0) {
         $mensagem .= " Erros: " . implode(" | ", $erros);
         header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode($mensagem));
     } else {
+        $mensagem .= " Todas as imagens foram adicionadas com sucesso.";
         header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&sucesso=" . urlencode($mensagem));
     }
 } else {

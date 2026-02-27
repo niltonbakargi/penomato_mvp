@@ -1,6 +1,10 @@
 <?php
 // ================================================
-// PROCESSAR UPLOAD DE IMAGENS POR PARTE
+// PROCESSAR UPLOAD DE IMAGEM - VERSÃO LEGADO
+// ================================================
+// ATENÇÃO: Este arquivo é mantido para compatibilidade
+// com o sistema antigo de upload. O novo sistema usa
+// processar_upload_temporario.php e finalizar_upload_temporario.php
 // ================================================
 
 ini_set('display_errors', 1);
@@ -15,16 +19,30 @@ $usuario_db = "root";
 $senha_db = "";
 $banco = "penomato";
 
-// Configurações de upload
+// ================================================
+// CONFIGURAÇÕES DE UPLOAD
+// ================================================
 $pasta_upload = dirname(dirname(__DIR__)) . '/uploads/especies/';
 $tamanho_maximo = 10 * 1024 * 1024; // 10MB
 $formatos_permitidos = ['image/jpeg', 'image/png', 'image/jpg'];
 $extensoes_permitidas = ['jpg', 'jpeg', 'png'];
 
 // ================================================
+// VERIFICAR SE USUÁRIO ESTÁ LOGADO
+// ================================================
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: ../Views/auth/login.php?erro=" . urlencode("Faça login para enviar imagens."));
+    exit;
+}
+$id_usuario = $_SESSION['usuario_id'];
+
+// ================================================
 // FUNÇÕES
 // ================================================
 
+/**
+ * Cria a estrutura de pastas se não existir
+ */
 function criarPastasUpload($caminho) {
     if (!file_exists($caminho)) {
         mkdir($caminho, 0777, true);
@@ -33,12 +51,18 @@ function criarPastasUpload($caminho) {
     return true;
 }
 
+/**
+ * Gera nome único para o arquivo
+ */
 function gerarNomeArquivo($especie_id, $parte, $extensao) {
     $timestamp = date('Ymd_His');
     $random = rand(100, 999);
     return "{$especie_id}_{$parte}_{$timestamp}_{$random}.{$extensao}";
 }
 
+/**
+ * Valida a imagem enviada
+ */
 function validarImagem($arquivo, &$erro) {
     if ($arquivo['error'] !== UPLOAD_ERR_OK) {
         $erro = "Erro no upload do arquivo. Código: " . $arquivo['error'];
@@ -68,6 +92,9 @@ function validarImagem($arquivo, &$erro) {
     return true;
 }
 
+/**
+ * Redimensiona imagem se necessário (mantém proporção)
+ */
 function redimensionarImagem($caminho_origem, $caminho_destino, $largura_max = 1920, $altura_max = 1920) {
     $info = getimagesize($caminho_origem);
     
@@ -130,6 +157,9 @@ function redimensionarImagem($caminho_origem, $caminho_destino, $largura_max = 1
     return $resultado;
 }
 
+/**
+ * Atualiza o status_imagens da espécie com base nas imagens cadastradas
+ */
 function atualizarStatusImagens($conexao, $especie_id) {
     $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
     $partes_completas = 0;
@@ -175,50 +205,55 @@ $sucessos = 0;
 $especie_id = isset($_POST['especie_id']) ? (int)$_POST['especie_id'] : 0;
 $parte_planta = isset($_POST['parte_planta']) ? $_POST['parte_planta'] : '';
 
+// ================================================
+// VALIDAÇÕES INICIAIS
+// ================================================
 if ($especie_id <= 0) {
-    header("Location: upload_imagens_internet.php?erro=" . urlencode("ID da espécie inválido."));
+    header("Location: ../Views/upload_imagem_views.php?erro=" . urlencode("ID da espécie inválido."));
     exit;
 }
 
 if (empty($parte_planta)) {
-    header("Location: upload_imagens_internet.php?especie_id=" . $especie_id . "&erro=" . urlencode("Parte da planta não informada."));
+    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&erro=" . urlencode("Parte da planta não informada."));
     exit;
 }
 
-if (!isset($_FILES['imagens'])) {
-    header("Location: upload_imagens_internet.php?especie_id=" . $especie_id . "&parte=" . $parte_planta . "&erro=" . urlencode("Nenhuma imagem selecionada."));
+if (!isset($_FILES['imagens']) || empty($_FILES['imagens']['name'][0])) {
+    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode("Nenhuma imagem selecionada."));
     exit;
 }
 
-// Verificar usuário
-if (!isset($_SESSION['usuario_id'])) {
-    $_SESSION['usuario_id'] = 1;
-}
-$id_usuario = $_SESSION['usuario_id'];
-
-// Dados comuns
+// ================================================
+// DADOS DE METADADOS
+// ================================================
 $fonte_nome = $_POST['fonte_nome'] ?? null;
 $fonte_url = $_POST['fonte_url'] ?? null;
 $autor_imagem = $_POST['autor_imagem'] ?? null;
 $licenca = $_POST['licenca'] ?? null;
 $descricao = $_POST['descricao'] ?? null;
 
-// Conectar ao banco
+// ================================================
+// CONECTAR AO BANCO
+// ================================================
 $conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
 
 if ($conexao->connect_error) {
-    header("Location: upload_imagens_internet.php?especie_id=" . $especie_id . "&parte=" . $parte_planta . "&erro=" . urlencode("Erro de conexão com banco."));
+    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode("Erro de conexão com banco."));
     exit;
 }
 
 $conexao->set_charset("utf8mb4");
 
-// Criar pasta de upload
+// ================================================
+// CRIAR PASTA DE UPLOAD
+// ================================================
 $pasta_raiz = dirname(dirname(__DIR__)) . '/uploads/especies/';
 $pasta_especie = $pasta_raiz . $especie_id . '/';
 criarPastasUpload($pasta_especie);
 
-// Processar cada arquivo
+// ================================================
+// PROCESSAR CADA ARQUIVO
+// ================================================
 $total_arquivos = count($_FILES['imagens']['name']);
 
 for ($i = 0; $i < $total_arquivos; $i++) {
@@ -258,9 +293,18 @@ for ($i = 0; $i < $total_arquivos; $i++) {
         $stmt = $conexao->prepare($sql_insert);
         $stmt->bind_param(
             "isssissssssi",
-            $especie_id, $parte_planta, $caminho_relativo, $arquivo['name'],
-            $arquivo['size'], $arquivo['type'], $fonte_nome, $fonte_url,
-            $autor_imagem, $licenca, $descricao, $id_usuario
+            $especie_id,
+            $parte_planta,
+            $caminho_relativo,
+            $arquivo['name'],
+            $arquivo['size'],
+            $arquivo['type'],
+            $fonte_nome,
+            $fonte_url,
+            $autor_imagem,
+            $licenca,
+            $descricao,
+            $id_usuario
         );
         
         if ($stmt->execute()) {
@@ -278,7 +322,9 @@ for ($i = 0; $i < $total_arquivos; $i++) {
     }
 }
 
-// Atualizar status da espécie
+// ================================================
+// ATUALIZAR STATUS DA ESPÉCIE
+// ================================================
 if ($sucessos > 0) {
     atualizarStatusImagens($conexao, $especie_id);
 }
@@ -295,9 +341,9 @@ if (count($erros) > 0) {
 }
 
 if ($sucessos > 0) {
-    header("Location: upload_imagens_internet.php?especie_id=" . $especie_id . "&parte=" . $parte_planta . "&sucesso=" . urlencode($mensagem));
+    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&sucesso=" . urlencode($mensagem));
 } else {
-    header("Location: upload_imagens_internet.php?especie_id=" . $especie_id . "&parte=" . $parte_planta . "&erro=" . urlencode($mensagem));
+    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode($mensagem));
 }
 
 ob_end_flush();

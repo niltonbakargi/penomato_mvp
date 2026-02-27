@@ -1,6 +1,6 @@
 <?php
 // ================================================
-// INSERIR DADOS INTERNET - VERSÃO TEMPORÁRIA
+// INSERIR DADOS INTERNET - VERSÃO COM CONTROLE DE USUÁRIO
 // ================================================
 
 ini_set('display_errors', 1);
@@ -9,6 +9,18 @@ error_reporting(E_ALL);
 
 session_start();
 ob_start();
+
+// ================================================
+// VERIFICAR SE USUÁRIO ESTÁ LOGADO
+// ================================================
+if (!isset($_SESSION['usuario_id'])) {
+    $url_atual = urlencode($_SERVER['REQUEST_URI']);
+    header("Location: ../Views/auth/login.php?redirect=" . $url_atual);
+    exit;
+}
+
+$id_usuario = $_SESSION['usuario_id'];
+$nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
 
 $servidor = "127.0.0.1";
 $usuario_db = "root";
@@ -129,7 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_caracteristica
                     // Pegar apenas os campos que existem no POST
                     foreach ($todos_campos as $campo) {
                         if (is_array($campo)) {
-                            // Caso seja o especie_id que já veio como array
                             continue;
                         }
                         if (isset($_POST[$campo]) && $_POST[$campo] !== '') {
@@ -145,10 +156,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_caracteristica
                     // ================================================
                     $temp_id = uniqid('temp_', true);
                     
-                    // Armazenar na sessão
+                    // Armazenar na sessão com ID do usuário
                     $_SESSION['importacao_temporaria'] = [
                         'temp_id' => $temp_id,
                         'especie_id' => $especie_id,
+                        'usuario_id' => $id_usuario,
                         'dados' => $dados_caracteristicas,
                         'imagens' => [],
                         'data_criacao' => time()
@@ -213,6 +225,7 @@ if (!$conexao->connect_error) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penomato - Importação de Dados Científicos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -230,6 +243,7 @@ if (!$conexao->connect_error) {
         .container {
             max-width: 900px;
             margin: 0 auto;
+            position: relative;
         }
         
         .paper-header {
@@ -238,6 +252,7 @@ if (!$conexao->connect_error) {
             border-radius: 12px 12px 0 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             border-bottom: 4px solid #0b5e42;
+            margin-bottom: 5px;
         }
         
         .paper-header h1 {
@@ -251,6 +266,45 @@ if (!$conexao->connect_error) {
             font-style: italic;
             margin-top: 10px;
             font-size: 0.95rem;
+        }
+        
+        /* Informações do usuário */
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 25px;
+            border-radius: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+        }
+        
+        .user-info i {
+            color: #0b5e42;
+            font-size: 1.2rem;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-logout {
+            color: #dc3545;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        
+        .user-logout:hover {
+            background: #dc3545;
+            color: white;
         }
         
         .paper-card {
@@ -736,10 +790,27 @@ if (!$conexao->connect_error) {
             font-size: 0.85rem;
             margin-top: 30px;
         }
+        
+        @media (max-width: 768px) {
+            .user-info {
+                position: static;
+                margin-bottom: 20px;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        
+        <!-- Informações do usuário logado -->
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span class="user-name"><?php echo htmlspecialchars($nome_usuario); ?></span>
+            <a href="../Controllers/auth/logout_controlador.php" class="user-logout" onclick="return confirm('Deseja sair do sistema?')">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </a>
+        </div>
         
         <div class="paper-header">
             <h1>📄 PENOMATO • IMPORTAR DADOS</h1>

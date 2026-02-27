@@ -1,6 +1,6 @@
 <?php
 // ================================================
-// UPLOAD DE IMAGENS - VERSÃO TEMPORÁRIA
+// UPLOAD DE IMAGENS - VERSÃO COM CONTROLE DE USUÁRIO
 // ================================================
 
 ini_set('display_errors', 1);
@@ -15,6 +15,18 @@ $senha_db = "";
 $banco = "penomato";
 
 // ================================================
+// VERIFICAR SE USUÁRIO ESTÁ LOGADO
+// ================================================
+if (!isset($_SESSION['usuario_id'])) {
+    $url_atual = urlencode($_SERVER['REQUEST_URI']);
+    header("Location: ../Views/auth/login.php?redirect=" . $url_atual);
+    exit;
+}
+
+$id_usuario = $_SESSION['usuario_id'];
+$nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
+
+// ================================================
 // VERIFICAR SESSÃO TEMPORÁRIA
 // ================================================
 $temp_id = isset($_GET['temp_id']) ? $_GET['temp_id'] : '';
@@ -27,12 +39,10 @@ $dados_temporarios = $_SESSION['importacao_temporaria'];
 $especie_id = $dados_temporarios['especie_id'];
 $dados_caracteristicas = $dados_temporarios['dados'];
 
-// Verificar se usuário está logado (temporário)
-if (!isset($_SESSION['usuario_id'])) {
-    $_SESSION['usuario_id'] = 1;
+// Verificar se o usuário da sessão é o mesmo que iniciou a importação
+if ($_SESSION['importacao_temporaria']['usuario_id'] != $id_usuario) {
+    die("Você não tem permissão para acessar esta importação.");
 }
-
-$id_usuario = $_SESSION['usuario_id'];
 
 // ================================================
 // BUSCAR DADOS DA ESPÉCIE NO BANCO (APENAS PARA EXIBIÇÃO)
@@ -113,7 +123,8 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penomato - Upload de Imagens Temporário</title>
+    <title>Penomato - Upload de Imagens</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -131,6 +142,46 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        /* Informações do usuário */
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 25px;
+            border-radius: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 100;
+        }
+        
+        .user-info i {
+            color: #0b5e42;
+            font-size: 1.2rem;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .user-logout {
+            color: #dc3545;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        
+        .user-logout:hover {
+            background: #dc3545;
+            color: white;
         }
 
         /* Cabeçalho */
@@ -572,6 +623,11 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         @media (max-width: 768px) {
+            .user-info {
+                position: static;
+                margin-bottom: 20px;
+                justify-content: center;
+            }
             .metadata-fields .form-grid {
                 grid-template-columns: 1fr;
             }
@@ -580,6 +636,15 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 </head>
 <body>
     <div class="container">
+        
+        <!-- Informações do usuário logado -->
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span class="user-name"><?php echo htmlspecialchars($nome_usuario); ?></span>
+            <a href="../Controllers/auth/logout_controlador.php" class="user-logout" onclick="return confirm('Deseja sair do sistema?')">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </a>
+        </div>
         
         <!-- Cabeçalho -->
         <div class="header">
