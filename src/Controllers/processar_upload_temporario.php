@@ -1,6 +1,7 @@
 <?php
 // ================================================
 // PROCESSAR UPLOAD TEMPORÁRIO DE IMAGENS
+// VERSÃO MODIFICADA - Aceita arquivo OU base64 (imagem colada)
 // ================================================
 
 ini_set('display_errors', 1);
@@ -52,11 +53,6 @@ if ($_SESSION['importacao_temporaria']['usuario_id'] != $id_usuario) {
 // ================================================
 if (empty($_POST['parte_planta'])) {
     header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Parte da planta não informada."));
-    exit;
-}
-
-if (!isset($_FILES['imagens']) || empty($_FILES['imagens']['name'][0])) {
-    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&parte=" . urlencode($_POST['parte_planta']) . "&erro=" . urlencode("Nenhuma imagem selecionada."));
     exit;
 }
 
@@ -125,64 +121,151 @@ function gerarNomeArquivoTemp($temp_id, $parte, $extensao) {
 // ================================================
 $erros = [];
 $sucessos = 0;
-$total_arquivos = count($_FILES['imagens']['name']);
-
-// Criar pasta temporária
-$pasta_temp = criarPastaTemporaria($temp_id);
 
 // Inicializar array de imagens na sessão se não existir
 if (!isset($_SESSION['importacao_temporaria']['imagens'])) {
     $_SESSION['importacao_temporaria']['imagens'] = [];
 }
 
-for ($i = 0; $i < $total_arquivos; $i++) {
+// ================================================
+// VERIFICAR SE VEIO ARQUIVO OU BASE64
+// ================================================
+if (isset($_FILES['imagens']) && !empty($_FILES['imagens']['name'][0])) {
+    // ================================================
+    // CASO 1: UPLOAD DE ARQUIVOS
+    // ================================================
+    $total_arquivos = count($_FILES['imagens']['name']);
     
-    $arquivo = [
-        'name' => $_FILES['imagens']['name'][$i],
-        'type' => $_FILES['imagens']['type'][$i],
-        'tmp_name' => $_FILES['imagens']['tmp_name'][$i],
-        'error' => $_FILES['imagens']['error'][$i],
-        'size' => $_FILES['imagens']['size'][$i]
-    ];
+    // Criar pasta temporária
+    $pasta_temp = criarPastaTemporaria($temp_id);
     
-    // Validar imagem
-    $erro_validacao = '';
-    if (!validarImagem($arquivo, $erro_validacao)) {
-        $erros[] = "Arquivo {$arquivo['name']}: $erro_validacao";
-        continue;
-    }
-    
-    // Gerar nome do arquivo
-    $extensao = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
-    $nome_arquivo = gerarNomeArquivoTemp($temp_id, $parte_planta, $extensao);
-    $caminho_completo = $pasta_temp . $nome_arquivo;
-    $caminho_relativo = 'uploads/temp/' . $temp_id . '/' . $nome_arquivo;
-    
-    // Mover arquivo para pasta temporária
-    if (move_uploaded_file($arquivo['tmp_name'], $caminho_completo)) {
+    for ($i = 0; $i < $total_arquivos; $i++) {
         
-        // Adicionar à sessão
-        $imagem_info = [
-            'nome_original' => $arquivo['name'],
-            'caminho_temporario' => $caminho_relativo,
-            'parte_planta' => $parte_planta,
-            'tamanho_bytes' => $arquivo['size'],
-            'mime_type' => $arquivo['type'],
-            'fonte_nome' => $fonte_nome,
-            'fonte_url' => $fonte_url,
-            'autor_imagem' => $autor_imagem,
-            'licenca' => $licenca,
-            'descricao' => $descricao,
-            'usuario_id' => $id_usuario,
-            'data_upload_temp' => time()
+        $arquivo = [
+            'name' => $_FILES['imagens']['name'][$i],
+            'type' => $_FILES['imagens']['type'][$i],
+            'tmp_name' => $_FILES['imagens']['tmp_name'][$i],
+            'error' => $_FILES['imagens']['error'][$i],
+            'size' => $_FILES['imagens']['size'][$i]
         ];
         
-        $_SESSION['importacao_temporaria']['imagens'][] = $imagem_info;
-        $sucessos++;
+        // Validar imagem
+        $erro_validacao = '';
+        if (!validarImagem($arquivo, $erro_validacao)) {
+            $erros[] = "Arquivo {$arquivo['name']}: $erro_validacao";
+            continue;
+        }
         
-    } else {
-        $erros[] = "Arquivo {$arquivo['name']}: Erro ao salvar arquivo.";
+        // Gerar nome do arquivo
+        $extensao = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
+        $nome_arquivo = gerarNomeArquivoTemp($temp_id, $parte_planta, $extensao);
+        $caminho_completo = $pasta_temp . $nome_arquivo;
+        $caminho_relativo = 'uploads/temp/' . $temp_id . '/' . $nome_arquivo;
+        
+        // Mover arquivo para pasta temporária
+        if (move_uploaded_file($arquivo['tmp_name'], $caminho_completo)) {
+            
+            // Adicionar à sessão
+            $imagem_info = [
+                'nome_original' => $arquivo['name'],
+                'caminho_temporario' => $caminho_relativo,
+                'parte_planta' => $parte_planta,
+                'tamanho_bytes' => $arquivo['size'],
+                'mime_type' => $arquivo['type'],
+                'fonte_nome' => $fonte_nome,
+                'fonte_url' => $fonte_url,
+                'autor_imagem' => $autor_imagem,
+                'licenca' => $licenca,
+                'descricao' => $descricao,
+                'usuario_id' => $id_usuario,
+                'data_upload_temp' => time()
+            ];
+            
+            $_SESSION['importacao_temporaria']['imagens'][] = $imagem_info;
+            $sucessos++;
+            
+        } else {
+            $erros[] = "Arquivo {$arquivo['name']}: Erro ao salvar arquivo.";
+        }
     }
+    
+    $mensagem = "$sucessos de $total_arquivos imagens adicionadas à sessão temporária.";
+    
+} elseif (isset($_POST['imagem_base64']) && !empty($_POST['imagem_base64'])) {
+    // ================================================
+    // CASO 2: IMAGEM COLADA (BASE64)
+    // ================================================
+    $imagem_base64 = $_POST['imagem_base64'];
+    
+    // Extrair os dados da base64
+    if (preg_match('/^data:image\/(\w+);base64,/', $imagem_base64, $matches)) {
+        $tipo_imagem = $matches[1]; // jpeg, png, etc.
+        $base64_sem_cabecalho = substr($imagem_base64, strpos($imagem_base64, ',') + 1);
+        $dados_imagem = base64_decode($base64_sem_cabecalho);
+        
+        if ($dados_imagem === false) {
+            $erros[] = "Erro ao decodificar imagem base64.";
+        } else {
+            // Validar tipo
+            if (!in_array('image/' . $tipo_imagem, $GLOBALS['formatos_permitidos'])) {
+                $erros[] = "Formato de imagem não permitido. Use JPG ou PNG.";
+            } else {
+                // Validar tamanho
+                $tamanho = strlen($dados_imagem);
+                if ($tamanho > $GLOBALS['tamanho_maximo']) {
+                    $erros[] = "Imagem muito grande. Tamanho máximo: 10MB";
+                } else {
+                    
+                    // Criar pasta temporária
+                    $pasta_temp = criarPastaTemporaria($temp_id);
+                    
+                    // Gerar nome do arquivo
+                    $extensao = $tipo_imagem == 'jpeg' ? 'jpg' : $tipo_imagem;
+                    $nome_arquivo = gerarNomeArquivoTemp($temp_id, $parte_planta, $extensao);
+                    $caminho_completo = $pasta_temp . $nome_arquivo;
+                    $caminho_relativo = 'uploads/temp/' . $temp_id . '/' . $nome_arquivo;
+                    
+                    // Salvar arquivo
+                    if (file_put_contents($caminho_completo, $dados_imagem)) {
+                        
+                        // Adicionar à sessão
+                        $imagem_info = [
+                            'nome_original' => 'imagem_colada_' . date('Ymd_His') . '.' . $extensao,
+                            'caminho_temporario' => $caminho_relativo,
+                            'parte_planta' => $parte_planta,
+                            'tamanho_bytes' => $tamanho,
+                            'mime_type' => 'image/' . $tipo_imagem,
+                            'fonte_nome' => $fonte_nome,
+                            'fonte_url' => $fonte_url,
+                            'autor_imagem' => $autor_imagem,
+                            'licenca' => $licenca,
+                            'descricao' => $descricao,
+                            'usuario_id' => $id_usuario,
+                            'data_upload_temp' => time(),
+                            'colado' => true
+                        ];
+                        
+                        $_SESSION['importacao_temporaria']['imagens'][] = $imagem_info;
+                        $sucessos++;
+                        
+                    } else {
+                        $erros[] = "Erro ao salvar imagem colada.";
+                    }
+                }
+            }
+        }
+    } else {
+        $erros[] = "Formato de imagem base64 inválido.";
+    }
+    
+    $mensagem = "$sucessos imagem(ns) colada(s) adicionada(s) à sessão temporária.";
+    
+} else {
+    // ================================================
+    // CASO 3: NENHUMA IMAGEM
+    // ================================================
+    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode("Nenhuma imagem selecionada ou colada."));
+    exit;
 }
 
 // ================================================
@@ -195,14 +278,11 @@ if ($sucessos > 0) {
 // ================================================
 // REDIRECIONAMENTO
 // ================================================
-$mensagem = "$sucessos de $total_arquivos imagens adicionadas à sessão temporária.";
-
 if ($sucessos > 0) {
     if (count($erros) > 0) {
         $mensagem .= " Erros: " . implode(" | ", $erros);
         header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode($mensagem));
     } else {
-        $mensagem .= " Todas as imagens foram adicionadas com sucesso.";
         header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&sucesso=" . urlencode($mensagem));
     }
 } else {
@@ -211,3 +291,4 @@ if ($sucessos > 0) {
 
 ob_end_flush();
 exit;
+?>

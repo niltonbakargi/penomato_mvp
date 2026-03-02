@@ -1,6 +1,22 @@
 <?php
 // ================================================
-// CONTROLLER DE UPLOAD DE IMAGENS
+// ⚠️ ARQUIVO LEGADO - NÃO USADO NO NOVO FLUXO
+// ================================================
+// Este arquivo pertence ao fluxo ANTIGO de upload de imagens.
+// O novo fluxo de importação (imagens primeiro, depois dados)
+// utiliza os seguintes arquivos:
+//
+// 1. escolher_especie.php (NOVO)
+// 2. upload_imagens_internet.php (MODIFICADO)  
+// 3. processar_upload_temporario.php (ATUAL)
+// 4. inserir_dados_internet.php (MODIFICADO)
+// 5. finalizar_upload_temporario.php (ATUAL)
+//
+// Mantido apenas para compatibilidade com sistemas antigos.
+// ================================================
+
+// ================================================
+// CONTROLLER DE UPLOAD DE IMAGENS (LEGADO)
 // Processa o envio das imagens e salva no banco
 // VERSÃO CORRIGIDA - 15/02/2026
 // ================================================
@@ -222,7 +238,7 @@ $sucesso = '';
 $id_usuario = $_SESSION['usuario_id'] ?? 0;
 
 // Log para depuração
-error_log("=== INÍCIO DO PROCESSAMENTO DE UPLOAD ===");
+error_log("=== INÍCIO DO PROCESSAMENTO DE UPLOAD (LEGADO) ===");
 error_log("Método: " . $_SERVER['REQUEST_METHOD']);
 error_log("Usuário da sessão: " . $id_usuario);
 error_log("POST: " . print_r($_POST, true));
@@ -367,7 +383,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['imagem'])) {
     error_log("ERRO: Requisição inválida ou nenhum arquivo");
 }
 
-error_log("=== FIM DO PROCESSAMENTO ===");
+error_log("=== FIM DO PROCESSAMENTO (LEGADO) ===");
 
 // ================================================
 // REDIRECIONAMENTO E FEEDBACK

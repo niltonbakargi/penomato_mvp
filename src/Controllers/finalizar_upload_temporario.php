@@ -37,37 +37,94 @@ if (empty($temp_id) || !isset($_SESSION['importacao_temporaria']) || $_SESSION['
 
 $dados_temporarios = $_SESSION['importacao_temporaria'];
 $especie_id = $dados_temporarios['especie_id'];
-$dados_caracteristicas = $dados_temporarios['dados'];
-$imagens_temporarias = $dados_temporarios['imagens'];
+$dados_caracteristicas = $dados_temporarios['dados'] ?? [];
+$imagens_temporarias = $dados_temporarios['imagens'] ?? [];
+
+// ================================================
+// LOG INICIAL - DIAGNÓSTICO
+// ================================================
+error_log("========== INICIANDO FINALIZAÇÃO ==========");
+error_log("Temp ID: " . $temp_id);
+error_log("Espécie ID: " . $especie_id);
+error_log("Total imagens na sessão: " . count($imagens_temporarias));
+error_log("Total campos características: " . count($dados_caracteristicas));
 
 // ================================================
 // VERIFICAR SE O USUÁRIO DA SESSÃO É O MESMO DA IMPORTAÇÃO
 // ================================================
 if (!isset($dados_temporarios['usuario_id']) || $dados_temporarios['usuario_id'] != $id_usuario) {
+    error_log("ERRO: Usuário sem permissão");
     header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Você não tem permissão para finalizar esta importação."));
     exit;
 }
 
 // ================================================
-// VERIFICAR PARTES OBRIGATÓRIAS
+// VERIFICAR SE HÁ IMAGENS PARA SALVAR
 // ================================================
-$partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
-$partes_presentes = [];
-
-foreach ($imagens_temporarias as $img) {
-    $partes_presentes[$img['parte_planta']] = true;
+if (empty($imagens_temporarias)) {
+    error_log("ERRO: Nenhuma imagem para salvar");
+    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Não há imagens para salvar."));
+    exit;
 }
 
-$faltam = [];
-foreach ($partes_obrigatorias as $parte) {
-    if (!isset($partes_presentes[$parte])) {
-        $faltam[] = $parte;
+// ================================================
+// VERIFICAR SE HÁ DADOS PARA SALVAR
+// ================================================
+if (empty($dados_caracteristicas)) {
+    error_log("ERRO: Nenhum dado para salvar");
+    header("Location: ../Controllers/inserir_dados_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Você precisa colar os dados morfológicos primeiro."));
+    exit;
+}
+
+// ================================================
+// VERIFICAR PASTAS
+// ================================================
+$pasta_temp = dirname(dirname(__DIR__)) . '/uploads/temp/' . $temp_id . '/';
+$pasta_definitiva = dirname(dirname(__DIR__)) . '/uploads/exsicatas/' . $especie_id . '/';
+
+error_log("Pasta temp: " . $pasta_temp);
+error_log("Pasta definitiva: " . $pasta_definitiva);
+
+// Verificar se pasta temporária existe
+if (!file_exists($pasta_temp)) {
+    error_log("ERRO: Pasta temporária não encontrada");
+    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Pasta temporária não encontrada."));
+    exit;
+}
+
+// Listar arquivos na pasta temp
+$arquivos_temp = scandir($pasta_temp);
+error_log("Arquivos na pasta temp: " . implode(", ", $arquivos_temp));
+
+// ================================================
+// VERIFICAR ARQUIVOS ANTES DE COMEÇAR
+// ================================================
+$imagens_validas = [];
+foreach ($imagens_temporarias as $i => $img) {
+    $nome_arquivo = basename($img['caminho_temporario']);
+    $caminho_completo = $pasta_temp . $nome_arquivo;
+    
+    error_log("Verificando imagem $i - Parte: " . $img['parte_planta']);
+    error_log("  Nome: " . $nome_arquivo);
+    error_log("  Caminho: " . $caminho_completo);
+    error_log("  Existe? " . (file_exists($caminho_completo) ? "SIM" : "NÃO"));
+    
+    if (file_exists($caminho_completo)) {
+        $imagens_validas[] = $img;
+    } else {
+        error_log("  REMOVIDA: Imagem fantasma - " . $nome_arquivo);
     }
 }
 
-if (count($faltam) > 0) {
-    $mensagem = "Faltam imagens para as partes: " . implode(", ", $faltam);
-    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode($mensagem));
+$imagens_temporarias = $imagens_validas;
+$_SESSION['importacao_temporaria']['imagens'] = $imagens_validas;
+
+error_log("Imagens válidas após verificação: " . count($imagens_temporarias));
+
+// Verificar se ainda há imagens após limpeza
+if (empty($imagens_temporarias)) {
+    error_log("ERRO: Nenhuma imagem válida encontrada");
+    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Nenhuma imagem válida encontrada para salvar."));
     exit;
 }
 
@@ -77,33 +134,27 @@ if (count($faltam) > 0) {
 $conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
 
 if ($conexao->connect_error) {
+    error_log("ERRO: Falha na conexão com banco");
     die("Erro de conexão: " . $conexao->connect_error);
 }
 
 $conexao->set_charset("utf8mb4");
-
-// ================================================
-// VERIFICAR SE A COLUNA status_imagens EXISTE
-// ================================================
-$check_column = $conexao->query("SHOW COLUMNS FROM especies_administrativo LIKE 'status_imagens'");
-if ($check_column->num_rows == 0) {
-    $conexao->query("ALTER TABLE especies_administrativo 
-                     ADD COLUMN status_imagens ENUM('sem_imagens', 'internet', 'registrada') 
-                     NOT NULL DEFAULT 'sem_imagens' 
-                     COMMENT 'Status do conjunto de imagens da espécie'");
-}
+error_log("Conectado ao banco com sucesso");
 
 // ================================================
 // INICIAR TRANSAÇÃO
 // ================================================
 $conexao->begin_transaction();
+error_log("Transação iniciada");
 
 try {
     
     // ================================================
     // 1. SALVAR DADOS DAS CARACTERÍSTICAS
     // ================================================
+    error_log("--- Salvando características ---");
     
+    // Verificar se já existem características para esta espécie
     $sql_check = "SELECT id FROM especies_caracteristicas WHERE especie_id = ?";
     $stmt_check = $conexao->prepare($sql_check);
     $stmt_check->bind_param("i", $especie_id);
@@ -112,7 +163,10 @@ try {
     $ja_existe = $stmt_check->num_rows > 0;
     $stmt_check->close();
     
+    error_log("Características já existem? " . ($ja_existe ? "SIM" : "NÃO"));
+    
     if ($ja_existe) {
+        // UPDATE - características já existem
         $sql = "UPDATE especies_caracteristicas SET ";
         $sets = [];
         $tipos = "";
@@ -131,12 +185,17 @@ try {
         $valores[] = $especie_id;
         $tipos .= "i";
         
+        error_log("SQL UPDATE: " . $sql);
+        
         $stmt = $conexao->prepare($sql);
         $stmt->bind_param($tipos, ...$valores);
         $stmt->execute();
         $stmt->close();
         
+        error_log("UPDATE realizado com sucesso");
+        
     } else {
+        // INSERT - novas características
         $colunas = implode(", ", array_keys($dados_caracteristicas));
         $placeholders = implode(", ", array_fill(0, count($dados_caracteristicas), "?"));
         $sql = "INSERT INTO especies_caracteristicas ($colunas) VALUES ($placeholders)";
@@ -144,15 +203,21 @@ try {
         $tipos = str_repeat("s", count($dados_caracteristicas));
         $valores = array_values($dados_caracteristicas);
         
+        error_log("SQL INSERT: " . $sql);
+        
         $stmt = $conexao->prepare($sql);
         $stmt->bind_param($tipos, ...$valores);
         $stmt->execute();
         $stmt->close();
+        
+        error_log("INSERT realizado com sucesso");
     }
     
     // ================================================
-    // 2. ATUALIZAR STATUS E AUTOR DA ESPÉCIE
+    // 2. ATUALIZAR STATUS DA ESPÉCIE (dados_internet)
     // ================================================
+    error_log("--- Atualizando status da espécie ---");
+    
     $sql_status = "UPDATE especies_administrativo 
                    SET status = 'dados_internet',
                        autor_dados_internet_id = ?,
@@ -163,112 +228,131 @@ try {
     $stmt_status->execute();
     $stmt_status->close();
     
+    error_log("Status atualizado para 'dados_internet'");
+    
     // ================================================
     // 3. SALVAR IMAGENS (MOVER DA PASTA TEMP PARA DEFINITIVA)
     // ================================================
-    $pasta_temp = dirname(dirname(__DIR__)) . '/uploads/temp/' . $temp_id . '/';
-    $pasta_definitiva = dirname(dirname(__DIR__)) . '/uploads/especies/' . $especie_id . '/';
+    error_log("--- Processando imagens ---");
     
+    // Criar pasta definitiva se não existir
     if (!file_exists($pasta_definitiva)) {
         mkdir($pasta_definitiva, 0777, true);
+        error_log("Pasta definitiva criada: " . $pasta_definitiva);
     }
     
     $imagens_salvas = 0;
+    $imagens_falhas = [];
     
-    foreach ($imagens_temporarias as $img) {
+    foreach ($imagens_temporarias as $i => $img) {
         
-        $caminho_temp = dirname(dirname(__DIR__)) . '/' . $img['caminho_temporario'];
-        $nome_arquivo = basename($caminho_temp);
+        $nome_arquivo = basename($img['caminho_temporario']);
+        $caminho_temp = $pasta_temp . $nome_arquivo;
         $caminho_definitivo = $pasta_definitiva . $nome_arquivo;
-        $caminho_relativo = 'uploads/especies/' . $especie_id . '/' . $nome_arquivo;
+        $caminho_relativo = 'uploads/exsicatas/' . $especie_id . '/' . $nome_arquivo;
+        
+        error_log("--- Imagem $i ---");
+        error_log("Parte: " . $img['parte_planta']);
+        error_log("Nome: " . $nome_arquivo);
+        error_log("Temp: " . $caminho_temp);
+        error_log("Definitivo: " . $caminho_definitivo);
+        error_log("Arquivo existe? " . (file_exists($caminho_temp) ? "SIM" : "NÃO"));
+        error_log("Tamanho: " . (file_exists($caminho_temp) ? filesize($caminho_temp) . " bytes" : "N/A"));
         
         // Mover arquivo
         if (rename($caminho_temp, $caminho_definitivo)) {
+            error_log("RENAME SUCESSO: Arquivo movido");
+            
+            // Verificar se o arquivo foi movido corretamente
+            if (file_exists($caminho_definitivo)) {
+                error_log("Arquivo confirmado no destino: " . $caminho_definitivo);
+            } else {
+                error_log("ALERTA: Arquivo não encontrado no destino após rename");
+            }
             
             // ================================================
-            // INSERIR NA TABELA especies_imagens (CORRIGIDO)
+            // INSERT NA TABELA especies_imagens
             // ================================================
             $sql_insert = "INSERT INTO especies_imagens (
                 especie_id,
-                tipo_imagem,
                 parte_planta,
                 caminho_imagem,
-                nome_original,
-                tamanho_bytes,
-                mime_type,
+                id_usuario_identificador,
+                data_upload,
+                descricao,
                 fonte_nome,
                 fonte_url,
                 autor_imagem,
                 licenca,
-                descricao,
-                id_usuario_identificador,
-                status_validacao,
-                data_upload
-            ) VALUES (?, 'provisoria', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente', NOW())";
+                status_validacao
+            ) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, 'pendente')";
             
             $stmt = $conexao->prepare($sql_insert);
             $stmt->bind_param(
-                "isssissssssi",
+                "ississsss",
                 $especie_id,
                 $img['parte_planta'],
                 $caminho_relativo,
-                $img['nome_original'],
-                $img['tamanho_bytes'],
-                $img['mime_type'],
+                $id_usuario,
+                $img['descricao'],
                 $img['fonte_nome'],
                 $img['fonte_url'],
                 $img['autor_imagem'],
-                $img['licenca'],
-                $img['descricao'],
-                $id_usuario
+                $img['licenca']
             );
             
             if ($stmt->execute()) {
                 $imagens_salvas++;
-                error_log("Imagem salva: ID " . $stmt->insert_id . " - " . $caminho_relativo);
+                error_log("INSERT SUCESSO: ID " . $stmt->insert_id);
             } else {
-                error_log("Erro ao inserir imagem: " . $stmt->error);
+                error_log("INSERT FALHOU: " . $stmt->error);
+                $imagens_falhas[] = $nome_arquivo . " (erro banco: " . $stmt->error . ")";
             }
             $stmt->close();
+            
         } else {
-            error_log("Erro ao mover arquivo: " . $caminho_temp . " -> " . $caminho_definitivo);
+            $erro_rename = error_get_last();
+            error_log("RENAME FALHOU: " . ($erro_rename['message'] ?? 'Erro desconhecido'));
+            $imagens_falhas[] = $nome_arquivo . " (erro mover arquivo)";
         }
     }
     
-    // ================================================
-    // 4. ATUALIZAR STATUS_IMAGENS DA ESPÉCIE
-    // ================================================
-    if ($imagens_salvas > 0) {
-        $sql_status_imagens = "UPDATE especies_administrativo SET status_imagens = 'registrada' WHERE id = ?";
-        $stmt_status_imagens = $conexao->prepare($sql_status_imagens);
-        $stmt_status_imagens->bind_param("i", $especie_id);
-        $stmt_status_imagens->execute();
-        $stmt_status_imagens->close();
+    error_log("--- Resumo imagens ---");
+    error_log("Salvas com sucesso: " . $imagens_salvas);
+    if (!empty($imagens_falhas)) {
+        error_log("Falhas: " . implode(", ", $imagens_falhas));
     }
     
     // ================================================
     // COMMIT - TUDO OK
     // ================================================
     $conexao->commit();
+    error_log("COMMIT realizado com sucesso");
     
     // ================================================
-    // 5. LIMPAR DADOS TEMPORÁRIOS
+    // 4. LIMPAR PASTA TEMPORÁRIA
     // ================================================
     if (file_exists($pasta_temp)) {
         $itens = scandir($pasta_temp);
         foreach ($itens as $item) {
             if ($item == '.' || $item == '..') continue;
             $caminho_item = $pasta_temp . $item;
-            if (is_dir($caminho_item)) {
-                rmdir($caminho_item);
-            } else {
+            if (is_file($caminho_item)) {
                 unlink($caminho_item);
+                error_log("Arquivo temporário removido: " . $item);
             }
         }
         rmdir($pasta_temp);
+        error_log("Pasta temporária removida: " . $pasta_temp);
     }
     
+    // ================================================
+    // 5. LIMPAR SESSÃO TEMPORÁRIA
+    // ================================================
     unset($_SESSION['importacao_temporaria']);
+    error_log("Sessão temporária limpa");
+    
+    error_log("========== FINALIZAÇÃO CONCLUÍDA COM SUCESSO ==========");
     
     // ================================================
     // REDIRECIONAR PARA PÁGINA DE SUCESSO
@@ -277,10 +361,15 @@ try {
     exit;
     
 } catch (Exception $e) {
+    // ================================================
+    // ROLLBACK EM CASO DE ERRO
+    // ================================================
     $conexao->rollback();
     
     $erro = "Erro ao salvar dados: " . $e->getMessage();
     error_log("ERRO NA TRANSAÇÃO: " . $erro);
+    error_log("========== FINALIZAÇÃO FALHOU ==========");
+    
     header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode($erro));
     exit;
 }
@@ -288,3 +377,4 @@ try {
 $conexao->close();
 ob_end_flush();
 exit;
+?>

@@ -1,6 +1,7 @@
 <?php
 // ================================================
-// INSERIR DADOS INTERNET - VERSÃO COM CONTROLE DE USUÁRIO
+// INSERIR DADOS INTERNET - VERSÃO MODIFICADA
+// AGORA É A TERCEIRA TELA (depois das imagens)
 // ================================================
 
 ini_set('display_errors', 1);
@@ -26,6 +27,39 @@ $servidor = "127.0.0.1";
 $usuario_db = "root";
 $senha_db = "";
 $banco = "penomato";
+
+// ================================================
+// VERIFICAR SESSÃO TEMPORÁRIA
+// ================================================
+$temp_id = isset($_GET['temp_id']) ? $_GET['temp_id'] : '';
+
+if (empty($temp_id) || !isset($_SESSION['importacao_temporaria']) || $_SESSION['importacao_temporaria']['temp_id'] !== $temp_id) {
+    header("Location: escolher_especie.php?erro=" . urlencode("Sessão expirada. Inicie novamente."));
+    exit;
+}
+
+// Verificar se o usuário da sessão é o mesmo
+if ($_SESSION['importacao_temporaria']['usuario_id'] != $id_usuario) {
+    die("Você não tem permissão para acessar esta importação.");
+}
+
+$dados_temporarios = $_SESSION['importacao_temporaria'];
+$especie_id = $dados_temporarios['especie_id'];
+
+// Buscar nome da espécie para exibir
+$conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
+if (!$conexao->connect_error) {
+    $conexao->set_charset("utf8mb4");
+    $sql_especie = "SELECT nome_cientifico FROM especies_administrativo WHERE id = ?";
+    $stmt = $conexao->prepare($sql_especie);
+    $stmt->bind_param("i", $especie_id);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+    $especie = $resultado->fetch_assoc();
+    $nome_cientifico = $especie['nome_cientifico'] ?? 'Espécie desconhecida';
+    $stmt->close();
+    $conexao->close();
+}
 
 // ================================================
 // LISTA DE VALORES PADRONIZADOS PARA VALIDAÇÃO
@@ -70,153 +104,54 @@ $opcoes_validas = [
 ];
 
 // ================================================
-// PROCESSAR O ENVIO DO FORMULÁRIO
+// PROCESSAR O ENVIO DO FORMULÁRIO (FINALIZAR)
 // ================================================
 $erro = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar_caracteristicas'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'])) {
     
-    $conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
+    // Pega os dados do JSON do POST (campos ocultos gerados pelo JavaScript)
+    $dados_caracteristicas = [];
+    $todos_campos = [
+        'nome_cientifico_completo', 'nome_cientifico_completo_ref',
+        'sinonimos', 'sinonimos_ref', 'nome_popular', 'nome_popular_ref',
+        'familia', 'familia_ref', 'forma_folha', 'forma_folha_ref',
+        'filotaxia_folha', 'filotaxia_folha_ref', 'tipo_folha', 'tipo_folha_ref',
+        'tamanho_folha', 'tamanho_folha_ref', 'textura_folha', 'textura_folha_ref',
+        'margem_folha', 'margem_folha_ref', 'venacao_folha', 'venacao_folha_ref',
+        'cor_flores', 'cor_flores_ref', 'simetria_floral', 'simetria_floral_ref',
+        'numero_petalas', 'numero_petalas_ref', 'disposicao_flores', 'disposicao_flores_ref',
+        'aroma', 'aroma_ref', 'tamanho_flor', 'tamanho_flor_ref',
+        'tipo_fruto', 'tipo_fruto_ref', 'tamanho_fruto', 'tamanho_fruto_ref',
+        'cor_fruto', 'cor_fruto_ref', 'textura_fruto', 'textura_fruto_ref',
+        'dispersao_fruto', 'dispersao_fruto_ref', 'aroma_fruto', 'aroma_fruto_ref',
+        'tipo_semente', 'tipo_semente_ref', 'tamanho_semente', 'tamanho_semente_ref',
+        'cor_semente', 'cor_semente_ref', 'textura_semente', 'textura_semente_ref',
+        'quantidade_sementes', 'quantidade_sementes_ref',
+        'tipo_caule', 'tipo_caule_ref', 'estrutura_caule', 'estrutura_caule_ref',
+        'textura_caule', 'textura_caule_ref', 'cor_caule', 'cor_caule_ref',
+        'forma_caule', 'forma_caule_ref', 'modificacao_caule', 'modificacao_caule_ref',
+        'diametro_caule', 'diametro_caule_ref', 'ramificacao_caule', 'ramificacao_caule_ref',
+        'possui_espinhos', 'possui_espinhos_ref', 'possui_latex', 'possui_latex_ref',
+        'possui_seiva', 'possui_seiva_ref', 'possui_resina', 'possui_resina_ref',
+        'referencias'
+    ];
     
-    if ($conexao->connect_error) {
-        $erro = "Erro de conexão: " . $conexao->connect_error;
-    } else {
-        
-        $conexao->set_charset("utf8mb4");
-        $especie_id = isset($_POST['especie_id']) ? (int)$_POST['especie_id'] : 0;
-        
-        if ($especie_id <= 0) {
-            $erro = "Selecione uma espécie válida!";
-        } else {
-            
-            // VERIFICAR SE A ESPÉCIE ESTÁ COM STATUS PERMITIDO
-            $sql_status = "SELECT status FROM especies_administrativo WHERE id = ?";
-            $stmt_status = $conexao->prepare($sql_status);
-            $stmt_status->bind_param("i", $especie_id);
-            $stmt_status->execute();
-            $resultado_status = $stmt_status->get_result();
-            
-            if ($resultado_status->num_rows === 0) {
-                $erro = "Espécie não encontrada no banco de dados!";
-            } else {
-                $row = $resultado_status->fetch_assoc();
-                $status_atual = $row['status'];
-                
-                if (!in_array($status_atual, ['sem_dados', 'dados_internet'])) {
-                    $erro = "Espécie com status '$status_atual' não permite novos cadastros.";
-                } else {
-                    
-                    // ================================================
-                    // DADOS VALIDADOS - ARMAZENAR NA SESSÃO
-                    // ================================================
-                    
-                    // Construir array de campos a partir do POST
-                    $dados_caracteristicas = [];
-                    $todos_campos = [
-                        'especie_id' => $especie_id,
-                        'nome_cientifico_completo', 'nome_cientifico_completo_ref',
-                        'sinonimos', 'sinonimos_ref', 'nome_popular', 'nome_popular_ref',
-                        'familia', 'familia_ref', 'forma_folha', 'forma_folha_ref',
-                        'filotaxia_folha', 'filotaxia_folha_ref', 'tipo_folha', 'tipo_folha_ref',
-                        'tamanho_folha', 'tamanho_folha_ref', 'textura_folha', 'textura_folha_ref',
-                        'margem_folha', 'margem_folha_ref', 'venacao_folha', 'venacao_folha_ref',
-                        'cor_flores', 'cor_flores_ref', 'simetria_floral', 'simetria_floral_ref',
-                        'numero_petalas', 'numero_petalas_ref', 'disposicao_flores', 'disposicao_flores_ref',
-                        'aroma', 'aroma_ref', 'tamanho_flor', 'tamanho_flor_ref',
-                        'tipo_fruto', 'tipo_fruto_ref', 'tamanho_fruto', 'tamanho_fruto_ref',
-                        'cor_fruto', 'cor_fruto_ref', 'textura_fruto', 'textura_fruto_ref',
-                        'dispersao_fruto', 'dispersao_fruto_ref', 'aroma_fruto', 'aroma_fruto_ref',
-                        'tipo_semente', 'tipo_semente_ref', 'tamanho_semente', 'tamanho_semente_ref',
-                        'cor_semente', 'cor_semente_ref', 'textura_semente', 'textura_semente_ref',
-                        'quantidade_sementes', 'quantidade_sementes_ref',
-                        'tipo_caule', 'tipo_caule_ref', 'estrutura_caule', 'estrutura_caule_ref',
-                        'textura_caule', 'textura_caule_ref', 'cor_caule', 'cor_caule_ref',
-                        'forma_caule', 'forma_caule_ref', 'modificacao_caule', 'modificacao_caule_ref',
-                        'diametro_caule', 'diametro_caule_ref', 'ramificacao_caule', 'ramificacao_caule_ref',
-                        'possui_espinhos', 'possui_espinhos_ref', 'possui_latex', 'possui_latex_ref',
-                        'possui_seiva', 'possui_seiva_ref', 'possui_resina', 'possui_resina_ref',
-                        'referencias'
-                    ];
-                    
-                    // Pegar apenas os campos que existem no POST
-                    foreach ($todos_campos as $campo) {
-                        if (is_array($campo)) {
-                            continue;
-                        }
-                        if (isset($_POST[$campo]) && $_POST[$campo] !== '') {
-                            $dados_caracteristicas[$campo] = $_POST[$campo];
-                        }
-                    }
-                    
-                    // Adicionar especie_id
-                    $dados_caracteristicas['especie_id'] = $especie_id;
-                    
-                    // ================================================
-                    // GERAR ID ÚNICO PARA A SESSÃO TEMPORÁRIA
-                    // ================================================
-                    $temp_id = uniqid('temp_', true);
-                    
-                    // Armazenar na sessão com ID do usuário
-                    $_SESSION['importacao_temporaria'] = [
-                        'temp_id' => $temp_id,
-                        'especie_id' => $especie_id,
-                        'usuario_id' => $id_usuario,
-                        'dados' => $dados_caracteristicas,
-                        'imagens' => [],
-                        'data_criacao' => time()
-                    ];
-                    
-                    // ================================================
-                    // REDIRECIONAR PARA UPLOAD DE IMAGENS COM ID TEMPORÁRIO
-                    // ================================================
-                    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . $temp_id);
-                    exit;
-                }
-            }
-            $stmt_status->close();
-        }
-        
-        $conexao->close();
-    }
-}
-
-// ================================================
-// BUSCAR ESPÉCIES PARA O SELECT
-// ================================================
-$conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
-$opcoes_especies = [];
-$opcoes_especies_html = '';
-
-if (!$conexao->connect_error) {
-    $sql = "SELECT id, nome_cientifico, status 
-            FROM especies_administrativo 
-            WHERE status IN ('sem_dados', 'dados_internet')
-            ORDER BY 
-                CASE status 
-                    WHEN 'dados_internet' THEN 1
-                    WHEN 'sem_dados' THEN 2
-                END,
-                nome_cientifico";
-    
-    $resultado = $conexao->query($sql);
-    
-    if ($resultado && $resultado->num_rows > 0) {
-        while ($linha = $resultado->fetch_assoc()) {
-            $id_especie = htmlspecialchars($linha['id']);
-            $nome_cientifico = htmlspecialchars($linha['nome_cientifico']);
-            $status = htmlspecialchars($linha['status']);
-            
-            $opcoes_especies[$nome_cientifico] = [
-                'id' => $id_especie,
-                'status' => $status
-            ];
-            
-            $badge = $status === 'dados_internet' ? ' (parcial)' : '';
-            $opcoes_especies_html .= "<option value=\"{$id_especie}\">{$nome_cientifico}{$badge}</option>\n";
+    foreach ($todos_campos as $campo) {
+        if (isset($_POST[$campo]) && $_POST[$campo] !== '') {
+            $dados_caracteristicas[$campo] = $_POST[$campo];
         }
     }
     
-    $conexao->close();
+    // Adicionar especie_id da sessão
+    $dados_caracteristicas['especie_id'] = $especie_id;
+    
+    // ATUALIZAR A SESSÃO COM OS DADOS CARREGADOS
+    $_SESSION['importacao_temporaria']['dados'] = $dados_caracteristicas;
+    
+    // REDIRECIONAR PARA FINALIZAR (que vai processar tudo)
+    header("Location: finalizar_upload_temporario.php?temp_id=" . urlencode($temp_id));
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -224,7 +159,7 @@ if (!$conexao->connect_error) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penomato - Importação de Dados Científicos</title>
+    <title>Penomato - Importar Dados da Espécie</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -259,6 +194,9 @@ if (!$conexao->connect_error) {
             color: #0b5e42;
             font-size: 2rem;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .paper-header .subtitle {
@@ -305,6 +243,38 @@ if (!$conexao->connect_error) {
         .user-logout:hover {
             background: #dc3545;
             color: white;
+        }
+        
+        /* Info da espécie atual */
+        .current-species {
+            background-color: #e8f5e9;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid #0b5e42;
+        }
+        
+        .current-species i {
+            font-size: 2rem;
+            color: #0b5e42;
+        }
+        
+        .current-species h2 {
+            font-size: 1.5rem;
+            color: #0b5e42;
+            font-style: italic;
+        }
+        
+        .current-species span {
+            margin-left: auto;
+            background-color: #0b5e42;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
         }
         
         .paper-card {
@@ -378,6 +348,19 @@ if (!$conexao->connect_error) {
         
         .btn-secondary:hover {
             background-color: #cbd5e0;
+        }
+        
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
         }
         
         .modal-overlay {
@@ -671,70 +654,13 @@ if (!$conexao->connect_error) {
             font-size: 0.85rem;
         }
         
-        .species-selector {
-            background-color: #f8fafc;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border: 2px solid #e2e8f0;
-        }
-        
-        .species-selector label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 10px;
-        }
-        
-        .species-selector select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            margin-top: 8px;
-            font-size: 1rem;
-            background-color: white;
-        }
-        
-        .species-selector select:focus {
-            outline: none;
-            border-color: #0b5e42;
-        }
-        
-        .auto-select-info {
-            margin-top: 10px;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-left: 4px solid;
-        }
-        
-        .auto-select-info.success {
-            background-color: #d4edda;
-            color: #155724;
-            border-left-color: #28a745;
-        }
-        
-        .auto-select-info.warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border-left-color: #ffc107;
-        }
-        
-        .auto-select-info.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left-color: #dc3545;
-        }
-        
         .save-button-container {
             text-align: center;
             margin: 30px 0;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
         .btn-save {
@@ -758,6 +684,24 @@ if (!$conexao->connect_error) {
         .btn-save:disabled {
             background-color: #cbd5e0;
             cursor: not-allowed;
+        }
+        
+        .btn-back-to-images {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-back-to-images:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
         }
         
         .alert {
@@ -784,6 +728,12 @@ if (!$conexao->connect_error) {
             border-left: 4px solid #ffc107;
         }
         
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
         .footer {
             text-align: center;
             color: #718096;
@@ -796,6 +746,15 @@ if (!$conexao->connect_error) {
                 position: static;
                 margin-bottom: 20px;
                 justify-content: center;
+            }
+            
+            .current-species {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .current-species span {
+                margin-left: 0;
             }
         }
     </style>
@@ -813,9 +772,12 @@ if (!$conexao->connect_error) {
         </div>
         
         <div class="paper-header">
-            <h1>📄 PENOMATO • IMPORTAR DADOS</h1>
+            <h1>
+                <span>📄</span>
+                PENOMATO • IMPORTAR DADOS
+            </h1>
             <div class="subtitle">
-                Cole o JSON da pesquisa. A espécie será identificada automaticamente.
+                PASSO 3: Cole o JSON com as características morfológicas
             </div>
         </div>
         
@@ -823,14 +785,27 @@ if (!$conexao->connect_error) {
             <div class="alert alert-danger">❌ <?php echo $erro; ?></div>
         <?php endif; ?>
         
+        <!-- Informação da espécie atual -->
+        <div class="current-species">
+            <i class="fas fa-tree"></i>
+            <h2><?php echo htmlspecialchars($nome_cientifico); ?></h2>
+            <span>ID: <?php echo $especie_id; ?></span>
+        </div>
+        
         <div class="paper-card">
             
             <div class="json-import-area">
                 <h3>
                     <span>📋</span>
-                    PASSO 1 • Cole o JSON
+                    Cole o JSON com os dados morfológicos
                 </h3>
-                <textarea id="json_input" rows="6" placeholder='Cole o JSON aqui...'></textarea>
+                <textarea id="json_input" rows="6" placeholder='{
+    "nome_cientifico_completo": "Mauritia flexuosa L.f.",
+    "familia": "Arecaceae",
+    "forma_folha": "Palmada",
+    "cor_flores": "Creme",
+    "referencias": "1. Flora Brasiliensis\n2. Lorenzi, 2002"
+}'></textarea>
                 
                 <div class="btn-group">
                     <button type="button" class="btn btn-primary" id="btn_carregar_json">
@@ -839,6 +814,9 @@ if (!$conexao->connect_error) {
                     <button type="button" class="btn btn-secondary" id="btn_limpar">
                         🗑️ LIMPAR
                     </button>
+                    <a href="upload_imagens_internet.php?temp_id=<?php echo urlencode($temp_id); ?>" class="btn btn-back">
+                        <i class="fas fa-arrow-left"></i> VOLTAR ÀS IMAGENS
+                    </a>
                 </div>
                 
                 <div id="mensagem_json" style="display: none;" class="alert"></div>
@@ -846,16 +824,16 @@ if (!$conexao->connect_error) {
             
             <form method="POST" action="" id="form_principal">
                 
-                <div class="species-selector">
-                    <label>
-                        <span>🔍</span>
-                        PASSO 2 • Espécie no banco de dados
-                    </label>
-                    <select id="especie_id" name="especie_id" required>
-                        <option value="" disabled selected>— Selecione uma espécie —</option>
-                        <?php echo $opcoes_especies_html; ?>
-                    </select>
-                    <div id="auto-select-info" class="auto-select-info" style="display: none;"></div>
+                <!-- Campo oculto com temp_id -->
+                <input type="hidden" name="temp_id" value="<?php echo htmlspecialchars($temp_id); ?>">
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Imagens já adicionadas:</strong> 
+                    <?php 
+                    $total_imagens = count($_SESSION['importacao_temporaria']['imagens'] ?? []);
+                    echo $total_imagens > 0 ? "{$total_imagens} imagem(ns) na sessão" : "Nenhuma imagem ainda (volte para adicionar)";
+                    ?>
                 </div>
                 
                 <div class="technical-paper" id="artigo_visualizacao">
@@ -881,19 +859,19 @@ if (!$conexao->connect_error) {
                 <div id="campos_ocultos"></div>
                 
                 <div class="save-button-container">
-                    <button type="submit" name="salvar_caracteristicas" value="1" class="btn-save" id="btn_salvar" disabled>
-                        💾 PREPARAR PARA UPLOAD DE IMAGENS
+                    <button type="submit" name="finalizar_importacao" value="1" class="btn-save" id="btn_finalizar" disabled>
+                        ✅ FINALIZAR IMPORTAÇÃO
                     </button>
                 </div>
                 
                 <p style="text-align: center; margin-top: 10px; color: #666; font-size: 0.9rem;">
-                    ⚠️ Nenhum dado será salvo ainda. Após preparar, você fará o upload das imagens e tudo será salvo junto.
+                    ⚠️ Após finalizar, todas as imagens e dados serão salvos permanentemente.
                 </p>
             </form>
         </div>
         
         <div class="footer">
-            Penomato • Dados temporários até finalização com imagens
+            Penomato • Importação de dados - PASSO 3 DE 3
         </div>
     </div>
     
@@ -921,7 +899,6 @@ if (!$conexao->connect_error) {
     let camposParaValidar = [];
     let opcoesValidas = <?php echo json_encode($opcoes_validas); ?>;
     let escolhasUsuario = {};
-    let especiesDisponiveis = <?php echo json_encode($opcoes_especies); ?>;
     
     // ================================================
     // FUNÇÕES DO MODAL
@@ -1009,50 +986,6 @@ if (!$conexao->connect_error) {
     
     function formatarNomeCampo(campo) {
         return campo.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    }
-    
-    // ================================================
-    // SELECIONAR ESPÉCIE AUTOMATICAMENTE
-    // ================================================
-    function selecionarEspecieAutomatica(nomeCientifico) {
-        const select = document.getElementById('especie_id');
-        const infoDiv = document.getElementById('auto-select-info');
-        
-        select.value = '';
-        infoDiv.style.display = 'none';
-        infoDiv.className = 'auto-select-info';
-        
-        if (!nomeCientifico) {
-            infoDiv.style.display = 'flex';
-            infoDiv.className = 'auto-select-info warning';
-            infoDiv.innerHTML = '⚠️ JSON não contém "especie_id". Selecione manualmente.';
-            return false;
-        }
-        
-        for (let especie in especiesDisponiveis) {
-            if (especie.toLowerCase() === nomeCientifico.toLowerCase()) {
-                select.value = especiesDisponiveis[especie].id;
-                infoDiv.style.display = 'flex';
-                infoDiv.className = 'auto-select-info success';
-                infoDiv.innerHTML = `✅ Espécie "${especie}" selecionada automaticamente`;
-                return true;
-            }
-        }
-        
-        for (let especie in especiesDisponiveis) {
-            if (nomeCientifico.toLowerCase().startsWith(especie.toLowerCase())) {
-                select.value = especiesDisponiveis[especie].id;
-                infoDiv.style.display = 'flex';
-                infoDiv.className = 'auto-select-info success';
-                infoDiv.innerHTML = `✅ Espécie "${especie}" selecionada (baseado em: ${nomeCientifico})`;
-                return true;
-            }
-        }
-        
-        infoDiv.style.display = 'flex';
-        infoDiv.className = 'auto-select-info error';
-        infoDiv.innerHTML = `❌ Espécie "${nomeCientifico}" não encontrada no banco.`;
-        return false;
     }
     
     // ================================================
@@ -1174,10 +1107,8 @@ if (!$conexao->connect_error) {
         atualizarVisualizacaoArtigo();
         fecharModal();
         
-        const especieId = document.getElementById('especie_id').value;
-        if (especieId && especieId !== '') {
-            document.getElementById('btn_salvar').disabled = false;
-        }
+        // Habilitar botão de finalizar
+        document.getElementById('btn_finalizar').disabled = false;
     }
     
     document.getElementById('btn_carregar_json').addEventListener('click', function() {
@@ -1191,14 +1122,6 @@ if (!$conexao->connect_error) {
             if (!jsonTexto) throw new Error('Nenhum JSON foi colado!');
             
             dadosJson = JSON.parse(jsonTexto);
-            
-            if (dadosJson.especie_id) {
-                selecionarEspecieAutomatica(dadosJson.especie_id);
-            } else {
-                document.getElementById('auto-select-info').style.display = 'flex';
-                document.getElementById('auto-select-info').className = 'auto-select-info warning';
-                document.getElementById('auto-select-info').innerHTML = '⚠️ JSON não contém "especie_id". Selecione manualmente.';
-            }
             
             camposParaValidar = [];
             escolhasUsuario = {};
@@ -1223,10 +1146,7 @@ if (!$conexao->connect_error) {
                 mensagemDiv.className = 'alert alert-success';
                 mensagemDiv.innerHTML = '✅ Todos os campos estão padronizados!';
                 
-                const especieId = document.getElementById('especie_id').value;
-                if (especieId && especieId !== '') {
-                    document.getElementById('btn_salvar').disabled = false;
-                }
+                document.getElementById('btn_finalizar').disabled = false;
             }
             
         } catch (erro) {
@@ -1236,20 +1156,12 @@ if (!$conexao->connect_error) {
         }
     });
     
-    document.getElementById('especie_id').addEventListener('change', function() {
-        const btnSalvar = document.getElementById('btn_salvar');
-        const temDados = dadosJson !== null;
-        btnSalvar.disabled = !(this.value && this.value !== '' && temDados);
-    });
-    
     document.getElementById('btn_limpar').addEventListener('click', function() {
         if (confirm('Limpar todos os dados?')) {
             document.getElementById('json_input').value = '';
             document.getElementById('mensagem_json').style.display = 'none';
             document.getElementById('campos_ocultos').innerHTML = '';
-            document.getElementById('btn_salvar').disabled = true;
-            document.getElementById('especie_id').value = '';
-            document.getElementById('auto-select-info').style.display = 'none';
+            document.getElementById('btn_finalizar').disabled = true;
             dadosJson = null;
             
             document.getElementById('preview_nome_cientifico').innerHTML = '[Nome científico]';

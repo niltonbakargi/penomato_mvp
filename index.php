@@ -395,7 +395,7 @@ $tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
                         
                         <!-- Rodapé -->
                         <div class="footer">
-                            <p>© 2026 Penomato - Em parceria com UEMS (Bioma Cerrado)</p>
+                            <p>© 2026 Penomato - Em parceria com Dr. Norton Hayd Rêgo (Bioma Cerrado) UEMS Aquidauana MS</p>
                         </div>
                         
                     </div>

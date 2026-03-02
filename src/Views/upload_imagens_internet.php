@@ -1,6 +1,6 @@
 <?php
 // ================================================
-// UPLOAD DE IMAGENS - VERSÃO COM CONTROLE DE USUÁRIO
+// UPLOAD DE IMAGENS - VERSÃO COM BOTÃO AVANÇAR
 // ================================================
 
 ini_set('display_errors', 1);
@@ -362,7 +362,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             color: #0b5e42;
         }
 
-        /* Formulário de upload por parte */
+        /* Formulário de upload */
         .upload-parte-form {
             background-color: #f8fafc;
             border: 3px solid #0b5e42;
@@ -409,7 +409,10 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             color: <?php echo $contagem_por_parte[$parte_selecionada] > 0 ? '#155724' : '#856404'; ?>;
         }
 
-        .upload-area {
+        /* ================================================ */
+        /* ÁREA: COLAR IMAGEM (Ctrl+V) */
+        /* ================================================ */
+        .colar-area {
             border: 2px dashed #0b5e42;
             border-radius: 8px;
             padding: 40px;
@@ -420,29 +423,89 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             margin-bottom: 20px;
         }
 
-        .upload-area:hover {
+        .colar-area:hover {
             background-color: #e0f0e0;
             border-color: #0a4c35;
         }
 
-        .upload-area .icone {
+        .colar-area .icone {
             font-size: 4rem;
             margin-bottom: 15px;
             color: #0b5e42;
         }
 
-        .upload-area .texto {
+        .colar-area .texto {
             font-size: 1.2rem;
             color: #2c3e50;
             margin-bottom: 10px;
         }
 
-        .upload-area .subtexto {
+        .colar-area .subtexto {
             font-size: 0.9rem;
             color: #666;
         }
 
-        /* Preview das imagens selecionadas para esta parte */
+        /* Textarea escondido para capturar o Ctrl+V */
+        #colarInput {
+            position: absolute;
+            opacity: 0;
+            height: 0;
+            width: 0;
+            pointer-events: none;
+        }
+
+        /* ================================================ */
+        /* CAMPOS DA FONTE (URL SEPARADA) */
+        /* ================================================ */
+        .fonte-info {
+            background-color: #edf2f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .fonte-info h4 {
+            color: #0b5e42;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fonte-info .form-group {
+            margin-bottom: 15px;
+        }
+
+        .fonte-info label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .fonte-info input, 
+        .fonte-info select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .fonte-info input:focus,
+        .fonte-info select:focus {
+            outline: none;
+            border-color: #0b5e42;
+        }
+
+        .fonte-info small {
+            color: #666;
+            font-size: 0.85rem;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Preview das imagens */
         .preview-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -510,47 +573,6 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             color: white;
         }
 
-        /* Campos de metadados */
-        .metadata-fields {
-            background-color: #edf2f7;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .metadata-fields h4 {
-            color: #0b5e42;
-            margin-bottom: 15px;
-        }
-
-        .metadata-fields .form-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-
-        .metadata-fields label {
-            display: block;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-        }
-
-        .metadata-fields input,
-        .metadata-fields select {
-            width: 100%;
-            padding: 8px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-        }
-
-        .metadata-fields input:focus,
-        .metadata-fields select:focus {
-            outline: none;
-            border-color: #0b5e42;
-        }
-
         /* Botões de ação */
         .action-buttons {
             display: flex;
@@ -605,6 +627,18 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             box-shadow: 0 6px 15px rgba(40,167,69,0.4);
         }
 
+        .btn-avancar {
+            background-color: #0b5e42;
+            color: white;
+            box-shadow: 0 4px 10px rgba(11,94,66,0.3);
+        }
+
+        .btn-avancar:hover {
+            background-color: #0a4c35;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(11,94,66,0.4);
+        }
+
         .btn-secondary {
             background-color: #6c757d;
             color: white;
@@ -628,9 +662,6 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 margin-bottom: 20px;
                 justify-content: center;
             }
-            .metadata-fields .form-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -650,7 +681,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         <div class="header">
             <h1>📸 PENOMATO • UPLOAD DE IMAGENS</h1>
             <div class="subtitle">
-                Adicione as imagens para cada parte da planta
+                PASSO 2: Adicione as imagens para cada parte da planta
             </div>
         </div>
 
@@ -660,7 +691,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             <div>
                 <strong>Dados temporários</strong> - As imagens ainda não foram salvas no banco.
                 Utilize os botões abaixo para adicionar imagens a cada parte.
-                Ao finalizar, tudo será salvo permanentemente.
+                Quando terminar, clique em "AVANÇAR PARA DADOS".
             </div>
         </div>
 
@@ -753,48 +784,54 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                     <input type="hidden" name="temp_id" value="<?php echo htmlspecialchars($temp_id); ?>">
                     <input type="hidden" name="parte_planta" value="<?php echo $parte_selecionada; ?>">
                     
-                    <!-- Área de upload -->
-                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-                        <div class="icone">📁</div>
-                        <div class="texto">Clique aqui ou arraste as imagens para <?php echo $parte_atual['nome']; ?></div>
-                        <div class="subtexto">Formatos: JPG, PNG (máx 10MB por imagem)</div>
-                        <input type="file" id="fileInput" name="imagens[]" multiple accept="image/jpeg,image/png,image/jpg" style="display: none;" onchange="handleFiles(this.files)">
+                    <!-- ================================================ -->
+                    <!-- ÁREA PARA COLAR A IMAGEM (Ctrl+V) -->
+                    <!-- ================================================ -->
+                    <div class="colar-area" id="colarArea" onclick="document.getElementById('colarInput').focus()">
+                        <div class="icone">📋</div>
+                        <div class="texto">Cole a imagem aqui (Ctrl+V)</div>
+                        <div class="subtexto">Copie a imagem de qualquer lugar e cole neste campo</div>
+                        <textarea id="colarInput" placeholder="Clique aqui e pressione Ctrl+V para colar a imagem..."></textarea>
                     </div>
 
-                    <!-- Metadados comuns -->
-                    <div class="metadata-fields">
-                        <h4>📋 Metadados (aplicados a todas as imagens desta parte)</h4>
-                        <div class="form-grid">
-                            <div>
-                                <label>Fonte</label>
-                                <input type="text" name="fonte_nome" placeholder="Ex: Flora do Brasil">
-                            </div>
-                            <div>
-                                <label>URL da fonte</label>
-                                <input type="url" name="fonte_url" placeholder="https://...">
-                            </div>
-                            <div>
-                                <label>Autor da imagem</label>
-                                <input type="text" name="autor_imagem" placeholder="Nome do autor">
-                            </div>
-                            <div>
-                                <label>Licença</label>
-                                <select name="licenca">
-                                    <option value="">Selecione...</option>
-                                    <option value="Domínio público">Domínio público</option>
-                                    <option value="CC BY 4.0">CC BY 4.0</option>
-                                    <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
-                                    <option value="CC0">CC0 (Domínio público)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label>Descrição (opcional)</label>
-                                <input type="text" name="descricao" placeholder="Descrição geral">
-                            </div>
+                    <!-- Campo hidden para armazenar a imagem em base64 -->
+                    <input type="hidden" name="imagem_base64" id="imagemBase64">
+
+                    <!-- ================================================ -->
+                    <!-- CAMPOS DA FONTE (URL SEPARADA) -->
+                    <!-- ================================================ -->
+                    <div class="fonte-info">
+                        <h4><i class="fas fa-link"></i> URL da fonte (de onde você copiou a imagem)</h4>
+                        <div class="form-group">
+                            <label for="fonte_url">Cole a URL da fonte aqui:</label>
+                            <input type="url" id="fonte_url" name="fonte_url" placeholder="https://exemplo.com/fonte-da-imagem" value="<?php echo isset($dados_caracteristicas['fonte_url']) ? htmlspecialchars($dados_caracteristicas['fonte_url']) : ''; ?>">
+                            <small>Ex: link do site, artigo, herbário digital, etc.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="fonte_nome">Nome da fonte (opcional):</label>
+                            <input type="text" id="fonte_nome" name="fonte_nome" placeholder="Ex: Flora do Brasil, Lorenzi, etc." value="<?php echo isset($dados_caracteristicas['fonte_nome']) ? htmlspecialchars($dados_caracteristicas['fonte_nome']) : ''; ?>">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="autor_imagem">Autor da imagem (opcional):</label>
+                            <input type="text" id="autor_imagem" name="autor_imagem" placeholder="Nome do fotógrafo/ilustrador">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="licenca">Licença:</label>
+                            <select id="licenca" name="licenca">
+                                <option value="">Selecione...</option>
+                                <option value="Domínio público">Domínio público</option>
+                                <option value="CC BY 4.0">CC BY 4.0</option>
+                                <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
+                                <option value="CC BY-NC 4.0">CC BY-NC 4.0</option>
+                                <option value="CC0">CC0 (Domínio público)</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Preview das imagens selecionadas -->
+                    <!-- Preview das imagens coladas -->
                     <div id="previewContainer" class="preview-container"></div>
 
                     <!-- Botões -->
@@ -810,116 +847,145 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             </div>
             <?php endif; ?>
 
-            <!-- Botões de ação global -->
+            <!-- ================================================ -->
+            <!-- BOTÕES DE AÇÃO GLOBAL - MODIFICADO -->
+            <!-- ================================================ -->
             <div class="action-buttons">
-                <?php if ($partes_completas == count($partes_obrigatorias)): ?>
-                <a href="../Controllers/finalizar_upload_temporario.php?temp_id=<?php echo urlencode($temp_id); ?>" class="btn btn-success">
-                    ✅ FINALIZAR E SALVAR TUDO NO BANCO
+                <!-- NOVO BOTÃO: AVANÇAR PARA DADOS (sempre visível) -->
+                <a href="../Controllers/inserir_dados_internet.php?temp_id=<?php echo urlencode($temp_id); ?>" class="btn btn-avancar">
+                    ➡️ AVANÇAR PARA DADOS (PASSO 3)
                 </a>
-                <?php else: ?>
-                <button class="btn btn-success" disabled title="Complete todas as partes obrigatórias primeiro">
-                    ⏳ AGUARDANDO PARTES OBRIGATÓRIAS
-                </button>
-                <?php endif; ?>
-                <a href="../Controllers/inserir_dados_internet.php" class="btn btn-secondary" onclick="return confirm('Tem certeza? Todo o progresso atual será perdido.')">
+                
+                <!-- Botão cancelar (mantido) -->
+                <a href="escolher_especie.php" class="btn btn-secondary" onclick="return confirm('Tem certeza? Todo o progresso atual será perdido.')">
                     ⏪ CANCELAR IMPORTAÇÃO
                 </a>
             </div>
+            
+            <!-- Informação adicional -->
+            <p style="text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> 
+                Você pode adicionar imagens agora ou clicar em "AVANÇAR PARA DADOS" para ir para o próximo passo.
+                As imagens já adicionadas ficarão salvas na sessão.
+            </p>
 
         </div>
 
         <div class="footer">
-            Penomato • Upload temporário - Nada foi salvo permanentemente ainda
+            Penomato • PASSO 2 DE 3 - Upload de imagens
         </div>
     </div>
 
     <script>
-    let arquivosSelecionados = [];
-
-    // Elementos DOM
+    // ================================================
+    // SCRIPT PARA COLAR IMAGEM (Ctrl+V)
+    // ================================================
+    const colarArea = document.getElementById('colarArea');
+    const colarInput = document.getElementById('colarInput');
     const previewContainer = document.getElementById('previewContainer');
+    const imagemBase64 = document.getElementById('imagemBase64');
     const btnEnviar = document.getElementById('btnEnviar');
 
-    // Função para lidar com arquivos selecionados
-    function handleFiles(files) {
-        arquivosSelecionados = Array.from(files);
-        atualizarPreview();
-    }
+    // Variável para armazenar a imagem colada
+    let imagemColada = null;
 
-    // Função para atualizar preview das imagens
-    function atualizarPreview() {
-        previewContainer.innerHTML = '';
-        
-        if (arquivosSelecionados.length === 0) {
-            btnEnviar.disabled = true;
-            btnEnviar.innerHTML = '📤 ADICIONAR À SESSÃO TEMPORÁRIA';
-            return;
-        }
-
-        btnEnviar.disabled = false;
-        btnEnviar.innerHTML = `📤 ADICIONAR ${arquivosSelecionados.length} IMAGEM(S)`;
-
-        arquivosSelecionados.forEach((arquivo, index) => {
+    // Função para processar a imagem colada
+    function processarImagemColada(item) {
+        if (item.type && item.type.indexOf('image') !== -1) {
+            const blob = item.getAsFile();
             const reader = new FileReader();
             
             reader.onload = function(e) {
+                // Armazenar imagem
+                imagemColada = e.target.result;
+                imagemBase64.value = e.target.result;
+                
+                // Limpar preview anterior
+                previewContainer.innerHTML = '';
+                
+                // Criar preview
                 const previewItem = document.createElement('div');
                 previewItem.className = 'preview-item';
-                previewItem.dataset.index = index;
-
                 previewItem.innerHTML = `
                     <div class="preview-image">
-                        <img src="${e.target.result}" alt="Preview">
+                        <img src="${e.target.result}" alt="Imagem colada">
                     </div>
                     <div class="preview-info">
-                        <strong>${arquivo.name}</strong>
-                        <small>${(arquivo.size / 1024).toFixed(1)} KB</small>
+                        <strong>Imagem colada</strong>
+                        <small>${(blob.size / 1024).toFixed(1)} KB</small>
                     </div>
-                    <div class="remove-btn" onclick="removerImagem(${index})">×</div>
+                    <div class="remove-btn" onclick="removerImagem()">×</div>
                 `;
-
                 previewContainer.appendChild(previewItem);
+                
+                // Habilitar botão
+                btnEnviar.disabled = false;
+                btnEnviar.innerHTML = '📤 ADICIONAR À SESSÃO TEMPORÁRIA';
+                
+                // Feedback visual
+                colarArea.style.backgroundColor = '#e8f5e9';
+                colarArea.style.borderColor = '#28a745';
             };
-
-            reader.readAsDataURL(arquivo);
-        });
-    }
-
-    // Função para remover imagem da lista
-    function removerImagem(index) {
-        arquivosSelecionados.splice(index, 1);
-        atualizarPreview();
-    }
-
-    // Evento de drag and drop
-    const uploadArea = document.getElementById('uploadArea');
-
-    if (uploadArea) {
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.backgroundColor = '#e0f0e0';
-            uploadArea.style.borderColor = '#0a4c35';
-        });
-
-        uploadArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            uploadArea.style.backgroundColor = '#f0f8f0';
-            uploadArea.style.borderColor = '#0b5e42';
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.backgroundColor = '#f0f8f0';
-            uploadArea.style.borderColor = '#0b5e42';
             
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        });
+            reader.readAsDataURL(blob);
+        }
     }
 
-    // Prevenir comportamento padrão do drag and drop
-    document.addEventListener('dragover', (e) => e.preventDefault());
-    document.addEventListener('drop', (e) => e.preventDefault());
+    // Evento de colar (Ctrl+V)
+    document.addEventListener('paste', function(e) {
+        // Verificar se o foco está na área de colar
+        if (document.activeElement === colarInput || colarArea.contains(document.activeElement)) {
+            e.preventDefault();
+            
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    processarImagemColada(items[i]);
+                    break;
+                }
+            }
+        }
+    });
+
+    // Focar no textarea ao clicar na área
+    colarArea.addEventListener('click', function() {
+        colarInput.focus();
+        colarArea.style.backgroundColor = '#e0f0e0';
+        colarArea.style.borderColor = '#0a4c35';
+    });
+
+    colarInput.addEventListener('focus', function() {
+        colarArea.style.backgroundColor = '#e0f0e0';
+        colarArea.style.borderColor = '#0a4c35';
+    });
+
+    colarInput.addEventListener('blur', function() {
+        if (!imagemColada) {
+            colarArea.style.backgroundColor = '#f0f8f0';
+            colarArea.style.borderColor = '#0b5e42';
+        }
+    });
+
+    // Função para remover a imagem
+    function removerImagem() {
+        imagemColada = null;
+        imagemBase64.value = '';
+        previewContainer.innerHTML = '';
+        btnEnviar.disabled = true;
+        btnEnviar.innerHTML = '📤 ADICIONAR À SESSÃO TEMPORÁRIA';
+        colarArea.style.backgroundColor = '#f0f8f0';
+        colarArea.style.borderColor = '#0b5e42';
+    }
+
+    // Validação do formulário antes de enviar
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        if (!imagemColada) {
+            e.preventDefault();
+            alert('Por favor, cole uma imagem primeiro!');
+            return;
+        }
+    });
     </script>
 </body>
 </html>

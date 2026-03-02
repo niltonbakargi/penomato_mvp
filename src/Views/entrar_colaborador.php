@@ -447,8 +447,10 @@ if ($hora >= 5 && $hora < 12) {
                 </p>
             </a>
             
-            <!-- Dados da Internet -->
-            <a href="/penomato_mvp/src/Controllers/inserir_dados_internet.php" class="option-card">
+            <!-- ================================================ -->
+            <!-- Dados da Internet - LINK CORRIGIDO -->
+            <!-- ================================================ -->
+            <a href="/penomato_mvp/src/Views/escolher_especie.php" class="option-card">
                 <div class="option-icon"><i class="fas fa-globe"></i></div>
                 <h3 class="option-title">DADOS DA INTERNET</h3>
                 <p class="option-desc">
