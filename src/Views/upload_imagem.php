@@ -838,7 +838,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                             <?php endif; ?>
                         </div>
                         
-                        <form method="POST" enctype="multipart/form-data" action="../Controllers/upload_imagem_controller.php">
+                        <form method="POST" enctype="multipart/form-data" action="../Controllers/upload_imagem_controlador.php">
                             <input type="hidden" name="especie_id" value="<?php echo $especie_selecionada['id']; ?>">
                             <input type="hidden" name="parte" value="<?php echo $parte_key; ?>">
                             

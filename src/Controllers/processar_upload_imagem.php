@@ -209,17 +209,17 @@ $parte_planta = isset($_POST['parte_planta']) ? $_POST['parte_planta'] : '';
 // VALIDAÇÕES INICIAIS
 // ================================================
 if ($especie_id <= 0) {
-    header("Location: ../Views/upload_imagem_views.php?erro=" . urlencode("ID da espécie inválido."));
+    header("Location: ../Views/enviar_imagem.php?erro=" . urlencode("ID da espécie inválido."));
     exit;
 }
 
 if (empty($parte_planta)) {
-    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&erro=" . urlencode("Parte da planta não informada."));
+    header("Location: ../Views/enviar_imagem.php?especie_id=" . $especie_id . "&erro=" . urlencode("Parte da planta não informada."));
     exit;
 }
 
 if (!isset($_FILES['imagens']) || empty($_FILES['imagens']['name'][0])) {
-    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode("Nenhuma imagem selecionada."));
+    header("Location: ../Views/enviar_imagem.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode("Nenhuma imagem selecionada."));
     exit;
 }
 
@@ -238,7 +238,7 @@ $descricao = $_POST['descricao'] ?? null;
 $conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
 
 if ($conexao->connect_error) {
-    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode("Erro de conexão com banco."));
+    header("Location: ../Views/enviar_imagem.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode("Erro de conexão com banco."));
     exit;
 }
 
@@ -341,9 +341,9 @@ if (count($erros) > 0) {
 }
 
 if ($sucessos > 0) {
-    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&sucesso=" . urlencode($mensagem));
+    header("Location: ../Views/enviar_imagem.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&sucesso=" . urlencode($mensagem));
 } else {
-    header("Location: ../Views/upload_imagem_views.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode($mensagem));
+    header("Location: ../Views/enviar_imagem.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode($mensagem));
 }
 
 ob_end_flush();

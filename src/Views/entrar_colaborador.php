@@ -439,7 +439,7 @@ if ($hora >= 5 && $hora < 12) {
             </a>
             
             <!-- Registrar imagens -->
-            <a href="/penomato_mvp/src/Views/upload_imagem_views.php" class="option-card">
+            <a href="/penomato_mvp/src/Views/enviar_imagem.php" class="option-card">
                 <div class="option-icon"><i class="fas fa-camera"></i></div>
                 <h3 class="option-title">REGISTRAR IMAGENS</h3>
                 <p class="option-desc">

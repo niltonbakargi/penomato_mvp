@@ -394,7 +394,7 @@ $_SESSION['mensagem_sucesso'] = $sucesso;
 $_SESSION['mensagem_erro'] = $erro;
 
 // Redireciona de volta para a página de upload
-$redirect = "../Views/upload_imagem_views.php";
+$redirect = "../Views/enviar_imagem.php";
 if (!empty($_POST['especie_id'])) {
     $redirect .= "?especie_id=" . $_POST['especie_id'];
 }
