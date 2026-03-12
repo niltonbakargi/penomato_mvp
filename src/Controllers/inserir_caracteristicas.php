@@ -1,63 +1,37 @@
 <?php
 // ================================================
-// CONEXÃO E BUSCA NO BANCO - VERSÃO CORRIGIDA
+// CONEXÃO E BUSCA NO BANCO
 // ================================================
 
-// Iniciar buffer de saída para evitar problemas
 ob_start();
 
-// Configurações do banco
-$servidor = "127.0.0.1";
-$usuario = "root";
-$senha = "";
-$banco = "penomato";
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
-// Variáveis para armazenar as opções
 $opcoes_especies = '';
 $mensagem_erro = '';
 
-// Tentar conectar e buscar dados
-$conexao = mysqli_connect($servidor, $usuario, $senha, $banco);
+try {
+    $especies = buscarTodos(
+        "SELECT id, nome_cientifico
+         FROM especies_administrativo
+         WHERE status IN ('sem_dados', 'dados_internet')
+         ORDER BY
+             CASE status
+                 WHEN 'dados_internet' THEN 1
+                 WHEN 'sem_dados' THEN 2
+             END,
+             nome_cientifico"
+    );
 
-if (!$conexao) {
-    $mensagem_erro = 'Erro: Não foi possível conectar ao banco de dados';
-} else {
-    mysqli_set_charset($conexao, "utf8mb4");
-    
-    // CORRIGIDO: Agora busca espécies com status 'sem_dados' OU 'dados_internet'
-    $sql = "SELECT id, nome_cientifico 
-            FROM especies_administrativo 
-            WHERE status IN ('sem_dados', 'dados_internet')
-            ORDER BY 
-                CASE status 
-                    WHEN 'dados_internet' THEN 1
-                    WHEN 'sem_dados' THEN 2
-                END,
-                nome_cientifico";
-    
-    $resultado = mysqli_query($conexao, $sql);
-    
-    if (!$resultado) {
-        $mensagem_erro = 'Erro na consulta ao banco de dados';
-    } else {
-        $encontrou_especies = false;
-        
-        if (mysqli_num_rows($resultado) > 0) {
-            $encontrou_especies = true;
-            while ($linha = mysqli_fetch_assoc($resultado)) {
-                $id_especie = htmlspecialchars($linha['id']);
-                $nome_cientifico = htmlspecialchars($linha['nome_cientifico']);
-                $opcoes_especies .= "<option value=\"{$id_especie}\">{$nome_cientifico}</option>\n";
-            }
-        }
-        
-        mysqli_free_result($resultado);
+    foreach ($especies as $linha) {
+        $id_especie = htmlspecialchars($linha['id']);
+        $nome_cientifico = htmlspecialchars($linha['nome_cientifico']);
+        $opcoes_especies .= "<option value=\"{$id_especie}\">{$nome_cientifico}</option>\n";
     }
-    
-    mysqli_close($conexao);
+} catch (Exception $e) {
+    $mensagem_erro = 'Erro: Não foi possível conectar ao banco de dados';
 }
 
-// Limpar buffer
 ob_end_clean();
 ?>
 <!DOCTYPE html>
