@@ -224,7 +224,7 @@ PASTA,0,scripts,scripts,-,0 B,08/02/2026 17:39
 PASTA,0,src,src,-,286.88 KB,08/02/2026 17:39
 PASTA,1,Controllers,src\Controllers,-,100.16 KB,12/02/2026 22:38
 ARQUIVO,2,busca_caracteristicas.php,src\Controllers\busca_caracteristicas.php,php,47.56 KB,12/02/2026 16:45
-ARQUIVO,2,inserir_caracteristicas.php,src\Controllers\inserir_caracteristicas.php,php,37.18 KB,09/02/2026 22:08
+ARQUIVO,2,confirmar_caracteristicas.php,src\Controllers\confirmar_caracteristicas.php,php,37.18 KB,09/02/2026 22:08
 ARQUIVO,2,upload_imagem_controller.php,src\Controllers\upload_imagem_controller.php,php,15.43 KB,12/02/2026 22:45
 PASTA,1,Views,src\Views,-,186.63 KB,12/02/2026 22:36
 ARQUIVO,2,cadastro_caracteristicas.php,src\Views\cadastro_caracteristicas.php,php,11.78 KB,09/02/2026 22:16

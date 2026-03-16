@@ -429,12 +429,12 @@ if ($hora >= 5 && $hora < 12) {
         <!-- Grid de opções principais -->
         <div class="options-grid">
             
-            <!-- Descrever características -->
-            <a href="/penomato_mvp/src/Controllers/inserir_caracteristicas.php" class="option-card">
-                <div class="option-icon"><i class="fas fa-pen-fancy"></i></div>
-                <h3 class="option-title">DESCREVER CARACTERÍSTICAS</h3>
+            <!-- Confirmar identificação -->
+            <a href="/penomato_mvp/src/Controllers/confirmar_caracteristicas.php" class="option-card">
+                <div class="option-icon"><i class="fas fa-clipboard-check"></i></div>
+                <h3 class="option-title">CONFIRMAR IDENTIFICAÇÃO</h3>
                 <p class="option-desc">
-                    Cadastre características morfológicas de espécies, incluindo folhas, flores, frutos e muito mais.
+                    Verifique e confirme as informações provenientes da internet antes de registrá-las no sistema.
                 </p>
             </a>
             

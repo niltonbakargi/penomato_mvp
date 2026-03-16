@@ -238,7 +238,7 @@ $status_texto = $status_amigavel[$status] ?? $status;
     </div>
     
     <div class="buttons-container">
-        <a href="inserir_caracteristicas.php" class="btn btn-primary">
+        <a href="confirmar_caracteristicas.php" class="btn btn-primary">
             Cadastrar Nova Espécie
         </a>
         

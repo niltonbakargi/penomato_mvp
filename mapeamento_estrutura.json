@@ -1957,8 +1957,8 @@
         {
             "tipo": "📄",
             "nivel": 2,
-            "nome": "inserir_caracteristicas.php",
-            "caminho": "src\\Controllers\\inserir_caracteristicas.php",
+            "nome": "confirmar_caracteristicas.php",
+            "caminho": "src\\Controllers\\confirmar_caracteristicas.php",
             "extensao": "php",
             "tamanho": "37.18 KB",
             "modificado": "09\/02\/2026 22:08"

@@ -145,7 +145,7 @@
         <h2 class="section-title">🧭 Acesso aos Perfis</h2>
         
         <div class="nav-grid">
-            <div class="nav-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_colaborador.php'">
+            <div class="nav-btn" onclick="window.location.href='/penomato_mvp/src/Views/entrar_colaborador.php'">
                 <div class="nav-icon">👤</div>
                 <div>Colaborador</div>
             </div>
