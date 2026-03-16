@@ -150,7 +150,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                         <div class="profile-badges">
                             <span class="badge-type">
                                 <i class="fas fa-user-tag"></i> 
-                                <?php echo traduzirTipo($usuario['tipo'] ?? ''); ?>
+                                <?php echo traduzirTipo($usuario['categoria'] ?? ''); ?>
                             </span>
                             
                             <?php if (!empty($usuario['subtipo_colaborador'])): ?>

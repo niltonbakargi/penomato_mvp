@@ -1,21 +1,18 @@
 <?php
 /**
- * INDEX MVP - PENOMATO
- * Versão simplificada: apenas PESQUISAR e AUTENTICAÇÃO
+ * INDEX - PENOMATO MVP
  */
 
-// Iniciar sessão
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/src/Controllers/auth/verificar_acesso.php';
 
-// Função simples para verificar login
-function estaLogadoSimples() {
-    return isset($_SESSION['usuario_id']);
-}
+$logado      = sessaoValida();
+$tipo        = getTipoUsuario();      // 'visitante' se não logado
+$nome        = getNomeUsuario();      // 'Visitante' se não logado
 
-// Pegar tipo de usuário
-$tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
+// Painel destino baseado no tipo
+$url_painel = ($tipo === 'gestor')
+    ? '/penomato_mvp/src/Controllers/controlador_gestor.php'
+    : '/penomato_mvp/src/Views/entrar_colaborador.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -33,7 +30,7 @@ $tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
             align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .home-card {
             background: white;
             border-radius: 30px;
@@ -41,26 +38,20 @@ $tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
             overflow: hidden;
             animation: slideUp 0.6s ease-out;
         }
-        
+
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(40px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        
+
         .home-header {
             background: #0b5e42;
             color: white;
             padding: 40px;
             text-align: center;
         }
-        
-        .home-header i {
+
+        .home-header .logo-icon {
             font-size: 5rem;
             background: rgba(255,255,255,0.2);
             width: 120px;
@@ -72,25 +63,34 @@ $tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
             margin: 0 auto 20px;
             border: 4px solid white;
         }
-        
+
         .home-header h1 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 10px;
         }
-        
+
         .home-header p {
             font-size: 1.1rem;
             opacity: 0.9;
             max-width: 600px;
             margin: 0 auto;
         }
-        
+
+        .badge-bioma {
+            margin-top: 12px;
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.15);
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 40px;
+        }
+
         .home-body {
             padding: 50px 40px;
         }
-        
-        /* Card de Pesquisa (único) */
+
+        /* Card de pesquisa */
         .search-card {
             background: #f8f9fa;
             border-radius: 20px;
@@ -100,55 +100,57 @@ $tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
             border: 2px solid transparent;
             cursor: pointer;
             margin-bottom: 40px;
+            text-decoration: none;
+            display: block;
+            color: inherit;
         }
-        
+
         .search-card:hover {
             transform: translateY(-5px);
             border-color: #0b5e42;
             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            color: inherit;
         }
-        
+
         .search-icon {
             font-size: 4.5rem;
             color: #0b5e42;
             margin-bottom: 20px;
         }
-        
+
         .search-title {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 700;
             color: #1e293b;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
-        
+
         .search-desc {
             color: #4b5563;
             margin-bottom: 25px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             max-width: 500px;
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         .btn-search {
             background: #0b5e42;
             color: white;
             border: none;
-            padding: 15px 50px;
+            padding: 14px 50px;
             border-radius: 50px;
             font-weight: 600;
-            font-size: 1.2rem;
-            text-decoration: none;
+            font-size: 1.1rem;
             display: inline-block;
             transition: all 0.3s;
         }
-        
-        .btn-search:hover {
+
+        .search-card:hover .btn-search {
             background: #0a4c35;
-            transform: scale(1.05);
             box-shadow: 0 10px 20px rgba(11,94,66,0.3);
         }
-        
+
         /* Separador */
         .divider {
             display: flex;
@@ -157,251 +159,265 @@ $tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
             margin: 30px 0;
             color: #9ca3af;
         }
-        
+
         .divider::before,
         .divider::after {
             content: '';
             flex: 1;
             border-bottom: 2px solid #e5e7eb;
         }
-        
+
         .divider span {
             padding: 0 15px;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 1px;
         }
-        
-        /* Botões de autenticação */
-        .auth-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin: 20px 0 30px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-login {
-            background: white;
-            color: #0b5e42;
-            border: 2px solid #0b5e42;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-            flex: 1;
-            min-width: 200px;
-            justify-content: center;
-        }
-        
-        .btn-login:hover {
-            background: #0b5e42;
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(11,94,66,0.2);
-        }
-        
-        .btn-cadastro {
-            background: #0b5e42;
-            color: white;
-            border: 2px solid #0b5e42;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-            flex: 1;
-            min-width: 200px;
-            justify-content: center;
-        }
-        
-        .btn-cadastro:hover {
-            background: white;
-            color: #0b5e42;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(11,94,66,0.2);
-        }
-        
-        .btn-sair {
-            background: #dc3545;
-            color: white;
-            border: 2px solid #dc3545;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-            min-width: 200px;
-            justify-content: center;
-        }
-        
-        .btn-sair:hover {
-            background: #c82333;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(220,53,69,0.2);
-        }
-        
+
+        /* Saudação */
         .user-greeting {
             text-align: center;
             margin-bottom: 20px;
-            padding: 15px;
+            padding: 12px 20px;
             background: #f0f9f4;
             border-radius: 50px;
             color: #0b5e42;
             font-weight: 600;
         }
-        
-        .user-greeting i {
-            margin-right: 8px;
+
+        /* Botões de autenticação */
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0 25px;
+            flex-wrap: wrap;
         }
-        
-        /* Link para o painel do colaborador */
-        .painel-link {
-            text-align: center;
-            margin-top: 15px;
-            padding: 10px;
-            background: #e8f5e9;
-            border-radius: 12px;
-        }
-        
-        .painel-link a {
-            color: #0b5e42;
-            text-decoration: none;
+
+        .btn-auth {
+            padding: 14px 36px;
+            border-radius: 50px;
             font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            border-radius: 30px;
+            gap: 10px;
             transition: all 0.3s;
+            flex: 1;
+            min-width: 180px;
+            justify-content: center;
+            border: 2px solid #0b5e42;
         }
-        
-        .painel-link a:hover {
+
+        .btn-auth-outline {
+            background: white;
+            color: #0b5e42;
+        }
+
+        .btn-auth-outline:hover {
+            background: #0b5e42;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(11,94,66,0.2);
+        }
+
+        .btn-auth-filled {
             background: #0b5e42;
             color: white;
         }
-        
+
+        .btn-auth-filled:hover {
+            background: #0a4c35;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(11,94,66,0.3);
+        }
+
+        .btn-auth-danger {
+            background: white;
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-auth-danger:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(220,53,69,0.2);
+        }
+
+        /* Links rápidos (só para usuários logados) */
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            background: #e8f5e9;
+            border-radius: 14px;
+            margin-top: 5px;
+        }
+
+        .quick-links a {
+            color: #0b5e42;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .quick-links a:hover {
+            background: #0b5e42;
+            color: white;
+        }
+
+        .quick-links .sep {
+            color: #d1d5db;
+            align-self: center;
+        }
+
         .footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 35px;
             color: #9ca3af;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
         }
-        
-        @media (max-width: 768px) {
-            .auth-buttons {
-                flex-direction: column;
-            }
-            .btn-login, .btn-cadastro, .btn-sair {
-                width: 100%;
-            }
+
+        @media (max-width: 576px) {
+            .home-body { padding: 30px 20px; }
+            .home-header { padding: 30px 20px; }
+            .home-header h1 { font-size: 2rem; }
+            .search-card { padding: 30px 20px; }
+            .auth-buttons { flex-direction: column; }
+            .btn-auth { width: 100%; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10 col-lg-8">
-                <div class="home-card">
-                    
-                    <!-- Cabeçalho -->
-                    <div class="home-header">
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="home-card">
+
+                <!-- Cabeçalho -->
+                <div class="home-header">
+                    <div class="logo-icon">
                         <i class="fas fa-leaf"></i>
-                        <h1>Penomato</h1>
-                        <p>Plataforma colaborativa para documentação botânica com validação científica</p>
-                        <div style="margin-top: 10px; font-size: 0.9rem; background: rgba(255,255,255,0.1); display: inline-block; padding: 5px 20px; border-radius: 40px;">
-                            🌳 Bioma: Cerrado (MVP)
-                        </div>
                     </div>
-                    
-                    <!-- Corpo -->
-                    <div class="home-body">
-                        
-                        <!-- Card de Pesquisa (único) -->
-                        <div class="search-card" onclick="window.location.href='/penomato_mvp/src/Views/publico/busca_caracteristicas.php'">
-                            <div class="search-icon">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <div class="search-title">PESQUISAR ESPÉCIES</div>
-                            <div class="search-desc">
-                                Busque por características morfológicas, nome científico ou nome popular
-                            </div>
-                            <div class="btn-search">
-                                <i class="fas fa-search me-2"></i>Acessar Busca
-                            </div>
+                    <h1>Penomato</h1>
+                    <p>Plataforma colaborativa para documentação botânica com validação científica</p>
+                    <div class="badge-bioma">🌳 Bioma: Cerrado (MVP)</div>
+                </div>
+
+                <!-- Corpo -->
+                <div class="home-body">
+
+                    <!-- Card de pesquisa -->
+                    <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php" class="search-card">
+                        <div class="search-icon">
+                            <i class="fas fa-search"></i>
                         </div>
-                        
-                        <!-- Separador -->
-                        <div class="divider">
-                            <span>ACESSO AO SISTEMA</span>
+                        <div class="search-title">PESQUISAR ESPÉCIES</div>
+                        <div class="search-desc">
+                            Busque por características morfológicas, nome científico ou nome popular
                         </div>
-                        
-                        <!-- BOTÕES DE AUTENTICAÇÃO -->
-                        <?php if (!estaLogadoSimples()): ?>
-                            <!-- USUÁRIO NÃO LOGADO -->
-                            <div class="auth-buttons">
-                                <a href="/penomato_mvp/src/Views/auth/login.php" class="btn-login">
-                                    <i class="fas fa-sign-in-alt"></i> Entrar
-                                </a>
-                                <a href="/penomato_mvp/src/Views/auth/cadastro.php" class="btn-cadastro">
-                                    <i class="fas fa-user-plus"></i> Cadastrar-se
-                                </a>
-                            </div>
-                            
-                            <div style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #6b7280;">
-                                Faça login para contribuir com dados, imagens e revisões
-                            </div>
-                            
-                        <?php else: ?>
-                            <!-- USUÁRIO LOGADO -->
-                            <div class="user-greeting">
-                                <i class="fas fa-user-circle"></i> Olá, <strong><?php echo htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário'); ?></strong>!
-                            </div>
-                            
-                            <div class="auth-buttons">
-                                <a href="/penomato_mvp/src/Views/entrar_colaborador.php" class="btn-login">
-                                    <i class="fas fa-tachometer-alt"></i> Painel do Colaborador
-                                </a>
-                                <a href="/penomato_mvp/src/Controllers/auth/logout_controlador.php" class="btn-sair">
-                                    <i class="fas fa-sign-out-alt"></i> Sair
-                                </a>
-                            </div>
-                            
-                            <!-- Links rápidos para funcionalidades principais -->
-                            <div class="painel-link">
-                                <a href="/penomato_mvp/src/Controllers/inserir_dados_internet.php">
-                                    <i class="fas fa-globe"></i> Importar dados da internet
-                                </a>
-                                <span style="margin: 0 10px; color: #d1d5db;">|</span>
-                                <a href="/penomato_mvp/src/Controllers/inserir_caracteristicas.php">
-                                    <i class="fas fa-pen-fancy"></i> Descrever espécie
-                                </a>
-                            </div>
+                        <span class="btn-search">
+                            <i class="fas fa-search me-2"></i>Acessar Busca
+                        </span>
+                    </a>
+
+                    <!-- Separador -->
+                    <div class="divider">
+                        <span>ACESSO AO SISTEMA</span>
+                    </div>
+
+                    <?php if (!$logado): ?>
+
+                        <!-- Não logado -->
+                        <div class="auth-buttons">
+                            <a href="/penomato_mvp/src/Views/auth/login.php" class="btn-auth btn-auth-outline">
+                                <i class="fas fa-sign-in-alt"></i> Entrar
+                            </a>
+                            <a href="/penomato_mvp/src/Views/auth/cadastro.php" class="btn-auth btn-auth-filled">
+                                <i class="fas fa-user-plus"></i> Cadastrar-se
+                            </a>
+                        </div>
+
+                        <p class="text-center text-muted small">
+                            Faça login para contribuir com dados, imagens e revisões
+                        </p>
+
+                    <?php else: ?>
+
+                        <!-- Logado -->
+                        <div class="user-greeting">
+                            <i class="fas fa-user-circle me-2"></i>
+                            Olá, <strong><?php echo htmlspecialchars($nome); ?></strong>!
+                            <?php if ($tipo !== 'visitante'): ?>
+                                <span class="ms-2 badge bg-success"><?php echo htmlspecialchars(ucfirst($tipo)); ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="auth-buttons">
+                            <a href="<?php echo $url_painel; ?>" class="btn-auth btn-auth-outline">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <?php echo $tipo === 'gestor' ? 'Painel do Gestor' : 'Meu Painel'; ?>
+                            </a>
+                            <a href="/penomato_mvp/src/Views/usuario/meu_perfil.php" class="btn-auth btn-auth-outline">
+                                <i class="fas fa-user"></i> Meu Perfil
+                            </a>
+                            <a href="/penomato_mvp/src/Controllers/auth/logout_controlador.php" class="btn-auth btn-auth-danger">
+                                <i class="fas fa-sign-out-alt"></i> Sair
+                            </a>
+                        </div>
+
+                        <!-- Links rápidos por tipo -->
+                        <?php if (in_array($tipo, ['colaborador', 'gestor'])): ?>
+                        <div class="quick-links">
+                            <a href="/penomato_mvp/src/Views/colaborador/upload_imagem.php">
+                                <i class="fas fa-camera"></i> Upload de Imagens
+                            </a>
+                            <span class="sep">|</span>
+                            <a href="/penomato_mvp/src/Views/colaborador/cadastrar_caracteristicas.php">
+                                <i class="fas fa-pen-fancy"></i> Descrever Espécie
+                            </a>
+                        </div>
+                        <?php elseif ($tipo === 'revisor'): ?>
+                        <div class="quick-links">
+                            <a href="/penomato_mvp/src/Views/revisor/painel_revisor.php">
+                                <i class="fas fa-clipboard-check"></i> Fila de Revisão
+                            </a>
+                        </div>
+                        <?php elseif ($tipo === 'validador'): ?>
+                        <div class="quick-links">
+                            <a href="/penomato_mvp/src/Views/validador/painel_validador.php">
+                                <i class="fas fa-check-double"></i> Fila de Validação
+                            </a>
+                        </div>
                         <?php endif; ?>
-                        
-                        <!-- Rodapé -->
-                        <div class="footer">
-                            <p>© 2026 Penomato - Em parceria com Dr. Norton Hayd Rêgo (Bioma Cerrado) UEMS Aquidauana MS</p>
-                        </div>
-                        
+
+                    <?php endif; ?>
+
+                    <!-- Rodapé -->
+                    <div class="footer">
+                        © <?php echo date('Y'); ?> Penomato<br>
+                        Em parceria com Dr. Norton Hayd Rêgo — UEMS Aquidauana MS — Bioma Cerrado
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

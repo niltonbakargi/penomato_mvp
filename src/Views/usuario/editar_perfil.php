@@ -61,6 +61,11 @@ $mensagens = getMensagens();
 $dados_tentativa = $_SESSION['dados_edicao'] ?? [];
 unset($_SESSION['dados_edicao']);
 
+// CSRF separado para o formulário de exclusão de conta
+if (!isset($_SESSION['csrf_token_exclusao'])) {
+    $_SESSION['csrf_token_exclusao'] = bin2hex(random_bytes(32));
+}
+
 // ============================================================
 // INCLUIR CABEÇALHO
 // ============================================================
@@ -239,7 +244,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                                 <input type="text" 
                                        class="form-control bg-light" 
                                        id="tipo" 
-                                       value="<?php echo traduzirTipo($usuario['tipo']); ?><?php echo $usuario['subtipo_colaborador'] ? ' - ' . traduzirSubtipo($usuario['subtipo_colaborador']) : ''; ?>" 
+                                       value="<?php echo traduzirTipo($usuario['categoria'] ?? ''); ?><?php echo $usuario['subtipo_colaborador'] ? ' - ' . traduzirSubtipo($usuario['subtipo_colaborador']) : ''; ?>"
                                        readonly>
                                 <div class="form-text">
                                     <i class="fas fa-lock"></i> 
@@ -423,39 +428,52 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="text-center mb-4">
-                    <i class="fas fa-trash-alt fa-4x text-danger"></i>
+            <form action="/penomato_mvp/src/Controllers/usuario/excluir_conta_controlador.php"
+                  method="POST" id="formExcluirConta">
+
+                <input type="hidden" name="csrf_token"
+                       value="<?php echo $_SESSION['csrf_token_exclusao']; ?>">
+
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-trash-alt fa-4x text-danger"></i>
+                    </div>
+
+                    <p class="fw-bold">ATENÇÃO: Esta ação é IRREVERSÍVEL!</p>
+
+                    <p>Ao confirmar a exclusão:</p>
+                    <ul>
+                        <li>Sua conta será permanentemente desativada</li>
+                        <li>Suas informações pessoais serão removidas</li>
+                        <li>Suas contribuições (espécies, imagens) serão anonimizadas</li>
+                        <li>Você não poderá recuperar seus dados</li>
+                    </ul>
+
+                    <p class="text-muted small mt-3">
+                        Digite <strong class="text-danger">EXCLUIR</strong> e confirme sua senha:
+                    </p>
+
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="confirmarExclusao"
+                               name="confirmacao_exclusao" placeholder="Digite EXCLUIR">
+                    </div>
+                    <div class="mb-2">
+                        <input type="password" class="form-control" name="senha_exclusao"
+                               placeholder="Sua senha atual">
+                    </div>
                 </div>
-                
-                <p class="fw-bold">ATENÇÃO: Esta ação é IRREVERSÍVEL!</p>
-                
-                <p>Ao confirmar a exclusão:</p>
-                <ul>
-                    <li>Sua conta será permanentemente desativada</li>
-                    <li>Suas informações pessoais serão removidas</li>
-                    <li>Suas contribuições (espécies, imagens) serão anonimizadas</li>
-                    <li>Você não poderá recuperar seus dados</li>
-                </ul>
-                
-                <p class="text-muted small">
-                    Se você tem certeza que deseja prosseguir, digite 
-                    <strong class="text-danger">EXCLUIR</strong> no campo abaixo.
-                </p>
-                
-                <input type="text" class="form-control" id="confirmarExclusao" placeholder="Digite EXCLUIR">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Cancelar
-                </button>
-                <a href="/penomato_mvp/src/Controllers/usuario/excluir_conta_controlador.php" 
-                   class="btn btn-danger" 
-                   id="btnConfirmarExclusao"
-                   onclick="return confirmarExclusao(event)">
-                    <i class="fas fa-trash-alt me-2"></i>Sim, excluir permanentemente
-                </a>
-            </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-danger" id="btnConfirmarExclusao"
+                            onclick="return confirmarExclusao(event)">
+                        <i class="fas fa-trash-alt me-2"></i>Sim, excluir permanentemente
+                    </button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>

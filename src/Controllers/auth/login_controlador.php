@@ -27,70 +27,137 @@ if (isset($_SESSION['usuario_id'])) {
 }
 
 // ============================================================
+// CONFIGURAÇÕES DE BRUTE FORCE
+// ============================================================
+define('BF_MAX_TENTATIVAS', 5);   // Máximo de falhas por IP
+define('BF_JANELA_MINUTOS', 15);  // Janela de tempo em minutos
+define('BF_LIMPEZA_CHANCE', 50);  // 1-em-N chance de limpar registros antigos
+
+// ============================================================
 // PROCESSAR LOGIN
 // ============================================================
-$email = '';
-$erro = '';
+$email    = '';
+$erro     = '';
 $redirect = $_POST['redirect'] ?? $_GET['redirect'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
+
     $email = trim($_POST['email'] ?? '');
     $senha = $_POST['senha'] ?? '';
-    
+    $ip    = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+    // --------------------------------------------------------
+    // VERIFICAR BRUTE FORCE ANTES DE QUALQUER PROCESSAMENTO
+    // --------------------------------------------------------
+    $janela_inicio = date('Y-m-d H:i:s', time() - BF_JANELA_MINUTOS * 60);
+
+    $contagem = buscarUm(
+        "SELECT COUNT(*) as total FROM tentativas_login
+         WHERE ip = :ip AND criado_em >= :janela",
+        [':ip' => $ip, ':janela' => $janela_inicio]
+    );
+
+    if ($contagem && $contagem['total'] >= BF_MAX_TENTATIVAS) {
+        $erro = "Muitas tentativas falhas. Aguarde " . BF_JANELA_MINUTOS . " minutos e tente novamente.";
+        $_SESSION['mensagem_erro']   = $erro;
+        $_SESSION['email_tentativa'] = $email;
+        header('Location: /penomato_mvp/src/Views/auth/login.php');
+        exit;
+    }
+
+    // Limpeza ocasional de registros antigos (evita crescimento infinito da tabela)
+    if (rand(1, BF_LIMPEZA_CHANCE) === 1) {
+        $limite_limpeza = date('Y-m-d H:i:s', time() - 86400); // 24h
+        executarQuery(
+            "DELETE FROM tentativas_login WHERE criado_em < :limite",
+            [':limite' => $limite_limpeza]
+        );
+    }
+
     // Validações básicas
     if (empty($email) || empty($senha)) {
         $erro = "Preencha todos os campos.";
-    }
-    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $erro = "Email inválido.";
-    }
-    else {
-        // Buscar usuário (adaptado para mysqli, não PDO)
-        $conexao = new mysqli('127.0.0.1', 'root', '', 'penomato');
-        
-        if ($conexao->connect_error) {
-            $erro = "Erro de conexão com o banco de dados.";
-        } else {
-            $sql = "SELECT * FROM usuarios WHERE email = ? AND ativo = 1 LIMIT 1";
-            $stmt = $conexao->prepare($sql);
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $resultado = $stmt->get_result();
-            $usuario = $resultado->fetch_assoc();
-            
-            // Verificar senha
-            if ($usuario && password_verify($senha, $usuario['senha_hash'])) {
-                
-                // Atualizar último acesso
-                $sql_update = "UPDATE usuarios SET ultimo_acesso = NOW() WHERE id = ?";
-                $stmt_update = $conexao->prepare($sql_update);
-                $stmt_update->bind_param("i", $usuario['id']);
-                $stmt_update->execute();
-                $stmt_update->close();
-                
-                // Criar sessão
-                $_SESSION['usuario_id'] = $usuario['id'];
-                $_SESSION['usuario_nome'] = $usuario['nome'];
-                $_SESSION['usuario_email'] = $usuario['email'];
-                $_SESSION['usuario_tipo'] = $usuario['categoria']; // Campo 'categoria' na tabela
-                $_SESSION['usuario_instituicao'] = $usuario['instituicao'] ?? '';
-                
-                // ================================================
-                // REDIRECIONAR BASEADO NO TIPO DE USUÁRIO
-                // ================================================
-                if ($usuario['categoria'] === 'gestor') {
-                    header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
-                } else {
-                    // Qualquer outro tipo (colaborador, revisor, validador, visitante)
-                    header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
-                }
+    } else {
+        $usuario = buscarUm(
+            "SELECT * FROM usuarios WHERE email = :email AND ativo = 1 LIMIT 1",
+            [':email' => $email]
+        );
+
+        // Verificar senha
+        if ($usuario && password_verify($senha, $usuario['senha_hash'])) {
+
+            // ------------------------------------------------
+            // BLOQUEAR CONTA NÃO VERIFICADA
+            // ------------------------------------------------
+            if ($usuario['status_verificacao'] === 'pendente') {
+                $link_reenvio = '/penomato_mvp/src/Controllers/auth/reenviar_verificacao_controlador.php';
+                $erro = "Sua conta ainda não foi verificada. "
+                      . "Verifique seu e-mail ou "
+                      . "<a href=\"{$link_reenvio}?email=" . urlencode($email) . "\">clique aqui para reenviar o link</a>.";
+                $_SESSION['mensagem_erro'] = $erro;
+                $_SESSION['email_tentativa'] = $email;
+                header('Location: /penomato_mvp/src/Views/auth/login.php');
                 exit;
-                
-            } else {
-                $erro = "Email ou senha incorretos.";
             }
-            $conexao->close();
+
+            if ($usuario['status_verificacao'] === 'bloqueado') {
+                $erro = "Esta conta foi bloqueada. Entre em contato com o suporte.";
+                $_SESSION['mensagem_erro'] = $erro;
+                header('Location: /penomato_mvp/src/Views/auth/login.php');
+                exit;
+            }
+
+            // Login bem-sucedido: limpar tentativas falhas deste IP
+            executarQuery(
+                "DELETE FROM tentativas_login WHERE ip = :ip",
+                [':ip' => $ip]
+            );
+
+            // Atualizar último acesso
+            atualizar('usuarios', ['ultimo_acesso' => date('Y-m-d H:i:s')], 'id = :id', [':id' => $usuario['id']]);
+
+            // Criar sessão
+            $_SESSION['usuario_id']          = $usuario['id'];
+            $_SESSION['usuario_nome']        = $usuario['nome'];
+            $_SESSION['usuario_email']       = $usuario['email'];
+            $_SESSION['usuario_tipo']        = $usuario['categoria'];
+            $_SESSION['usuario_subtipo']     = $usuario['subtipo_colaborador'] ?? '';
+            $_SESSION['usuario_instituicao'] = $usuario['instituicao'] ?? '';
+            $_SESSION['login_time']          = time();
+
+            // ------------------------------------------------
+            // REDIRECIONAR BASEADO NO TIPO DE USUÁRIO
+            // ------------------------------------------------
+            if ($usuario['categoria'] === 'gestor') {
+                header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
+            } else {
+                header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
+            }
+            exit;
+
+        } else {
+            // Registrar tentativa falha
+            inserir('tentativas_login', [
+                'ip'       => $ip,
+                'email'    => $email,
+                'criado_em' => date('Y-m-d H:i:s'),
+            ]);
+
+            // Calcular tentativas restantes para feedback ao usuário
+            $contagem_atual = buscarUm(
+                "SELECT COUNT(*) as total FROM tentativas_login
+                 WHERE ip = :ip AND criado_em >= :janela",
+                [':ip' => $ip, ':janela' => $janela_inicio]
+            );
+            $restantes = BF_MAX_TENTATIVAS - ($contagem_atual['total'] ?? 1);
+
+            if ($restantes > 0) {
+                $erro = "Email ou senha incorretos. Você tem mais {$restantes} tentativa(s) antes do bloqueio temporário.";
+            } else {
+                $erro = "Muitas tentativas falhas. Aguarde " . BF_JANELA_MINUTOS . " minutos e tente novamente.";
+            }
         }
     }
 }

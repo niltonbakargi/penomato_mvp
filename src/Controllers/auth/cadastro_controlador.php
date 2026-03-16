@@ -42,8 +42,9 @@ $email = strtolower(trim($_POST['email'] ?? ''));
 $confirmar_email = strtolower(trim($_POST['confirmar_email'] ?? ''));
 $senha = $_POST['senha'] ?? '';
 $confirmar_senha = $_POST['confirmar_senha'] ?? '';
-$categoria = $_POST['tipo'] ?? ''; // Mudou de 'tipo' para 'categoria'
-$subtipo = $_POST['subtipo'] ?? null;
+$categoria   = $_POST['tipo']        ?? '';
+$subtipo     = $_POST['subtipo']     ?? null;
+$instituicao = trim($_POST['instituicao'] ?? '');
 
 // Guardar dados na sessão para repopular o formulário
 $_SESSION['dados_cadastro'] = [
@@ -110,14 +111,15 @@ try {
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
     
     $dados_insert = [
-        'nome' => $nome,
-        'email' => $email,
-        'senha_hash' => $senha_hash,
-        'categoria' => $categoria, // Campo correto da tabela
+        'nome'               => $nome,
+        'email'              => $email,
+        'senha_hash'         => $senha_hash,
+        'categoria'          => $categoria,
         'subtipo_colaborador' => $subtipo,
-        'status_verificacao' => 'pendente',
-        'ativo' => 1,
-        'data_cadastro' => date('Y-m-d H:i:s')
+        'instituicao'        => $instituicao ?: null,
+        'status_verificacao' => 'verificado',
+        'ativo'              => 1,
+        'data_cadastro'      => date('Y-m-d H:i:s'),
     ];
     
     $usuario_id = inserir('usuarios', $dados_insert);
@@ -125,14 +127,14 @@ try {
     if (!$usuario_id) {
         throw new Exception("Erro ao inserir usuário.");
     }
-    
+
     // ============================================================
     // SUCESSO - REDIRECIONAR PARA LOGIN
     // ============================================================
-    $_SESSION['mensagem_sucesso'] = "Cadastro realizado com sucesso! Faça login.";
+    $_SESSION['mensagem_sucesso'] = "Cadastro realizado com sucesso! Faça login para continuar.";
     unset($_SESSION['dados_cadastro']);
-    
-    header('Location: /penomato_mvp/login');
+
+    header('Location: /penomato_mvp/src/Views/auth/login.php');
     exit;
     
 } catch (Exception $e) {

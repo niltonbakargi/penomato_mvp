@@ -26,8 +26,13 @@ mysqli_set_charset($conexao, "utf8mb4");
 // ================================================
 // USUÁRIO LOGADO (DA SESSÃO)
 // ================================================
-$id_usuario_logado = $_SESSION['usuario_id'] ?? 1; // Fallback para 1 durante testes
+$id_usuario_logado = $_SESSION['usuario_id'] ?? null;
 $nome_usuario_logado = "Usuário";
+
+if (!$id_usuario_logado) {
+    header('Location: /penomato_mvp/index.php');
+    exit;
+}
 
 // Buscar nome do usuário se possível
 if ($id_usuario_logado) {

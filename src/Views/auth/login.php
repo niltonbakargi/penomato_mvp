@@ -245,26 +245,6 @@ unset($_SESSION['email_tentativa']);
             color: #0b5e42;
         }
         
-        .test-info {
-            margin-top: 25px;
-            padding: 15px;
-            background: #f0f9f4;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            color: #2c3e50;
-            border-left: 4px solid #0b5e42;
-        }
-        
-        .test-info strong {
-            color: #0b5e42;
-            display: block;
-            margin-bottom: 8px;
-        }
-        
-        .test-info p {
-            margin-bottom: 5px;
-        }
-        
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -290,14 +270,14 @@ unset($_SESSION['email_tentativa']);
                 <?php if ($erro): ?>
                     <div class="alert alert-error">
                         <i class="fas fa-exclamation-circle"></i>
-                        <?php echo htmlspecialchars($erro); ?>
+                        <?php echo $erro; ?>
                     </div>
                 <?php endif; ?>
-                
+
                 <?php if ($sucesso): ?>
                     <div class="alert alert-success">
                         <i class="fas fa-check-circle"></i>
-                        <?php echo htmlspecialchars($sucesso); ?>
+                        <?php echo $sucesso; ?>
                     </div>
                 <?php endif; ?>
                 
@@ -345,16 +325,13 @@ unset($_SESSION['email_tentativa']);
                 
                 <!-- Links -->
                 <div class="links">
+                    <a href="/penomato_mvp/src/Views/auth/recuperar_senha.php">
+                        <i class="fas fa-key"></i> Esqueceu sua senha?
+                    </a>
+                    &nbsp;·&nbsp;
                     <a href="/penomato_mvp/src/Views/auth/cadastro.php">
                         <i class="fas fa-user-plus"></i> Criar nova conta
                     </a>
-                </div>
-                
-                <!-- Informações de teste -->
-                <div class="test-info">
-                    <strong><i class="fas fa-flask"></i> Ambiente de Teste</strong>
-                    <p><i class="fas fa-envelope" style="width: 20px;"></i> admin@penomato.com</p>
-                    <p><i class="fas fa-lock" style="width: 20px;"></i> 123456</p>
                 </div>
                 
                 <!-- Link voltar -->
