@@ -1670,76 +1670,162 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     <button type="button" class="btn btn-copy" id="btn_copiar_prompt" onclick="copiarPrompt()">📋 Copiar Prompt</button>
                 </div>
                 <div class="prompt-content" id="prompt-display"><?php
-$prompt_especie = $nome_cientifico;
-echo htmlspecialchars('Você é um especialista em botânica tropical brasileira. Preciso das características morfológicas de "' . $prompt_especie . '" para um banco de dados científico.
+echo htmlspecialchars(
+'Você é um especialista em botânica sistemática. Preencha o JSON abaixo com as características botânicas da espécie indicada.
 
-Retorne SOMENTE um JSON válido com os campos abaixo. Para campos de seleção, use exatamente um dos valores indicados entre barras. Use "" para campos desconhecidos.
+ESPÉCIE-ALVO: ' . $nome_cientifico . '
+
+REGRAS OBRIGATÓRIAS — leia antes de responder:
+
+1. FORMATO DE SAÍDA: Responda APENAS com o JSON preenchido, sem nenhum texto antes ou depois, sem blocos de código markdown (sem ```json), sem comentários.
+
+2. ESTRUTURA: O JSON de saída deve ser PLANO (flat), com todos os campos no mesmo nível — sem seções aninhadas como "folha", "flor", "fruto" etc. Siga exatamente a estrutura do EXEMPLO DE SAÍDA abaixo.
+
+3. CAMPOS DE SELEÇÃO: Para cada campo de seleção, escreva APENAS a string exata da opção escolhida, sem nenhum wrapper. Escolha somente entre as opções listadas. NUNCA use valor fora da lista.
+
+4. CAMPOS MÚLTIPLOS (sinonimos, nome_popular): Use uma única string com os valores separados por vírgula e espaço. Ex: "Valor A, Valor B, Valor C"
+
+5. CAMPO referencias: Use uma única string com cada referência separada por \n, no formato:
+   N. SOBRENOME, Nome. Título. Local: Editora, Ano.
+
+6. CAMPOS _ref: String com números separados por vírgula. Ex: "1,3". Se sem referência, use string vazia "".
+
+7. CAMPOS OPCIONAIS INAPLICÁVEIS: Use string vazia "" (ex: modificacao_caule quando a espécie não possui modificação caulinar).
+
+8. DADOS AUSENTES: Se a informação não puder ser confirmada com segurança por uma fonte bibliográfica, use "Não informado" para campos de seleção e "" para campos livres. NUNCA invente ou suponha dados.
+
+9. especie_id deve conter EXATAMENTE o nome científico da espécie: ' . $nome_cientifico . '
+
+---
+
+CAMPOS DE SELEÇÃO E SUAS OPÇÕES VÁLIDAS:
+
+forma_folha: Acicular | Cordiforme | Elíptica | Lanceolada | Linear | Lobada | Obovada | Orbicular | Oval | Ovalada | Palmada | Reniforme | Sagitada | Trifoliada
+filotaxia_folha: Alterna | Alterna dística | Alterna espiralada | Oposta | Oposta decussada | Rosulada | Verticilada
+tipo_folha: Simples | Composta bipinada | Composta digitada | Composta imparipinada | Composta paripinada | Composta pinnada | Composta trifoliada | Composta tripinada
+tamanho_folha: Microfila | Nanofila | Mesofila | Macrofila | Megafila
+textura_folha: Cartácea | Coriácea | Glabra | Membranácea | Pilosa | Pubescente | Rugosa | Suculenta | Tomentosa | Cerosa
+margem_folha: Crenada | Dentada | Inteira | Lobada | Ondulada | Serreada | Serrilhada | Partida
+venacao_folha: Curvinérvea | Dicotômica | Paralela | Peninérvea | Reticulada palmada | Reticulada pinada
+cor_flores: Alaranjada | Amarela | Avermelhada | Azul | Branca | Esverdeada | Lilás | Púrpura | Rósea | Roxa | Vermelha | Vinácea
+simetria_floral: Actinomorfa | Zigomorfa | Assimétrica
+numero_petalas: 3 pétalas | 4 pétalas | 5 pétalas | 6 pétalas | Muitas pétalas | Ausentes
+disposicao_flores: Solitária | Capítulo | Cacho | Corimbo | Espádice | Espiga | Panícula | Umbela
+aroma: Ausente | Suave | Forte | Desagradável | Adocicada | Cítrica
+tamanho_flor: Muito pequena | Pequena | Média | Grande | Muito grande
+tipo_fruto: Aquênio | Baga | Cápsula | Drupa | Folículo | Legume | Pixídio | Sâmara | Síliqua | Cariopse | Hespéridio | Pepo
+tamanho_fruto: Minúsculo | Pequeno | Médio | Grande | Muito grande
+cor_fruto: Alaranjado | Amarelo | Avermelhado | Branco | Esverdeado | Marrom | Preto | Roxo | Verde | Vináceo
+textura_fruto: Lisa | Rugosa | Coriácea | Pubescente | Pilosa | Espinhosa | Cerosa | Tuberculada
+dispersao_fruto: Anemocórica | Autocórica | Hidrocórica | Zoocórica | Mirmecocórica | Ornitocórica
+aroma_fruto: Ausente | Suave | Forte | Adocicado | Cítrico | Desagradável
+tipo_semente: Alada | Carnosa | Dura | Oleaginosa | Plumosa | Ruminada | Arilada
+tamanho_semente: Minúscula | Muito pequena | Pequena | Média | Grande | Muito grande
+cor_semente: Amarela | Branca | Castanha | Cinza | Marrom | Preta | Vermelha | Alaranjada
+textura_semente: Lisa | Rugosa | Estriada | Pontuada | Foveolada | Reticulada | Tuberculada
+quantidade_sementes: 1 | 2–3 | 4–10 | 11–50 | > 50
+tipo_caule: Ereto | Prostrado | Escandente | Trepador | Rastejante | Subterrâneo
+estrutura_caule: Herbáceo | Lenhoso | Suculento | Sublenhoso
+textura_caule: Lisa | Rugosa | Fissurada | Sulcada | Estriada | Escamosa | Suberosa | Aculeada
+cor_caule: Acinzentado | Alaranjado | Avermelhado | Esbranquiçado | Esverdeado | Marrom | Pardacento
+forma_caule: Cilíndrico | Quadrangular | Triangular | Achatado | Alado | Irregular
+modificacao_caule: Cladódio | Espinho | Estolão | Gavinha | Rizoma | Tubérculo | Bulbo
+diametro_caule: Capilar | Delgado | Fino | Médio | Grosso | Muito grosso
+ramificacao_caule: Monopodial | Simpodial | Dicotômica | Pseudodicotômica
+possui_espinhos: Sim | Não | Não informado
+possui_latex: Sim | Não | Não informado
+possui_seiva: Sim | Não | Não informado
+possui_resina: Sim | Não | Não informado
+
+---
+
+ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
 
 {
-  "nome_cientifico_completo": "Nome completo com autor e ano",
-  "sinonimos": "Sinônimos separados por vírgula",
-  "nome_popular": "Nomes populares no Brasil",
-  "familia": "Família botânica",
-
-  "forma_folha": "Lanceolada | Linear | Elíptica | Oval | Orbicular | Cordiforme | Espatulada | Sagitada | Reniforme | Obovada | Trilobada | Palmada | Lobada",
-  "filotaxia_folha": "Alterna | Oposta Simples | Oposta Decussada | Verticilada | Rosetada | Dística | Espiralada",
-  "tipo_folha": "Simples | Composta pinnada | Composta bipinada | Composta tripinada | Composta tetrapinada",
-  "tamanho_folha": "Microfilos (< 2 cm) | Nanofilos (2–7 cm) | Mesofilos (7–20 cm) | Macrófilos (20–50 cm) | Megafilas (> 50 cm)",
-  "textura_folha": "Coriácea | Cartácea | Membranácea | Suculenta | Pilosa | Glabra | Rugosa | Cerosa",
-  "margem_folha": "Inteira | Serrada | Dentada | Crenada | Ondulada | Lobada | Partida | Revoluta | Involuta",
-  "venacao_folha": "Reticulada Pinnada | Reticulada Palmada | Paralela | Peninérvea | Dicotômica | Curvinérvea",
-
-  "cor_flores": "Brancas | Amarelas | Vermelhas | Rosadas | Roxas | Azuis | Laranjas | Verdes",
-  "simetria_floral": "Actinomorfa | Zigomorfa | Assimétrica",
-  "numero_petalas": "3 pétalas | 4 pétalas | 5 pétalas | Muitas pétalas",
-  "disposicao_flores": "Isoladas | Inflorescência",
-  "aroma": "Sem cheiro | Aroma suave | Aroma forte | Aroma desagradável",
-  "tamanho_flor": "Pequena | Média | Grande",
-
-  "tipo_fruto": "Baga | Drupa | Cápsula | Folículo | Legume | Síliqua | Aquênio | Sâmara | Cariopse | Pixídio | Hespéridio | Pepo",
-  "tamanho_fruto": "Pequeno | Médio | Grande",
-  "cor_fruto": "Verde | Amarelo | Vermelho | Roxo | Laranja | Marrom | Preto | Branco",
-  "textura_fruto": "Lisa | Rugosa | Coriácea | Peluda | Espinhosa | Cerosa",
-  "dispersao_fruto": "Zoocórica | Anemocórica | Hidrocórica | Autocórica",
-  "aroma_fruto": "Sem cheiro | Aroma suave | Aroma forte | Aroma desagradável",
-
-  "tipo_semente": "Alada | Carnosa | Dura | Oleosa | Peluda",
-  "tamanho_semente": "Pequena | Média | Grande",
-  "cor_semente": "Preta | Marrom | Branca | Amarela | Verde",
-  "textura_semente": "Lisa | Rugosa | Estriada | Cerosa",
-  "quantidade_sementes": "Uma | Poucas | Muitas",
-
-  "tipo_caule": "Ereto | Prostrado | Rastejante | Trepador | Subterrâneo",
-  "estrutura_caule": "Lenhoso | Herbáceo | Suculento",
-  "textura_caule": "Lisa | Rugosa | Sulcada | Fissurada | Cerosa | Espinhosa | Suberosa",
-  "cor_caule": "Marrom | Verde | Cinza | Avermelhado | Alaranjado",
-  "forma_caule": "Cilíndrico | Quadrangular | Achatado | Irregular",
-  "modificacao_caule": "Estolão | Cladódio | Rizoma | Tubérculo | Espinhos",
-  "diametro_caule": "Fino | Médio | Grosso",
-  "ramificacao_caule": "Dicotômica | Monopodial | Simpodial",
-
-  "possui_espinhos": "Sim | Não",
-  "possui_latex": "Sim | Não",
-  "possui_seiva": "Sim | Não",
-  "possui_resina": "Sim | Não",
-
-  "referencias": "1. Fonte principal\n2. Fonte secundária",
-  "nome_cientifico_completo_ref": "[1]",
-  "sinonimos_ref": "[1]", "nome_popular_ref": "[1]", "familia_ref": "[1]",
-  "forma_folha_ref": "[1]", "filotaxia_folha_ref": "[1]", "tipo_folha_ref": "[1]",
-  "tamanho_folha_ref": "[1]", "textura_folha_ref": "[1]", "margem_folha_ref": "[1]",
-  "venacao_folha_ref": "[1]", "cor_flores_ref": "[1]", "simetria_floral_ref": "[1]",
-  "numero_petalas_ref": "[1]", "disposicao_flores_ref": "[1]", "aroma_ref": "[1]",
-  "tamanho_flor_ref": "[1]", "tipo_fruto_ref": "[1]", "tamanho_fruto_ref": "[1]",
-  "cor_fruto_ref": "[1]", "textura_fruto_ref": "[1]", "dispersao_fruto_ref": "[1]",
-  "aroma_fruto_ref": "[1]", "tipo_semente_ref": "[1]", "tamanho_semente_ref": "[1]",
-  "cor_semente_ref": "[1]", "textura_semente_ref": "[1]", "quantidade_sementes_ref": "[1]",
-  "tipo_caule_ref": "[1]", "estrutura_caule_ref": "[1]", "textura_caule_ref": "[1]",
-  "cor_caule_ref": "[1]", "forma_caule_ref": "[1]", "modificacao_caule_ref": "[1]",
-  "diametro_caule_ref": "[1]", "ramificacao_caule_ref": "[1]",
-  "possui_espinhos_ref": "[1]", "possui_latex_ref": "[1]",
-  "possui_seiva_ref": "[1]", "possui_resina_ref": "[1]"
-}');
+  "especie_id": "' . $nome_cientifico . '",
+  "nome_cientifico_completo": "",
+  "nome_cientifico_completo_ref": "",
+  "sinonimos": "",
+  "sinonimos_ref": "",
+  "nome_popular": "",
+  "nome_popular_ref": "",
+  "familia": "",
+  "familia_ref": "",
+  "forma_folha": "",
+  "forma_folha_ref": "",
+  "filotaxia_folha": "",
+  "filotaxia_folha_ref": "",
+  "tipo_folha": "",
+  "tipo_folha_ref": "",
+  "tamanho_folha": "",
+  "tamanho_folha_ref": "",
+  "textura_folha": "",
+  "textura_folha_ref": "",
+  "margem_folha": "",
+  "margem_folha_ref": "",
+  "venacao_folha": "",
+  "venacao_folha_ref": "",
+  "cor_flores": "",
+  "cor_flores_ref": "",
+  "simetria_floral": "",
+  "simetria_floral_ref": "",
+  "numero_petalas": "",
+  "numero_petalas_ref": "",
+  "disposicao_flores": "",
+  "disposicao_flores_ref": "",
+  "aroma": "",
+  "aroma_ref": "",
+  "tamanho_flor": "",
+  "tamanho_flor_ref": "",
+  "tipo_fruto": "",
+  "tipo_fruto_ref": "",
+  "tamanho_fruto": "",
+  "tamanho_fruto_ref": "",
+  "cor_fruto": "",
+  "cor_fruto_ref": "",
+  "textura_fruto": "",
+  "textura_fruto_ref": "",
+  "dispersao_fruto": "",
+  "dispersao_fruto_ref": "",
+  "aroma_fruto": "",
+  "aroma_fruto_ref": "",
+  "tipo_semente": "",
+  "tipo_semente_ref": "",
+  "tamanho_semente": "",
+  "tamanho_semente_ref": "",
+  "cor_semente": "",
+  "cor_semente_ref": "",
+  "textura_semente": "",
+  "textura_semente_ref": "",
+  "quantidade_sementes": "",
+  "quantidade_sementes_ref": "",
+  "tipo_caule": "",
+  "tipo_caule_ref": "",
+  "estrutura_caule": "",
+  "estrutura_caule_ref": "",
+  "textura_caule": "",
+  "textura_caule_ref": "",
+  "cor_caule": "",
+  "cor_caule_ref": "",
+  "forma_caule": "",
+  "forma_caule_ref": "",
+  "modificacao_caule": "",
+  "modificacao_caule_ref": "",
+  "diametro_caule": "",
+  "diametro_caule_ref": "",
+  "ramificacao_caule": "",
+  "ramificacao_caule_ref": "",
+  "possui_espinhos": "",
+  "possui_espinhos_ref": "",
+  "possui_latex": "",
+  "possui_latex_ref": "",
+  "possui_seiva": "",
+  "possui_seiva_ref": "",
+  "possui_resina": "",
+  "possui_resina_ref": "",
+  "referencias": ""
+}'
+);
                 ?></div>
             </div>
 
