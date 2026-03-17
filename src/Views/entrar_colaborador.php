@@ -1,529 +1,293 @@
 <?php
-// ============================================================
-// ENTRAR COLABORADOR - PAINEL DO COLABORADOR
-// ============================================================
-
-// Iniciar sessão
 session_start();
 
-// Verificar se usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: /penomato_mvp/src/Views/auth/login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
     exit;
 }
 
-// Pegar dados do usuário
-$id_usuario = $_SESSION['usuario_id'];
-$nome_usuario = $_SESSION['usuario_nome'] ?? 'Colaborador';
-$tipo_usuario = $_SESSION['usuario_tipo'] ?? 'colaborador';
-$email_usuario = $_SESSION['usuario_email'] ?? '';
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
-// Mensagens de boas-vindas baseadas na hora
-$hora = date('H');
-if ($hora >= 5 && $hora < 12) {
-    $saudacao = "Bom dia";
-} elseif ($hora >= 12 && $hora < 18) {
-    $saudacao = "Boa tarde";
+$nome_usuario  = $_SESSION['usuario_nome']    ?? 'Colaborador';
+$subtipo       = strtolower(trim($_SESSION['usuario_subtipo'] ?? ''));
+$email_usuario = $_SESSION['usuario_email']   ?? '';
+$usuario_id    = $_SESSION['usuario_id'];
+
+// ================================================
+// ESTATÍSTICAS PESSOAIS
+// ================================================
+$qtd_internet  = $pdo->prepare("SELECT COUNT(*) FROM especies_administrativo WHERE autor_dados_internet_id = ?");
+$qtd_internet->execute([$usuario_id]);
+$total_internet = $qtd_internet->fetchColumn();
+
+$qtd_registrada = $pdo->prepare("SELECT COUNT(*) FROM especies_administrativo WHERE autor_registrada_id = ?");
+$qtd_registrada->execute([$usuario_id]);
+$total_registrada = $qtd_registrada->fetchColumn();
+
+$qtd_revisada = $pdo->prepare("SELECT COUNT(*) FROM especies_administrativo WHERE autor_revisada_id = ?");
+$qtd_revisada->execute([$usuario_id]);
+$total_revisada = $qtd_revisada->fetchColumn();
+
+// ================================================
+// MAPA DE BOTÕES
+// ================================================
+$todos_botoes = [
+    'dados_internet' => [
+        'icon'  => '🌐',
+        'label' => 'Dados da Internet',
+        'desc'  => 'Importe dados científicos via JSON (Flora do Brasil, Lorenzi, etc.)',
+        'link'  => '/penomato_mvp/src/Views/escolher_especie.php',
+    ],
+    'confirmar' => [
+        'icon'  => '✅',
+        'label' => 'Confirmar Identificação',
+        'desc'  => 'Verifique e confirme as informações vindas da internet antes de registrá-las.',
+        'link'  => '/penomato_mvp/src/Controllers/confirmar_caracteristicas.php',
+    ],
+    'registrar_imagens' => [
+        'icon'  => '📷',
+        'label' => 'Registrar Imagens',
+        'desc'  => 'Envie exsicatas digitais e fotos de habitat para o acervo científico.',
+        'link'  => '/penomato_mvp/src/Views/enviar_imagem.php',
+    ],
+    'contestar' => [
+        'icon'  => '⚠️',
+        'label' => 'Contestar Informação',
+        'desc'  => 'Sinalize inconsistências ou sugira correções em dados existentes.',
+        'link'  => '#em-breve',
+        'breve' => true,
+    ],
+    'dev_tools' => [
+        'icon'  => '⚙️',
+        'label' => 'Ferramentas DEV',
+        'desc'  => 'Acesso a documentação técnica, logs e ferramentas de desenvolvimento.',
+        'link'  => '#em-breve',
+        'breve' => true,
+    ],
+    'revisar_artigo' => [
+        'icon'  => '📝',
+        'label' => 'Revisar Artigo',
+        'desc'  => 'Revise e aprove artigos científicos antes da publicação.',
+        'link'  => '#em-breve',
+        'breve' => true,
+    ],
+];
+
+// Permissões por subtipo
+$permissoes = [
+    'identificador' => ['dados_internet', 'confirmar', 'registrar_imagens'],
+    'dev'           => ['dados_internet', 'dev_tools'],
+    'especialista'  => ['dados_internet', 'confirmar', 'registrar_imagens', 'contestar', 'revisar_artigo'],
+    'gestor'        => ['dados_internet', 'confirmar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools'],
+];
+
+// Gestor (por categoria ou subtipo) acessa tudo
+$tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
+if ($tipo_usuario === 'gestor' || $subtipo === 'gestor') {
+    $chaves_visiveis = array_keys($todos_botoes);
 } else {
-    $saudacao = "Boa noite";
+    $chaves_visiveis = $permissoes[$subtipo] ?? ['dados_internet', 'confirmar', 'registrar_imagens'];
 }
+
+// Labels de exibição dos subtipos
+$labels_subtipo = [
+    'identificador' => 'Identificador',
+    'dev'           => 'Desenvolvedor',
+    'especialista'  => 'Especialista',
+    'gestor'        => 'Gestor de Equipe',
+];
+$label_subtipo = $labels_subtipo[$subtipo] ?? ucfirst($subtipo ?: 'Colaborador');
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Colaborador - Penomato</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Painel do Colaborador — Penomato</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f2e9 0%, #e8e2d4 100%);
+            background: #f0f4f0;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 30px 20px;
+            color: #1e2e1e;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Cabeçalho */
         .header {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            border-left: 8px solid #0b5e42;
-        }
-
-        .header-info h1 {
-            color: #0b5e42;
-            font-size: 2rem;
-            margin-bottom: 5px;
-        }
-
-        .header-info p {
-            color: #666;
-            font-size: 1.1rem;
-        }
-
-        .header-info i {
-            color: #0b5e42;
-            margin-right: 8px;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            background: #f8f9fa;
-            padding: 15px 25px;
-            border-radius: 50px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .user-avatar {
-            width: 60px;
-            height: 60px;
-            background: #0b5e42;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.8rem;
-        }
-
-        .user-details h4 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .user-details span {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .user-details i {
-            color: #0b5e42;
-            margin-right: 5px;
-        }
-
-        .badge-colaborador {
             background: #0b5e42;
             color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        /* Cards de opções */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .option-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 30px;
-            text-align: center;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .option-card:hover {
-            transform: translateY(-5px);
-            border-color: #0b5e42;
-            box-shadow: 0 20px 40px rgba(11,94,66,0.2);
-        }
-
-        .option-card:hover .option-icon {
-            transform: scale(1.1);
-        }
-
-        .option-icon {
-            font-size: 3.5rem;
-            color: #0b5e42;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-
-        .option-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .option-desc {
-            color: #666;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .option-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #ffc107;
-            color: #2c3e50;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .option-badge.dev {
-            background: #6c757d;
-            color: white;
-        }
-
-        /* Estatísticas */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            background: #e8f5e9;
+            padding: 20px 40px;
             border-radius: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+            width: 100%;
+            max-width: 640px;
+        }
+        .header h1 { font-size: 1.4em; font-weight: 600; }
+        .header p  { font-size: 0.88em; opacity: 0.8; margin-top: 4px; }
+
+        /* Badge de subtipo */
+        .subtipo-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 3px 12px;
+            font-size: 0.8em;
+            margin-top: 8px;
+            letter-spacing: 0.03em;
+        }
+
+        /* Stats rápidas */
+        .stats-bar {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0b5e42;
-            font-size: 1.5rem;
-        }
-
-        .stat-info h3 {
-            font-size: 1.5rem;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .stat-info p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        /* Atividades recentes */
-        .recent-section {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .recent-title {
-            display: flex;
-            align-items: center;
             gap: 10px;
             margin-bottom: 20px;
-            color: #0b5e42;
-            font-size: 1.3rem;
-            font-weight: 600;
+            width: 100%;
+            max-width: 640px;
         }
-
-        .recent-list {
-            list-style: none;
-        }
-
-        .recent-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .recent-item:last-child {
-            border-bottom: none;
-        }
-
-        .recent-icon {
-            width: 40px;
-            height: 40px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0b5e42;
-        }
-
-        .recent-content {
+        .stat-chip {
             flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .stat-chip .num { font-size: 1.5em; font-weight: 700; color: #0b5e42; line-height: 1; }
+        .stat-chip .lbl { font-size: 0.72em; color: #999; margin-top: 3px; }
+
+        /* Grade de botões */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            width: 100%;
+            max-width: 640px;
         }
 
-        .recent-content h4 {
-            font-size: 1rem;
-            margin-bottom: 5px;
-        }
-
-        .recent-content p {
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .recent-time {
-            color: #999;
-            font-size: 0.8rem;
-        }
-
-        /* Botões de ação */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .btn-action {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
+        .action-btn {
+            background: white;
+            border: 2px solid #0b5e42;
+            border-radius: 12px;
+            padding: 22px 16px;
+            text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: #0b5e42;
+            font-size: 0.9em;
             text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            display: block;
+            position: relative;
         }
-
-        .btn-primary {
+        .action-btn:hover {
             background: #0b5e42;
             color: white;
-            box-shadow: 0 4px 10px rgba(11,94,66,0.3);
-        }
-
-        .btn-primary:hover {
-            background: #0a4c35;
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(11,94,66,0.4);
+            box-shadow: 0 6px 16px rgba(11,94,66,0.2);
+        }
+        .action-btn .icon { font-size: 1.8em; margin-bottom: 8px; display: block; }
+        .action-btn .desc {
+            font-size: 0.78em;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-top: 4px;
+            line-height: 1.35;
         }
 
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-            box-shadow: 0 4px 10px rgba(220,53,69,0.3);
+        .action-btn.em-breve {
+            border-color: #ccc;
+            color: #aaa;
+            cursor: default;
+        }
+        .action-btn.em-breve:hover {
+            background: white;
+            color: #aaa;
+            transform: none;
+            box-shadow: none;
+        }
+        .badge-breve {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #e0e0e0;
+            color: #888;
+            font-size: 0.68em;
+            padding: 2px 7px;
+            border-radius: 8px;
+            font-weight: 600;
         }
 
-        .btn-danger:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(220,53,69,0.4);
+        .btn-sair {
+            margin-top: 24px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 0.9em;
+            cursor: pointer;
+            text-decoration: underline;
         }
+        .btn-sair:hover { color: #dc3545; }
 
-        .footer {
-            text-align: center;
-            color: #718096;
-            font-size: 0.9rem;
-            margin-top: 40px;
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .user-profile {
-                width: 100%;
-                justify-content: center;
-            }
+        @media (max-width: 480px) {
+            .btn-grid { grid-template-columns: 1fr; }
+            .stats-bar { flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        
-        <!-- Cabeçalho com saudação -->
-        <div class="header">
-            <div class="header-info">
-                <h1><i class="fas fa-hand-peace"></i> <?php echo $saudacao; ?>, <?php echo htmlspecialchars(explode(' ', $nome_usuario)[0]); ?>!</h1>
-                <p><i class="fas fa-tachometer-alt"></i> Painel do Colaborador</p>
-            </div>
-            
-            <div class="user-profile">
-                <div class="user-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="user-details">
-                    <h4><?php echo htmlspecialchars($nome_usuario); ?></h4>
-                    <span><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($email_usuario); ?></span>
-                    <div class="badge-colaborador" style="margin-top: 5px;">
-                        <i class="fas fa-user-tag"></i> Colaborador
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Estatísticas rápidas -->
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-pen-fancy"></i></div>
-                <div class="stat-info">
-                    <h3>0</h3>
-                    <p>Características descritas</p>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-camera"></i></div>
-                <div class="stat-info">
-                    <h3>0</h3>
-                    <p>Imagens enviadas</p>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-check-double"></i></div>
-                <div class="stat-info">
-                    <h3>0</h3>
-                    <p>Revisões realizadas</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Grid de opções principais -->
-        <div class="options-grid">
-            
-            <!-- Confirmar identificação -->
-            <a href="/penomato_mvp/src/Controllers/confirmar_caracteristicas.php" class="option-card">
-                <div class="option-icon"><i class="fas fa-clipboard-check"></i></div>
-                <h3 class="option-title">CONFIRMAR IDENTIFICAÇÃO</h3>
-                <p class="option-desc">
-                    Verifique e confirme as informações provenientes da internet antes de registrá-las no sistema.
-                </p>
-            </a>
-            
-            <!-- Registrar imagens -->
-            <a href="/penomato_mvp/src/Views/enviar_imagem.php" class="option-card">
-                <div class="option-icon"><i class="fas fa-camera"></i></div>
-                <h3 class="option-title">REGISTRAR IMAGENS</h3>
-                <p class="option-desc">
-                    Envie exsicatas digitais e imagens de habitat para compor o acervo científico.
-                </p>
-            </a>
-            
-            <!-- ================================================ -->
-            <!-- Dados da Internet - LINK CORRIGIDO -->
-            <!-- ================================================ -->
-            <a href="/penomato_mvp/src/Views/escolher_especie.php" class="option-card">
-                <div class="option-icon"><i class="fas fa-globe"></i></div>
-                <h3 class="option-title">DADOS DA INTERNET</h3>
-                <p class="option-desc">
-                    Importe dados de fontes científicas via JSON (Flora do Brasil, Lorenzi, etc.).
-                </p>
-                <span class="option-badge"><i class="fas fa-star"></i> NOVO</span>
-            </a>
-            
-            <!-- DEV (Em desenvolvimento) -->
-            <div class="option-card" onclick="if(confirm('🚧 Esta funcionalidade está em desenvolvimento. Deseja ser notificado quando estiver pronta?')){}">
-                <div class="option-icon"><i class="fas fa-code"></i></div>
-                <h3 class="option-title">DEV</h3>
-                <p class="option-desc">
-                    Acesso a ferramentas de desenvolvimento e documentação técnica da API.
-                </p>
-                <span class="option-badge dev"><i class="fas fa-tools"></i> EM BREVE</span>
-            </div>
-            
-            <!-- Contestar informação -->
-            <div class="option-card" onclick="if(confirm('🚧 Esta funcionalidade está em desenvolvimento. Deseja ser notificado quando estiver pronta?')){}">
-                <div class="option-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                <h3 class="option-title">CONTESTAR INFORMAÇÃO</h3>
-                <p class="option-desc">
-                    Sugira correções para dados existentes ou reporte inconsistências.
-                </p>
-                <span class="option-badge dev"><i class="fas fa-tools"></i> EM BREVE</span>
-            </div>
-            
-            <!-- Validar informações -->
-            <div class="option-card" onclick="if(confirm('🚧 Esta funcionalidade está em desenvolvimento. Deseja ser notificado quando estiver pronta?')){}">
-                <div class="option-icon"><i class="fas fa-check-circle"></i></div>
-                <h3 class="option-title">VALIDAR INFORMAÇÕES</h3>
-                <p class="option-desc">
-                    Valide dados e imagens de outros colaboradores (requer permissão especial).
-                </p>
-                <span class="option-badge dev"><i class="fas fa-tools"></i> EM BREVE</span>
-            </div>
-        </div>
-        
-        <!-- Atividades recentes -->
-        <div class="recent-section">
-            <div class="recent-title">
-                <i class="fas fa-history"></i>
-                <span>Minhas atividades recentes</span>
-            </div>
-            
-            <ul class="recent-list">
-                <li class="recent-item">
-                    <div class="recent-icon"><i class="fas fa-check-circle" style="color: #28a745;"></i></div>
-                    <div class="recent-content">
-                        <h4>Bem-vindo ao Penomato!</h4>
-                        <p>Comece a contribuir com dados e imagens.</p>
-                    </div>
-                    <div class="recent-time">Agora</div>
-                </li>
-            </ul>
-        </div>
-        
-        <!-- Botões de ação -->
-        <div class="action-buttons">
-            <a href="/penomato_mvp/index.php" class="btn-action btn-primary">
-                <i class="fas fa-home"></i> Página Inicial
-            </a>
-            <a href="/penomato_mvp/src/Controllers/auth/logout_controlador.php" class="btn-action btn-danger" onclick="return confirm('Deseja realmente sair do sistema?')">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </a>
-        </div>
-        
-        <!-- Rodapé -->
-        <div class="footer">
-            <p>© 2026 Penomato - Em parceria com UEMS (Bioma Cerrado)</p>
-        </div>
-        
+
+    <div class="header">
+        <h1>🌿 Painel do Colaborador</h1>
+        <p><?php echo htmlspecialchars($nome_usuario); ?></p>
+        <?php if ($subtipo): ?>
+            <span class="subtipo-badge"><?php echo htmlspecialchars($label_subtipo); ?></span>
+        <?php endif; ?>
     </div>
+
+    <!-- Stats pessoais -->
+    <div class="stats-bar">
+        <div class="stat-chip">
+            <div class="num"><?php echo $total_internet; ?></div>
+            <div class="lbl">Dados internet</div>
+        </div>
+        <div class="stat-chip">
+            <div class="num"><?php echo $total_registrada; ?></div>
+            <div class="lbl">Registradas</div>
+        </div>
+        <div class="stat-chip">
+            <div class="num"><?php echo $total_revisada; ?></div>
+            <div class="lbl">Revisadas</div>
+        </div>
+    </div>
+
+    <!-- Botões conforme subtipo -->
+    <div class="btn-grid">
+        <?php foreach ($chaves_visiveis as $chave):
+            $b = $todos_botoes[$chave];
+            $breve = !empty($b['breve']);
+        ?>
+        <a href="<?php echo $breve ? '#' : $b['link']; ?>"
+           class="action-btn<?php echo $breve ? ' em-breve' : ''; ?>"
+           <?php echo $breve ? 'onclick="return false;"' : ''; ?>>
+            <?php if ($breve): ?>
+                <span class="badge-breve">Em breve</span>
+            <?php endif; ?>
+            <span class="icon"><?php echo $b['icon']; ?></span>
+            <?php echo htmlspecialchars($b['label']); ?>
+            <div class="desc"><?php echo htmlspecialchars($b['desc']); ?></div>
+        </a>
+        <?php endforeach; ?>
+    </div>
+
+    <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
+        🚪 Sair
+    </button>
+
 </body>
 </html>

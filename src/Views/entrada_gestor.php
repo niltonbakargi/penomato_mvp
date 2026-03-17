@@ -202,6 +202,18 @@
             <span class="icon">📋</span>
             Gestão de Espécies
         </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/aprovacao_acoes.php'">
+            <span class="icon">✅</span>
+            Aprovação de Ações
+        </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/monitoramento.php'">
+            <span class="icon">📡</span>
+            Monitoramento
+        </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/relatorio_colaboradores.php'">
+            <span class="icon">📊</span>
+            Relatório de Colaboradores
+        </div>
         <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Views/entrar_colaborador.php'">
             <span class="icon">👤</span>
             Perfil Colaborador
