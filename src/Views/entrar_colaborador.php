@@ -54,8 +54,7 @@ $todos_botoes = [
         'icon'  => '⚠️',
         'label' => 'Contestar Informação',
         'desc'  => 'Sinalize inconsistências ou sugira correções em dados existentes.',
-        'link'  => '#em-breve',
-        'breve' => true,
+        'link'  => '/penomato_mvp/src/Controllers/contestar_informacao.php',
     ],
     'dev_tools' => [
         'icon'  => '⚙️',
