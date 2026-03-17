@@ -1,5 +1,5 @@
 <?php
-// ================================================
+// ==============================src\Controllers\inserir_dados_internet.php==================
 // INSERIR DADOS INTERNET - VERSÃO MODIFICADA
 // AGORA É A TERCEIRA TELA (depois das imagens)
 // ================================================
@@ -162,6 +162,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
     <title>Penomato - Importar Dados da Espécie</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ── Planilha de campos ── */
+        .section-title {
+            background: #0b5e42;
+            color: #fff;
+            padding: 9px 14px;
+            margin: 24px 0 14px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+            align-items: flex-start;
+        }
+        .main-input { flex: 2; }
+        .ref-col    { flex: 1; }
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.88em;
+            margin-bottom: 4px;
+            color: #2d3d2d;
+        }
+        .input-group label .subtext { font-weight: normal; font-size: 0.9em; color: #666; }
+        .info-text { font-size: 0.78em; color: #666; margin-top: 3px; }
+        .input-group select,
+        .input-group input[type="text"],
+        .input-group textarea {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-family: inherit;
+            transition: border-color 0.15s;
+        }
+        .input-group select:focus,
+        .input-group input[type="text"]:focus,
+        .input-group textarea:focus { border-color: #0b5e42; outline: none; }
+        .input-group textarea { resize: vertical; }
+        .auto-filled { border-color: #0b5e42 !important; background: #f0faf5; }
+        .ref-wrapper { display: flex; gap: 5px; align-items: center; }
+        .ref-wrapper input { flex: 1; }
+        .confirm-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 5px;
+            border: 2px solid #ccc; background: #f8f9fa; color: #ccc;
+            font-size: 1.1em; font-weight: 700; flex-shrink: 0;
+            cursor: pointer; padding: 0; line-height: 1; user-select: none;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .confirm-btn:hover { border-color: #0b5e42; color: #0b5e42; }
+        .confirm-btn.confirmed { background: #0b5e42; border-color: #0b5e42; color: #fff; }
+        /* ── Prompt box ── */
+        .prompt-box {
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            border-radius: 10px; padding: 18px 20px; margin-bottom: 24px;
+        }
+        .prompt-box-header {
+            display: flex; align-items: center;
+            justify-content: space-between; margin-bottom: 12px;
+        }
+        .prompt-box-title { font-weight: 600; color: #2d3d2d; font-size: 0.95rem; }
+        .prompt-content {
+            background: white; border: 1px solid #e2e8f0; border-radius: 6px;
+            padding: 14px; font-family: 'Courier New', monospace; font-size: 0.75rem;
+            color: #374151; max-height: 200px; overflow-y: auto;
+            white-space: pre-wrap; word-break: break-word; line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .prompt-placeholder { color: #aaa; font-style: italic; font-family: inherit; font-size: 0.88rem; }
+        .btn-copy { background: #17a2b8; color: white; }
+        .btn-copy:hover { background: #138496; transform: translateY(-1px); }
+        .btn-copy.copied { background: #0b5e42; }
+        .ai-section-header {
+            font-size: 1.1rem; font-weight: 700; color: #0b5e42;
+            margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+        }
+        .ai-section-sub { color: #666; font-size: 0.88rem; margin-bottom: 20px; }
         * {
             margin: 0;
             padding: 0;
@@ -761,7 +842,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
 </head>
 <body>
     <div class="container">
-        
+
         <!-- Informações do usuário logado -->
         <div class="user-info">
             <i class="fas fa-user-circle"></i>
@@ -770,109 +851,918 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                 <i class="fas fa-sign-out-alt"></i> Sair
             </a>
         </div>
-        
+
         <div class="paper-header">
-            <h1>
-                <span>📄</span>
-                PENOMATO • IMPORTAR DADOS
-            </h1>
-            <div class="subtitle">
-                PASSO 3: Cole o JSON com as características morfológicas
-            </div>
+            <h1><span>📄</span> PENOMATO • IMPORTAR DADOS</h1>
+            <div class="subtitle">PASSO 3: Preencha as características morfológicas manualmente ou use a pesquisa por IA abaixo</div>
         </div>
-        
+
         <?php if (isset($erro)): ?>
             <div class="alert alert-danger">❌ <?php echo $erro; ?></div>
         <?php endif; ?>
-        
+
         <!-- Informação da espécie atual -->
         <div class="current-species">
             <i class="fas fa-tree"></i>
             <h2><?php echo htmlspecialchars($nome_cientifico); ?></h2>
             <span>ID: <?php echo $especie_id; ?></span>
         </div>
-        
+
+        <!-- ══════════════════════════════════════════
+             PLANILHA MANUAL
+        ══════════════════════════════════════════ -->
         <div class="paper-card">
-            
-            <div class="json-import-area">
-                <h3>
-                    <span>📋</span>
-                    Cole o JSON com os dados morfológicos
-                </h3>
-                <textarea id="json_input" rows="6" placeholder='{
-    "nome_cientifico_completo": "Mauritia flexuosa L.f.",
-    "familia": "Arecaceae",
-    "forma_folha": "Palmada",
-    "cor_flores": "Creme",
-    "referencias": "1. Flora Brasiliensis\n2. Lorenzi, 2002"
-}'></textarea>
-                
-                <div class="btn-group">
-                    <button type="button" class="btn btn-primary" id="btn_carregar_json">
-                        🔄 VALIDAR E PROCESSAR
-                    </button>
-                    <button type="button" class="btn btn-secondary" id="btn_limpar">
-                        🗑️ LIMPAR
-                    </button>
-                    <a href="upload_imagens_internet.php?temp_id=<?php echo urlencode($temp_id); ?>" class="btn btn-back">
-                        <i class="fas fa-arrow-left"></i> VOLTAR ÀS IMAGENS
-                    </a>
-                </div>
-                
-                <div id="mensagem_json" style="display: none;" class="alert"></div>
+
+            <div class="alert alert-info" style="margin-bottom:20px;">
+                <i class="fas fa-info-circle"></i>
+                <strong>Imagens já adicionadas:</strong>
+                <?php
+                $total_imagens = count($_SESSION['importacao_temporaria']['imagens'] ?? []);
+                echo $total_imagens > 0 ? "{$total_imagens} imagem(ns) na sessão" : "Nenhuma imagem ainda (volte para adicionar)";
+                ?>
             </div>
-            
+
             <form method="POST" action="" id="form_principal">
-                
-                <!-- Campo oculto com temp_id -->
                 <input type="hidden" name="temp_id" value="<?php echo htmlspecialchars($temp_id); ?>">
-                
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Imagens já adicionadas:</strong> 
-                    <?php 
-                    $total_imagens = count($_SESSION['importacao_temporaria']['imagens'] ?? []);
-                    echo $total_imagens > 0 ? "{$total_imagens} imagem(ns) na sessão" : "Nenhuma imagem ainda (volte para adicionar)";
-                    ?>
-                </div>
-                
-                <div class="technical-paper" id="artigo_visualizacao">
-                    <div class="species-title" id="preview_nome_cientifico">[Nome científico]</div>
-                    
-                    <div class="info-grid">
-                        <div class="info-item"><strong>Família</strong><span id="preview_familia">—</span></div>
-                        <div class="info-item"><strong>Nomes populares</strong><span id="preview_nome_popular">—</span></div>
-                        <div class="info-item"><strong>Sinônimos</strong><span id="preview_sinonimos">—</span></div>
-                        <div class="info-item"><strong>Autor</strong><span id="preview_autor">—</span></div>
+
+                <!-- ── IDENTIFICAÇÃO BÁSICA ── -->
+                <div class="section-title">📌 Identificação Básica</div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="nome_cientifico_completo">Nome Científico Completo</label>
+                        <input type="text" id="nome_cientifico_completo" name="nome_cientifico_completo"
+                               placeholder="Ex: Mauritia flexuosa L.f.">
                     </div>
-                    
-                    <div id="preview_secoes"></div>
-                    
-                    <div class="references-section">
-                        <div class="references-title">📚 Referências</div>
-                        <ul class="reference-list" id="preview_referencias">
-                            <li>Nenhuma referência</li>
-                        </ul>
+                    <div class="ref-col">
+                        <label for="nome_cientifico_completo_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="nome_cientifico_completo_ref" name="nome_cientifico_completo_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
                     </div>
                 </div>
-                
-                <div id="campos_ocultos"></div>
-                
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="sinonimos">Sinônimos <span class="subtext">(nomes científicos antigos)</span></label>
+                        <input type="text" id="sinonimos" name="sinonimos" placeholder="Separados por vírgula">
+                    </div>
+                    <div class="ref-col">
+                        <label for="sinonimos_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="sinonimos_ref" name="sinonimos_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="nome_popular">Nome Popular</label>
+                        <input type="text" id="nome_popular" name="nome_popular" placeholder="Nome popular da espécie">
+                    </div>
+                    <div class="ref-col">
+                        <label for="nome_popular_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="nome_popular_ref" name="nome_popular_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="familia">Família</label>
+                        <input type="text" id="familia" name="familia" placeholder="Família botânica">
+                    </div>
+                    <div class="ref-col">
+                        <label for="familia_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="familia_ref" name="familia_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── FOLHA ── -->
+                <div class="section-title">🍃 Características da Folha</div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="forma_folha">Forma</label>
+                        <select id="forma_folha" name="forma_folha">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Lanceolada</option><option>Linear</option><option>Elíptica</option>
+                            <option>Oval</option><option>Orbicular</option><option>Cordiforme</option>
+                            <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
+                            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Lobada</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="forma_folha_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="forma_folha_ref" name="forma_folha_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="filotaxia_folha">Filotaxia</label>
+                        <select id="filotaxia_folha" name="filotaxia_folha">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Alterna</option><option>Oposta Simples</option><option>Oposta Decussada</option>
+                            <option>Verticilada</option><option>Rosetada</option><option>Dística</option><option>Espiralada</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="filotaxia_folha_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="filotaxia_folha_ref" name="filotaxia_folha_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="tipo_folha">Tipo</label>
+                        <select id="tipo_folha" name="tipo_folha">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Simples</option><option>Composta pinnada</option><option>Composta bipinada</option>
+                            <option>Composta tripinada</option><option>Composta tetrapinada</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="tipo_folha_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="tipo_folha_ref" name="tipo_folha_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="tamanho_folha">Tamanho</label>
+                        <select id="tamanho_folha" name="tamanho_folha">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="Microfilos (< 2 cm)">Microfilos (&lt; 2 cm)</option>
+                            <option value="Nanofilos (2–7 cm)">Nanofilos (2–7 cm)</option>
+                            <option value="Mesofilos (7–20 cm)">Mesofilos (7–20 cm)</option>
+                            <option value="Macrófilos (20–50 cm)">Macrófilos (20–50 cm)</option>
+                            <option value="Megafilas (> 50 cm)">Megafilas (&gt; 50 cm)</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="tamanho_folha_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="tamanho_folha_ref" name="tamanho_folha_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="textura_folha">Textura</label>
+                        <select id="textura_folha" name="textura_folha">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Coriácea</option><option>Cartácea</option><option>Membranácea</option>
+                            <option>Suculenta</option><option>Pilosa</option><option>Glabra</option>
+                            <option>Rugosa</option><option>Cerosa</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="textura_folha_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="textura_folha_ref" name="textura_folha_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="margem_folha">Margem</label>
+                        <select id="margem_folha" name="margem_folha">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Inteira</option><option>Serrada</option><option>Dentada</option>
+                            <option>Crenada</option><option>Ondulada</option><option>Lobada</option>
+                            <option>Partida</option><option>Revoluta</option><option>Involuta</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="margem_folha_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="margem_folha_ref" name="margem_folha_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="venacao_folha">Venação</label>
+                        <select id="venacao_folha" name="venacao_folha">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Reticulada Pinnada</option><option>Reticulada Palmada</option>
+                            <option>Paralela</option><option>Peninérvea</option>
+                            <option>Dicotômica</option><option>Curvinérvea</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="venacao_folha_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="venacao_folha_ref" name="venacao_folha_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── FLORES ── -->
+                <div class="section-title">🌸 Características das Flores</div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="cor_flores">Cor das Flores</label>
+                        <select id="cor_flores" name="cor_flores">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Brancas</option><option>Amarelas</option><option>Vermelhas</option>
+                            <option>Rosadas</option><option>Roxas</option><option>Azuis</option>
+                            <option>Laranjas</option><option>Verdes</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="cor_flores_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="cor_flores_ref" name="cor_flores_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="simetria_floral">Simetria Floral</label>
+                        <select id="simetria_floral" name="simetria_floral">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="Actinomorfa">Actinomorfa (simetria radial)</option>
+                            <option value="Zigomorfa">Zigomorfa (simetria bilateral)</option>
+                            <option value="Assimétrica">Assimétrica (sem simetria)</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="simetria_floral_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="simetria_floral_ref" name="simetria_floral_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="numero_petalas">Número de Pétalas</label>
+                        <select id="numero_petalas" name="numero_petalas">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="3 pétalas">3 pétalas</option>
+                            <option value="4 pétalas">4 pétalas</option>
+                            <option value="5 pétalas">5 pétalas</option>
+                            <option value="Muitas pétalas">Muitas pétalas</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="numero_petalas_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="numero_petalas_ref" name="numero_petalas_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="disposicao_flores">Disposição das Flores</label>
+                        <select id="disposicao_flores" name="disposicao_flores">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Isoladas</option>
+                            <option value="Inflorescência">Inflorescência (cacho, espiga, capítulo, umbela)</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="disposicao_flores_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="disposicao_flores_ref" name="disposicao_flores_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="aroma">Aroma das Flores</label>
+                        <select id="aroma" name="aroma">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="Sem cheiro">Sem cheiro</option>
+                            <option value="Aroma suave">Aroma suave</option>
+                            <option value="Aroma forte">Aroma forte</option>
+                            <option value="Aroma desagradável">Aroma desagradável</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="aroma_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="aroma_ref" name="aroma_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="tamanho_flor">Tamanho da Flor</label>
+                        <select id="tamanho_flor" name="tamanho_flor">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Pequena</option><option>Média</option><option>Grande</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="tamanho_flor_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="tamanho_flor_ref" name="tamanho_flor_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── FRUTOS ── -->
+                <div class="section-title">🍎 Características dos Frutos</div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="tipo_fruto">Tipo de Fruto</label>
+                        <select id="tipo_fruto" name="tipo_fruto">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Baga</option><option>Drupa</option><option>Cápsula</option>
+                            <option>Folículo</option><option>Legume</option><option>Síliqua</option>
+                            <option>Aquênio</option><option>Sâmara</option><option>Cariopse</option>
+                            <option>Pixídio</option><option>Hespéridio</option><option>Pepo</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="tipo_fruto_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="tipo_fruto_ref" name="tipo_fruto_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="tamanho_fruto">Tamanho do Fruto</label>
+                        <select id="tamanho_fruto" name="tamanho_fruto">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="Pequeno">Pequeno (&lt; 2 cm)</option>
+                            <option value="Médio">Médio (2–5 cm)</option>
+                            <option value="Grande">Grande (&gt; 5 cm)</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="tamanho_fruto_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="tamanho_fruto_ref" name="tamanho_fruto_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="cor_fruto">Cor do Fruto</label>
+                        <select id="cor_fruto" name="cor_fruto">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Verde</option><option>Amarelo</option><option>Vermelho</option>
+                            <option>Roxo</option><option>Laranja</option><option>Marrom</option>
+                            <option>Preto</option><option>Branco</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="cor_fruto_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="cor_fruto_ref" name="cor_fruto_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="textura_fruto">Textura do Fruto</label>
+                        <select id="textura_fruto" name="textura_fruto">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Lisa</option><option>Rugosa</option><option>Coriácea</option>
+                            <option>Peluda</option><option>Espinhosa</option><option>Cerosa</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="textura_fruto_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="textura_fruto_ref" name="textura_fruto_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="dispersao_fruto">Tipo de Dispersão</label>
+                        <select id="dispersao_fruto" name="dispersao_fruto">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="Zoocórica">Zoocórica (por animais)</option>
+                            <option value="Anemocórica">Anemocórica (pelo vento)</option>
+                            <option value="Hidrocórica">Hidrocórica (pela água)</option>
+                            <option value="Autocórica">Autocórica (pelo próprio fruto)</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="dispersao_fruto_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="dispersao_fruto_ref" name="dispersao_fruto_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="aroma_fruto">Aroma do Fruto</label>
+                        <select id="aroma_fruto" name="aroma_fruto">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="Sem cheiro">Sem cheiro</option>
+                            <option value="Aroma suave">Aroma suave</option>
+                            <option value="Aroma forte">Aroma forte</option>
+                            <option value="Aroma desagradável">Aroma desagradável</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="aroma_fruto_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="aroma_fruto_ref" name="aroma_fruto_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SEMENTES ── -->
+                <div class="section-title">🌱 Características das Sementes</div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="tipo_semente">Tipo de Semente</label>
+                        <select id="tipo_semente" name="tipo_semente">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Alada</option><option>Carnosa</option><option>Dura</option>
+                            <option>Oleosa</option><option>Peluda</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="tipo_semente_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="tipo_semente_ref" name="tipo_semente_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="tamanho_semente">Tamanho da Semente</label>
+                        <select id="tamanho_semente" name="tamanho_semente">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="Pequena">Pequena (&lt; 5 mm)</option>
+                            <option value="Média">Média (5–10 mm)</option>
+                            <option value="Grande">Grande (&gt; 10 mm)</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="tamanho_semente_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="tamanho_semente_ref" name="tamanho_semente_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="cor_semente">Cor da Semente</label>
+                        <select id="cor_semente" name="cor_semente">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Preta</option><option>Marrom</option><option>Branca</option>
+                            <option>Amarela</option><option>Verde</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="cor_semente_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="cor_semente_ref" name="cor_semente_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="textura_semente">Textura da Semente</label>
+                        <select id="textura_semente" name="textura_semente">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Lisa</option><option>Rugosa</option><option>Estriada</option><option>Cerosa</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="textura_semente_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="textura_semente_ref" name="textura_semente_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="quantidade_sementes">Quantidade de Sementes por Fruto</label>
+                        <select id="quantidade_sementes" name="quantidade_sementes">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Uma</option>
+                            <option value="Poucas">Poucas (2–5)</option>
+                            <option value="Muitas">Muitas (&gt; 5)</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="quantidade_sementes_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="quantidade_sementes_ref" name="quantidade_sementes_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── CAULE ── -->
+                <div class="section-title">🌿 Características do Caule</div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="tipo_caule">Tipo de Caule</label>
+                        <select id="tipo_caule" name="tipo_caule">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Ereto</option><option>Prostrado</option><option>Rastejante</option>
+                            <option>Trepador</option><option>Subterrâneo</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="tipo_caule_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="tipo_caule_ref" name="tipo_caule_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="estrutura_caule">Estrutura do Caule</label>
+                        <select id="estrutura_caule" name="estrutura_caule">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Lenhoso</option><option>Herbáceo</option><option>Suculento</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="estrutura_caule_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="estrutura_caule_ref" name="estrutura_caule_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="textura_caule">Textura do Caule</label>
+                        <select id="textura_caule" name="textura_caule">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Lisa</option><option>Rugosa</option><option>Sulcada</option>
+                            <option>Fissurada</option><option>Cerosa</option><option>Espinhosa</option><option>Suberosa</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="textura_caule_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="textura_caule_ref" name="textura_caule_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="cor_caule">Cor do Caule</label>
+                        <select id="cor_caule" name="cor_caule">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Marrom</option><option>Verde</option><option>Cinza</option>
+                            <option>Avermelhado</option><option>Alaranjado</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="cor_caule_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="cor_caule_ref" name="cor_caule_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="forma_caule">Forma do Caule</label>
+                        <select id="forma_caule" name="forma_caule">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Cilíndrico</option><option>Quadrangular</option>
+                            <option>Achatado</option><option>Irregular</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="forma_caule_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="forma_caule_ref" name="forma_caule_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="modificacao_caule">Modificações do Caule</label>
+                        <select id="modificacao_caule" name="modificacao_caule">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Estolão</option><option>Cladódio</option><option>Rizoma</option>
+                            <option>Tubérculo</option><option>Espinhos</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="modificacao_caule_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="modificacao_caule_ref" name="modificacao_caule_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="diametro_caule">Diâmetro do Caule</label>
+                        <select id="diametro_caule" name="diametro_caule">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option value="Fino">Fino (&lt; 1 cm)</option>
+                            <option value="Médio">Médio (1–5 cm)</option>
+                            <option value="Grosso">Grosso (&gt; 5 cm)</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="diametro_caule_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="diametro_caule_ref" name="diametro_caule_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="ramificacao_caule">Ramificação do Caule</label>
+                        <select id="ramificacao_caule" name="ramificacao_caule">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Dicotômica</option><option>Monopodial</option><option>Simpodial</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="ramificacao_caule_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="ramificacao_caule_ref" name="ramificacao_caule_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── OUTRAS ── -->
+                <div class="section-title">⚡ Outras Características</div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="possui_espinhos">Possui Espinhos?</label>
+                        <select id="possui_espinhos" name="possui_espinhos">
+                            <option value="">Selecione…</option>
+                            <option>Sim</option><option>Não</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="possui_espinhos_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="possui_espinhos_ref" name="possui_espinhos_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="possui_latex">Possui Látex?</label>
+                        <select id="possui_latex" name="possui_latex">
+                            <option value="">Selecione…</option>
+                            <option>Sim</option><option>Não</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="possui_latex_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="possui_latex_ref" name="possui_latex_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="possui_seiva">Possui Seiva?</label>
+                        <select id="possui_seiva" name="possui_seiva">
+                            <option value="">Selecione…</option>
+                            <option>Sim</option><option>Não</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="possui_seiva_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="possui_seiva_ref" name="possui_seiva_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="possui_resina">Possui Resina?</label>
+                        <select id="possui_resina" name="possui_resina">
+                            <option value="">Selecione…</option>
+                            <option>Sim</option><option>Não</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="possui_resina_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="possui_resina_ref" name="possui_resina_ref" placeholder="URL ou nº">
+                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── REFERÊNCIAS ── -->
+                <div class="section-title">📚 Referências</div>
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="referencias">Lista Completa de Referências</label>
+                        <textarea id="referencias" name="referencias" rows="6"
+                            placeholder="1. Lorenzi, H. (2002). Árvores Brasileiras Vol.1&#10;2. https://floradobrasil.jbrj.gov.br/"></textarea>
+                        <div class="info-text">Use [1], [2]… nos campos de referência para referenciar esta lista</div>
+                    </div>
+                </div>
+
                 <div class="save-button-container">
-                    <button type="submit" name="finalizar_importacao" value="1" class="btn-save" id="btn_finalizar" disabled>
+                    <a href="upload_imagens_internet.php?temp_id=<?php echo urlencode($temp_id); ?>" class="btn-back-to-images">
+                        <i class="fas fa-arrow-left"></i> Voltar às Imagens
+                    </a>
+                    <button type="submit" name="finalizar_importacao" value="1" class="btn-save" id="btn_finalizar">
                         ✅ FINALIZAR IMPORTAÇÃO
                     </button>
                 </div>
-                
-                <p style="text-align: center; margin-top: 10px; color: #666; font-size: 0.9rem;">
+                <p style="text-align:center;margin-top:10px;color:#666;font-size:0.9rem;">
                     ⚠️ Após finalizar, todas as imagens e dados serão salvos permanentemente.
                 </p>
             </form>
         </div>
-        
-        <div class="footer">
-            Penomato • Importação de dados - PASSO 3 DE 3
+
+        <!-- ══════════════════════════════════════════
+             SEÇÃO DE PESQUISA POR IA
+        ══════════════════════════════════════════ -->
+        <div class="paper-card">
+            <div class="ai-section-header">🤖 Pesquisa Automatizada com Agentes de IA</div>
+            <p class="ai-section-sub">
+                Copie o prompt abaixo e cole em um agente de IA (Claude, ChatGPT, Gemini…).
+                O agente retornará um JSON — cole-o abaixo para preencher a planilha automaticamente.
+            </p>
+
+            <!-- Prompt -->
+            <div class="prompt-box">
+                <div class="prompt-box-header">
+                    <div class="prompt-box-title">📝 Prompt de Pesquisa — <em><?php echo htmlspecialchars($nome_cientifico); ?></em></div>
+                    <button type="button" class="btn btn-copy" id="btn_copiar_prompt" onclick="copiarPrompt()">📋 Copiar Prompt</button>
+                </div>
+                <div class="prompt-content" id="prompt-display"><?php
+$prompt_especie = $nome_cientifico;
+echo htmlspecialchars('Você é um especialista em botânica tropical brasileira. Preciso das características morfológicas de "' . $prompt_especie . '" para um banco de dados científico.
+
+Retorne SOMENTE um JSON válido com os campos abaixo. Para campos de seleção, use exatamente um dos valores indicados entre barras. Use "" para campos desconhecidos.
+
+{
+  "nome_cientifico_completo": "Nome completo com autor e ano",
+  "sinonimos": "Sinônimos separados por vírgula",
+  "nome_popular": "Nomes populares no Brasil",
+  "familia": "Família botânica",
+
+  "forma_folha": "Lanceolada | Linear | Elíptica | Oval | Orbicular | Cordiforme | Espatulada | Sagitada | Reniforme | Obovada | Trilobada | Palmada | Lobada",
+  "filotaxia_folha": "Alterna | Oposta Simples | Oposta Decussada | Verticilada | Rosetada | Dística | Espiralada",
+  "tipo_folha": "Simples | Composta pinnada | Composta bipinada | Composta tripinada | Composta tetrapinada",
+  "tamanho_folha": "Microfilos (< 2 cm) | Nanofilos (2–7 cm) | Mesofilos (7–20 cm) | Macrófilos (20–50 cm) | Megafilas (> 50 cm)",
+  "textura_folha": "Coriácea | Cartácea | Membranácea | Suculenta | Pilosa | Glabra | Rugosa | Cerosa",
+  "margem_folha": "Inteira | Serrada | Dentada | Crenada | Ondulada | Lobada | Partida | Revoluta | Involuta",
+  "venacao_folha": "Reticulada Pinnada | Reticulada Palmada | Paralela | Peninérvea | Dicotômica | Curvinérvea",
+
+  "cor_flores": "Brancas | Amarelas | Vermelhas | Rosadas | Roxas | Azuis | Laranjas | Verdes",
+  "simetria_floral": "Actinomorfa | Zigomorfa | Assimétrica",
+  "numero_petalas": "3 pétalas | 4 pétalas | 5 pétalas | Muitas pétalas",
+  "disposicao_flores": "Isoladas | Inflorescência",
+  "aroma": "Sem cheiro | Aroma suave | Aroma forte | Aroma desagradável",
+  "tamanho_flor": "Pequena | Média | Grande",
+
+  "tipo_fruto": "Baga | Drupa | Cápsula | Folículo | Legume | Síliqua | Aquênio | Sâmara | Cariopse | Pixídio | Hespéridio | Pepo",
+  "tamanho_fruto": "Pequeno | Médio | Grande",
+  "cor_fruto": "Verde | Amarelo | Vermelho | Roxo | Laranja | Marrom | Preto | Branco",
+  "textura_fruto": "Lisa | Rugosa | Coriácea | Peluda | Espinhosa | Cerosa",
+  "dispersao_fruto": "Zoocórica | Anemocórica | Hidrocórica | Autocórica",
+  "aroma_fruto": "Sem cheiro | Aroma suave | Aroma forte | Aroma desagradável",
+
+  "tipo_semente": "Alada | Carnosa | Dura | Oleosa | Peluda",
+  "tamanho_semente": "Pequena | Média | Grande",
+  "cor_semente": "Preta | Marrom | Branca | Amarela | Verde",
+  "textura_semente": "Lisa | Rugosa | Estriada | Cerosa",
+  "quantidade_sementes": "Uma | Poucas | Muitas",
+
+  "tipo_caule": "Ereto | Prostrado | Rastejante | Trepador | Subterrâneo",
+  "estrutura_caule": "Lenhoso | Herbáceo | Suculento",
+  "textura_caule": "Lisa | Rugosa | Sulcada | Fissurada | Cerosa | Espinhosa | Suberosa",
+  "cor_caule": "Marrom | Verde | Cinza | Avermelhado | Alaranjado",
+  "forma_caule": "Cilíndrico | Quadrangular | Achatado | Irregular",
+  "modificacao_caule": "Estolão | Cladódio | Rizoma | Tubérculo | Espinhos",
+  "diametro_caule": "Fino | Médio | Grosso",
+  "ramificacao_caule": "Dicotômica | Monopodial | Simpodial",
+
+  "possui_espinhos": "Sim | Não",
+  "possui_latex": "Sim | Não",
+  "possui_seiva": "Sim | Não",
+  "possui_resina": "Sim | Não",
+
+  "referencias": "1. Fonte principal\n2. Fonte secundária",
+  "nome_cientifico_completo_ref": "[1]",
+  "sinonimos_ref": "[1]", "nome_popular_ref": "[1]", "familia_ref": "[1]",
+  "forma_folha_ref": "[1]", "filotaxia_folha_ref": "[1]", "tipo_folha_ref": "[1]",
+  "tamanho_folha_ref": "[1]", "textura_folha_ref": "[1]", "margem_folha_ref": "[1]",
+  "venacao_folha_ref": "[1]", "cor_flores_ref": "[1]", "simetria_floral_ref": "[1]",
+  "numero_petalas_ref": "[1]", "disposicao_flores_ref": "[1]", "aroma_ref": "[1]",
+  "tamanho_flor_ref": "[1]", "tipo_fruto_ref": "[1]", "tamanho_fruto_ref": "[1]",
+  "cor_fruto_ref": "[1]", "textura_fruto_ref": "[1]", "dispersao_fruto_ref": "[1]",
+  "aroma_fruto_ref": "[1]", "tipo_semente_ref": "[1]", "tamanho_semente_ref": "[1]",
+  "cor_semente_ref": "[1]", "textura_semente_ref": "[1]", "quantidade_sementes_ref": "[1]",
+  "tipo_caule_ref": "[1]", "estrutura_caule_ref": "[1]", "textura_caule_ref": "[1]",
+  "cor_caule_ref": "[1]", "forma_caule_ref": "[1]", "modificacao_caule_ref": "[1]",
+  "diametro_caule_ref": "[1]", "ramificacao_caule_ref": "[1]",
+  "possui_espinhos_ref": "[1]", "possui_latex_ref": "[1]",
+  "possui_seiva_ref": "[1]", "possui_resina_ref": "[1]"
+}');
+                ?></div>
+            </div>
+
+            <!-- Cole o JSON -->
+            <div class="json-import-area">
+                <h3><span>📋</span> Cole aqui o JSON da espécie</h3>
+                <p>Após obter o JSON do agente de IA, cole-o abaixo e clique em "Preencher Planilha". Revise cada campo antes de finalizar.</p>
+                <textarea id="json_input" rows="8" placeholder='{
+    "nome_cientifico_completo": "Mauritia flexuosa L.f.",
+    "familia": "Arecaceae",
+    "forma_folha": "Palmada",
+    "cor_flores": "Amarelas",
+    "referencias": "1. Flora Brasiliensis\n2. Lorenzi, 2002"
+}'></textarea>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" id="btn_carregar_json">🔄 PREENCHER PLANILHA</button>
+                    <button type="button" class="btn btn-secondary" id="btn_limpar">🗑️ LIMPAR</button>
+                </div>
+                <div id="mensagem_json" style="display:none;" class="alert"></div>
+            </div>
         </div>
+
+        <div class="footer">Penomato • Importação de dados - PASSO 3 DE 3</div>
     </div>
     
     <!-- MODAL DE VALIDAÇÃO -->
@@ -893,290 +1783,139 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
     
     <script>
     // ================================================
-    // VARIÁVEIS GLOBAIS
+    // CONFIRM-BTNS: toggle e progresso visual
     // ================================================
-    let dadosJson = null;
-    let camposParaValidar = [];
-    let opcoesValidas = <?php echo json_encode($opcoes_validas); ?>;
-    let escolhasUsuario = {};
-    
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.confirm-btn');
+        if (btn) btn.classList.toggle('confirmed');
+    });
+
     // ================================================
-    // FUNÇÕES DO MODAL
+    // PREENCHER campo visível (select ou input/textarea)
     // ================================================
-    function abrirModal() {
-        document.getElementById('modalValidacao').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-    
-    function fecharModal() {
-        document.getElementById('modalValidacao').style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-    
-    function atualizarContador() {
-        const total = camposParaValidar.length;
-        const resolvidos = Object.keys(escolhasUsuario).length;
-        document.getElementById('modal-contador').innerHTML = `${resolvidos}/${total}`;
-        document.getElementById('btnConfirmarValidacao').disabled = resolvidos !== total;
-    }
-    
-    function selecionarOpcao(campo, valor) {
-        escolhasUsuario[campo] = valor;
-        
-        document.querySelectorAll(`.opcao-item[data-campo="${campo}"]`).forEach(el => {
-            if (el.dataset.valor === valor) {
-                el.classList.add('selecionado');
-                el.querySelector('input[type="radio"]').checked = true;
-            } else {
-                el.classList.remove('selecionado');
-            }
-        });
-        
-        atualizarContador();
-    }
-    
-    function gerarModalValidacao() {
-        const modalBody = document.getElementById('modal-body');
-        let html = '';
-        
-        camposParaValidar.forEach(campo => {
-            const valorJson = dadosJson[campo] || '';
-            const opcoes = opcoesValidas[campo] || [];
-            
-            let sugestao = '';
-            const valorLower = valorJson.toLowerCase();
-            
-            for (let opcao of opcoes) {
-                if (valorLower.includes(opcao.toLowerCase())) {
-                    sugestao = opcao;
-                    break;
-                }
-            }
-            
-            if (!sugestao && opcoes.length > 0) {
-                sugestao = opcoes[0];
-            }
-            
-            if (!escolhasUsuario[campo] && sugestao) {
-                escolhasUsuario[campo] = sugestao;
-            }
-            
-            html += `<div class="campo-validacao">`;
-            html += `<div class="campo-titulo"><span>🔍</span> ${formatarNomeCampo(campo)}</div>`;
-            html += `<div class="campo-json">JSON: "${valorJson}"</div>`;
-            html += `<div class="opcoes-grid">`;
-            
-            opcoes.forEach(opcao => {
-                const selecionado = (escolhasUsuario[campo] === opcao) ? 'selecionado' : '';
-                const checked = (escolhasUsuario[campo] === opcao) ? 'checked' : '';
-                const sugerida = (opcao === sugestao && !escolhasUsuario[campo]) ? 'sugerida' : '';
-                
-                html += `<div class="opcao-item ${selecionado} ${sugerida}" data-campo="${campo}" data-valor="${opcao}" onclick="selecionarOpcao('${campo}', '${opcao}')">`;
-                html += `<input type="radio" name="${campo}" value="${opcao}" ${checked} onchange="selecionarOpcao('${campo}', '${opcao}')">`;
-                html += `<span>${opcao}</span>`;
-                html += `</div>`;
-            });
-            
-            html += `</div></div>`;
-        });
-        
-        modalBody.innerHTML = html;
-        atualizarContador();
-    }
-    
-    function formatarNomeCampo(campo) {
-        return campo.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    }
-    
-    // ================================================
-    // GERAR CAMPOS OCULTOS PARA O FORMULÁRIO
-    // ================================================
-    function gerarCamposOcultos() {
-        if (!dadosJson) return;
-        
-        const container = document.getElementById('campos_ocultos');
-        container.innerHTML = '';
-        
-        const todosCampos = [
-            'nome_cientifico_completo', 'nome_cientifico_completo_ref',
-            'sinonimos', 'sinonimos_ref', 'nome_popular', 'nome_popular_ref',
-            'familia', 'familia_ref', 'forma_folha', 'forma_folha_ref',
-            'filotaxia_folha', 'filotaxia_folha_ref', 'tipo_folha', 'tipo_folha_ref',
-            'tamanho_folha', 'tamanho_folha_ref', 'textura_folha', 'textura_folha_ref',
-            'margem_folha', 'margem_folha_ref', 'venacao_folha', 'venacao_folha_ref',
-            'cor_flores', 'cor_flores_ref', 'simetria_floral', 'simetria_floral_ref',
-            'numero_petalas', 'numero_petalas_ref', 'disposicao_flores', 'disposicao_flores_ref',
-            'aroma', 'aroma_ref', 'tamanho_flor', 'tamanho_flor_ref',
-            'tipo_fruto', 'tipo_fruto_ref', 'tamanho_fruto', 'tamanho_fruto_ref',
-            'cor_fruto', 'cor_fruto_ref', 'textura_fruto', 'textura_fruto_ref',
-            'dispersao_fruto', 'dispersao_fruto_ref', 'aroma_fruto', 'aroma_fruto_ref',
-            'tipo_semente', 'tipo_semente_ref', 'tamanho_semente', 'tamanho_semente_ref',
-            'cor_semente', 'cor_semente_ref', 'textura_semente', 'textura_semente_ref',
-            'quantidade_sementes', 'quantidade_sementes_ref',
-            'tipo_caule', 'tipo_caule_ref', 'estrutura_caule', 'estrutura_caule_ref',
-            'textura_caule', 'textura_caule_ref', 'cor_caule', 'cor_caule_ref',
-            'forma_caule', 'forma_caule_ref', 'modificacao_caule', 'modificacao_caule_ref',
-            'diametro_caule', 'diametro_caule_ref', 'ramificacao_caule', 'ramificacao_caule_ref',
-            'possui_espinhos', 'possui_espinhos_ref', 'possui_latex', 'possui_latex_ref',
-            'possui_seiva', 'possui_seiva_ref', 'possui_resina', 'possui_resina_ref',
-            'referencias'
-        ];
-        
-        todosCampos.forEach(campo => {
-            if (dadosJson[campo] && dadosJson[campo] !== '') {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = campo;
-                input.value = dadosJson[campo];
-                container.appendChild(input);
-            }
-        });
-    }
-    
-    // ================================================
-    // ATUALIZAR VISUALIZAÇÃO DO ARTIGO
-    // ================================================
-    function atualizarVisualizacaoArtigo() {
-        if (!dadosJson) return;
-        
-        document.getElementById('preview_nome_cientifico').innerHTML = dadosJson.nome_cientifico_completo || '[Nome não informado]';
-        document.getElementById('preview_familia').innerHTML = dadosJson.familia || '—';
-        document.getElementById('preview_nome_popular').innerHTML = dadosJson.nome_popular || '—';
-        document.getElementById('preview_sinonimos').innerHTML = dadosJson.sinonimos || '—';
-        document.getElementById('preview_autor').innerHTML = (dadosJson.nome_cientifico_completo || '').replace(/^[^(]+/, '') || '—';
-        
-        const secoesContainer = document.getElementById('preview_secoes');
-        secoesContainer.innerHTML = '';
-        
-        const secoes = [
-            { titulo: 'Folhas', icone: '🍃', campos: ['forma_folha', 'filotaxia_folha', 'tipo_folha', 'tamanho_folha', 'textura_folha', 'margem_folha', 'venacao_folha'] },
-            { titulo: 'Flores', icone: '🌸', campos: ['cor_flores', 'simetria_floral', 'numero_petalas', 'disposicao_flores', 'aroma', 'tamanho_flor'] },
-            { titulo: 'Frutos', icone: '🍎', campos: ['tipo_fruto', 'tamanho_fruto', 'cor_fruto', 'textura_fruto', 'dispersao_fruto', 'aroma_fruto'] },
-            { titulo: 'Sementes', icone: '🌱', campos: ['tipo_semente', 'tamanho_semente', 'cor_semente', 'textura_semente', 'quantidade_sementes'] },
-            { titulo: 'Caule', icone: '🌿', campos: ['tipo_caule', 'estrutura_caule', 'textura_caule', 'cor_caule', 'forma_caule', 'modificacao_caule', 'diametro_caule', 'ramificacao_caule'] },
-            { titulo: 'Outras', icone: '⚡', campos: ['possui_espinhos', 'possui_latex', 'possui_seiva', 'possui_resina'] }
-        ];
-        
-        secoes.forEach(secao => {
-            const temCampos = secao.campos.some(campo => dadosJson[campo] && dadosJson[campo] !== '');
-            
-            if (temCampos) {
-                let secaoHtml = `<div class="section-divider"><span>${secao.icone}</span> ${secao.titulo}</div>`;
-                secaoHtml += `<div class="characteristic-block">`;
-                
-                secao.campos.forEach(campo => {
-                    if (dadosJson[campo] && dadosJson[campo] !== '') {
-                        const ref = dadosJson[`${campo}_ref`] ? `<span class="ref-note">[${dadosJson[`${campo}_ref`]}]</span>` : '';
-                        
-                        secaoHtml += `<div class="characteristic-item">`;
-                        secaoHtml += `<span class="characteristic-label">${formatarNomeCampo(campo)}</span>`;
-                        secaoHtml += `<span class="characteristic-value">${dadosJson[campo]} ${ref}</span>`;
-                        secaoHtml += `</div>`;
-                    }
-                });
-                
-                secaoHtml += `</div>`;
-                secoesContainer.innerHTML += secaoHtml;
-            }
-        });
-        
-        const refList = document.getElementById('preview_referencias');
-        refList.innerHTML = '';
-        
-        if (dadosJson.referencias && dadosJson.referencias.trim() !== '') {
-            const linhas = dadosJson.referencias.split('\n');
-            linhas.forEach(linha => {
-                if (linha.trim()) {
-                    const li = document.createElement('li');
-                    li.innerHTML = linha;
-                    refList.appendChild(li);
-                }
-            });
+    function preencherCampo(id, valor) {
+        const el = document.getElementById(id);
+        if (!el || valor === null || valor === undefined || valor === '') return;
+        const v = String(valor).trim();
+        if (!v) return;
+        if (el.tagName === 'SELECT') {
+            const opts = Array.from(el.options);
+            let match = opts.find(o => o.value === v);
+            if (!match) match = opts.find(o => o.text.trim() === v);
+            if (!match) match = opts.find(o => o.value.startsWith(v) || v.startsWith(o.value));
+            if (!match) match = opts.find(o => o.text.trim().startsWith(v) || v.startsWith(o.text.trim()));
+            if (match) { el.value = match.value; el.classList.add('auto-filled'); }
         } else {
-            refList.innerHTML = '<li>Nenhuma referência fornecida</li>';
+            el.value = v;
+            el.classList.add('auto-filled');
         }
-        
-        gerarCamposOcultos();
     }
-    
-    function confirmarValidacao() {
-        for (let campo in escolhasUsuario) {
-            dadosJson[campo] = escolhasUsuario[campo];
-        }
-        
-        atualizarVisualizacaoArtigo();
-        fecharModal();
-        
-        // Habilitar botão de finalizar
-        document.getElementById('btn_finalizar').disabled = false;
+
+    // ================================================
+    // LIMPAR PLANILHA
+    // ================================================
+    function limparPlanilha() {
+        document.querySelectorAll('#form_principal input[type="text"], #form_principal textarea').forEach(el => {
+            el.value = ''; el.classList.remove('auto-filled');
+        });
+        document.querySelectorAll('#form_principal select').forEach(el => {
+            el.value = ''; el.classList.remove('auto-filled');
+            if (el.options[0] && el.options[0].disabled) el.selectedIndex = 0;
+        });
+        document.querySelectorAll('.confirm-btn').forEach(b => b.classList.remove('confirmed'));
     }
-    
+
+    // ================================================
+    // CARREGAR JSON → preenche planilha visível
+    // ================================================
     document.getElementById('btn_carregar_json').addEventListener('click', function() {
-        const jsonInput = document.getElementById('json_input');
         const mensagemDiv = document.getElementById('mensagem_json');
-        
         mensagemDiv.style.display = 'none';
-        
+
         try {
-            const jsonTexto = jsonInput.value.trim();
+            const jsonTexto = document.getElementById('json_input').value.trim();
             if (!jsonTexto) throw new Error('Nenhum JSON foi colado!');
-            
-            dadosJson = JSON.parse(jsonTexto);
-            
-            camposParaValidar = [];
-            escolhasUsuario = {};
-            
-            for (let campo in opcoesValidas) {
-                if (dadosJson[campo] && !opcoesValidas[campo].includes(dadosJson[campo])) {
-                    camposParaValidar.push(campo);
+            const dados = JSON.parse(jsonTexto);
+
+            const todosCampos = [
+                'nome_cientifico_completo','sinonimos','nome_popular','familia',
+                'forma_folha','filotaxia_folha','tipo_folha','tamanho_folha',
+                'textura_folha','margem_folha','venacao_folha',
+                'cor_flores','simetria_floral','numero_petalas','disposicao_flores','aroma','tamanho_flor',
+                'tipo_fruto','tamanho_fruto','cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto',
+                'tipo_semente','tamanho_semente','cor_semente','textura_semente','quantidade_sementes',
+                'tipo_caule','estrutura_caule','textura_caule','cor_caule','forma_caule',
+                'modificacao_caule','diametro_caule','ramificacao_caule',
+                'possui_espinhos','possui_latex','possui_seiva','possui_resina','referencias',
+                'nome_cientifico_completo_ref','sinonimos_ref','nome_popular_ref','familia_ref',
+                'forma_folha_ref','filotaxia_folha_ref','tipo_folha_ref','tamanho_folha_ref',
+                'textura_folha_ref','margem_folha_ref','venacao_folha_ref',
+                'cor_flores_ref','simetria_floral_ref','numero_petalas_ref','disposicao_flores_ref',
+                'aroma_ref','tamanho_flor_ref','tipo_fruto_ref','tamanho_fruto_ref','cor_fruto_ref',
+                'textura_fruto_ref','dispersao_fruto_ref','aroma_fruto_ref',
+                'tipo_semente_ref','tamanho_semente_ref','cor_semente_ref','textura_semente_ref',
+                'quantidade_sementes_ref','tipo_caule_ref','estrutura_caule_ref','textura_caule_ref',
+                'cor_caule_ref','forma_caule_ref','modificacao_caule_ref','diametro_caule_ref',
+                'ramificacao_caule_ref','possui_espinhos_ref','possui_latex_ref',
+                'possui_seiva_ref','possui_resina_ref'
+            ];
+
+            let preenchidos = 0;
+            todosCampos.forEach(function(campo) {
+                if (dados[campo] !== undefined && dados[campo] !== '') {
+                    preencherCampo(campo, dados[campo]);
+                    preenchidos++;
                 }
-            }
-            
-            if (camposParaValidar.length > 0) {
-                gerarModalValidacao();
-                abrirModal();
-                
-                mensagemDiv.style.display = 'block';
-                mensagemDiv.className = 'alert alert-warning';
-                mensagemDiv.innerHTML = `⚠️ ${camposParaValidar.length} campo(s) precisam de validação.`;
-            } else {
-                atualizarVisualizacaoArtigo();
-                
-                mensagemDiv.style.display = 'block';
-                mensagemDiv.className = 'alert alert-success';
-                mensagemDiv.innerHTML = '✅ Todos os campos estão padronizados!';
-                
-                document.getElementById('btn_finalizar').disabled = false;
-            }
-            
+            });
+
+            // Scroll até a planilha
+            document.getElementById('form_principal').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            mensagemDiv.style.display = 'block';
+            mensagemDiv.className = 'alert alert-success';
+            mensagemDiv.innerHTML = '✅ ' + preenchidos + ' campos preenchidos! Revise a planilha acima e clique em Finalizar Importação.';
+
         } catch (erro) {
             mensagemDiv.style.display = 'block';
             mensagemDiv.className = 'alert alert-danger';
-            mensagemDiv.innerHTML = `❌ Erro: ${erro.message}`;
+            mensagemDiv.innerHTML = '❌ Erro: ' + erro.message;
         }
     });
-    
+
     document.getElementById('btn_limpar').addEventListener('click', function() {
-        if (confirm('Limpar todos os dados?')) {
+        if (confirm('Limpar o JSON e todos os campos da planilha?')) {
             document.getElementById('json_input').value = '';
             document.getElementById('mensagem_json').style.display = 'none';
-            document.getElementById('campos_ocultos').innerHTML = '';
-            document.getElementById('btn_finalizar').disabled = true;
-            dadosJson = null;
-            
-            document.getElementById('preview_nome_cientifico').innerHTML = '[Nome científico]';
-            document.getElementById('preview_familia').innerHTML = '—';
-            document.getElementById('preview_nome_popular').innerHTML = '—';
-            document.getElementById('preview_sinonimos').innerHTML = '—';
-            document.getElementById('preview_autor').innerHTML = '—';
-            document.getElementById('preview_secoes').innerHTML = '';
-            document.getElementById('preview_referencias').innerHTML = '<li>Nenhuma referência</li>';
+            limparPlanilha();
         }
     });
-    
+
+    // ================================================
+    // COPIAR PROMPT
+    // ================================================
+    function copiarPrompt() {
+        const texto = document.getElementById('prompt-display').textContent;
+        const btn   = document.getElementById('btn_copiar_prompt');
+        navigator.clipboard.writeText(texto).then(function() {
+            btn.textContent = '✅ Copiado!';
+            btn.classList.add('copied');
+            setTimeout(function() { btn.textContent = '📋 Copiar Prompt'; btn.classList.remove('copied'); }, 2500);
+        }).catch(function() {
+            const ta = document.createElement('textarea');
+            ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+            document.body.removeChild(ta);
+            btn.textContent = '✅ Copiado!'; btn.classList.add('copied');
+            setTimeout(function() { btn.textContent = '📋 Copiar Prompt'; btn.classList.remove('copied'); }, 2500);
+        });
+    }
+
     window.onclick = function(event) {
         const modal = document.getElementById('modalValidacao');
-        if (event.target === modal) fecharModal();
+        if (modal && event.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
     };
     </script>
 </body>

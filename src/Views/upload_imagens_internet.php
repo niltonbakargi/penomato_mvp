@@ -894,51 +894,44 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         if (item.type && item.type.indexOf('image') !== -1) {
             const blob = item.getAsFile();
             const reader = new FileReader();
-            
+
             reader.onload = function(e) {
-                // Armazenar imagem
                 imagemColada = e.target.result;
                 imagemBase64.value = e.target.result;
-                
-                // Limpar preview anterior
-                previewContainer.innerHTML = '';
-                
-                // Criar preview
-                const previewItem = document.createElement('div');
-                previewItem.className = 'preview-item';
-                previewItem.innerHTML = `
-                    <div class="preview-image">
-                        <img src="${e.target.result}" alt="Imagem colada">
+
+                // Mostrar imagem DENTRO da colarArea
+                colarArea.innerHTML = `
+                    <img src="${e.target.result}" alt="Imagem colada"
+                         style="max-width:100%;max-height:320px;border-radius:6px;box-shadow:0 2px 10px rgba(0,0,0,0.15);display:block;margin:0 auto;">
+                    <div style="margin-top:12px;font-size:0.9rem;color:#155724;font-weight:600;">
+                        ✅ Imagem colada (${(blob.size / 1024).toFixed(1)} KB)
                     </div>
-                    <div class="preview-info">
-                        <strong>Imagem colada</strong>
-                        <small>${(blob.size / 1024).toFixed(1)} KB</small>
-                    </div>
-                    <div class="remove-btn" onclick="removerImagem()">×</div>
+                    <button type="button" onclick="removerImagem()"
+                            style="margin-top:10px;padding:6px 18px;border:2px solid #dc3545;background:white;color:#dc3545;border-radius:20px;cursor:pointer;font-weight:600;">
+                        × Remover imagem
+                    </button>
                 `;
-                previewContainer.appendChild(previewItem);
-                
+                colarArea.style.backgroundColor = '#e8f5e9';
+                colarArea.style.borderColor = '#28a745';
+                colarArea.style.padding = '20px';
+
+                // Limpar preview separado (não é mais necessário)
+                previewContainer.innerHTML = '';
+
                 // Habilitar botão
                 btnEnviar.disabled = false;
                 btnEnviar.innerHTML = '📤 ADICIONAR À SESSÃO TEMPORÁRIA';
-                
-                // Feedback visual
-                colarArea.style.backgroundColor = '#e8f5e9';
-                colarArea.style.borderColor = '#28a745';
             };
-            
+
             reader.readAsDataURL(blob);
         }
     }
 
-    // Evento de colar (Ctrl+V)
+    // Evento de colar (Ctrl+V) — usa delegação para funcionar após removerImagem()
     document.addEventListener('paste', function(e) {
-        // Verificar se o foco está na área de colar
-        if (document.activeElement === colarInput || colarArea.contains(document.activeElement)) {
+        if (colarArea.contains(document.activeElement) || document.activeElement === colarArea) {
             e.preventDefault();
-            
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-            
             for (let i = 0; i < items.length; i++) {
                 if (items[i].type.indexOf('image') !== -1) {
                     processarImagemColada(items[i]);
@@ -948,34 +941,46 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
     });
 
-    // Focar no textarea ao clicar na área
+    // Focar no textarea ao clicar na área (delegado, funciona após recriação)
     colarArea.addEventListener('click', function() {
-        colarInput.focus();
-        colarArea.style.backgroundColor = '#e0f0e0';
-        colarArea.style.borderColor = '#0a4c35';
-    });
-
-    colarInput.addEventListener('focus', function() {
-        colarArea.style.backgroundColor = '#e0f0e0';
-        colarArea.style.borderColor = '#0a4c35';
-    });
-
-    colarInput.addEventListener('blur', function() {
-        if (!imagemColada) {
-            colarArea.style.backgroundColor = '#f0f8f0';
-            colarArea.style.borderColor = '#0b5e42';
+        const input = document.getElementById('colarInput');
+        if (input) {
+            input.focus();
+            colarArea.style.backgroundColor = '#e0f0e0';
+            colarArea.style.borderColor = '#0a4c35';
         }
     });
 
-    // Função para remover a imagem
+    // Função para remover a imagem e restaurar a área de colar
     function removerImagem() {
         imagemColada = null;
         imagemBase64.value = '';
         previewContainer.innerHTML = '';
         btnEnviar.disabled = true;
         btnEnviar.innerHTML = '📤 ADICIONAR À SESSÃO TEMPORÁRIA';
+
+        colarArea.innerHTML = `
+            <div class="icone">📋</div>
+            <div class="texto">Cole a imagem aqui (Ctrl+V)</div>
+            <div class="subtexto">Copie a imagem de qualquer lugar e cole neste campo</div>
+            <textarea id="colarInput" placeholder="Clique aqui e pressione Ctrl+V para colar a imagem..."></textarea>
+        `;
         colarArea.style.backgroundColor = '#f0f8f0';
         colarArea.style.borderColor = '#0b5e42';
+        colarArea.style.padding = '40px';
+
+        // Reanexar referência ao novo textarea
+        const novoColarInput = document.getElementById('colarInput');
+        novoColarInput.addEventListener('focus', function() {
+            colarArea.style.backgroundColor = '#e0f0e0';
+            colarArea.style.borderColor = '#0a4c35';
+        });
+        novoColarInput.addEventListener('blur', function() {
+            if (!imagemColada) {
+                colarArea.style.backgroundColor = '#f0f8f0';
+                colarArea.style.borderColor = '#0b5e42';
+            }
+        });
     }
 
     // Validação do formulário antes de enviar
