@@ -60,9 +60,8 @@ $todos_botoes = [
     'dev_tools' => [
         'icon'  => '⚙️',
         'label' => 'Ferramentas DEV',
-        'desc'  => 'Acesso a documentação técnica, logs e ferramentas de desenvolvimento.',
-        'link'  => '#em-breve',
-        'breve' => true,
+        'desc'  => 'Kanban do projeto, backlog e histórico de desenvolvimento.',
+        'link'  => '/penomato_mvp/penomato_kanban.html',
     ],
     'revisar_artigo' => [
         'icon'  => '📝',

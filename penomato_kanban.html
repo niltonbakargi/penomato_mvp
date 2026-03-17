@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penomato — Kanban MVP</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --g900: #062e1f;
+  --g800: #0b5e42;
+  --g700: #0d7050;
+  --g600: #1a8a62;
+  --g400: #34c48a;
+  --g200: #a8edce;
+  --g100: #d4f5e8;
+  --g50:  #f0fdf6;
+
+  --ink: #0f1a14;
+  --ink2: #2d3f35;
+  --ink3: #5a7066;
+  --muted: #8fa899;
+  --border: #d6e8de;
+  --border2: #eaf4ef;
+  --surface: #f7fbf9;
+  --white: #ffffff;
+
+  --todo-col:    #f0fdf6;
+  --doing-col:   #fffbeb;
+  --review-col:  #eff6ff;
+  --done-col:    #f8fffe;
+
+  --todo-accent:   #0b5e42;
+  --doing-accent:  #b45309;
+  --review-accent: #1e40af;
+  --done-accent:   #065f46;
+
+  --p1: #dc2626; --p1-bg: #fef2f2; --p1-border: #fca5a5;
+  --p2: #d97706; --p2-bg: #fffbeb; --p2-border: #fcd34d;
+  --p3: #059669; --p3-bg: #f0fdf4; --p3-border: #6ee7b7;
+  --p4: #2563eb; --p4-bg: #eff6ff; --p4-border: #93c5fd;
+
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-drag: 0 12px 32px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Lato', sans-serif;
+  background: #eef5f1;
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ───────────────────────────────── */
+header {
+  background: var(--g800);
+  padding: 0 2rem;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(11,94,66,0.35);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 1rem 0;
+}
+
+.logo-mark {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.logo-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.02em;
+}
+
+.logo-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.08em;
+  margin-top: 1px;
+}
+
+.header-stats {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.hstat {
+  padding: 0.5rem 1rem;
+  text-align: center;
+  border-left: 1px solid rgba(255,255,255,0.1);
+}
+
+.hstat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.hstat-num.green { color: var(--g200); }
+.hstat-num.amber { color: #fcd34d; }
+.hstat-num.red   { color: #fca5a5; }
+
+.hstat-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 0;
+}
+
+.btn-add-main {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  background: white;
+  color: var(--g800);
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 18px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  transition: all 0.15s;
+  letter-spacing: -0.01em;
+}
+
+.btn-add-main:hover { background: var(--g100); transform: translateY(-1px); }
+
+.btn-icon {
+  font-size: 18px; line-height: 1;
+}
+
+/* ── PROGRESS BAR ─────────────────────────── */
+.progress-section {
+  background: var(--g900);
+  padding: 6px 2rem;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.progress-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--g400), var(--g200));
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.progress-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+}
+
+/* ── TOOLBAR ──────────────────────────────── */
+.toolbar {
+  padding: 0.6rem 2rem 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+}
+
+.search-input {
+  font-family: 'Lato', sans-serif;
+  font-size: 13px;
+  width: 100%;
+  padding: 7px 12px 7px 34px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--white);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-input:focus { border-color: var(--g600); }
+
+.search-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.filter-group {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 13px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.chip:hover { border-color: var(--g600); color: var(--g800); }
+.chip.active { background: var(--g800); border-color: var(--g800); color: white; }
+
+.chip.p1.active { background: var(--p1); border-color: var(--p1); }
+.chip.p2.active { background: var(--p2); border-color: var(--p2); }
+.chip.p3.active { background: var(--p3); border-color: var(--p3); }
+.chip.p4.active { background: var(--p4); border-color: var(--p4); }
+
+/* ── BOARD ────────────────────────────────── */
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1.25rem 2rem 1.5rem;
+  height: calc(100vh - 120px);
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.column {
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.col-header {
+  padding: 12px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.col-todo    .col-header { background: #1c5c3e; }
+.col-doing   .col-header { background: #92400e; }
+.col-review  .col-header { background: #1e3a8a; }
+.col-done    .col-header { background: #065f46; }
+
+.col-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.col-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
+.col-todo   .col-dot { background: #6ee7b7; }
+.col-doing  .col-dot { background: #fcd34d; }
+.col-review .col-dot { background: #93c5fd; }
+.col-done   .col-dot { background: #34d399; }
+
+.col-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.col-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.8);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.col-body {
+  background: var(--white);
+  border: 1px solid var(--border2);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 10px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: background 0.15s;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.col-body.drag-over {
+  background: var(--g50);
+  border-color: var(--g600);
+}
+
+.col-add {
+  width: 100%;
+  background: transparent;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  color: var(--muted);
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px; justify-content: center;
+}
+
+.col-add:hover { border-color: var(--g600); color: var(--g800); background: var(--g50); }
+
+/* ── CARD ─────────────────────────────────── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 13px;
+  margin-bottom: 7px;
+  cursor: grab;
+  box-shadow: var(--shadow);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  position: relative;
+  animation: cardIn 0.2s ease;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.card.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.card.done-card {
+  opacity: 0.55;
+}
+
+.card.done-card .card-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.card-prio-bar {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.bar-p1 { background: var(--p1); }
+.bar-p2 { background: var(--p2); }
+.bar-p3 { background: var(--p3); }
+.bar-p4 { background: var(--p4); }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.card-title {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.45;
+  flex: 1;
+}
+
+.card-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all 0.12s;
+  display: flex; align-items: center;
+}
+
+.card-menu-btn:hover { background: var(--surface); color: var(--ink2); }
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.prio-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  letter-spacing: 0.03em;
+}
+
+.pc-p1 { background: var(--p1-bg); color: var(--p1); border: 1px solid var(--p1-border); }
+.pc-p2 { background: var(--p2-bg); color: var(--p2); border: 1px solid var(--p2-border); }
+.pc-p3 { background: var(--p3-bg); color: var(--p3); border: 1px solid var(--p3-border); }
+.pc-p4 { background: var(--p4-bg); color: var(--p4); border: 1px solid var(--p4-border); }
+
+.tag-chip {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink3);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+
+.card-date {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+/* ── CONTEXT MENU ─────────────────────────── */
+.ctx-menu {
+  position: fixed;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 1000;
+  padding: 4px;
+  min-width: 160px;
+  animation: menuIn 0.1s ease;
+}
+
+@keyframes menuIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.ctx-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: background 0.1s;
+  border: none; background: none; width: 100%; text-align: left;
+}
+
+.ctx-item:hover { background: var(--surface); }
+.ctx-item.danger { color: var(--p1); }
+.ctx-item.danger:hover { background: var(--p1-bg); }
+.ctx-divider { height: 1px; background: var(--border2); margin: 4px 0; }
+
+/* ── MODAL ────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,18,12,0.55);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  transform: translateY(12px);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.modal-title span { color: var(--g800); }
+
+.form-group { margin-bottom: 1rem; }
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.form-input, .form-select, .form-textarea {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--g600);
+  background: var(--white);
+}
+
+.form-textarea { resize: vertical; min-height: 80px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-cancel:hover { background: var(--surface); }
+
+.btn-save {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 9px 24px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--g800);
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: -0.01em;
+}
+
+.btn-save:hover { background: var(--g700); transform: translateY(-1px); }
+
+/* ── TOAST ────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 1.5rem; right: 1.5rem;
+  background: var(--g900);
+  color: white;
+  font-size: 13px;
+  padding: 10px 18px;
+  border-radius: 99px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 500;
+  display: flex; align-items: center; gap: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.25s;
+  pointer-events: none;
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ── EMPTY STATE ──────────────────────────── */
+.empty-col {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.empty-col-icon { font-size: 28px; margin-bottom: 6px; }
+
+/* ── SCROLLBAR ────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+@media (max-width: 900px) {
+  .board { grid-template-columns: repeat(2, 1fr); height: auto; overflow: visible; }
+  .column { min-height: 300px; }
+  .col-body { max-height: 60vh; }
+  .header-stats { display: none; }
+}
+
+@media (max-width: 560px) {
+  .board { grid-template-columns: 1fr; }
+  header, .toolbar { padding-left: 1rem; padding-right: 1rem; }
+  .board { padding: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo-mark">🌿</div>
+    <div>
+      <div class="logo-title">Penomato</div>
+      <div class="logo-sub">MVP KANBAN</div>
+    </div>
+  </div>
+
+  <div class="header-stats" id="header-stats">
+    <div class="hstat">
+      <div class="hstat-num" id="hs-total">0</div>
+      <div class="hstat-label">Total</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num amber" id="hs-doing">0</div>
+      <div class="hstat-label">Em andamento</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num green" id="hs-done">0</div>
+      <div class="hstat-label">Concluídas</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num red" id="hs-crit">0</div>
+      <div class="hstat-label">Críticas</div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <a href="/penomato_mvp/src/Views/entrar_colaborador.php" style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:var(--radius);padding:8px 16px;text-decoration:none;display:flex;align-items:center;gap:6px;">← Painel</a>
+    <button class="btn-add-main" onclick="openModal()">
+      <span class="btn-icon">+</span> Nova Tarefa
+    </button>
+  </div>
+</header>
+
+<!-- PROGRESS -->
+<div class="progress-section">
+  <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <span class="progress-label" id="prog-label">0 / 0 concluídas</span>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="text" id="search" placeholder="Buscar tarefa..." oninput="render()">
+  </div>
+  <div class="filter-group">
+    <button class="chip active" onclick="setFilter('all',this)">Todas</button>
+    <button class="chip p1" onclick="setFilter('p1',this)">🔴 Crítica</button>
+    <button class="chip p2" onclick="setFilter('p2',this)">🟡 Alta</button>
+    <button class="chip p3" onclick="setFilter('p3',this)">🟢 Média</button>
+    <button class="chip p4" onclick="setFilter('p4',this)">🔵 Baixa</button>
+  </div>
+</div>
+
+<!-- BOARD -->
+<div class="board">
+  <div class="column col-todo">
+    <div class="col-header">
+      <div class="col-title-wrap">
+        <div class="col-dot"></div>
+        <span class="col-title">A fazer</span>
+      </div>
+      <span class="col-count" id="cnt-todo">0</span>
+    </div>
+    <div class="col-body" id="col-todo" ondragover="onDragOver(event,'todo')" ondrop="onDrop(event,'todo')" ondragleave="onDragLeave(event)">
+    </div>
+  </div>
+
+  <div class="column col-doing">
+    <div class="col-header">
+      <div class="col-title-wrap">
+        <div class="col-dot"></div>
+        <span class="col-title">Em andamento</span>
+      </div>
+      <span class="col-count" id="cnt-doing">0</span>
+    </div>
+    <div class="col-body" id="col-doing" ondragover="onDragOver(event,'doing')" ondrop="onDrop(event,'doing')" ondragleave="onDragLeave(event)">
+    </div>
+  </div>
+
+  <div class="column col-review">
+    <div class="col-header">
+      <div class="col-title-wrap">
+        <div class="col-dot"></div>
+        <span class="col-title">Revisão / Testes</span>
+      </div>
+      <span class="col-count" id="cnt-review">0</span>
+    </div>
+    <div class="col-body" id="col-review" ondragover="onDragOver(event,'review')" ondrop="onDrop(event,'review')" ondragleave="onDragLeave(event)">
+    </div>
+  </div>
+
+  <div class="column col-done">
+    <div class="col-header">
+      <div class="col-title-wrap">
+        <div class="col-dot"></div>
+        <span class="col-title">Concluído</span>
+      </div>
+      <span class="col-count" id="cnt-done">0</span>
+    </div>
+    <div class="col-body" id="col-done" ondragover="onDragOver(event,'done')" ondrop="onDrop(event,'done')" ondragleave="onDragLeave(event)">
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-icon">+</span>
+      <span id="modal-heading">Nova Tarefa</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Título *</label>
+      <input class="form-input" id="f-title" type="text" placeholder="Descreva a tarefa...">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Notas</label>
+      <textarea class="form-textarea" id="f-notes" placeholder="Detalhes, contexto ou links úteis..."></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Prioridade</label>
+        <select class="form-select" id="f-prio">
+          <option value="p1">🔴 Crítica</option>
+          <option value="p2">🟡 Alta</option>
+          <option value="p3" selected>🟢 Média</option>
+          <option value="p4">🔵 Baixa</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Coluna</label>
+        <select class="form-select" id="f-col">
+          <option value="todo" selected>A fazer</option>
+          <option value="doing">Em andamento</option>
+          <option value="review">Revisão</option>
+          <option value="done">Concluído</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Módulo / Tag</label>
+        <input class="form-input" id="f-tag" type="text" placeholder="ex: Autenticação">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prazo</label>
+        <input class="form-input" id="f-due" type="date">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveTask()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div class="ctx-menu" id="ctx-menu" style="display:none">
+  <button class="ctx-item" onclick="ctxEdit()">✏️ Editar</button>
+  <button class="ctx-item" onclick="ctxMove('todo')">⬜ Mover para A fazer</button>
+  <button class="ctx-item" onclick="ctxMove('doing')">🔄 Mover para Em andamento</button>
+  <button class="ctx-item" onclick="ctxMove('review')">🔍 Mover para Revisão</button>
+  <button class="ctx-item" onclick="ctxMove('done')">✅ Mover para Concluído</button>
+  <div class="ctx-divider"></div>
+  <button class="ctx-item danger" onclick="ctxDelete()">🗑️ Excluir</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'penomato_kanban_v3';
+
+const DEFAULT_TASKS = [
+  // ── CONCLUÍDO (histórico git) ──────────────────────────────────────────
+  { id:1,  col:'done', title:"Estrutura inicial do projeto Penomato MVP", prio:"p1", tag:"Infraestrutura", notes:"initial commit — 08/02/2026", due:"2026-02-08", created:"2026-02-08" },
+  { id:2,  col:'done', title:"Sistema de cadastro de características botânicas (formulário completo)", prio:"p1", tag:"Módulo Fichas", notes:"Todas as partes da planta: folha, flor, fruto, caule, semente, hábito — 08/02/2026", due:"2026-02-08", created:"2026-02-08" },
+  { id:3,  col:'done', title:"Campos de referências bibliográficas salvos no banco", prio:"p2", tag:"Módulo Fichas", notes:"cadastro_caracteristicas — 09/02/2026", due:"2026-02-09", created:"2026-02-09" },
+  { id:4,  col:'done', title:"Novos campos no formulário de características (informacoes_basicas)", prio:"p2", tag:"Módulo Fichas", notes:"09/02/2026", due:"2026-02-09", created:"2026-02-09" },
+  { id:5,  col:'done', title:"Sistema de busca com filtros por categoria", prio:"p2", tag:"Busca", notes:"busca_caracteristicas.php — 12/02/2026", due:"2026-02-12", created:"2026-02-12" },
+  { id:6,  col:'done', title:"Sistema de upload de imagens e exsicatas para identificadores", prio:"p1", tag:"Upload Imagens", notes:"Metadados, autoria, rastreabilidade — 12/02/2026", due:"2026-02-12", created:"2026-02-12" },
+  { id:7,  col:'done', title:"Painel do revisor com modal de seleção e busca em tempo real", prio:"p2", tag:"Módulo Revisão", notes:"entrada_revisor.php — filtro por status completo/aguardando — 13/02/2026", due:"2026-02-13", created:"2026-02-13" },
+  { id:8,  col:'done', title:"Sistema de revisão de espécies (base)", prio:"p2", tag:"Módulo Revisão", notes:"13/02/2026", due:"2026-02-13", created:"2026-02-13" },
+  { id:9,  col:'done', title:"Refatoração do banco: status único cumulativo substituindo múltiplos status", prio:"p1", tag:"Banco de Dados", notes:"15/02/2026 — estrutura que persiste até hoje", due:"2026-02-15", created:"2026-02-15" },
+  { id:10, col:'done', title:"Sistema de autenticação completo (login, cadastro, gestão de usuários)", prio:"p1", tag:"Autenticação", notes:"17/02/2026", due:"2026-02-17", created:"2026-02-17" },
+  { id:11, col:'done', title:"Painel do gestor v1 e ajustes de autenticação", prio:"p1", tag:"Painel Gestor", notes:"18/02/2026", due:"2026-02-18", created:"2026-02-18" },
+  { id:12, col:'done', title:"Index MVP simplificado + correções na busca e caminhos", prio:"p2", tag:"Infraestrutura", notes:"18/02/2026", due:"2026-02-18", created:"2026-02-18" },
+  { id:13, col:'done', title:"Campo de sinônimos no cadastro de espécies", prio:"p3", tag:"Módulo Fichas", notes:"19/02/2026", due:"2026-02-19", created:"2026-02-19" },
+  { id:14, col:'done', title:"Fix: campos inexistentes tamanho_flores removidos do script JSON", prio:"p2", tag:"Dados Internet", notes:"19/02/2026", due:"2026-02-19", created:"2026-02-19" },
+  { id:15, col:'done', title:"Sistema completo de importação de dados da internet via JSON", prio:"p1", tag:"Dados Internet", notes:"20/02/2026 — Flora do Brasil, Lorenzi etc.", due:"2026-02-20", created:"2026-02-20" },
+  { id:16, col:'done', title:"Sistema de autenticação refatorado + painel do colaborador v1", prio:"p1", tag:"Autenticação", notes:"27/02/2026 — tokens, verificação de email, brute-force protection", due:"2026-02-27", created:"2026-02-27" },
+  { id:17, col:'done', title:"Refatoração completa do fluxo de importação (3 etapas)", prio:"p1", tag:"Dados Internet", notes:"02/03/2026 — escolher espécie → upload imagens → confirmar", due:"2026-03-02", created:"2026-03-02" },
+  { id:18, col:'done', title:"Fix: inconsistências entre nomes de colunas do banco e código PHP", prio:"p1", tag:"Banco de Dados", notes:"12/03/2026", due:"2026-03-12", created:"2026-03-12" },
+  { id:19, col:'done', title:"Renomeação de todos os arquivos do inglês para português", prio:"p2", tag:"Infraestrutura", notes:"12/03/2026", due:"2026-03-12", created:"2026-03-12" },
+  { id:20, col:'done', title:"Página de confirmação de identificação de espécies", prio:"p1", tag:"Módulo Revisão", notes:"16/03/2026 — confirmar_caracteristicas.php", due:"2026-03-16", created:"2026-03-16" },
+  { id:21, col:'done', title:"Refatoração completa do sistema de autenticação", prio:"p1", tag:"Autenticação", notes:"16/03/2026", due:"2026-03-16", created:"2026-03-16" },
+  { id:22, col:'done', title:"Prompt de IA com 9 regras e template JSON estruturado", prio:"p2", tag:"Dados Internet", notes:"17/03/2026 — especie_id usa nome_cientifico", due:"2026-03-17", created:"2026-03-17" },
+  { id:23, col:'done', title:"Planilha manual de dados + preview de imagem colada", prio:"p3", tag:"Dados Internet", notes:"17/03/2026", due:"2026-03-17", created:"2026-03-17" },
+  { id:24, col:'done', title:"Upload de imagens com licença Privado e campo Outros", prio:"p3", tag:"Upload Imagens", notes:"17/03/2026 — upload_imagens_internet.php", due:"2026-03-17", created:"2026-03-17" },
+  { id:25, col:'done', title:"Painel do gestor reformulado: grade de botões com modais (aceitar/excluir membro, adicionar espécies)", prio:"p1", tag:"Painel Gestor", notes:"17/03/2026", due:"2026-03-17", created:"2026-03-17" },
+  { id:26, col:'done', title:"Gestão de Espécies: filtros, prioridade inline, atribuição de colaborador", prio:"p2", tag:"Painel Gestor", notes:"17/03/2026 — gestao_especies.php + coluna atribuido_a no BD", due:"2026-03-17", created:"2026-03-17" },
+  { id:27, col:'done', title:"Monitoramento: contribuições recentes, espécies paradas, membros inativos", prio:"p2", tag:"Painel Gestor", notes:"17/03/2026 — monitoramento.php com filtros por dias", due:"2026-03-17", created:"2026-03-17" },
+  { id:28, col:'done', title:"Relatório de colaboradores com exportação CSV", prio:"p2", tag:"Relatórios", notes:"17/03/2026 — relatorio_colaboradores.php", due:"2026-03-17", created:"2026-03-17" },
+  { id:29, col:'done', title:"Fila de aprovação de ações do gestor (aprovar/rejeitar com motivo)", prio:"p1", tag:"Painel Gestor", notes:"17/03/2026 — aprovacao_acoes.php + tabela fila_aprovacao no BD", due:"2026-03-17", created:"2026-03-17" },
+  { id:30, col:'done', title:"Painel colaborador com permissões por subtipo (identificador, dev, especialista, gestor)", prio:"p2", tag:"Painel Colaborador", notes:"17/03/2026 — usa SESSION usuario_subtipo", due:"2026-03-17", created:"2026-03-17" },
+
+  // ── EM ANDAMENTO ───────────────────────────────────────────────────────
+  { id:13, col:'doing', title:"Integrar fila_aprovacao nos controladores existentes (dados_internet, confirmacao, imagem)", prio:"p1", tag:"Módulo Aprovação", notes:"Ao concluir uma etapa, inserir em fila_aprovacao em vez de avançar status direto", due:"", created:"2026-03-17" },
+  { id:14, col:'doing', title:"Funcionalidade real de Contestar Informação", prio:"p2", tag:"Módulo Contestação", notes:"Colaborador sinaliza inconsistência → entra na fila de aprovação como tipo 'contestacao'", due:"", created:"2026-03-17" },
+  { id:15, col:'doing', title:"Funcionalidade real de Revisar Artigo (colaborador especialista)", prio:"p2", tag:"Módulo Revisão", notes:"Especialista revisa artigo → gestor aprova via fila_aprovacao", due:"", created:"2026-03-17" },
+
+  // ── A FAZER — CRÍTICO ──────────────────────────────────────────────────
+  { id:16, col:'todo', title:"Testar fluxo completo: cadastro → dados internet → confirmação → aprovação", prio:"p1", tag:"Testes", notes:"", due:"", created:"2026-03-17" },
+  { id:17, col:'todo', title:"Criar 1 espécie com fluxo completo validado e aprovado pelo gestor", prio:"p1", tag:"Dados", notes:"", due:"", created:"2026-03-17" },
+  { id:18, col:'todo', title:"Verificar requisitos formais da UEMS para o projeto integrador", prio:"p1", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+
+  // ── A FAZER — ALTA ─────────────────────────────────────────────────────
+  { id:19, col:'todo', title:"Galeria de imagens na ficha detalhada da espécie", prio:"p2", tag:"Módulo Fichas", notes:"", due:"", created:"2026-03-17" },
+  { id:20, col:'todo', title:"Painel do validador (aprovação final pós-revisão pelo especialista)", prio:"p2", tag:"Módulo Validação", notes:"", due:"", created:"2026-03-17" },
+  { id:21, col:'todo', title:"Histórico de ações por espécie (quem, quando, parecer)", prio:"p2", tag:"Módulo Revisão", notes:"", due:"", created:"2026-03-17" },
+  { id:22, col:'todo', title:"Dashboard com estatísticas gerais (espécies por status, % concluídas)", prio:"p2", tag:"Painel Gestor", notes:"", due:"", created:"2026-03-17" },
+  { id:23, col:'todo', title:"Escrever introdução e justificativa do TCC (ângulo educação ambiental)", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  { id:24, col:'todo', title:"Documentar arquitetura e banco de dados no relatório", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  { id:25, col:'todo', title:"Descrever fluxo científico e sistema de referências bibliográficas", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  { id:26, col:'todo', title:"Adicionar imagens reais a pelo menos 3 espécies", prio:"p2", tag:"Dados", notes:"", due:"", created:"2026-03-17" },
+
+  // ── A FAZER — MÉDIA ────────────────────────────────────────────────────
+  { id:27, col:'todo', title:"Lightbox para ampliar imagens com créditos e licença", prio:"p3", tag:"Módulo Fichas", notes:"", due:"", created:"2026-03-17" },
+  { id:28, col:'todo', title:"Exportação da ficha da espécie em PDF", prio:"p3", tag:"Fichas", notes:"", due:"", created:"2026-03-17" },
+  { id:29, col:'todo', title:"Validação JavaScript nos formulários principais", prio:"p3", tag:"UX", notes:"", due:"", created:"2026-03-17" },
+  { id:30, col:'todo', title:"Responsividade mobile nos formulários longos", prio:"p3", tag:"UX", notes:"", due:"", created:"2026-03-17" },
+  { id:31, col:'todo', title:"Preparar apresentação para a banca (slides)", prio:"p3", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  { id:32, col:'todo', title:"Preparar demonstração ao vivo do sistema", prio:"p3", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  { id:33, col:'todo', title:"Testar busca avançada com filtros combinados", prio:"p3", tag:"Dados", notes:"", due:"", created:"2026-03-17" },
+
+  // ── A FAZER — BAIXA ────────────────────────────────────────────────────
+  { id:34, col:'todo', title:"API REST pública para consulta de espécies", prio:"p4", tag:"API", notes:"", due:"", created:"2026-03-17" },
+  { id:35, col:'todo', title:"Notificações por email (aprovação, rejeição, atribuição)", prio:"p4", tag:"Sistema", notes:"", due:"", created:"2026-03-17" },
+  { id:36, col:'todo', title:"Logs de auditoria de todas as ações do sistema", prio:"p4", tag:"Sistema", notes:"", due:"", created:"2026-03-17" },
+  { id:37, col:'todo', title:"Configurações do sistema: subtipos de colaborador e partes obrigatórias", prio:"p4", tag:"Painel Gestor", notes:"configuracoes_sistema.php — adiado", due:"", created:"2026-03-17" },
+];
+
+// ── STATE ──
+let tasks = [];
+let nextId = 100;
+let currentFilter = 'all';
+let dragId = null;
+let ctxId = null;
+let editingId = null;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      tasks = s.tasks || DEFAULT_TASKS;
+      nextId = s.nextId || 100;
+    } else {
+      tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+    }
+  } catch(e) {
+    tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ tasks, nextId }));
+  } catch(e) {}
+}
+
+// ── FILTER ──
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function getFiltered() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  return tasks.filter(t => {
+    const matchPrio = currentFilter === 'all' || t.prio === currentFilter;
+    const matchQ = !q || t.title.toLowerCase().includes(q) || (t.tag && t.tag.toLowerCase().includes(q));
+    return matchPrio && matchQ;
+  });
+}
+
+// ── RENDER ──
+const COLS = ['todo','doing','review','done'];
+const PRIO_LABELS = { p1:'Crítica', p2:'Alta', p3:'Média', p4:'Baixa' };
+
+function render() {
+  const filtered = getFiltered();
+  const done = tasks.filter(t => t.col === 'done').length;
+  const total = tasks.length;
+  const crit = tasks.filter(t => t.prio === 'p1' && t.col !== 'done').length;
+
+  document.getElementById('hs-total').textContent = total;
+  document.getElementById('hs-doing').textContent = tasks.filter(t => t.col === 'doing').length;
+  document.getElementById('hs-done').textContent = done;
+  document.getElementById('hs-crit').textContent = crit;
+  document.getElementById('prog-fill').style.width = total ? Math.round(done/total*100) + '%' : '0%';
+  document.getElementById('prog-label').textContent = `${done} / ${total} concluídas (${total ? Math.round(done/total*100) : 0}%)`;
+
+  COLS.forEach(col => {
+    const colTasks = filtered.filter(t => t.col === col);
+    document.getElementById('cnt-' + col).textContent = colTasks.length;
+    const body = document.getElementById('col-' + col);
+
+    if (!colTasks.length) {
+      body.innerHTML = `<div class="empty-col"><div class="empty-col-icon">${col === 'done' ? '🎉' : '📋'}</div>${col === 'done' ? 'Nenhuma concluída ainda' : 'Arraste cards aqui'}</div>`;
+    } else {
+      body.innerHTML = '';
+      colTasks.forEach(t => {
+        const card = buildCard(t);
+        body.appendChild(card);
+      });
+    }
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'col-add';
+    addBtn.innerHTML = '+ Adicionar tarefa';
+    addBtn.onclick = () => openModal(col);
+    body.appendChild(addBtn);
+  });
+}
+
+function buildCard(t) {
+  const div = document.createElement('div');
+  div.className = 'card' + (t.col === 'done' ? ' done-card' : '');
+  div.setAttribute('draggable','true');
+  div.setAttribute('data-id', t.id);
+  div.addEventListener('dragstart', e => onDragStart(e, t.id));
+  div.addEventListener('dragend', e => onDragEnd(e));
+
+  const dueStr = t.due ? `<span class="card-date">📅 ${t.due}</span>` : '';
+
+  div.innerHTML = `
+    <div class="card-prio-bar bar-${t.prio}"></div>
+    <div class="card-top">
+      <div class="card-title">${t.title}</div>
+      <button class="card-menu-btn" onclick="openCtx(event,${t.id})">⋯</button>
+    </div>
+    <div class="card-meta">
+      <span class="prio-chip pc-${t.prio}">${PRIO_LABELS[t.prio]}</span>
+      ${t.tag ? `<span class="tag-chip">${t.tag}</span>` : ''}
+      ${dueStr}
+    </div>
+    ${t.notes ? `<div style="font-size:11px;color:var(--ink3);margin-top:7px;line-height:1.5;border-top:1px solid var(--border2);padding-top:7px;">${t.notes.substring(0,120)}${t.notes.length>120?'…':''}</div>` : ''}
+  `;
+  return div;
+}
+
+// ── DRAG & DROP ──
+function onDragStart(e, id) {
+  dragId = id;
+  setTimeout(() => {
+    const el = document.querySelector(`[data-id="${id}"]`);
+    if (el) el.classList.add('dragging');
+  }, 0);
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragEnd(e) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
+  document.querySelectorAll('.col-body').forEach(c => c.classList.remove('drag-over'));
+}
+
+function onDragOver(e, col) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.col-body').forEach(c => c.classList.remove('drag-over'));
+  document.getElementById('col-' + col).classList.add('drag-over');
+}
+
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function onDrop(e, col) {
+  e.preventDefault();
+  document.querySelectorAll('.col-body').forEach(c => c.classList.remove('drag-over'));
+  if (dragId !== null) {
+    const t = tasks.find(x => x.id === dragId);
+    if (t) {
+      t.col = col;
+      saveState();
+      render();
+      showToast(col === 'done' ? '✅ Tarefa concluída!' : '📌 Tarefa movida');
+    }
+    dragId = null;
+  }
+}
+
+// ── MODAL ──
+function openModal(defaultCol = 'todo', taskId = null) {
+  editingId = taskId;
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('modal-icon').textContent = taskId ? '✏️' : '+';
+  document.getElementById('modal-heading').textContent = taskId ? 'Editar Tarefa' : 'Nova Tarefa';
+  document.getElementById('f-col').value = defaultCol;
+
+  if (taskId) {
+    const t = tasks.find(x => x.id === taskId);
+    if (t) {
+      document.getElementById('f-title').value = t.title;
+      document.getElementById('f-notes').value = t.notes || '';
+      document.getElementById('f-prio').value = t.prio;
+      document.getElementById('f-col').value = t.col;
+      document.getElementById('f-tag').value = t.tag || '';
+      document.getElementById('f-due').value = t.due || '';
+    }
+  } else {
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-notes').value = '';
+    document.getElementById('f-prio').value = 'p3';
+    document.getElementById('f-tag').value = '';
+    document.getElementById('f-due').value = '';
+  }
+
+  overlay.classList.add('open');
+  setTimeout(() => document.getElementById('f-title').focus(), 250);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  editingId = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function saveTask() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) {
+    document.getElementById('f-title').style.borderColor = 'var(--p1)';
+    setTimeout(() => document.getElementById('f-title').style.borderColor = '', 1500);
+    return;
+  }
+
+  if (editingId) {
+    const t = tasks.find(x => x.id === editingId);
+    if (t) {
+      t.title = title;
+      t.notes = document.getElementById('f-notes').value.trim();
+      t.prio  = document.getElementById('f-prio').value;
+      t.col   = document.getElementById('f-col').value;
+      t.tag   = document.getElementById('f-tag').value.trim();
+      t.due   = document.getElementById('f-due').value;
+    }
+    showToast('✏️ Tarefa atualizada');
+  } else {
+    tasks.push({
+      id: nextId++,
+      col:   document.getElementById('f-col').value,
+      title,
+      notes: document.getElementById('f-notes').value.trim(),
+      prio:  document.getElementById('f-prio').value,
+      tag:   document.getElementById('f-tag').value.trim(),
+      due:   document.getElementById('f-due').value,
+      created: new Date().toISOString().slice(0,10)
+    });
+    showToast('✅ Tarefa adicionada');
+  }
+
+  saveState();
+  closeModal();
+  render();
+}
+
+// ── CONTEXT MENU ──
+function openCtx(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  ctxId = id;
+  const menu = document.getElementById('ctx-menu');
+  menu.style.display = 'block';
+  const x = Math.min(e.clientX, window.innerWidth - 180);
+  const y = Math.min(e.clientY, window.innerHeight - 240);
+  menu.style.left = x + 'px';
+  menu.style.top  = y + 'px';
+}
+
+function closeCtx() {
+  document.getElementById('ctx-menu').style.display = 'none';
+  ctxId = null;
+}
+
+function ctxEdit() {
+  closeCtx();
+  openModal(null, ctxId);
+}
+
+function ctxMove(col) {
+  const t = tasks.find(x => x.id === ctxId);
+  if (t) { t.col = col; saveState(); render(); showToast('📌 Tarefa movida'); }
+  closeCtx();
+}
+
+function ctxDelete() {
+  if (confirm('Excluir esta tarefa?')) {
+    tasks = tasks.filter(x => x.id !== ctxId);
+    saveState(); render();
+    showToast('🗑️ Tarefa excluída');
+  }
+  closeCtx();
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeCtx(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    if (document.getElementById('modal-overlay').classList.contains('open')) saveTask();
+  }
+});
+
+document.addEventListener('click', e => {
+  if (!document.getElementById('ctx-menu').contains(e.target)) closeCtx();
+});
+
+// ── INIT ──
+function adjustBoardHeight() {
+  const header = document.querySelector('header');
+  const progress = document.querySelector('.progress-section');
+  const toolbar = document.querySelector('.toolbar');
+  if (!header) return;
+  const used = header.offsetHeight + (progress ? progress.offsetHeight : 0) + (toolbar ? toolbar.offsetHeight : 0) + 20;
+  document.querySelector('.board').style.height = (window.innerHeight - used) + 'px';
+}
+
+loadState();
+render();
+adjustBoardHeight();
+window.addEventListener('resize', adjustBoardHeight);
+</script>
+</body>
+</html>
