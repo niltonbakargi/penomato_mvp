@@ -100,7 +100,48 @@
         .logout-btn:hover { background: #c82333; }
         
         .footer { display: flex; justify-content: center; }
-        
+
+        /* ── Inserir espécies ── */
+        .especies-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .especies-card textarea {
+            width: 100%;
+            min-height: 140px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.95em;
+            font-family: inherit;
+            resize: vertical;
+            margin-top: 10px;
+        }
+        .especies-card textarea:focus { outline: none; border-color: #0b5e42; }
+        .especies-card .hint {
+            font-size: 0.82em;
+            color: #888;
+            margin-top: 6px;
+        }
+        .btn-inserir {
+            background: #0b5e42;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 28px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .btn-inserir:hover { background: #094d36; }
+        .msg-ok   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:6px; padding:10px 14px; margin-top:10px; }
+        .msg-warn { background:#fff3cd; color:#856404; border:1px solid #ffeeba; border-radius:6px; padding:10px 14px; margin-top:10px; }
+        .msg-err  { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:6px; padding:10px 14px; margin-top:10px; }
+
         @media (max-width: 768px) {
             .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
             .nav-grid { grid-template-columns: repeat(2, 1fr); }
@@ -161,6 +202,28 @@
                 <div class="nav-icon">📊</div>
                 <div>Gestor</div>
             </div>
+        </div>
+
+        <!-- INSERIR ESPÉCIES DE INTERESSE -->
+        <h2 class="section-title">🌿 Inserir Espécie de Interesse</h2>
+
+        <div class="especies-card">
+            <?php if (!empty($msg_especies)): foreach ($msg_especies as $m): ?>
+                <div class="msg-<?php echo $m['tipo']; ?>">
+                    <?php echo htmlspecialchars($m['texto']); ?>
+                </div>
+            <?php endforeach; endif; ?>
+
+            <form method="POST" action="/penomato_mvp/src/Controllers/controlador_gestor.php">
+                <textarea name="lista_especies" placeholder="Uma espécie por linha. Exemplo:
+Acca sellowiana
+Euterpe oleracea
+Handroanthus impetiginosus"></textarea>
+                <div class="hint">Digite uma ou várias espécies, uma por linha. Espécies já cadastradas serão ignoradas.</div>
+                <button type="submit" name="inserir_especies" value="1" class="btn-inserir">
+                    ➕ Inserir no Banco
+                </button>
+            </form>
         </div>
 
         <!-- BOTÃO SAIR -->
