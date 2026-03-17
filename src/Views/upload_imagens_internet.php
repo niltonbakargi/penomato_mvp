@@ -820,14 +820,20 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                         
                         <div class="form-group">
                             <label for="licenca">Licença:</label>
-                            <select id="licenca" name="licenca">
+                            <select id="licenca" name="licenca" onchange="toggleLicencaOutros(this.value)">
                                 <option value="">Selecione...</option>
                                 <option value="Domínio público">Domínio público</option>
                                 <option value="CC BY 4.0">CC BY 4.0</option>
                                 <option value="CC BY-SA 4.0">CC BY-SA 4.0</option>
                                 <option value="CC BY-NC 4.0">CC BY-NC 4.0</option>
                                 <option value="CC0">CC0 (Domínio público)</option>
+                                <option value="Privado">Privado</option>
+                                <option value="outros">Outros...</option>
                             </select>
+                        </div>
+                        <div class="form-group" id="licenca_outros_grupo" style="display:none;">
+                            <label for="licenca_outros">Especifique a licença:</label>
+                            <input type="text" id="licenca_outros" name="licenca_outros" placeholder="Descreva o tipo de direitos autorais">
                         </div>
                     </div>
 
@@ -981,6 +987,20 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 colarArea.style.borderColor = '#0b5e42';
             }
         });
+    }
+
+    // Mostrar/esconder campo "Outros" na licença
+    function toggleLicencaOutros(valor) {
+        const grupo = document.getElementById('licenca_outros_grupo');
+        const input = document.getElementById('licenca_outros');
+        if (valor === 'outros') {
+            grupo.style.display = 'block';
+            input.required = true;
+        } else {
+            grupo.style.display = 'none';
+            input.required = false;
+            input.value = '';
+        }
     }
 
     // Validação do formulário antes de enviar

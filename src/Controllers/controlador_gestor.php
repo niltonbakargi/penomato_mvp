@@ -82,6 +82,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inserir_especies'])) 
     $total_especies = $stmt->fetchColumn();
 }
 
+// ================================================
+// PROCESSAR ACEITAR MEMBRO
+// ================================================
+$msg_aceitar = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aceitar_membro'])) {
+    $membro_id  = (int)($_POST['membro_aceitar_id'] ?? 0);
+    $motivacao  = trim($_POST['motivacao_aceitar'] ?? '');
+    $categoria  = trim($_POST['categoria_aceitar'] ?? 'colaborador');
+
+    if ($membro_id) {
+        $stmt = $pdo->prepare("UPDATE usuarios SET status_verificacao = 'verificado', ativo = 1, categoria = ? WHERE id = ?");
+        $stmt->execute([$categoria, $membro_id]);
+        $msg_aceitar[] = ['tipo' => 'ok', 'texto' => "Membro aceito com sucesso." . ($motivacao ? " Motivo: $motivacao" : '')];
+        $total_usuarios = $pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
+    } else {
+        $msg_aceitar[] = ['tipo' => 'err', 'texto' => 'Selecione um membro.'];
+    }
+}
+
+// ================================================
+// PROCESSAR EXCLUIR MEMBRO
+// ================================================
+$msg_excluir = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_membro'])) {
+    $membro_id = (int)($_POST['membro_excluir_id'] ?? 0);
+    $motivacao = trim($_POST['motivacao_excluir'] ?? '');
+
+    if ($membro_id && $membro_id != ($_SESSION['usuario_id'] ?? 0)) {
+        $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = ?");
+        $stmt->execute([$membro_id]);
+        $msg_excluir[] = ['tipo' => 'ok', 'texto' => "Membro removido." . ($motivacao ? " Motivo: $motivacao" : '')];
+        $total_usuarios = $pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
+    } else {
+        $msg_excluir[] = ['tipo' => 'err', 'texto' => 'Selecione um membro válido (você não pode excluir a si mesmo).'];
+    }
+}
+
+// ================================================
+// BUSCAR LISTA DE MEMBROS PARA OS FORMULÁRIOS
+// ================================================
+$membros_pendentes = $pdo->query("SELECT id, nome, email, categoria, status_verificacao, data_cadastro FROM usuarios WHERE status_verificacao = 'pendente' OR ativo = 0 ORDER BY data_cadastro DESC")->fetchAll(PDO::FETCH_ASSOC);
+$membros_ativos    = $pdo->query("SELECT id, nome, email, categoria FROM usuarios WHERE ativo = 1 AND status_verificacao = 'verificado' ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
+
 // Carregar a view
 include __DIR__ . '/../Views/entrada_gestor.php';
 ?>

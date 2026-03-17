@@ -1,7 +1,5 @@
 <?php
 // entrada_gestor.php - View do gestor
-// As variáveis $total_especies, $em_revisao, $validadas, $total_usuarios
-// já foram definidas no controlador
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -14,224 +12,348 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f4f0;
-            padding: 30px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
             color: #1e2e1e;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
-        
+
         .header {
             background: #0b5e42;
             color: white;
-            padding: 20px 30px;
+            padding: 20px 40px;
             border-radius: 12px;
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header h1 { font-size: 1.5em; }
-        .user-badge {
-            background-color: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 40px;
-        }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
             text-align: center;
+            width: 100%;
+            max-width: 600px;
         }
-        .card-icon { font-size: 2.5em; margin-bottom: 10px; }
-        .card-value { font-size: 2em; font-weight: bold; color: #0b5e42; }
-        .card-label { color: #666; font-size: 0.9em; margin-top: 5px; }
-        
-        .section-title {
-            font-size: 1.3em;
-            color: #0b5e42;
-            margin: 25px 0 15px 0;
-            border-bottom: 2px solid #0b5e42;
-            padding-bottom: 8px;
-        }
-        
-        .nav-grid {
+        .header h1 { font-size: 1.4em; font-weight: 600; }
+        .header p { font-size: 0.9em; opacity: 0.8; margin-top: 4px; }
+
+        .btn-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin: 20px 0;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            width: 100%;
+            max-width: 600px;
         }
-        
-        .nav-btn {
+
+        .action-btn {
             background: white;
             border: 2px solid #0b5e42;
-            border-radius: 10px;
-            padding: 20px 10px;
+            border-radius: 12px;
+            padding: 28px 16px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 600;
             color: #0b5e42;
+            font-size: 0.95em;
         }
-        .nav-btn:hover {
+        .action-btn:hover {
             background: #0b5e42;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(11,94,66,0.2);
         }
-        .nav-icon { font-size: 2em; margin-bottom: 10px; }
-        
-        .logout-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 12px 30px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 30px;
-            width: 200px;
-        }
-        .logout-btn:hover { background: #c82333; }
-        
-        .footer { display: flex; justify-content: center; }
+        .action-btn .icon { font-size: 2em; margin-bottom: 10px; display: block; }
 
-        /* ── Inserir espécies ── */
-        .especies-card {
+        .action-btn.danger { border-color: #dc3545; color: #dc3545; }
+        .action-btn.danger:hover { background: #dc3545; color: white; }
+
+        .btn-sair {
+            margin-top: 30px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 0.9em;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .btn-sair:hover { color: #dc3545; }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.ativo { display: flex; }
+
+        .modal {
             background: white;
-            border-radius: 12px;
-            padding: 25px 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        .especies-card textarea {
+            border-radius: 14px;
+            padding: 30px;
             width: 100%;
-            min-height: 140px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 0.95em;
-            font-family: inherit;
-            resize: vertical;
-            margin-top: 10px;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
-        .especies-card textarea:focus { outline: none; border-color: #0b5e42; }
-        .especies-card .hint {
-            font-size: 0.82em;
-            color: #888;
+        .modal h2 {
+            color: #0b5e42;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0ede8;
+        }
+        .modal h2.danger { color: #dc3545; border-color: #f5c6cb; }
+
+        .modal label {
+            display: block;
+            font-size: 0.87em;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 5px;
+        }
+        .modal select,
+        .modal textarea,
+        .modal input[type=text] {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.92em;
+            font-family: inherit;
+            margin-bottom: 14px;
+        }
+        .modal select:focus,
+        .modal textarea:focus,
+        .modal input[type=text]:focus { outline: none; border-color: #0b5e42; }
+        .modal textarea { resize: vertical; min-height: 80px; }
+
+        .modal .pendente-lista {
+            background: #f9f9f9;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            font-size: 0.83em;
+            color: #555;
+        }
+        .modal .pendente-lista span {
+            display: inline-block;
+            background: #fff3cd;
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin: 2px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
             margin-top: 6px;
         }
-        .btn-inserir {
-            background: #0b5e42;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 11px 28px;
-            font-size: 0.95em;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 12px;
+        .btn-confirm {
+            background: #0b5e42; color: white; border: none;
+            border-radius: 6px; padding: 10px 24px;
+            font-weight: 600; cursor: pointer; font-size: 0.92em;
         }
-        .btn-inserir:hover { background: #094d36; }
-        .msg-ok   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:6px; padding:10px 14px; margin-top:10px; }
-        .msg-warn { background:#fff3cd; color:#856404; border:1px solid #ffeeba; border-radius:6px; padding:10px 14px; margin-top:10px; }
-        .msg-err  { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:6px; padding:10px 14px; margin-top:10px; }
+        .btn-confirm:hover { background: #094d36; }
+        .btn-confirm.danger { background: #dc3545; }
+        .btn-confirm.danger:hover { background: #b02a37; }
+        .btn-cancel {
+            background: none; color: #666; border: 1px solid #ccc;
+            border-radius: 6px; padding: 10px 20px;
+            cursor: pointer; font-size: 0.92em;
+        }
+        .btn-cancel:hover { background: #f0f0f0; }
 
-        @media (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
-            .nav-grid { grid-template-columns: repeat(2, 1fr); }
+        .msg-ok   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
+        .msg-warn { background:#fff3cd; color:#856404; border:1px solid #ffeeba; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
+        .msg-err  { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
+
+        @media (max-width: 480px) {
+            .btn-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- HEADER -->
-        <div class="header">
-            <h1>📊 Painel do Gestor</h1>
-            <div class="user-badge">
-                👤 <?php echo htmlspecialchars($usuario_nome); ?> · <?php echo htmlspecialchars($usuario_instituicao); ?>
-            </div>
+
+    <div class="header">
+        <h1>📊 Painel do Gestor</h1>
+        <p><?php echo htmlspecialchars($usuario_nome); ?> · <?php echo htmlspecialchars($usuario_instituicao); ?></p>
+    </div>
+
+    <div class="btn-grid">
+        <div class="action-btn" onclick="abrirModal('modal-aceitar')">
+            <span class="icon">✅</span>
+            Aceitar Membro
         </div>
-
-        <!-- DASHBOARD -->
-        <div class="dashboard-grid">
-            <div class="card">
-                <div class="card-icon">🌳</div>
-                <div class="card-value"><?php echo $total_especies; ?></div>
-                <div class="card-label">Espécies</div>
-            </div>
-            <div class="card">
-                <div class="card-icon">🔍</div>
-                <div class="card-value"><?php echo $em_revisao; ?></div>
-                <div class="card-label">Em revisão</div>
-            </div>
-            <div class="card">
-                <div class="card-icon">✅</div>
-                <div class="card-value"><?php echo $validadas; ?></div>
-                <div class="card-label">Validadas</div>
-            </div>
-            <div class="card">
-                <div class="card-icon">👥</div>
-                <div class="card-value"><?php echo $total_usuarios; ?></div>
-                <div class="card-label">Usuários</div>
-            </div>
+        <div class="action-btn danger" onclick="abrirModal('modal-excluir')">
+            <span class="icon">🗑️</span>
+            Excluir Membro
         </div>
-
-        <!-- NAVEGAÇÃO ENTRE PERFIS -->
-        <h2 class="section-title">🧭 Acesso aos Perfis</h2>
-        
-        <div class="nav-grid">
-            <div class="nav-btn" onclick="window.location.href='/penomato_mvp/src/Views/entrar_colaborador.php'">
-                <div class="nav-icon">👤</div>
-                <div>Colaborador</div>
-            </div>
-            <div class="nav-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_painel_revisor.php'">
-                <div class="nav-icon">🔍</div>
-                <div>Revisor</div>
-            </div>
-            <div class="nav-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_autenticador.php'">
-                <div class="nav-icon">✅</div>
-                <div>Autenticador</div>
-            </div>
-            <div class="nav-btn" style="background:#0b5e42; color:white;" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_gestor.php'">
-                <div class="nav-icon">📊</div>
-                <div>Gestor</div>
-            </div>
+        <div class="action-btn" onclick="abrirModal('modal-especies')">
+            <span class="icon">🌿</span>
+            Adicionar Espécies de Interesse
         </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Views/entrar_colaborador.php'">
+            <span class="icon">👤</span>
+            Perfil Colaborador
+        </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_painel_revisor.php'">
+            <span class="icon">🔍</span>
+            Perfil Revisor
+        </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_autenticador.php'">
+            <span class="icon">✅</span>
+            Perfil Autenticador
+        </div>
+    </div>
 
-        <!-- INSERIR ESPÉCIES DE INTERESSE -->
-        <h2 class="section-title">🌿 Inserir Espécie de Interesse</h2>
+    <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
+        🚪 Sair
+    </button>
 
-        <div class="especies-card">
-            <?php if (!empty($msg_especies)): foreach ($msg_especies as $m): ?>
-                <div class="msg-<?php echo $m['tipo']; ?>">
-                    <?php echo htmlspecialchars($m['texto']); ?>
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODAL: ACEITAR MEMBRO                      -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-aceitar">
+        <div class="modal">
+            <h2>✅ Aceitar Membro</h2>
+
+            <?php if (!empty($msg_aceitar)): foreach ($msg_aceitar as $m): ?>
+                <div class="msg-<?php echo $m['tipo']; ?>"><?php echo htmlspecialchars($m['texto']); ?></div>
+            <?php endforeach; endif; ?>
+
+            <?php if (!empty($membros_pendentes)): ?>
+                <div class="pendente-lista">
+                    Aguardando aprovação:
+                    <?php foreach ($membros_pendentes as $p): ?>
+                        <span><?php echo htmlspecialchars($p['nome']); ?></span>
+                    <?php endforeach; ?>
                 </div>
+            <?php else: ?>
+                <p style="font-size:0.85em;color:#888;margin-bottom:14px;">Nenhum membro pendente no momento.</p>
+            <?php endif; ?>
+
+            <form method="POST" action="/penomato_mvp/src/Controllers/controlador_gestor.php">
+                <label>Membro</label>
+                <select name="membro_aceitar_id" required>
+                    <option value="">Selecione...</option>
+                    <?php foreach ($membros_pendentes as $u): ?>
+                        <option value="<?php echo $u['id']; ?>">
+                            <?php echo htmlspecialchars($u['nome']); ?> — <?php echo htmlspecialchars($u['email']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label>Categoria</label>
+                <select name="categoria_aceitar">
+                    <option value="colaborador">Colaborador</option>
+                    <option value="revisor">Revisor</option>
+                    <option value="validador">Validador</option>
+                    <option value="gestor">Gestor</option>
+                </select>
+
+                <label>Motivação / Observação</label>
+                <textarea name="motivacao_aceitar" placeholder="Ex: aprovado por critérios do edital XYZ..."></textarea>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="fecharModal('modal-aceitar')">Cancelar</button>
+                    <button type="submit" name="aceitar_membro" value="1" class="btn-confirm">✅ Aceitar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODAL: EXCLUIR MEMBRO                      -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-excluir">
+        <div class="modal">
+            <h2 class="danger">🗑️ Excluir Membro</h2>
+
+            <?php if (!empty($msg_excluir)): foreach ($msg_excluir as $m): ?>
+                <div class="msg-<?php echo $m['tipo']; ?>"><?php echo htmlspecialchars($m['texto']); ?></div>
+            <?php endforeach; endif; ?>
+
+            <form method="POST" action="/penomato_mvp/src/Controllers/controlador_gestor.php"
+                  onsubmit="return confirm('Tem certeza que deseja excluir este membro permanentemente?')">
+                <label>Membro</label>
+                <select name="membro_excluir_id" required>
+                    <option value="">Selecione...</option>
+                    <?php foreach (array_merge($membros_ativos, $membros_pendentes) as $u): ?>
+                        <option value="<?php echo $u['id']; ?>">
+                            <?php echo htmlspecialchars($u['nome']); ?> — <?php echo htmlspecialchars($u['email']); ?> (<?php echo $u['categoria']; ?>)
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label>Motivação / Justificativa</label>
+                <textarea name="motivacao_excluir" placeholder="Ex: inatividade, violação de conduta..."></textarea>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="fecharModal('modal-excluir')">Cancelar</button>
+                    <button type="submit" name="excluir_membro" value="1" class="btn-confirm danger">🗑️ Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODAL: ADICIONAR ESPÉCIES                  -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-especies">
+        <div class="modal">
+            <h2>🌿 Adicionar Espécies de Interesse</h2>
+
+            <?php if (!empty($msg_especies)): foreach ($msg_especies as $m): ?>
+                <div class="msg-<?php echo $m['tipo']; ?>"><?php echo htmlspecialchars($m['texto']); ?></div>
             <?php endforeach; endif; ?>
 
             <form method="POST" action="/penomato_mvp/src/Controllers/controlador_gestor.php">
-                <textarea name="lista_especies" placeholder="Uma espécie por linha. Exemplo:
-Acca sellowiana
+                <label>Uma ou várias espécies (uma por linha)</label>
+                <textarea name="lista_especies" rows="8" placeholder="Acca sellowiana
 Euterpe oleracea
 Handroanthus impetiginosus"></textarea>
-                <div class="hint">Digite uma ou várias espécies, uma por linha. Espécies já cadastradas serão ignoradas.</div>
-                <button type="submit" name="inserir_especies" value="1" class="btn-inserir">
-                    ➕ Inserir no Banco
-                </button>
+                <small style="color:#888;font-size:0.82em;display:block;margin-top:-10px;margin-bottom:14px;">
+                    Espécies já cadastradas serão ignoradas automaticamente.
+                </small>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="fecharModal('modal-especies')">Cancelar</button>
+                    <button type="submit" name="inserir_especies" value="1" class="btn-confirm">➕ Inserir</button>
+                </div>
             </form>
         </div>
-
-        <!-- BOTÃO SAIR -->
-        <div class="footer">
-            <button class="logout-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
-                🚪 Sair
-            </button>
-        </div>
     </div>
+
+    <script>
+    function abrirModal(id) {
+        document.getElementById(id).classList.add('ativo');
+    }
+    function fecharModal(id) {
+        document.getElementById(id).classList.remove('ativo');
+    }
+    // Fechar clicando fora do modal
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) fecharModal(overlay.id);
+        });
+    });
+
+    // Abrir modal automaticamente se houver mensagem de retorno
+    <?php if (!empty($msg_aceitar)): ?>
+        abrirModal('modal-aceitar');
+    <?php endif; ?>
+    <?php if (!empty($msg_excluir)): ?>
+        abrirModal('modal-excluir');
+    <?php endif; ?>
+    <?php if (!empty($msg_especies)): ?>
+        abrirModal('modal-especies');
+    <?php endif; ?>
+    </script>
 </body>
 </html>
