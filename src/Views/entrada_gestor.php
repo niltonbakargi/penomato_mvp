@@ -198,6 +198,10 @@
             <span class="icon">🌿</span>
             Adicionar Espécies de Interesse
         </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/gestao_especies.php'">
+            <span class="icon">📋</span>
+            Gestão de Espécies
+        </div>
         <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Views/entrar_colaborador.php'">
             <span class="icon">👤</span>
             Perfil Colaborador
