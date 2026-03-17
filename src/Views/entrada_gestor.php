@@ -206,6 +206,10 @@
             <span class="icon">✅</span>
             Aprovação de Ações
         </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/gerar_artigo.php'">
+            <span class="icon">📄</span>
+            Gerar Artigo
+        </div>
         <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/monitoramento.php'">
             <span class="icon">📡</span>
             Monitoramento
