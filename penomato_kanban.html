@@ -862,7 +862,7 @@ header {
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = 'penomato_kanban_v3';
+const STORAGE_KEY = 'penomato_kanban_v4';
 
 const DEFAULT_TASKS = [
   // ── CONCLUÍDO (histórico git) ──────────────────────────────────────────
@@ -896,11 +896,11 @@ const DEFAULT_TASKS = [
   { id:28, col:'done', title:"Relatório de colaboradores com exportação CSV", prio:"p2", tag:"Relatórios", notes:"17/03/2026 — relatorio_colaboradores.php", due:"2026-03-17", created:"2026-03-17" },
   { id:29, col:'done', title:"Fila de aprovação de ações do gestor (aprovar/rejeitar com motivo)", prio:"p1", tag:"Painel Gestor", notes:"17/03/2026 — aprovacao_acoes.php + tabela fila_aprovacao no BD", due:"2026-03-17", created:"2026-03-17" },
   { id:30, col:'done', title:"Painel colaborador com permissões por subtipo (identificador, dev, especialista, gestor)", prio:"p2", tag:"Painel Colaborador", notes:"17/03/2026 — usa SESSION usuario_subtipo", due:"2026-03-17", created:"2026-03-17" },
+  { id:31, col:'done', title:"Página de Contestar Informação com fila de aprovação", prio:"p2", tag:"Módulo Contestação", notes:"18/03/2026 — contestar_informacao.php (547 linhas) — insere em fila_aprovacao como tipo contestacao", due:"2026-03-18", created:"2026-03-18" },
+  { id:32, col:'done', title:"Gerador de artigo científico com template estruturado", prio:"p2", tag:"Módulo Revisão", notes:"18/03/2026 — gerar_artigo.php (469 linhas) — especialista gera artigo → entra na fila_aprovacao", due:"2026-03-18", created:"2026-03-18" },
 
   // ── EM ANDAMENTO ───────────────────────────────────────────────────────
-  { id:13, col:'doing', title:"Integrar fila_aprovacao nos controladores existentes (dados_internet, confirmacao, imagem)", prio:"p1", tag:"Módulo Aprovação", notes:"Ao concluir uma etapa, inserir em fila_aprovacao em vez de avançar status direto", due:"", created:"2026-03-17" },
-  { id:14, col:'doing', title:"Funcionalidade real de Contestar Informação", prio:"p2", tag:"Módulo Contestação", notes:"Colaborador sinaliza inconsistência → entra na fila de aprovação como tipo 'contestacao'", due:"", created:"2026-03-17" },
-  { id:15, col:'doing', title:"Funcionalidade real de Revisar Artigo (colaborador especialista)", prio:"p2", tag:"Módulo Revisão", notes:"Especialista revisa artigo → gestor aprova via fila_aprovacao", due:"", created:"2026-03-17" },
+  { id:13, col:'doing', title:"Integrar fila_aprovacao nos controladores existentes (dados_internet, confirmacao, imagem)", prio:"p1", tag:"Módulo Aprovação", notes:"Parcialmente feito: contestar_informacao e gerar_artigo já usam. Faltam: inserir_dados_internet, confirmar_caracteristicas, processar_upload_imagem", due:"", created:"2026-03-17" },
 
   // ── A FAZER — CRÍTICO ──────────────────────────────────────────────────
   { id:16, col:'todo', title:"Testar fluxo completo: cadastro → dados internet → confirmação → aprovação", prio:"p1", tag:"Testes", notes:"", due:"", created:"2026-03-17" },
