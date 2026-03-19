@@ -21,11 +21,12 @@
 2. Problema de Pesquisa
 3. Justificativa
 4. Objetivos
-5. Referencial Teórico
-6. Metodologia
-7. Resultados Esperados
-8. Cronograma
-9. Referências
+5. Modelo de Funcionamento do Sistema
+6. Referencial Teórico
+7. Metodologia
+8. Resultados Esperados
+9. Cronograma
+10. Referências
 
 ---
 
@@ -125,7 +126,173 @@ Desenvolver um sistema web colaborativo — denominado Penomato — para documen
 
 ---
 
-## 5. REFERENCIAL TEÓRICO
+## 5. MODELO DE FUNCIONAMENTO DO SISTEMA
+
+Esta seção descreve o modelo operacional do Penomato: os atores envolvidos, o pipeline de documentação e as regras de negócio que governam cada transição de estado. O objetivo é explicitar a lógica de funcionamento do sistema antes de sua descrição técnica de implementação.
+
+### 5.1 Atores do Sistema
+
+O Penomato é estruturado em torno de três papéis internos e um público externo, com permissões e responsabilidades distintas:
+
+| Ator | Papel no sistema |
+|------|-----------------|
+| **Gestor** | Administrador institucional. Define quais espécies serão documentadas, aprova dispensas de partes vegetais e monitora o progresso geral. |
+| **Colaborador** | Aluno ou pesquisador de campo. Insere dados morfológicos de referência, cadastra exemplares físicos, fotografa as partes da planta e solicita a geração do artigo. |
+| **Especialista (Revisor)** | Professor ou pesquisador sênior em botânica. Aprova exemplares físicos antes do início do registro fotográfico e valida o artigo gerado antes da publicação. |
+| **Público** | Qualquer pessoa com acesso à internet. Consulta fichas de espécies publicadas sem necessidade de cadastro. Público-alvo final da plataforma como recurso de educação ambiental. |
+
+---
+
+### 5.2 Pipeline de Documentação
+
+O ciclo de documentação de uma espécie percorre as etapas descritas a seguir. Cada etapa possui condições de entrada, ações disponíveis e um estado de saída bem definido.
+
+#### Etapa 1 — Cadastro da demanda pelo gestor
+
+O gestor registra uma espécie de interesse fornecendo nome científico e nome popular. O sistema cria um registro único com identificador interno. Estado inicial: **SEM DADOS**.
+
+#### Etapa 2 — Inserção de dados morfológicos de referência
+
+O colaborador pesquisa a espécie em fontes bibliográficas e preenche os atributos fitomorfológicos: folha, flor, fruto, caule, semente, hábito de crescimento, distribuição geográfica, sinonímias taxonômicas e referências bibliográficas. Imagens de referência com fonte podem ser incluídas. Os dados inseridos nesta etapa têm **aprovação automática** — não passam por revisão humana, funcionando como ponto de partida para a etapa seguinte. Estado resultante: **DADOS DA INTERNET**.
+
+A partir deste estado, dois caminhos de documentação correm em **paralelo e de forma independente**:
+
+---
+
+#### Caminho A — Confirmação fitomorfológica → IDENTIFICADA
+
+O colaborador acessa a interface de confirmação e revisa cada atributo individualmente, podendo:
+- **Confirmar** — o dado de referência está correto;
+- **Corrigir** — substitui o valor pelo dado verificado.
+
+Regra absoluta: **todos os atributos devem ser confirmados ou corrigidos** para que a espécie avance. Qualquer atributo ainda pendente bloqueia a transição. Não há exceção a essa regra. Estado resultante: **IDENTIFICADA**.
+
+---
+
+#### Caminho B — Registro fotográfico de campo → REGISTRADA
+
+**B.1 — Cadastro do exemplar físico**
+
+Antes de qualquer foto de parte vegetal, o colaborador cadastra o **exemplar** — o registro do indivíduo físico encontrado no campo. Os dados coletados são:
+
+- Espécie à qual o indivíduo pertence;
+- Coordenadas geográficas (capturadas pelo GPS do navegador ou inseridas manualmente);
+- Município, estado e bioma;
+- Descrição livre do local de coleta;
+- Fotografia de identificação geral do indivíduo, tirada no momento do encontro em campo;
+- Especialista orientador responsável pelo exemplar;
+- Número da etiqueta de alumínio fixada fisicamente na planta.
+
+O sistema gera automaticamente um **código único** para o exemplar no formato alfanumérico `XX000` (ex.: KT001, BR047) — curto o suficiente para ser anotado na etiqueta de campo. Estado do exemplar: **AGUARDANDO REVISÃO**. O upload de fotos das partes fica **bloqueado** até a aprovação.
+
+**B.2 — Revisão do exemplar pelo especialista**
+
+O especialista recebe a notificação, analisa a fotografia de identificação, os dados de localização e o mapa com o ponto de coleta. Suas opções:
+- **Aprovar** — partes são desbloqueadas; colaboradores podem iniciar o envio de fotos;
+- **Rejeitar com motivo** — o motivo é registrado e exibido ao colaborador; o exemplar pode ser corrigido e resubmetido.
+
+**B.3 — Envio incremental de fotos das partes**
+
+Com o exemplar aprovado, colaboradores enviam fotos das seis partes vegetais: folha, flor, fruto, caule, semente e hábito. Cada foto é obrigatoriamente vinculada ao exemplar aprovado, garantindo que nunca se misture material de indivíduos diferentes na mesma coleção. Múltiplos colaboradores podem contribuir com partes distintas em momentos distintos. Uma parte pode ser formalmente **dispensada** pelo gestor quando não está disponível no indivíduo.
+
+Quando todas as partes estiverem fotografadas ou dispensadas: estado da espécie → **REGISTRADA** (transição automática pelo sistema).
+
+---
+
+#### Etapa 3 — Geração do artigo científico
+
+**Condição:** espécie deve estar simultaneamente **IDENTIFICADA** e **REGISTRADA**. Ambas as condições são obrigatórias e independentes entre si.
+
+A geração não é automática — é disparada explicitamente pelo colaborador ou gestor após confirmação. O documento gerado contém:
+
+- Nome científico, família e sinonímias taxonômicas;
+- Descrição fitomorfológica por parte, com os atributos confirmados;
+- Referências bibliográficas utilizadas;
+- Galeria de exsicatas organizada por parte, com metadados completos (coletor, data, código do exemplar, município, bioma);
+- Lista de todos os contribuidores com suas respectivas contribuições.
+
+Estado resultante: **AGUARDANDO REVISÃO** — o artigo entra na fila do especialista.
+
+---
+
+#### Etapa 4 — Revisão científica pelo especialista
+
+O especialista acessa o artigo completo com todas as fotos. O sistema oferece filtros visuais de análise (brilho, contraste, zoom, saturação) — apenas para visualização, sem alterar os arquivos originais. O especialista decide:
+
+- **Aprovar com parecer** — parecer registrado no histórico; estado → **REVISADA**;
+- **Rejeitar com motivo** — motivo visível ao colaborador; espécie retorna ao estado correspondente ao problema identificado.
+
+#### Etapa 5 — Publicação automática
+
+Após aprovação pelo especialista, o sistema publica automaticamente a ficha pública da espécie, acessível sem autenticação, contendo:
+
+- Descrição fitomorfológica validada;
+- Galeria de exsicatas por parte da planta;
+- Mapa de ocorrência com o ponto de coleta georeferenciado;
+- Créditos individuais de todos os contribuidores;
+- Data de publicação e número da edição.
+
+Estado final: **PUBLICADA**.
+
+#### Etapa 6 — Contestação e reedição
+
+Qualquer colaborador ou especialista pode abrir uma contestação após a publicação, registrando o motivo. Se aceita pelo gestor ou especialista:
+- A identificação morfológica é corrigida;
+- As fotografias **permanecem vinculadas ao exemplar físico** — não são descartadas, pois representam o registro do indivíduo, não da identificação;
+- O artigo é regenerado, passa por nova revisão e é republicado como nova edição numerada.
+
+---
+
+### 5.3 Resumo do Fluxo com Exemplares
+
+```
+Gestor cadastra espécie → status: SEM_DADOS
+
+Colaborador insere dados de referência → status: DADOS_INTERNET
+
+[PARALELO A] Colaborador confirma atributos um a um
+             → status: IDENTIFICADA (100% atributos validados)
+
+[PARALELO B] Colaborador cadastra exemplar físico
+             → Sistema gera código XX000
+             → status exemplar: AGUARDANDO_REVISAO
+             → Fotos de partes: BLOQUEADAS
+
+             Especialista revisa exemplar
+             → Aprovado: partes desbloqueadas
+             → Rejeitado: colaborador corrige e resubmete
+
+             Colaboradores enviam fotos de cada parte
+             → Quando todas completas/dispensadas
+             → status espécie: REGISTRADA
+
+IDENTIFICADA + REGISTRADA → Artigo pode ser gerado
+
+Colaborador/gestor dispara geração → status: AGUARDANDO_REVISAO
+
+Especialista revisa artigo
+→ Aprova → publicação automática → status: PUBLICADA
+→ Rejeita → colaborador corrige → reinicia etapa 3
+```
+
+---
+
+### 5.4 Regras de Negócio Fundamentais
+
+| Regra | Descrição |
+|-------|-----------|
+| Dados de referência sem revisão humana | A inserção de dados morfológicos da internet é aprovada automaticamente, servindo como ponto de partida para a confirmação. |
+| Exemplar antes das fotos | Nenhuma foto de parte pode ser enviada sem que exista um exemplar cadastrado e aprovado pelo especialista. |
+| Fotos bloqueadas até aprovação do exemplar | O especialista valida o indivíduo físico antes de qualquer registro fotográfico, prevenindo coleções inválidas. |
+| Mesmo indivíduo em toda a coleção | As partes vegetais de uma coleção devem ser do mesmo indivíduo físico, garantido pelo vínculo obrigatório ao código do exemplar e pela etiqueta física. |
+| Identificação exige 100% dos atributos | Qualquer atributo pendente bloqueia o avanço para o estado "identificada", sem exceção. |
+| Registro é transição automática | O sistema verifica continuamente a completude das partes e transiciona automaticamente para "registrada", sem ação humana. |
+| Artigo exige IDENTIFICADA e REGISTRADA | As duas condições são obrigatórias e devem ser satisfeitas simultaneamente. |
+| Contestação não descarta fotos | As fotografias são registros do indivíduo físico, independentes de sua identificação taxonômica, e permanecem no sistema em caso de reclassificação. |
+
+---
+
+## 6. REFERENCIAL TEÓRICO
 
 ### 5.1 Exsicatas e Herbários Digitais
 
@@ -157,9 +324,9 @@ A geração de texto científico a partir de dados estruturados é uma área em 
 
 ---
 
-## 6. METODOLOGIA
+## 7. METODOLOGIA
 
-### 6.1 Natureza e Paradigma da Pesquisa
+### 7.1 Natureza e Paradigma da Pesquisa
 
 Esta pesquisa é de natureza aplicada, com abordagem quali-quantitativa. O paradigma metodológico adotado é a **Design Science Research (DSR)**, proposta por Hevner et al. (2004) como framework adequado para pesquisas em Sistemas de Informação que produzem artefatos tecnológicos como contribuição científica.
 
@@ -171,7 +338,7 @@ Na DSR, o artefato — neste caso o sistema Penomato — não é apenas o produt
 
 A DSR exige que o artefato seja avaliado em condições de uso real, o que neste trabalho se dará por meio de testes de usabilidade com os usuários do grupo de pesquisa parceiro.
 
-### 6.2 Etapas da Pesquisa
+### 7.2 Etapas da Pesquisa
 
 O trabalho é organizado em quatro etapas sequenciais, descritas a seguir.
 
@@ -246,7 +413,7 @@ Os resultados orientarão uma iteração de refinamento do sistema, corrigindo o
 
 ---
 
-## 7. RESULTADOS ESPERADOS
+## 8. RESULTADOS ESPERADOS
 
 Ao final da pesquisa, espera-se:
 
@@ -260,7 +427,7 @@ Como resultado secundário, espera-se que o sistema possa ser adotado pelo grupo
 
 ---
 
-## 8. CRONOGRAMA
+## 9. CRONOGRAMA
 
 | Etapa | Descrição | Mês |
 |---|---|---|
@@ -278,7 +445,7 @@ Como resultado secundário, espera-se que o sistema possa ser adotado pelo grupo
 
 ---
 
-## 9. REFERÊNCIAS
+## 10. REFERÊNCIAS
 
 _[A ser completado conforme as referências citadas no texto]_
 
