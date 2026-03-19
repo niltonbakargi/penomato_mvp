@@ -67,7 +67,7 @@ function menuAtivo($url, $pagina_atual) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
     <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -78,23 +78,15 @@ function menuAtivo($url, $pagina_atual) {
     
     <style>
         /* Estilos do cabeçalho e menu */
-        :root {
-            --verde-penomato: #0b5e42;
-            --verde-escuro: #0a4e36;
-            --verde-claro: #1a7a5a;
-            --cinza-fundo: #f5f5f5;
-            --cinza-borda: #e0e0e0;
-        }
-        
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--cinza-fundo);
+            background-color: var(--cinza-50);
             padding-top: 80px; /* Espaço para o menu fixo */
         }
         
         /* Navbar principal */
         .navbar-penomato {
-            background: linear-gradient(135deg, var(--verde-penomato) 0%, var(--verde-claro) 100%);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             padding: 0.5rem 1rem;
             position: fixed;
@@ -122,7 +114,7 @@ function menuAtivo($url, $pagina_atual) {
         .navbar-brand i {
             font-size: 2rem;
             background: white;
-            color: var(--verde-penomato);
+            color: var(--cor-primaria);
             width: 45px;
             height: 45px;
             border-radius: 50%;
@@ -193,7 +185,7 @@ function menuAtivo($url, $pagina_atual) {
             height: 35px;
             border-radius: 50%;
             background: white;
-            color: var(--verde-penomato);
+            color: var(--cor-primaria);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -245,12 +237,12 @@ function menuAtivo($url, $pagina_atual) {
         
         .dropdown-item i {
             width: 20px;
-            color: var(--verde-penomato);
+            color: var(--cor-primaria);
             font-size: 1rem;
         }
         
         .dropdown-item:hover {
-            background: var(--cinza-fundo);
+            background: var(--cinza-50);
             transform: translateX(3px);
         }
         
@@ -282,7 +274,7 @@ function menuAtivo($url, $pagina_atual) {
         }
         
         .breadcrumb-custom a {
-            color: var(--verde-penomato);
+            color: var(--cor-primaria);
             text-decoration: none;
         }
         
@@ -370,11 +362,11 @@ function menuAtivo($url, $pagina_atual) {
             }
             
             .navbar-nav .nav-link {
-                color: var(--verde-penomato) !important;
+                color: var(--cor-primaria) !important;
             }
             
             .navbar-nav .nav-link:hover {
-                background: var(--cinza-fundo);
+                background: var(--cinza-50);
             }
             
             .user-dropdown {

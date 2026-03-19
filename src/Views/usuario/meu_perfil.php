@@ -599,7 +599,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     
     .profile-cover {
         height: 100px;
-        background: linear-gradient(135deg, #0b5e42 0%, #1a7a5a 100%);
+        background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
     }
     
     .profile-avatar {
@@ -623,7 +623,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background: #0b5e42;
+        background: var(--cor-primaria);
         color: white;
         display: flex;
         align-items: center;
@@ -644,14 +644,14 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #0b5e42;
+        color: var(--cor-primaria);
         text-decoration: none;
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         transition: all 0.3s;
     }
     
     .avatar-edit:hover {
-        background: #0b5e42;
+        background: var(--cor-primaria);
         color: white;
         transform: scale(1.1);
     }
@@ -689,13 +689,13 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .badge-type {
-        background: #0b5e42;
+        background: var(--cor-primaria);
         color: white;
     }
     
     .badge-subtype {
         background: #e8f4f8;
-        color: #0b5e42;
+        color: var(--cor-primaria);
     }
     
     .badge-institution {
@@ -719,7 +719,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         display: block;
         font-size: 1.5rem;
         font-weight: 700;
-        color: #0b5e42;
+        color: var(--cor-primaria);
         line-height: 1.2;
     }
     
@@ -737,9 +737,9 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     .btn-profile {
         flex: 1;
         padding: 8px;
-        border: 1px solid #0b5e42;
+        border: 1px solid var(--cor-primaria);
         border-radius: 8px;
-        color: #0b5e42;
+        color: var(--cor-primaria);
         text-decoration: none;
         text-align: center;
         font-size: 0.9rem;
@@ -747,7 +747,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .btn-profile:hover {
-        background: #0b5e42;
+        background: var(--cor-primaria);
         color: white;
     }
     
@@ -775,7 +775,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     
     .link-item:hover {
         background: #e8f4f8;
-        color: #0b5e42;
+        color: var(--cor-primaria);
         transform: translateX(3px);
     }
     
@@ -809,7 +809,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     
     .stat-card-especies .stat-card-icon {
         background: rgba(11, 94, 66, 0.1);
-        color: #0b5e42;
+        color: var(--cor-primaria);
     }
     
     .stat-card-imagens .stat-card-icon {
@@ -1005,22 +1005,22 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .btn-icon:hover {
-        background: #0b5e42;
+        background: var(--cor-primaria);
         color: white;
     }
     
     .btn-sm-outline {
         padding: 4px 12px;
-        border: 1px solid #0b5e42;
+        border: 1px solid var(--cor-primaria);
         border-radius: 20px;
-        color: #0b5e42;
+        color: var(--cor-primaria);
         text-decoration: none;
         font-size: 0.85rem;
         transition: all 0.3s;
     }
     
     .btn-sm-outline:hover {
-        background: #0b5e42;
+        background: var(--cor-primaria);
         color: white;
     }
 </style>

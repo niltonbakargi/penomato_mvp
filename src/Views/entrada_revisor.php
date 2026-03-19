@@ -11,10 +11,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Revisor - Penomato</title>
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f4f0;
             padding: 30px;
             color: #1e2e1e;
@@ -22,8 +21,8 @@
         .container { max-width: 1200px; margin: 0 auto; }
         
         .header {
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             padding: 20px 30px;
             border-radius: 12px;
             margin-bottom: 25px;
@@ -44,8 +43,8 @@
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            background-color: #0b5e42;
-            color: white;
+            background-color: var(--cor-primaria);
+            color: var(--branco);
         }
         .btn-secondary {
             background-color: #e9ecef;
@@ -56,13 +55,13 @@
             font-size: 0.8em;
         }
         .btn-outline {
-            background: white;
-            border: 1px solid #0b5e42;
-            color: #0b5e42;
+            background: var(--branco);
+            border: 1px solid var(--cor-primaria);
+            color: var(--cor-primaria);
         }
         
         .actions-bar {
-            background: white;
+            background: var(--branco);
             border-radius: 10px;
             padding: 15px 20px;
             margin-bottom: 25px;
@@ -72,7 +71,7 @@
         }
         
         .main-content {
-            background: white;
+            background: var(--branco);
             border-radius: 10px;
             padding: 30px;
         }
@@ -92,8 +91,8 @@
             align-items: center;
         }
         .revisao-item:hover {
-            background-color: #f8f9fa;
-            border-color: #0b5e42;
+            background-color: var(--cinza-50);
+            border-color: var(--cor-primaria);
         }
         
         .badge {
@@ -103,14 +102,14 @@
             font-weight: 600;
             margin-left: 5px;
         }
-        .badge-alta { background-color: #dc3545; color: white; }
-        .badge-media { background-color: #ffc107; color: #1e2e1e; }
-        .badge-baixa { background-color: #28a745; color: white; }
+        .badge-alta { background-color: var(--perigo-cor); color: var(--branco); }
+        .badge-media { background-color: var(--aviso-cor); color: #1e2e1e; }
+        .badge-baixa { background-color: var(--sucesso-cor); color: var(--branco); }
         
         .empty-message {
             text-align: center;
             padding: 40px;
-            color: #6c757d;
+            color: var(--cinza-500);
         }
         
         /* Modal */
@@ -128,7 +127,7 @@
         }
         .modal.active { display: flex; }
         .modal-content {
-            background: white;
+            background: var(--branco);
             border-radius: 12px;
             width: 90%;
             max-width: 500px;
@@ -149,7 +148,7 @@
             border: none;
             font-size: 1.5em;
             cursor: pointer;
-            color: #6c757d;
+            color: var(--cinza-500);
         }
         .modal-body {
             padding: 20px;
@@ -165,8 +164,8 @@
             align-items: center;
         }
         .modal-list-item:hover {
-            background-color: #f8f9fa;
-            border-color: #0b5e42;
+            background-color: var(--cinza-50);
+            border-color: var(--cor-primaria);
         }
         
         input {
@@ -180,12 +179,12 @@
         .loading {
             text-align: center;
             padding: 30px;
-            color: #6c757d;
+            color: var(--cinza-500);
         }
         
         .info-text {
             font-size: 0.9em;
-            color: #6c757d;
+            color: var(--cinza-500);
             margin-top: 5px;
         }
     </style>

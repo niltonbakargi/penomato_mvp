@@ -110,7 +110,7 @@ $labels_status = [
         .container { max-width: 960px; margin: 0 auto; }
 
         .header {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             padding: 18px 28px;
             border-radius: 10px;
@@ -147,7 +147,7 @@ $labels_status = [
             border-bottom: 2px solid #e0e8e0;
             font-size: 0.92em;
             font-weight: 700;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
         .card-body { padding: 18px; }
 
@@ -175,7 +175,7 @@ $labels_status = [
         }
         select:focus, textarea:focus, input[type=text]:focus {
             outline: none;
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
         }
         textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
 
@@ -197,15 +197,15 @@ $labels_status = [
             text-align: center;
             transition: all 0.15s;
         }
-        .tipo-btn:hover { border-color: #0b5e42; color: #0b5e42; }
-        .tipo-btn.selecionado { border-color: #0b5e42; background: #e8f5e9; color: #0b5e42; }
+        .tipo-btn:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
+        .tipo-btn.selecionado { border-color: var(--cor-primaria); background: #e8f5e9; color: var(--cor-primaria); }
         .tipo-btn .icon { font-size: 1.3em; display: block; margin-bottom: 4px; }
 
         #subtipo-hidden { display: none; }
 
         .btn-enviar {
             width: 100%;
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             border: none;
             padding: 12px;
@@ -234,7 +234,7 @@ $labels_status = [
             font-size: 0.78em;
             font-weight: 600;
             background: #e0ebe0;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-left: 6px;
         }
 
@@ -253,8 +253,8 @@ $labels_status = [
             transition: border-color 0.15s;
             position: relative;
         }
-        .galeria-item:hover { border-color: #0b5e42; }
-        .galeria-item.selecionada { border-color: #0b5e42; box-shadow: 0 0 0 2px #0b5e42; }
+        .galeria-item:hover { border-color: var(--cor-primaria); }
+        .galeria-item.selecionada { border-color: var(--cor-primaria); box-shadow: 0 0 0 2px var(--cor-primaria); }
         .galeria-item img { width: 100%; height: 72px; object-fit: cover; display: block; }
         .galeria-item .parte {
             background: rgba(0,0,0,0.55);
@@ -290,7 +290,7 @@ $labels_status = [
         .historico-item:last-child { border-bottom: none; }
         .historico-item .esp { font-style: italic; font-weight: 600; color: #1a3a28; }
         .historico-item .st-pendente  { color: #d97706; font-weight: 600; }
-        .historico-item .st-aprovado  { color: #0b5e42; font-weight: 600; }
+        .historico-item .st-aprovado  { color: var(--cor-primaria); font-weight: 600; }
         .historico-item .st-rejeitado { color: #dc3545; font-weight: 600; }
     </style>
 </head>

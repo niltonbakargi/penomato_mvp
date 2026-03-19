@@ -75,15 +75,16 @@ $statusBadge = ['aguardando_revisao' => 'warning', 'aprovado' => 'success', 'rej
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
 <style>
-  body { background: #f8f9fa; }
+  body { background: var(--cinza-50); }
   #mapa-principal { height: 480px; border-radius: 12px; z-index: 0; }
   .stat-card { border-radius: 12px; border: none; }
   .exemplar-row { cursor: default; transition: background .15s; }
   .exemplar-row:hover { background: #f0f7ff; }
-  .badge-aguardando { background: #ffc107; color: #000; }
+  .badge-aguardando { background: var(--aviso-cor); color: #000; }
   .badge-aprovado    { background: #198754; }
-  .badge-rejeitado   { background: #dc3545; }
+  .badge-rejeitado   { background: var(--perigo-cor); }
   .legend-dot { display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:6px; vertical-align:middle; }
   .leaflet-popup-content { font-size: .85rem; min-width: 180px; }
   .popup-foto { width:100%; height:100px; object-fit:cover; border-radius:6px; margin-bottom:6px; }

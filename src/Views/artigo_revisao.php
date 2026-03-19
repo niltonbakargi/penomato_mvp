@@ -176,28 +176,27 @@ $nomes_partes = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Revisão: <?php echo htmlspecialchars($especie['nome_cientifico']); ?></title>
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f0f4f0;
+            background-color: var(--cinza-50);
             padding: 20px;
-            color: #1e2e1e;
+            color: var(--cinza-900);
         }
         .container { max-width: 1200px; margin: 0 auto; }
         
         .back-link {
             display: inline-block;
             margin-bottom: 15px;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             text-decoration: none;
             font-weight: bold;
         }
         .back-link:hover { text-decoration: underline; }
         
         .header {
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             padding: 25px;
             border-radius: 12px;
             margin-bottom: 25px;
@@ -216,7 +215,7 @@ $nomes_partes = [
             font-weight: 600;
             text-transform: uppercase;
             background: rgba(255,255,255,0.2);
-            color: white;
+            color: var(--branco);
         }
         
         .grid-2col {
@@ -227,7 +226,7 @@ $nomes_partes = [
         }
         
         .card {
-            background: white;
+            background: var(--branco);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -236,25 +235,25 @@ $nomes_partes = [
         
         .card-title {
             font-size: 1.3em;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 15px;
             font-weight: bold;
             display: flex;
             align-items: center;
             gap: 8px;
-            border-bottom: 2px solid #e0e0e0;
+            border-bottom: 2px solid var(--cinza-200);
             padding-bottom: 10px;
         }
         
         .section {
             margin-bottom: 25px;
             padding-bottom: 20px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--cinza-200);
         }
         
         .section-title {
             font-size: 1.2em;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 15px;
             font-weight: bold;
             display: flex;
@@ -275,7 +274,7 @@ $nomes_partes = [
         .char-label {
             font-weight: bold;
             font-size: 0.8em;
-            color: #666;
+            color: var(--cinza-500);
             text-transform: uppercase;
         }
         
@@ -288,8 +287,8 @@ $nomes_partes = [
         }
         
         .ref-link {
-            background: #e9ecef;
-            color: #0b5e42;
+            background: var(--cinza-200);
+            color: var(--cor-primaria);
             padding: 2px 6px;
             border-radius: 12px;
             font-size: 0.7em;
@@ -299,29 +298,29 @@ $nomes_partes = [
             display: inline-block;
         }
         .ref-link:hover {
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
         }
         
         .references {
-            background: #f8f9fa;
+            background: var(--cinza-50);
             border-radius: 12px;
             padding: 20px;
             margin-top: 20px;
         }
         .references h3 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 15px;
         }
         .ref-item {
             padding: 8px 0;
-            border-bottom: 1px dashed #ddd;
+            border-bottom: 1px dashed var(--cinza-300);
             font-size: 0.9em;
         }
         .ref-number {
             display: inline-block;
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             width: 22px;
             height: 22px;
             text-align: center;
@@ -339,19 +338,19 @@ $nomes_partes = [
             margin-top: 15px;
         }
         .imagem-card {
-            background: #f8f9fa;
+            background: var(--cinza-50);
             border-radius: 8px;
             overflow: hidden;
-            border: 1px solid #ddd;
+            border: 1px solid var(--cinza-300);
         }
         .imagem-preview {
             width: 100%;
             height: 120px;
-            background: #e9ecef;
+            background: var(--cinza-200);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #666;
+            color: var(--cinza-500);
             font-size: 2em;
             cursor: pointer;
         }
@@ -371,25 +370,25 @@ $nomes_partes = [
             text-overflow: ellipsis;
         }
         .sem-imagem {
-            background: #f8f9fa;
+            background: var(--cinza-50);
             padding: 20px;
             text-align: center;
-            color: #999;
+            color: var(--cinza-400);
             border-radius: 8px;
-            border: 2px dashed #ddd;
+            border: 2px dashed var(--cinza-300);
         }
         
         /* Decisão */
         .decision-box {
-            background: white;
+            background: var(--branco);
             padding: 25px;
             border-radius: 12px;
             margin-top: 30px;
-            border: 2px solid #0b5e42;
+            border: 2px solid var(--cor-primaria);
         }
         .decision-title {
             font-size: 1.3em;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 20px;
             font-weight: bold;
         }
@@ -404,14 +403,14 @@ $nomes_partes = [
             gap: 8px;
             cursor: pointer;
             padding: 10px 20px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--cinza-300);
             border-radius: 8px;
             transition: all 0.2s;
             flex: 1;
         }
         .radio-group label:hover {
-            border-color: #0b5e42;
-            background: #f0fdf4;
+            border-color: var(--cor-primaria);
+            background: var(--verde-50);
         }
         .radio-group input[type="radio"] {
             width: 18px;
@@ -420,7 +419,7 @@ $nomes_partes = [
         textarea {
             width: 100%;
             padding: 15px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--cinza-300);
             border-radius: 8px;
             margin: 15px 0;
             font-family: inherit;
@@ -428,7 +427,7 @@ $nomes_partes = [
             font-size: 1em;
         }
         textarea:focus {
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
             outline: none;
         }
         .action-bar {
@@ -450,27 +449,27 @@ $nomes_partes = [
             gap: 8px;
         }
         .btn-success {
-            background: #28a745;
-            color: white;
+            background: var(--sucesso-cor);
+            color: var(--branco);
         }
         .btn-success:hover {
             background: #218838;
             transform: translateY(-2px);
         }
         .btn-danger {
-            background: #dc3545;
-            color: white;
+            background: var(--perigo-cor);
+            color: var(--branco);
         }
         .btn-danger:hover {
             background: #c82333;
             transform: translateY(-2px);
         }
         .btn-secondary {
-            background: #6c757d;
-            color: white;
+            background: var(--cinza-500);
+            color: var(--branco);
         }
         .btn-secondary:hover {
-            background: #5a6268;
+            background: var(--cinza-600);
             transform: translateY(-2px);
         }
         
@@ -501,14 +500,14 @@ $nomes_partes = [
             position: absolute;
             top: 20px;
             right: 30px;
-            color: white;
+            color: var(--branco);
             font-size: 2em;
             cursor: pointer;
         }
         
         .info-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
+            background: var(--aviso-fundo);
+            border-left: 4px solid var(--aviso-borda);
             padding: 15px;
             border-radius: 8px;
             margin: 15px 0;
@@ -932,7 +931,7 @@ $nomes_partes = [
                                         </div>
                                         <div class="imagem-info">
                                             <div class="imagem-descricao"><?php echo htmlspecialchars($img['descricao'] ?? 'Sem descrição'); ?></div>
-                                            <div style="color: #666; margin-top: 4px;">
+                                            <div style="color: var(--cinza-500); margin-top: 4px;">
                                                 <?php echo date('d/m/Y', strtotime($img['data_upload'])); ?>
                                             </div>
                                         </div>

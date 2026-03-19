@@ -182,7 +182,7 @@ ob_end_clean();
     .page-header {
       max-width: 860px;
       margin: 0 auto 20px;
-      background: #0b5e42;
+      background: var(--cor-primaria);
       color: #fff;
       padding: 18px 24px;
       border-radius: 10px;
@@ -222,7 +222,7 @@ ob_end_clean();
     #status-especie.tem-dados {
       display: block;
       background: #d1fadf;
-      color: #0b5e42;
+      color: var(--cor-primaria);
     }
     #status-especie.sem-dados-status {
       display: block;
@@ -232,7 +232,7 @@ ob_end_clean();
 
     /* ── section headers ── */
     .section-title {
-      background: #0b5e42;
+      background: var(--cor-primaria);
       color: #fff;
       padding: 9px 14px;
       margin: 22px 0 12px;
@@ -278,14 +278,14 @@ ob_end_clean();
       transition: border-color 0.15s;
     }
     select:focus, input[type="text"]:focus, textarea:focus {
-      border-color: #0b5e42;
+      border-color: var(--cor-primaria);
       outline: none;
     }
     textarea { resize: vertical; }
 
     /* ── filled-from-internet highlight ── */
     .auto-filled {
-      border-color: #0b5e42 !important;
+      border-color: var(--cor-primaria) !important;
       background: #f0faf5;
     }
 
@@ -316,12 +316,12 @@ ob_end_clean();
       user-select: none;
     }
     .confirm-btn:hover {
-      border-color: #0b5e42;
-      color: #0b5e42;
+      border-color: var(--cor-primaria);
+      color: var(--cor-primaria);
     }
     .confirm-btn.confirmed {
-      background: #0b5e42;
-      border-color: #0b5e42;
+      background: var(--cor-primaria);
+      border-color: var(--cor-primaria);
       color: #fff;
     }
 
@@ -329,7 +329,7 @@ ob_end_clean();
     .submit-btn {
       width: 100%;
       margin-top: 22px;
-      background: #0b5e42;
+      background: var(--cor-primaria);
       color: #fff;
       padding: 14px;
       border: none;
@@ -364,7 +364,7 @@ ob_end_clean();
 </div>
 
 <?php if (!empty($_SESSION['msg_sucesso'])): ?>
-  <div style="max-width:860px;margin:0 auto 16px;padding:12px 18px;background:#d1fadf;color:#0b5e42;border-radius:8px;font-weight:600;">
+  <div style="max-width:860px;margin:0 auto 16px;padding:12px 18px;background:#d1fadf;color:var(--cor-primaria);border-radius:8px;font-weight:600;">
     ✅ <?php echo htmlspecialchars($_SESSION['msg_sucesso']); unset($_SESSION['msg_sucesso']); ?>
   </div>
 <?php elseif (!empty($_SESSION['msg_erro'])): ?>

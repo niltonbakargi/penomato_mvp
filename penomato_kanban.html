@@ -862,7 +862,7 @@ header {
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = 'penomato_kanban_v4';
+const STORAGE_KEY = 'penomato_kanban_v5';
 
 const DEFAULT_TASKS = [
   // ── CONCLUÍDO (histórico git) ──────────────────────────────────────────
@@ -898,39 +898,43 @@ const DEFAULT_TASKS = [
   { id:30, col:'done', title:"Painel colaborador com permissões por subtipo (identificador, dev, especialista, gestor)", prio:"p2", tag:"Painel Colaborador", notes:"17/03/2026 — usa SESSION usuario_subtipo", due:"2026-03-17", created:"2026-03-17" },
   { id:31, col:'done', title:"Página de Contestar Informação com fila de aprovação", prio:"p2", tag:"Módulo Contestação", notes:"18/03/2026 — contestar_informacao.php (547 linhas) — insere em fila_aprovacao como tipo contestacao", due:"2026-03-18", created:"2026-03-18" },
   { id:32, col:'done', title:"Gerador de artigo científico com template estruturado", prio:"p2", tag:"Módulo Revisão", notes:"18/03/2026 — gerar_artigo.php (469 linhas) — especialista gera artigo → entra na fila_aprovacao", due:"2026-03-18", created:"2026-03-18" },
+  { id:33, col:'done', title:"Fix busca_caracteristicas.php: FontAwesome CDN, familia LIKE, ação do form corrigida", prio:"p1", tag:"Busca", notes:"19/03/2026 — busca_caracteristicas.php: ícone fa-arrow-left não renderizava, família usava = ao invés de LIKE, form sem action", due:"2026-03-19", created:"2026-03-19" },
+  { id:34, col:'done', title:"Seções Caule e Semente adicionadas ao formulário de busca morfológica", prio:"p2", tag:"Busca", notes:"19/03/2026 — busca_caracteristicas.php: 8 campos de caule + 5 campos de semente alinhados com inserir_dados_internet.php", due:"2026-03-19", created:"2026-03-19" },
+  { id:35, col:'done', title:"especie_detalhes.php: página de resultados rica construída do zero", prio:"p1", tag:"Busca", notes:"19/03/2026 — Lista lateral sticky + artigo com carrossel + browse Netflix por parte da planta + mapa Leaflet. Zero AJAX: todos os dados pré-carregados em JSON no PHP.", due:"2026-03-19", created:"2026-03-19" },
+  { id:36, col:'done', title:"Visualização de espécies com qualquer status (não só publicadas) com badges visuais", prio:"p2", tag:"Busca", notes:"19/03/2026 — status != sem_dados. Botão Abrir Artigo habilitado só para publicado. Dados exibidos em formulário com créditos de imagem.", due:"2026-03-19", created:"2026-03-19" },
+  { id:37, col:'done', title:"Fix: validação de partes obrigatórias no upload de imagens (semente opcional)", prio:"p1", tag:"Upload Imagens", notes:"19/03/2026 — finalizar_upload_temporario.php exige folha/flor/fruto/caule/habito. Semente genuinamente opcional, sem botão de ausência.", due:"2026-03-19", created:"2026-03-19" },
+  { id:38, col:'done', title:"Fix crítico: controlador_colaborador.php redirecionava para arquivo inexistente", prio:"p1", tag:"Autenticação", notes:"19/03/2026 — entrada_colaborador.php → entrar_colaborador.php. Login de colaboradores estava completamente quebrado.", due:"2026-03-19", created:"2026-03-19" },
+  { id:39, col:'done', title:"Fix banco de dados: enum status corrigido ('descrita' no lugar de 'iden  tificado')", prio:"p1", tag:"Banco de Dados", notes:"19/03/2026 — ALTER TABLE especies_administrativo MODIFY COLUMN status ENUM(...'descrita'...). Código PHP usava 'descrita' mas banco tinha valor incompatível com espaço duplo.", due:"2026-03-19", created:"2026-03-19" },
+  { id:40, col:'done', title:"Módulo de exemplares: cadastro, revisão e mapa (controladores + views)", prio:"p1", tag:"Módulo Exemplares", notes:"19/03/2026 — cadastrar_exemplar.php, processar_cadastro_exemplar.php, revisar_exemplar.php, processar_revisao_exemplar.php, mapa_exemplares.php. Tabela exemplares criada no banco.", due:"2026-03-19", created:"2026-03-19" },
 
   // ── EM ANDAMENTO ───────────────────────────────────────────────────────
-  { id:13, col:'doing', title:"Integrar fila_aprovacao nos controladores existentes (dados_internet, confirmacao, imagem)", prio:"p1", tag:"Módulo Aprovação", notes:"Parcialmente feito: contestar_informacao e gerar_artigo já usam. Faltam: inserir_dados_internet, confirmar_caracteristicas, processar_upload_imagem", due:"", created:"2026-03-17" },
+  { id:50, col:'doing', title:"Integrar fila_aprovacao nos controladores existentes (dados_internet, confirmacao, imagem)", prio:"p1", tag:"Módulo Aprovação", notes:"Parcialmente feito: contestar_informacao e gerar_artigo já usam. Faltam: inserir_dados_internet, confirmar_caracteristicas, processar_upload_imagem", due:"", created:"2026-03-17" },
 
   // ── A FAZER — CRÍTICO ──────────────────────────────────────────────────
-  { id:16, col:'todo', title:"Testar fluxo completo: cadastro → dados internet → confirmação → aprovação", prio:"p1", tag:"Testes", notes:"", due:"", created:"2026-03-17" },
-  { id:17, col:'todo', title:"Criar 1 espécie com fluxo completo validado e aprovado pelo gestor", prio:"p1", tag:"Dados", notes:"", due:"", created:"2026-03-17" },
-  { id:18, col:'todo', title:"Verificar requisitos formais da UEMS para o projeto integrador", prio:"p1", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  { id:51, col:'todo', title:"Testar fluxo completo ponta a ponta com espécie real", prio:"p1", tag:"Testes", notes:"Cadastrar dados internet → confirmar → revisão → publicar. Verificar se status avança corretamente em cada etapa.", due:"", created:"2026-03-19" },
+  { id:52, col:'todo', title:"Criar 1 espécie com fluxo completo validado e aprovado pelo gestor", prio:"p1", tag:"Dados", notes:"Meta de demonstração do MVP para a banca.", due:"", created:"2026-03-19" },
+  { id:53, col:'todo', title:"Validação JS no botão 'Avançar para Dados' em upload_imagens_internet.php", prio:"p1", tag:"Upload Imagens", notes:"Botão avança sem verificar se folha/flor/fruto/caule/habito têm imagem. Precisa de guarda JS antes de permitir avançar.", due:"", created:"2026-03-19" },
+  { id:54, col:'todo', title:"Verificar requisitos formais da UEMS para o projeto integrador", prio:"p1", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
 
   // ── A FAZER — ALTA ─────────────────────────────────────────────────────
-  { id:19, col:'todo', title:"Galeria de imagens na ficha detalhada da espécie", prio:"p2", tag:"Módulo Fichas", notes:"", due:"", created:"2026-03-17" },
-  { id:20, col:'todo', title:"Painel do validador (aprovação final pós-revisão pelo especialista)", prio:"p2", tag:"Módulo Validação", notes:"", due:"", created:"2026-03-17" },
-  { id:21, col:'todo', title:"Histórico de ações por espécie (quem, quando, parecer)", prio:"p2", tag:"Módulo Revisão", notes:"", due:"", created:"2026-03-17" },
-  { id:22, col:'todo', title:"Dashboard com estatísticas gerais (espécies por status, % concluídas)", prio:"p2", tag:"Painel Gestor", notes:"", due:"", created:"2026-03-17" },
-  { id:23, col:'todo', title:"Escrever introdução e justificativa do TCC (ângulo educação ambiental)", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
-  { id:24, col:'todo', title:"Documentar arquitetura e banco de dados no relatório", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
-  { id:25, col:'todo', title:"Descrever fluxo científico e sistema de referências bibliográficas", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
-  { id:26, col:'todo', title:"Adicionar imagens reais a pelo menos 3 espécies", prio:"p2", tag:"Dados", notes:"", due:"", created:"2026-03-17" },
+  { id:55, col:'todo', title:"Implementar destino do botão 'Abrir Artigo' para espécies publicadas", prio:"p2", tag:"Módulo Fichas", notes:"O botão existe e está habilitado para status=publicado, mas ainda não leva a nenhuma página. Falta criar a view de artigo publicado.", due:"", created:"2026-03-19" },
+  { id:56, col:'todo', title:"Painel do validador (aprovação final pós-revisão pelo especialista)", prio:"p2", tag:"Módulo Validação", notes:"painel_validador.php e validar_especie.php existem mas precisam ser integrados ao fluxo.", due:"", created:"2026-03-17" },
+  { id:57, col:'todo', title:"Implementar contato.php e sobre.php (páginas públicas vazias)", prio:"p2", tag:"Público", notes:"Ambos são stubs vazios. sobre.php: apresentação do projeto/parceria UEMS. contato.php: form simples.", due:"", created:"2026-03-19" },
+  { id:58, col:'todo', title:"Adicionar imagens reais a pelo menos 3 espécies do Cerrado", prio:"p2", tag:"Dados", notes:"Necessário para demonstração da busca pública e especie_detalhes.php funcionar com dados reais.", due:"", created:"2026-03-17" },
+  { id:59, col:'todo', title:"Escrever introdução e justificativa do TCC (ângulo educação ambiental fitomorfológica)", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  { id:60, col:'todo', title:"Documentar arquitetura, banco de dados e fluxo científico no relatório", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
 
   // ── A FAZER — MÉDIA ────────────────────────────────────────────────────
-  { id:27, col:'todo', title:"Lightbox para ampliar imagens com créditos e licença", prio:"p3", tag:"Módulo Fichas", notes:"", due:"", created:"2026-03-17" },
-  { id:28, col:'todo', title:"Exportação da ficha da espécie em PDF", prio:"p3", tag:"Fichas", notes:"", due:"", created:"2026-03-17" },
-  { id:29, col:'todo', title:"Validação JavaScript nos formulários principais", prio:"p3", tag:"UX", notes:"", due:"", created:"2026-03-17" },
-  { id:30, col:'todo', title:"Responsividade mobile nos formulários longos", prio:"p3", tag:"UX", notes:"", due:"", created:"2026-03-17" },
-  { id:31, col:'todo', title:"Preparar apresentação para a banca (slides)", prio:"p3", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
-  { id:32, col:'todo', title:"Preparar demonstração ao vivo do sistema", prio:"p3", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
-  { id:33, col:'todo', title:"Testar busca avançada com filtros combinados", prio:"p3", tag:"Dados", notes:"", due:"", created:"2026-03-17" },
+  { id:61, col:'todo', title:"Lightbox para ampliar imagens com créditos e licença", prio:"p3", tag:"Módulo Fichas", notes:"", due:"", created:"2026-03-17" },
+  { id:62, col:'todo', title:"Exportação da ficha da espécie em PDF", prio:"p3", tag:"Fichas", notes:"", due:"", created:"2026-03-17" },
+  { id:63, col:'todo', title:"Responsividade mobile nos formulários longos", prio:"p3", tag:"UX", notes:"", due:"", created:"2026-03-17" },
+  { id:64, col:'todo', title:"Preparar apresentação para a banca (slides)", prio:"p3", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  { id:65, col:'todo', title:"Preparar demonstração ao vivo do sistema", prio:"p3", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
 
   // ── A FAZER — BAIXA ────────────────────────────────────────────────────
-  { id:34, col:'todo', title:"API REST pública para consulta de espécies", prio:"p4", tag:"API", notes:"", due:"", created:"2026-03-17" },
-  { id:35, col:'todo', title:"Notificações por email (aprovação, rejeição, atribuição)", prio:"p4", tag:"Sistema", notes:"", due:"", created:"2026-03-17" },
-  { id:36, col:'todo', title:"Logs de auditoria de todas as ações do sistema", prio:"p4", tag:"Sistema", notes:"", due:"", created:"2026-03-17" },
-  { id:37, col:'todo', title:"Configurações do sistema: subtipos de colaborador e partes obrigatórias", prio:"p4", tag:"Painel Gestor", notes:"configuracoes_sistema.php — adiado", due:"", created:"2026-03-17" },
+  { id:66, col:'todo', title:"API REST pública para consulta de espécies", prio:"p4", tag:"API", notes:"", due:"", created:"2026-03-17" },
+  { id:67, col:'todo', title:"Notificações por email (aprovação, rejeição, atribuição)", prio:"p4", tag:"Sistema", notes:"Infraestrutura de tokens já existe no banco.", due:"", created:"2026-03-17" },
+  { id:68, col:'todo', title:"Configurações do sistema: subtipos de colaborador e partes obrigatórias", prio:"p4", tag:"Painel Gestor", notes:"configuracoes_sistema.php — adiado para pós-MVP", due:"", created:"2026-03-17" },
 ];
 
 // ── STATE ──

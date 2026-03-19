@@ -113,319 +113,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penomato - Escolher Espécie</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        body { background-color: var(--cinza-50); padding: var(--esp-8) var(--esp-5); }
+        .container { max-width: 900px; margin: 0 auto; position: relative; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f2e9;
-            padding: 30px 20px;
-            color: #2c3e50;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        /* Informações do usuário */
         .user-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 10px 25px;
-            border-radius: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 100;
+            position: absolute; top: var(--esp-5); right: var(--esp-5);
+            background: var(--branco); padding: var(--esp-2) var(--esp-6);
+            border-radius: var(--raio-full); box-shadow: var(--sombra-md);
+            display: flex; align-items: center; gap: var(--esp-4); z-index: 100;
         }
-        
-        .user-info i {
-            color: #0b5e42;
-            font-size: 1.2rem;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .user-logout {
-            color: #dc3545;
-            text-decoration: none;
-            font-size: 0.9rem;
-            padding: 5px 10px;
-            border-radius: 20px;
-            transition: all 0.2s;
-        }
-        
-        .user-logout:hover {
-            background: #dc3545;
-            color: white;
-        }
+        .user-info i { color: var(--cor-primaria); }
+        .user-name { font-weight: var(--peso-semi); }
+        .user-logout { color: var(--perigo-cor); text-decoration: none; font-size: var(--texto-sm); padding: var(--esp-1) var(--esp-2); border-radius: var(--raio-full); transition: var(--transicao); }
+        .user-logout:hover { background: var(--perigo-cor); color: var(--branco); }
 
-        /* Cabeçalho */
         .header {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 12px 12px 0 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-bottom: 4px solid #0b5e42;
-            margin-bottom: 5px;
+            background: var(--branco); padding: var(--esp-8) var(--esp-10);
+            border-radius: var(--raio-lg) var(--raio-lg) 0 0;
+            box-shadow: var(--sombra-sm); border-bottom: 4px solid var(--cor-primaria); margin-bottom: var(--esp-1);
         }
+        .header h1 { color: var(--cor-primaria); font-size: var(--texto-3xl); font-weight: var(--peso-medio); display: flex; align-items: center; gap: var(--esp-2); }
+        .header .subtitle { color: var(--cinza-600); font-style: italic; margin-top: var(--esp-2); font-size: var(--texto-sm); }
 
-        .header h1 {
-            color: #0b5e42;
-            font-size: 2rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .card { background: var(--branco); padding: var(--esp-8) var(--esp-10); box-shadow: var(--sombra-sm); margin-bottom: var(--esp-5); }
 
-        .header .subtitle {
-            color: #666;
-            font-style: italic;
-            margin-top: 10px;
-            font-size: 0.95rem;
-        }
+        .counter { display: inline-block; background-color: var(--cor-primaria); color: var(--branco); padding: var(--esp-1) var(--esp-4); border-radius: var(--raio-full); font-size: var(--texto-sm); margin-left: var(--esp-4); }
 
-        /* Card principal */
-        .card {
-            background: white;
-            padding: 30px 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
+        .search-container { margin: var(--esp-6) 0; }
+        .search-box { display: flex; align-items: center; background-color: var(--cinza-50); border: 2px solid var(--cinza-200); border-radius: var(--raio-full); padding: var(--esp-1) var(--esp-5); transition: var(--transicao); }
+        .search-box:focus-within { border-color: var(--cor-primaria); box-shadow: var(--sombra-foco); }
+        .search-box i { color: var(--cinza-400); }
+        .search-box input { flex: 1; padding: var(--esp-4); border: none; background: transparent; font-size: var(--texto-md); outline: none; }
+        .search-box input::placeholder { color: var(--cinza-400); }
+        .search-clear { cursor: pointer; color: var(--cinza-400); display: none; }
+        .search-clear:hover { color: var(--perigo-cor); }
 
-        /* Contador de espécies */
-        .counter {
-            display: inline-block;
-            background-color: #0b5e42;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            margin-left: 15px;
-        }
+        .especies-list { margin-top: var(--esp-5); max-height: 500px; overflow-y: auto; padding-right: var(--esp-2); }
+        .especie-card { background-color: var(--cinza-50); border: 2px solid var(--cinza-200); border-radius: var(--raio-lg); padding: var(--esp-5); margin-bottom: var(--esp-4); display: flex; justify-content: space-between; align-items: center; transition: var(--transicao); }
+        .especie-card:hover { border-color: var(--cor-primaria); transform: translateY(-2px); box-shadow: var(--sombra-md); }
+        .especie-info h3 { font-size: var(--texto-xl); color: var(--cor-primaria); margin-bottom: var(--esp-1); font-style: italic; }
+        .especie-info p { color: var(--cinza-400); font-size: var(--texto-sm); display: flex; align-items: center; gap: var(--esp-1); }
+        .especie-info p i { color: var(--cor-primaria); font-size: var(--texto-xs); }
 
-        /* Campo de busca */
-        .search-container {
-            margin: 25px 0;
-        }
+        .status-badge { background-color: var(--verde-50); color: var(--cor-primaria); padding: var(--esp-1) var(--esp-3); border-radius: var(--raio-full); font-size: var(--texto-xs); font-weight: var(--peso-semi); border: 1px solid var(--cor-primaria); }
 
-        .search-box {
-            display: flex;
-            align-items: center;
-            background-color: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 50px;
-            padding: 5px 20px;
-            transition: all 0.3s;
-        }
+        .btn-select { background-color: var(--cor-primaria); color: var(--branco); border: none; padding: var(--esp-2) var(--esp-6); border-radius: var(--raio-full); font-weight: var(--peso-semi); cursor: pointer; transition: var(--transicao); display: flex; align-items: center; gap: var(--esp-2); }
+        .btn-select:hover { background-color: var(--cor-primaria-hover); transform: translateY(-2px); box-shadow: var(--sombra-md); }
 
-        .search-box:focus-within {
-            border-color: #0b5e42;
-            box-shadow: 0 0 0 3px rgba(11,94,66,0.1);
-        }
+        .empty-state { text-align: center; padding: var(--esp-16) var(--esp-5); background-color: var(--cinza-50); border-radius: var(--raio-lg); border: 2px dashed var(--cinza-200); }
+        .empty-state i { font-size: var(--texto-4xl); color: var(--cinza-400); margin-bottom: var(--esp-5); }
+        .empty-state h3 { font-size: var(--texto-2xl); color: var(--cinza-600); margin-bottom: var(--esp-2); }
+        .empty-state p { color: var(--cinza-500); margin-bottom: var(--esp-6); }
 
-        .search-box i {
-            color: #718096;
-            font-size: 1.2rem;
-        }
+        .btn-back { display: inline-block; background-color: var(--cinza-200); color: var(--cinza-600); text-decoration: none; padding: var(--esp-3) var(--esp-8); border-radius: var(--raio-full); font-weight: var(--peso-semi); transition: var(--transicao); }
+        .btn-back:hover { background-color: var(--cinza-300); }
 
-        .search-box input {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            background: transparent;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .search-box input::placeholder {
-            color: #a0aec0;
-        }
-
-        .search-clear {
-            cursor: pointer;
-            color: #718096;
-            font-size: 1.2rem;
-            display: none;
-        }
-
-        .search-clear:hover {
-            color: #dc3545;
-        }
-
-        /* Lista de espécies */
-        .especies-list {
-            margin-top: 20px;
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .especie-card {
-            background-color: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-
-        .especie-card:hover {
-            border-color: #0b5e42;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .especie-info h3 {
-            font-size: 1.3rem;
-            color: #0b5e42;
-            margin-bottom: 5px;
-            font-style: italic;
-        }
-
-        .especie-info p {
-            color: #718096;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .especie-info p i {
-            color: #0b5e42;
-            font-size: 0.9rem;
-        }
-
-        .status-badge {
-            background-color: #e6f7e6;
-            color: #0b5e42;
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: 1px solid #0b5e42;
-        }
-
-        .btn-select {
-            background-color: #0b5e42;
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-select:hover {
-            background-color: #0a4c35;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(11,94,66,0.3);
-        }
-
-        .btn-select i {
-            font-size: 0.9rem;
-        }
-
-        /* Mensagem de lista vazia */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background-color: #f8fafc;
-            border-radius: 12px;
-            border: 2px dashed #e2e8f0;
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            color: #a0aec0;
-            margin-bottom: 20px;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            color: #4a5568;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            color: #718096;
-            margin-bottom: 25px;
-        }
-
-        .btn-back {
-            display: inline-block;
-            background-color: #e2e8f0;
-            color: #4a5568;
-            text-decoration: none;
-            padding: 12px 30px;
-            border-radius: 40px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-back:hover {
-            background-color: #cbd5e0;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            color: #718096;
-            font-size: 0.85rem;
-            margin-top: 30px;
-        }
-
-        /* Alertas */
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
+        .footer { text-align: center; color: var(--cinza-500); font-size: var(--texto-xs); margin-top: var(--esp-8); }
 
         @media (max-width: 768px) {
-            .user-info {
-                position: static;
-                margin-bottom: 20px;
-                justify-content: center;
-            }
-            
-            .especie-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .btn-select {
-                width: 100%;
-                justify-content: center;
-            }
+            .user-info { position: static; margin-bottom: var(--esp-5); justify-content: center; }
+            .especie-card { flex-direction: column; align-items: flex-start; gap: var(--esp-4); }
+            .btn-select { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -458,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
             
             <!-- Mensagem de erro (se houver) -->
             <?php if (isset($erro)): ?>
-                <div class="alert alert-danger">❌ <?php echo $erro; ?></div>
+                <div class="alerta--perigo">❌ <?php echo $erro; ?></div>
             <?php endif; ?>
             
             <!-- Campo de busca -->

@@ -79,7 +79,7 @@ $total_contrib  = array_sum(array_column($colaboradores, 'total_especies'));
         .container { max-width: 1200px; margin: 0 auto; }
 
         .header {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             padding: 18px 28px;
             border-radius: 10px;
@@ -103,7 +103,7 @@ $total_contrib  = array_sum(array_column($colaboradores, 'total_especies'));
         .btn-voltar:hover { background: rgba(255,255,255,0.35); }
         .btn-csv {
             background: rgba(255,255,255,0.9);
-            color: #0b5e42;
+            color: var(--cor-primaria);
             border: none;
             padding: 8px 18px;
             border-radius: 20px;
@@ -132,7 +132,7 @@ $total_contrib  = array_sum(array_column($colaboradores, 'total_especies'));
         .card-resumo .num {
             font-size: 2em;
             font-weight: 700;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             line-height: 1.1;
         }
         .card-resumo .label {
@@ -178,13 +178,13 @@ $total_contrib  = array_sum(array_column($colaboradores, 'total_especies'));
         .cat-colaborador { background: #d4edda; color: #155724; }
         .cat-revisor     { background: #fff3cd; color: #856404; }
         .cat-validador   { background: #d1ecf1; color: #0c5460; }
-        .cat-gestor      { background: #0b5e42; color: white; }
+        .cat-gestor      { background: var(--cor-primaria); color: white; }
         .cat-visitante   { background: #f0f0f0; color: #666; }
 
         .num-destaque {
             font-weight: 700;
             font-size: 1.05em;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
         .num-zero { color: #ccc; }
 
@@ -197,7 +197,7 @@ $total_contrib  = array_sum(array_column($colaboradores, 'total_especies'));
         }
         .barra-fill {
             height: 100%;
-            background: #0b5e42;
+            background: var(--cor-primaria);
             border-radius: 3px;
             transition: width 0.3s;
         }
@@ -214,7 +214,7 @@ $total_contrib  = array_sum(array_column($colaboradores, 'total_especies'));
             flex-wrap: wrap;
         }
         .breakdown span { white-space: nowrap; }
-        .breakdown .v { color: #0b5e42; font-weight: 600; }
+        .breakdown .v { color: var(--cor-primaria); font-weight: 600; }
     </style>
 </head>
 <body>

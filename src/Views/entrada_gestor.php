@@ -7,10 +7,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Gestor - Penomato</title>
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f4f0;
             min-height: 100vh;
             display: flex;
@@ -22,8 +21,8 @@
         }
 
         .header {
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             padding: 20px 40px;
             border-radius: 12px;
             margin-bottom: 40px;
@@ -43,38 +42,38 @@
         }
 
         .action-btn {
-            background: white;
-            border: 2px solid #0b5e42;
+            background: var(--branco);
+            border: 2px solid var(--cor-primaria);
             border-radius: 12px;
             padding: 28px 16px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 600;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 0.95em;
         }
         .action-btn:hover {
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(11,94,66,0.2);
         }
         .action-btn .icon { font-size: 2em; margin-bottom: 10px; display: block; }
 
-        .action-btn.danger { border-color: #dc3545; color: #dc3545; }
-        .action-btn.danger:hover { background: #dc3545; color: white; }
+        .action-btn.danger { border-color: var(--perigo-cor); color: var(--perigo-cor); }
+        .action-btn.danger:hover { background: var(--perigo-cor); color: var(--branco); }
 
         .btn-sair {
             margin-top: 30px;
             background: none;
             border: none;
-            color: #999;
+            color: var(--cinza-400);
             font-size: 0.9em;
             cursor: pointer;
             text-decoration: underline;
         }
-        .btn-sair:hover { color: #dc3545; }
+        .btn-sair:hover { color: var(--perigo-cor); }
 
         /* ── MODAL ── */
         .modal-overlay {
@@ -90,7 +89,7 @@
         .modal-overlay.ativo { display: flex; }
 
         .modal {
-            background: white;
+            background: var(--branco);
             border-radius: 14px;
             padding: 30px;
             width: 100%;
@@ -101,19 +100,19 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         .modal h2 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 20px;
             font-size: 1.2em;
             padding-bottom: 10px;
             border-bottom: 2px solid #e0ede8;
         }
-        .modal h2.danger { color: #dc3545; border-color: #f5c6cb; }
+        .modal h2.danger { color: var(--perigo-cor); border-color: #f5c6cb; }
 
         .modal label {
             display: block;
             font-size: 0.87em;
             font-weight: 600;
-            color: #444;
+            color: var(--cinza-600);
             margin-bottom: 5px;
         }
         .modal select,
@@ -129,7 +128,7 @@
         }
         .modal select:focus,
         .modal textarea:focus,
-        .modal input[type=text]:focus { outline: none; border-color: #0b5e42; }
+        .modal input[type=text]:focus { outline: none; border-color: var(--cor-primaria); }
         .modal textarea { resize: vertical; min-height: 80px; }
 
         .modal .pendente-lista {
@@ -138,11 +137,11 @@
             padding: 10px 12px;
             margin-bottom: 14px;
             font-size: 0.83em;
-            color: #555;
+            color: var(--cinza-600);
         }
         .modal .pendente-lista span {
             display: inline-block;
-            background: #fff3cd;
+            background: var(--aviso-fundo);
             border-radius: 4px;
             padding: 2px 8px;
             margin: 2px;
@@ -155,23 +154,23 @@
             margin-top: 6px;
         }
         .btn-confirm {
-            background: #0b5e42; color: white; border: none;
+            background: var(--cor-primaria); color: var(--branco); border: none;
             border-radius: 6px; padding: 10px 24px;
             font-weight: 600; cursor: pointer; font-size: 0.92em;
         }
-        .btn-confirm:hover { background: #094d36; }
-        .btn-confirm.danger { background: #dc3545; }
+        .btn-confirm:hover { background: var(--cor-primaria-hover); }
+        .btn-confirm.danger { background: var(--perigo-cor); }
         .btn-confirm.danger:hover { background: #b02a37; }
         .btn-cancel {
-            background: none; color: #666; border: 1px solid #ccc;
+            background: none; color: var(--cinza-500); border: 1px solid #ccc;
             border-radius: 6px; padding: 10px 20px;
             cursor: pointer; font-size: 0.92em;
         }
         .btn-cancel:hover { background: #f0f0f0; }
 
-        .msg-ok   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
-        .msg-warn { background:#fff3cd; color:#856404; border:1px solid #ffeeba; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
-        .msg-err  { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
+        .msg-ok   { background:var(--sucesso-fundo); color:var(--sucesso-texto); border:1px solid #c3e6cb; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
+        .msg-warn { background:var(--aviso-fundo); color:var(--aviso-texto); border:1px solid #ffeeba; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
+        .msg-err  { background:var(--perigo-fundo); color:var(--perigo-texto); border:1px solid #f5c6cb; border-radius:6px; padding:10px 14px; margin-bottom:12px; font-size:0.9em; }
 
         @media (max-width: 480px) {
             .btn-grid { grid-template-columns: 1fr; }

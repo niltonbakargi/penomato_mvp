@@ -124,19 +124,13 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penomato - Upload de Imagens</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f2e9;
-            padding: 30px 20px;
-            color: #2c3e50;
+            background-color: var(--cinza-50);
+            padding: var(--esp-8) var(--esp-5);
+            color: var(--cinza-800);
         }
 
         .container {
@@ -161,7 +155,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
         
         .user-info i {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 1.2rem;
         }
         
@@ -171,7 +165,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
         
         .user-logout {
-            color: #dc3545;
+            color: var(--perigo-cor);
             text-decoration: none;
             font-size: 0.9rem;
             padding: 5px 10px;
@@ -180,7 +174,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
         
         .user-logout:hover {
-            background: #dc3545;
+            background: var(--perigo-cor);
             color: white;
         }
 
@@ -190,18 +184,18 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             padding: 30px 40px;
             border-radius: 12px 12px 0 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-bottom: 4px solid #0b5e42;
+            border-bottom: 4px solid var(--cor-primaria);
             margin-bottom: 5px;
         }
 
         .header h1 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 2rem;
             font-weight: 500;
         }
 
         .header .subtitle {
-            color: #666;
+            color: var(--cinza-500);
             font-style: italic;
             margin-top: 10px;
             font-size: 0.95rem;
@@ -234,7 +228,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         /* Informações da espécie */
         .species-info {
-            background-color: #e8f5e9;
+            background-color: var(--verde-50);
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 30px;
@@ -247,7 +241,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         .species-name {
             font-size: 1.5rem;
             font-weight: 600;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
 
         .temp-badge {
@@ -266,7 +260,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         .progress-bar {
             height: 20px;
-            background-color: #e9ecef;
+            background-color: var(--cinza-200);
             border-radius: 10px;
             overflow: hidden;
             margin-bottom: 10px;
@@ -274,7 +268,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         .progress-fill {
             height: 100%;
-            background-color: #0b5e42;
+            background-color: var(--cor-primaria);
             width: <?php echo $progresso; ?>%;
             transition: width 0.3s ease;
         }
@@ -282,7 +276,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         .progress-text {
             text-align: center;
             font-size: 0.9rem;
-            color: #666;
+            color: var(--cinza-500);
         }
 
         /* Alertas */
@@ -293,15 +287,15 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
+            background-color: var(--sucesso-fundo);
+            color: var(--sucesso-texto);
+            border-left: 4px solid var(--sucesso-cor);
         }
 
         .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
+            background-color: var(--perigo-fundo);
+            color: var(--perigo-texto);
+            border-left: 4px solid var(--perigo-cor);
         }
 
         /* Grid de partes */
@@ -313,11 +307,11 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .parte-card {
-            background-color: #f8fafc;
+            background-color: var(--cinza-50);
             border-radius: 8px;
             padding: 15px;
             text-align: center;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--cinza-200);
             cursor: pointer;
             transition: all 0.2s;
             text-decoration: none;
@@ -326,20 +320,20 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .parte-card:hover {
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .parte-card.selecionado {
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
             background-color: #e6f7e6;
             border-width: 3px;
         }
 
         .parte-card.completa {
             background-color: #d4edda;
-            border-color: #28a745;
+            border-color: var(--sucesso-cor);
         }
 
         .parte-icone {
@@ -354,25 +348,25 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         .parte-contagem {
             font-size: 0.9rem;
-            color: #666;
+            color: var(--cinza-500);
         }
 
         .parte-contagem span {
             font-weight: 600;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
 
         /* Formulário de upload */
         .upload-parte-form {
-            background-color: #f8fafc;
-            border: 3px solid #0b5e42;
+            background-color: var(--cinza-50);
+            border: 3px solid var(--cor-primaria);
             border-radius: 12px;
             padding: 30px;
             margin: 30px 0;
         }
 
         .upload-parte-form h3 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -386,7 +380,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             gap: 15px;
             margin-bottom: 20px;
             padding: 15px;
-            background-color: #e8f5e9;
+            background-color: var(--verde-50);
             border-radius: 8px;
         }
 
@@ -397,7 +391,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         .parte-info-nome {
             font-size: 1.8rem;
             font-weight: 600;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
 
         .parte-info-status {
@@ -413,11 +407,11 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         /* ÁREA: COLAR IMAGEM (Ctrl+V) */
         /* ================================================ */
         .colar-area {
-            border: 2px dashed #0b5e42;
+            border: 2px dashed var(--cor-primaria);
             border-radius: 8px;
             padding: 40px;
             text-align: center;
-            background-color: #f0f8f0;
+            background-color: var(--verde-50);
             cursor: pointer;
             transition: all 0.3s;
             margin-bottom: 20px;
@@ -425,13 +419,13 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         .colar-area:hover {
             background-color: #e0f0e0;
-            border-color: #0a4c35;
+            border-color: var(--cor-primaria-hover);
         }
 
         .colar-area .icone {
             font-size: 4rem;
             margin-bottom: 15px;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
 
         .colar-area .texto {
@@ -442,7 +436,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         .colar-area .subtexto {
             font-size: 0.9rem;
-            color: #666;
+            color: var(--cinza-500);
         }
 
         /* Textarea escondido para capturar o Ctrl+V */
@@ -465,7 +459,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .fonte-info h4 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 15px;
             display: flex;
             align-items: center;
@@ -487,7 +481,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         .fonte-info select {
             width: 100%;
             padding: 10px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--cinza-200);
             border-radius: 6px;
             font-size: 1rem;
         }
@@ -495,11 +489,11 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         .fonte-info input:focus,
         .fonte-info select:focus {
             outline: none;
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
         }
 
         .fonte-info small {
-            color: #666;
+            color: var(--cinza-500);
             font-size: 0.85rem;
             display: block;
             margin-top: 5px;
@@ -515,7 +509,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         .preview-item {
             background: white;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--cinza-200);
             border-radius: 8px;
             overflow: hidden;
             position: relative;
@@ -523,11 +517,11 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         .preview-image {
             height: 150px;
-            background-color: #f8fafc;
+            background-color: var(--cinza-50);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--cinza-200);
         }
 
         .preview-image img {
@@ -547,7 +541,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .preview-info small {
-            color: #666;
+            color: var(--cinza-500);
         }
 
         .remove-btn {
@@ -555,8 +549,8 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             top: 10px;
             right: 10px;
             background: rgba(255, 255, 255, 0.9);
-            border: 2px solid #dc3545;
-            color: #dc3545;
+            border: 2px solid var(--perigo-cor);
+            color: var(--perigo-cor);
             width: 30px;
             height: 30px;
             border-radius: 50%;
@@ -569,7 +563,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .remove-btn:hover {
-            background: #dc3545;
+            background: var(--perigo-cor);
             color: white;
         }
 
@@ -597,26 +591,26 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .btn-primary {
-            background-color: #0b5e42;
+            background-color: var(--cor-primaria);
             color: white;
             box-shadow: 0 4px 10px rgba(11,94,66,0.3);
         }
 
         .btn-primary:hover {
-            background-color: #0a4c35;
+            background-color: var(--cor-primaria-hover);
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(11,94,66,0.4);
         }
 
         .btn-primary:disabled {
-            background-color: #cbd5e0;
+            background-color: var(--cinza-300);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
         .btn-success {
-            background-color: #28a745;
+            background-color: var(--sucesso-cor);
             color: white;
             box-shadow: 0 4px 10px rgba(40,167,69,0.3);
         }
@@ -628,19 +622,19 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .btn-avancar {
-            background-color: #0b5e42;
+            background-color: var(--cor-primaria);
             color: white;
             box-shadow: 0 4px 10px rgba(11,94,66,0.3);
         }
 
         .btn-avancar:hover {
-            background-color: #0a4c35;
+            background-color: var(--cor-primaria-hover);
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(11,94,66,0.4);
         }
 
         .btn-secondary {
-            background-color: #6c757d;
+            background-color: var(--cinza-500);
             color: white;
         }
 
@@ -651,7 +645,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
         .footer {
             text-align: center;
-            color: #718096;
+            color: var(--cinza-500);
             font-size: 0.85rem;
             margin-top: 30px;
         }
@@ -702,7 +696,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             <div class="species-info">
                 <div>
                     <span class="species-name"><?php echo htmlspecialchars($especie['nome_cientifico']); ?></span>
-                    <span style="margin-left: 15px; color: #666;">ID: <?php echo $especie_id; ?></span>
+                    <span style="margin-left: 15px; color: var(--cinza-500);">ID: <?php echo $especie_id; ?></span>
                 </div>
                 <div>
                     <span class="temp-badge">⚡ SESSÃO: <?php echo substr($temp_id, -8); ?></span>
@@ -756,7 +750,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                         <span><?php echo $contagem; ?></span> imagem(ns)
                     </div>
                     <?php if ($parte['obrigatoria'] && $contagem == 0): ?>
-                        <div style="font-size: 0.8rem; color: #dc3545; margin-top: 5px;">⛔ Obrigatória</div>
+                        <div style="font-size: 0.8rem; color: var(--perigo-cor); margin-top: 5px;">⛔ Obrigatória</div>
                     <?php endif; ?>
                 </a>
                 <?php endforeach; ?>
@@ -869,7 +863,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             </div>
             
             <!-- Informação adicional -->
-            <p style="text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem;">
+            <p style="text-align: center; margin-top: 20px; color: var(--cinza-500); font-size: 0.9rem;">
                 <i class="fas fa-info-circle"></i> 
                 Você pode adicionar imagens agora ou clicar em "AVANÇAR PARA DADOS" para ir para o próximo passo.
                 As imagens já adicionadas ficarão salvas na sessão.
@@ -913,12 +907,12 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                         ✅ Imagem colada (${(blob.size / 1024).toFixed(1)} KB)
                     </div>
                     <button type="button" onclick="removerImagem()"
-                            style="margin-top:10px;padding:6px 18px;border:2px solid #dc3545;background:white;color:#dc3545;border-radius:20px;cursor:pointer;font-weight:600;">
+                            style="margin-top:10px;padding:6px 18px;border:2px solid var(--perigo-cor);background:white;color:var(--perigo-cor);border-radius:20px;cursor:pointer;font-weight:600;">
                         × Remover imagem
                     </button>
                 `;
-                colarArea.style.backgroundColor = '#e8f5e9';
-                colarArea.style.borderColor = '#28a745';
+                colarArea.style.backgroundColor = 'var(--verde-50)';
+                colarArea.style.borderColor = 'var(--sucesso-cor)';
                 colarArea.style.padding = '20px';
 
                 // Limpar preview separado (não é mais necessário)
@@ -953,7 +947,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         if (input) {
             input.focus();
             colarArea.style.backgroundColor = '#e0f0e0';
-            colarArea.style.borderColor = '#0a4c35';
+            colarArea.style.borderColor = 'var(--cor-primaria-hover)';
         }
     });
 
@@ -971,20 +965,20 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             <div class="subtexto">Copie a imagem de qualquer lugar e cole neste campo</div>
             <textarea id="colarInput" placeholder="Clique aqui e pressione Ctrl+V para colar a imagem..."></textarea>
         `;
-        colarArea.style.backgroundColor = '#f0f8f0';
-        colarArea.style.borderColor = '#0b5e42';
+        colarArea.style.backgroundColor = 'var(--verde-50)';
+        colarArea.style.borderColor = 'var(--cor-primaria)';
         colarArea.style.padding = '40px';
 
         // Reanexar referência ao novo textarea
         const novoColarInput = document.getElementById('colarInput');
         novoColarInput.addEventListener('focus', function() {
             colarArea.style.backgroundColor = '#e0f0e0';
-            colarArea.style.borderColor = '#0a4c35';
+            colarArea.style.borderColor = 'var(--cor-primaria-hover)';
         });
         novoColarInput.addEventListener('blur', function() {
             if (!imagemColada) {
-                colarArea.style.backgroundColor = '#f0f8f0';
-                colarArea.style.borderColor = '#0b5e42';
+                colarArea.style.backgroundColor = 'var(--verde-50)';
+                colarArea.style.borderColor = 'var(--cor-primaria)';
             }
         });
     }

@@ -72,44 +72,35 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
 
     <style>
-        :root {
-            --verde:        #0b5e42;
-            --verde-escuro: #0a4c35;
-            --verde-claro:  #e8f5e9;
-            --fundo:        #f5f2e9;
-            --amarelo:      #f59e0b;
-            --vermelho:     #dc3545;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--fundo); color: #2c3e50; padding: 30px 20px;
+            background: var(--cinza-50); color: var(--cinza-800); padding: 30px 20px;
         }
         .container { max-width: 1100px; margin: 0 auto; }
 
         /* Cabeçalho */
         .cabecalho {
-            background: white; padding: 26px 36px;
-            border-radius: 12px 12px 0 0; border-bottom: 4px solid var(--verde);
+            background: var(--branco); padding: 26px 36px;
+            border-radius: 12px 12px 0 0; border-bottom: 4px solid var(--cor-primaria);
             display: flex; justify-content: space-between; align-items: center;
             flex-wrap: wrap; gap: 12px;
         }
-        .cabecalho h1 { color: var(--verde); font-size: 1.7rem; font-weight: 600; }
-        .cabecalho .sub { color: #666; font-style: italic; font-size: .88rem; margin-top: 3px; }
+        .cabecalho h1 { color: var(--cor-primaria); font-size: 1.7rem; font-weight: 600; }
+        .cabecalho .sub { color: var(--cinza-500); font-style: italic; font-size: .88rem; margin-top: 3px; }
         .user-pill {
-            background: #f8f9fa; padding: 7px 16px; border-radius: 40px;
+            background: var(--cinza-50); padding: 7px 16px; border-radius: 40px;
             display: flex; align-items: center; gap: 9px; font-size: .88rem;
         }
-        .user-pill i { color: var(--verde); }
-        .btn-sair { color: #dc3545; text-decoration: none; padding: 3px 8px; border-radius: 20px; transition: .2s; }
-        .btn-sair:hover { background: #dc3545; color: white; }
+        .user-pill i { color: var(--cor-primaria); }
+        .btn-sair { color: var(--perigo-cor); text-decoration: none; padding: 3px 8px; border-radius: 20px; transition: .2s; }
+        .btn-sair:hover { background: var(--perigo-cor); color: var(--branco); }
 
         /* Card principal */
         .card-principal {
-            background: white; padding: 30px 36px;
+            background: var(--branco); padding: 30px 36px;
             border-radius: 0 0 12px 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,.05);
         }
@@ -119,36 +110,36 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
             padding: 13px 16px; border-radius: 8px; margin-bottom: 20px;
             display: flex; align-items: flex-start; gap: 10px; font-size: .9rem;
         }
-        .alerta-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
-        .alerta-danger  { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .alerta--sucesso { background: var(--sucesso-fundo); color: var(--sucesso-texto); border-left: 4px solid var(--sucesso-cor); }
+        .alerta--perigo { background: var(--perigo-fundo); color: var(--perigo-texto); border-left: 4px solid var(--perigo-cor); }
 
         /* Filtros */
         .filtros {
             display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px;
         }
         .btn-filtro {
-            padding: 8px 20px; border-radius: 30px; border: 2px solid #e2e8f0;
-            background: white; font-size: .875rem; font-weight: 600;
+            padding: 8px 20px; border-radius: 30px; border: 2px solid var(--cinza-200);
+            background: var(--branco); font-size: .875rem; font-weight: 600;
             cursor: pointer; text-decoration: none; color: #555;
             display: inline-flex; align-items: center; gap: 8px; transition: .2s;
         }
-        .btn-filtro:hover { border-color: var(--verde); color: var(--verde); }
-        .btn-filtro.ativo { background: var(--verde); border-color: var(--verde); color: white; }
+        .btn-filtro:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
+        .btn-filtro.ativo { background: var(--cor-primaria); border-color: var(--cor-primaria); color: var(--branco); }
         .cnt-badge {
             background: rgba(255,255,255,.3); padding: 1px 7px;
             border-radius: 10px; font-size: .75rem;
         }
-        .btn-filtro:not(.ativo) .cnt-badge { background: #f0f0f0; color: #666; }
+        .btn-filtro:not(.ativo) .cnt-badge { background: #f0f0f0; color: var(--cinza-500); }
 
         /* Mapa geral */
         .mapa-geral-wrap { margin-bottom: 28px; }
         .mapa-geral-wrap h4 {
-            font-size: .95rem; font-weight: 700; color: #444;
+            font-size: .95rem; font-weight: 700; color: var(--cinza-600);
             margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
         }
         #mapa-geral {
             height: 280px; border-radius: 10px;
-            border: 2px solid #e2e8f0; z-index: 1;
+            border: 2px solid var(--cinza-200); z-index: 1;
         }
 
         /* Lista de exemplares */
@@ -157,28 +148,28 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
             margin-bottom: 18px; overflow: hidden; transition: .2s;
         }
         .exemplar-card:hover { border-color: #c0d0de; box-shadow: 0 4px 12px rgba(0,0,0,.07); }
-        .exemplar-card.aguardando { border-left: 5px solid var(--amarelo); }
-        .exemplar-card.aprovado   { border-left: 5px solid var(--verde); }
-        .exemplar-card.rejeitado  { border-left: 5px solid var(--vermelho); }
+        .exemplar-card.aguardando { border-left: 5px solid var(--aviso-cor); }
+        .exemplar-card.aprovado   { border-left: 5px solid var(--cor-primaria); }
+        .exemplar-card.rejeitado  { border-left: 5px solid var(--perigo-cor); }
 
         .exemplar-header {
-            padding: 14px 20px; background: #f8fafc;
+            padding: 14px 20px; background: var(--cinza-50);
             border-bottom: 1px solid #e8edf2;
             display: flex; justify-content: space-between;
             align-items: center; flex-wrap: wrap; gap: 10px;
         }
         .exemplar-codigo {
             font-family: 'Courier New', monospace; font-size: 1.3rem;
-            font-weight: 900; color: var(--verde); letter-spacing: 2px;
+            font-weight: 900; color: var(--cor-primaria); letter-spacing: 2px;
         }
-        .exemplar-especie { font-style: italic; font-size: .92rem; color: #444; margin-top: 2px; }
+        .exemplar-especie { font-style: italic; font-size: .92rem; color: var(--cinza-600); margin-top: 2px; }
         .status-pill {
             padding: 5px 14px; border-radius: 20px;
-            font-size: .78rem; font-weight: 700; color: white;
+            font-size: .78rem; font-weight: 700; color: var(--branco);
         }
-        .pill-aguardando { background: var(--amarelo); }
-        .pill-aprovado   { background: var(--verde); }
-        .pill-rejeitado  { background: var(--vermelho); }
+        .pill-aguardando { background: var(--aviso-cor); }
+        .pill-aprovado   { background: var(--cor-primaria); }
+        .pill-rejeitado  { background: var(--perigo-cor); }
 
         .exemplar-corpo {
             padding: 20px;
@@ -192,13 +183,13 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
         /* Foto de identificação */
         .foto-id {
             width: 100%; height: 160px; object-fit: cover;
-            border-radius: 8px; border: 2px solid #e2e8f0;
+            border-radius: 8px; border: 2px solid var(--cinza-200);
         }
         .foto-placeholder {
             width: 100%; height: 160px; border-radius: 8px;
-            border: 2px dashed #d0d8e0; background: #f8fafc;
+            border: 2px dashed #d0d8e0; background: var(--cinza-50);
             display: flex; align-items: center; justify-content: center;
-            color: #aaa; font-size: 2rem;
+            color: var(--cinza-400); font-size: 2rem;
         }
 
         /* Metadados */
@@ -207,38 +198,38 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
             gap: 10px 20px;
         }
         @media (max-width: 500px) { .meta-grid { grid-template-columns: 1fr; } }
-        .meta-item label { font-size: .72rem; font-weight: 700; color: #888; text-transform: uppercase; }
+        .meta-item label { font-size: .72rem; font-weight: 700; color: var(--cinza-400); text-transform: uppercase; }
         .meta-item span  { font-size: .9rem; color: #2c3e50; display: block; margin-top: 2px; }
 
         /* Mini mapa */
         .mini-mapa {
             height: 120px; border-radius: 8px;
-            border: 2px solid #e2e8f0; margin-top: 12px; z-index: 1;
+            border: 2px solid var(--cinza-200); margin-top: 12px; z-index: 1;
         }
 
         /* Área de ações */
         .exemplar-acoes {
-            padding: 16px 20px; background: #fafcfe;
+            padding: 16px 20px; background: var(--cinza-50);
             border-top: 1px solid #e8edf2;
             display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap;
         }
         .btn-aprovar {
-            background: var(--verde); color: white; border: none;
+            background: var(--cor-primaria); color: var(--branco); border: none;
             padding: 10px 24px; border-radius: 30px; font-weight: 700;
             font-size: .9rem; cursor: pointer; display: inline-flex;
             align-items: center; gap: 8px; transition: .2s;
         }
-        .btn-aprovar:hover { background: var(--verde-escuro); }
+        .btn-aprovar:hover { background: var(--cor-primaria-hover); }
 
         .rejeitar-wrap { flex: 1; min-width: 260px; }
         .rejeitar-wrap textarea {
-            width: 100%; padding: 9px 12px; border: 2px solid #e2e8f0;
+            width: 100%; padding: 9px 12px; border: 2px solid var(--cinza-200);
             border-radius: 8px; font-size: .875rem; resize: none;
             min-height: 60px; margin-bottom: 8px;
         }
-        .rejeitar-wrap textarea:focus { outline: none; border-color: var(--vermelho); }
+        .rejeitar-wrap textarea:focus { outline: none; border-color: var(--perigo-cor); }
         .btn-rejeitar {
-            background: var(--vermelho); color: white; border: none;
+            background: var(--perigo-cor); color: var(--branco); border: none;
             padding: 9px 20px; border-radius: 30px; font-weight: 700;
             font-size: .875rem; cursor: pointer; display: inline-flex;
             align-items: center; gap: 7px; transition: .2s;
@@ -246,26 +237,26 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
         .btn-rejeitar:hover { background: #b02a37; }
 
         .motivo-rejeicao {
-            background: #fff5f5; border-left: 3px solid var(--vermelho);
+            background: var(--perigo-fundo); border-left: 3px solid var(--perigo-cor);
             padding: 10px 14px; border-radius: 6px; font-size: .875rem;
-            color: #7c1d2a; margin-top: 4px;
+            color: var(--perigo-texto); margin-top: 4px;
         }
 
         /* Placeholder sem exemplares */
         .placeholder {
             text-align: center; padding: 60px 20px;
-            background: #f8fafc; border-radius: 10px; color: #718096;
+            background: var(--cinza-50); border-radius: 10px; color: var(--cinza-500);
         }
-        .placeholder i { font-size: 3.5rem; color: #cbd5e0; margin-bottom: 16px; display: block; }
+        .placeholder i { font-size: 3.5rem; color: var(--cinza-300); margin-bottom: 16px; display: block; }
 
         /* Rodapé */
         .rodape { display: flex; justify-content: center; margin-top: 30px; }
         .btn-voltar {
-            background: #6c757d; color: white; text-decoration: none;
+            background: var(--cinza-500); color: var(--branco); text-decoration: none;
             padding: 11px 28px; border-radius: 40px; font-weight: 600;
             display: inline-flex; align-items: center; gap: 8px; transition: .2s;
         }
-        .btn-voltar:hover { background: #5a6268; color: white; }
+        .btn-voltar:hover { background: var(--cinza-600); color: var(--branco); }
     </style>
 </head>
 <body>
@@ -298,13 +289,13 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
 
         <!-- Mensagens -->
         <?php if ($mensagem_sucesso): ?>
-            <div class="alerta alerta-success">
+            <div class="alerta alerta--sucesso">
                 <i class="fas fa-check-circle"></i>
                 <span><?= htmlspecialchars($mensagem_sucesso) ?></span>
             </div>
         <?php endif; ?>
         <?php if ($mensagem_erro): ?>
-            <div class="alerta alerta-danger">
+            <div class="alerta alerta--perigo">
                 <i class="fas fa-exclamation-circle"></i>
                 <span><?= htmlspecialchars($mensagem_erro) ?></span>
             </div>
@@ -335,7 +326,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
         if (count($com_geo) > 0):
         ?>
         <div class="mapa-geral-wrap">
-            <h4><i class="fas fa-map" style="color:var(--verde)"></i>
+            <h4><i class="fas fa-map" style="color:var(--cor-primaria)"></i>
                 Localização dos exemplares
             </h4>
             <div id="mapa-geral"></div>

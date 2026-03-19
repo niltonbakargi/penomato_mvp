@@ -102,135 +102,131 @@ $label_subtipo = $labels_subtipo[$subtipo] ?? ucfirst($subtipo ?: 'Colaborador')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Colaborador — Penomato</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f4f0;
+            background: var(--cinza-100);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 30px 20px;
-            color: #1e2e1e;
+            padding: var(--esp-8) var(--esp-5);
         }
 
         .header {
-            background: #0b5e42;
-            color: white;
-            padding: 20px 40px;
-            border-radius: 12px;
-            margin-bottom: 16px;
+            background: var(--cor-primaria);
+            color: var(--branco);
+            padding: var(--esp-5) var(--esp-10);
+            border-radius: var(--raio-lg);
+            margin-bottom: var(--esp-4);
             text-align: center;
             width: 100%;
             max-width: 640px;
         }
-        .header h1 { font-size: 1.4em; font-weight: 600; }
-        .header p  { font-size: 0.88em; opacity: 0.8; margin-top: 4px; }
+        .header h1 { font-size: var(--texto-lg); font-weight: var(--peso-semi); color: var(--branco); }
+        .header p  { font-size: var(--texto-sm); opacity: 0.8; margin-top: var(--esp-1); }
 
-        /* Badge de subtipo */
         .subtipo-badge {
             display: inline-block;
             background: rgba(255,255,255,0.2);
-            border-radius: 12px;
-            padding: 3px 12px;
-            font-size: 0.8em;
-            margin-top: 8px;
+            border-radius: var(--raio-full);
+            padding: var(--esp-1) var(--esp-3);
+            font-size: var(--texto-xs);
+            margin-top: var(--esp-2);
             letter-spacing: 0.03em;
         }
 
-        /* Stats rápidas */
         .stats-bar {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: var(--esp-2);
+            margin-bottom: var(--esp-5);
             width: 100%;
             max-width: 640px;
         }
         .stat-chip {
             flex: 1;
-            background: white;
-            border-radius: 10px;
-            padding: 12px;
+            background: var(--branco);
+            border-radius: var(--raio-md);
+            padding: var(--esp-3);
             text-align: center;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            box-shadow: var(--sombra-sm);
         }
-        .stat-chip .num { font-size: 1.5em; font-weight: 700; color: #0b5e42; line-height: 1; }
-        .stat-chip .lbl { font-size: 0.72em; color: #999; margin-top: 3px; }
+        .stat-chip .num { font-size: var(--texto-2xl); font-weight: var(--peso-bold); color: var(--cor-primaria); line-height: 1; }
+        .stat-chip .lbl { font-size: var(--texto-xs); color: var(--cinza-400); margin-top: var(--esp-1); }
 
-        /* Grade de botões */
         .btn-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: var(--esp-4);
             width: 100%;
             max-width: 640px;
         }
 
         .action-btn {
-            background: white;
-            border: 2px solid #0b5e42;
-            border-radius: 12px;
-            padding: 22px 16px;
+            background: var(--branco);
+            border: 2px solid var(--cor-primaria);
+            border-radius: var(--raio-lg);
+            padding: var(--esp-6) var(--esp-4);
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-            color: #0b5e42;
-            font-size: 0.9em;
+            transition: var(--transicao);
+            font-weight: var(--peso-semi);
+            color: var(--cor-primaria);
+            font-size: var(--texto-sm);
             text-decoration: none;
             display: block;
             position: relative;
         }
         .action-btn:hover {
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(11,94,66,0.2);
         }
-        .action-btn .icon { font-size: 1.8em; margin-bottom: 8px; display: block; }
+        .action-btn .icon { font-size: var(--texto-2xl); margin-bottom: var(--esp-2); display: block; }
         .action-btn .desc {
-            font-size: 0.78em;
-            font-weight: 400;
+            font-size: var(--texto-xs);
+            font-weight: var(--peso-normal);
             opacity: 0.7;
-            margin-top: 4px;
+            margin-top: var(--esp-1);
             line-height: 1.35;
         }
 
         .action-btn.em-breve {
-            border-color: #ccc;
-            color: #aaa;
+            border-color: var(--cinza-300);
+            color: var(--cinza-400);
             cursor: default;
         }
         .action-btn.em-breve:hover {
-            background: white;
-            color: #aaa;
+            background: var(--branco);
+            color: var(--cinza-400);
             transform: none;
             box-shadow: none;
         }
         .badge-breve {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #e0e0e0;
-            color: #888;
-            font-size: 0.68em;
-            padding: 2px 7px;
-            border-radius: 8px;
-            font-weight: 600;
+            top: var(--esp-2);
+            right: var(--esp-2);
+            background: var(--cinza-200);
+            color: var(--cinza-500);
+            font-size: var(--texto-xs);
+            padding: var(--esp-1) var(--esp-2);
+            border-radius: var(--raio-sm);
+            font-weight: var(--peso-semi);
         }
 
         .btn-sair {
-            margin-top: 24px;
+            margin-top: var(--esp-6);
             background: none;
             border: none;
-            color: #999;
-            font-size: 0.9em;
+            color: var(--cinza-400);
+            font-size: var(--texto-sm);
             cursor: pointer;
             text-decoration: underline;
         }
-        .btn-sair:hover { color: #dc3545; }
+        .btn-sair:hover { color: var(--perigo-cor); }
 
         @media (max-width: 480px) {
             .btn-grid { grid-template-columns: 1fr; }

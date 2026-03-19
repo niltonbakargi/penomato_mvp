@@ -377,7 +377,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .change-password-card .card-header {
-        background: linear-gradient(135deg, #0b5e42 0%, #1a7a5a 100%);
+        background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
         color: white;
         padding: 25px 30px;
         border: none;
@@ -396,7 +396,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .change-password-card .card-footer {
-        background: #f8f9fa;
+        background: var(--cinza-50);
         border-top: 1px solid #e0e0e0;
         padding: 15px 30px;
     }
@@ -408,19 +408,19 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         background: #e8f4f8;
         border-radius: 15px;
         padding: 20px;
-        border-left: 4px solid #0b5e42;
+        border-left: 4px solid var(--cor-primaria);
     }
     
     .security-info-icon {
         font-size: 2rem;
-        color: #0b5e42;
+        color: var(--cor-primaria);
     }
     
     .security-info-text h5 {
         font-size: 1rem;
         font-weight: 600;
         margin-bottom: 10px;
-        color: #333;
+        color: var(--cinza-800);
     }
     
     .security-info-text ul {
@@ -431,17 +431,17 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     
     .security-info-text li {
         font-size: 0.9rem;
-        color: #555;
+        color: var(--cinza-600);
         margin-bottom: 5px;
     }
     
     /* Aviso de segurança */
     .security-warning {
-        background: #fff3cd;
+        background: var(--aviso-fundo);
         border: 1px solid #ffeeba;
         border-radius: 10px;
         padding: 12px 15px;
-        color: #856404;
+        color: var(--aviso-texto);
         font-size: 0.9rem;
         display: flex;
         align-items: center;
@@ -454,14 +454,14 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     /* Formulário */
     .form-control {
         border-radius: 10px;
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--cinza-200);
         padding: 10px 15px;
         transition: all 0.3s;
         height: 45px;
     }
     
     .form-control:focus {
-        border-color: #0b5e42;
+        border-color: var(--cor-primaria);
         box-shadow: 0 0 0 3px rgba(11, 94, 66, 0.1);
     }
     
@@ -471,10 +471,10 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .input-group-text {
-        background: #f8f9fa;
-        border: 2px solid #e0e0e0;
+        background: var(--cinza-50);
+        border: 2px solid var(--cinza-200);
         border-radius: 10px;
-        color: #666;
+        color: var(--cinza-500);
     }
     
     .senha-toggle {
@@ -483,17 +483,17 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .senha-toggle:hover {
-        color: #0b5e42;
+        color: var(--cor-primaria);
     }
     
     .form-label {
         font-weight: 600;
-        color: #333;
+        color: var(--cinza-800);
         margin-bottom: 5px;
     }
     
     .form-label i {
-        color: #0b5e42;
+        color: var(--cor-primaria);
     }
     
     /* Medidor de força da senha */
@@ -517,23 +517,23 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .strength-weak {
-        background: #dc3545;
+        background: var(--perigo-cor);
         width: 33.33%;
     }
     
     .strength-medium {
-        background: #ffc107;
+        background: var(--aviso-cor);
         width: 66.66%;
     }
     
     .strength-strong {
-        background: #28a745;
+        background: var(--sucesso-cor);
         width: 100%;
     }
     
     /* Requisitos da senha */
     .password-requirements {
-        background: #f8f9fa;
+        background: var(--cinza-50);
         border-radius: 10px;
         padding: 12px 15px;
         font-size: 0.85rem;
@@ -551,11 +551,11 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .requirement.met {
-        color: #28a745;
+        color: var(--sucesso-cor);
     }
     
     .requirement.met i {
-        color: #28a745;
+        color: var(--sucesso-cor);
     }
     
     .requirement:last-child {
@@ -564,7 +564,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     
     /* Botões */
     .btn-primary {
-        background: #0b5e42;
+        background: var(--cor-primaria);
         border: none;
         border-radius: 10px;
         padding: 10px 25px;
@@ -572,7 +572,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .btn-primary:hover {
-        background: #0a4e36;
+        background: var(--cor-primaria-hover);
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(11, 94, 66, 0.3);
     }
@@ -599,7 +599,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     .last-logins-card .card-header h5 {
         font-size: 1rem;
         font-weight: 600;
-        color: #333;
+        color: var(--cinza-800);
     }
     
     .last-logins-card .table {
@@ -754,15 +754,15 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         } else if (forca <= 2) {
             barra.classList.add('strength-weak');
             texto.textContent = 'Força: Fraca';
-            texto.style.color = '#dc3545';
+            texto.style.color = 'var(--perigo-cor)';
         } else if (forca <= 4) {
             barra.classList.add('strength-medium');
             texto.textContent = 'Força: Média';
-            texto.style.color = '#ffc107';
+            texto.style.color = 'var(--aviso-cor)';
         } else {
             barra.classList.add('strength-strong');
             texto.textContent = 'Força: Forte';
-            texto.style.color = '#28a745';
+            texto.style.color = 'var(--sucesso-cor)';
         }
         
         atualizarRequisitos(senha);
@@ -782,10 +782,10 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         if (confirmar.length > 0) {
             if (senha === confirmar) {
                 feedback.innerHTML = '<i class="fas fa-check-circle text-success"></i> Senhas conferem';
-                feedback.style.color = '#28a745';
+                feedback.style.color = 'var(--sucesso-cor)';
             } else {
                 feedback.innerHTML = '<i class="fas fa-times-circle text-danger"></i> Senhas não conferem';
-                feedback.style.color = '#dc3545';
+                feedback.style.color = 'var(--perigo-cor)';
             }
         } else {
             feedback.innerHTML = '';

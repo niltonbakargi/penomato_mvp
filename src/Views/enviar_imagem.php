@@ -148,7 +148,7 @@ $status_labels = [
     'registrada'     => ['label' => 'Registrada',     'cor' => '#f59e0b'],
     'em_revisao'     => ['label' => 'Em revisão',     'cor' => '#ef4444'],
     'revisada'       => ['label' => 'Revisada',       'cor' => '#10b981'],
-    'publicado'      => ['label' => 'Publicada',      'cor' => '#0b5e42'],
+    'publicado'      => ['label' => 'Publicada',      'cor' => 'var(--cor-primaria)'],
 ];
 
 $mensagem_sucesso = isset($_GET['sucesso']) ? urldecode($_GET['sucesso']) : '';
@@ -161,90 +161,84 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exsicatas — Penomato</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        :root {
-            --verde:        #0b5e42;
-            --verde-escuro: #0a4c35;
-            --verde-claro:  #e8f5e9;
-            --fundo:        #f5f2e9;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; background:var(--fundo); color:#2c3e50; padding:30px 20px; }
+        body { background: var(--cinza-50); color: var(--cinza-800); padding: var(--esp-8) var(--esp-5); }
         .container { max-width:1100px; margin:0 auto; }
 
         /* Cabeçalho */
         .cabecalho {
             background:white; padding:26px 36px; border-radius:12px 12px 0 0;
-            border-bottom:4px solid var(--verde);
+            border-bottom:4px solid var(--cor-primaria);
             display:flex; justify-content:space-between; align-items:center;
             flex-wrap:wrap; gap:12px;
         }
-        .cabecalho h1 { color:var(--verde); font-size:1.7rem; font-weight:600; }
-        .cabecalho .sub { color:#666; font-style:italic; font-size:.88rem; margin-top:3px; }
-        .user-pill { background:#f8f9fa; padding:7px 16px; border-radius:40px; display:flex; align-items:center; gap:9px; font-size:.88rem; }
-        .user-pill i { color:var(--verde); }
-        .btn-sair { color:#dc3545; text-decoration:none; padding:3px 8px; border-radius:20px; transition:.2s; }
-        .btn-sair:hover { background:#dc3545; color:white; }
+        .cabecalho h1 { color:var(--cor-primaria); font-size:1.7rem; font-weight:600; }
+        .cabecalho .sub { color:var(--cinza-500); font-style:italic; font-size:.88rem; margin-top:3px; }
+        .user-pill { background:var(--cinza-50); padding:7px 16px; border-radius:40px; display:flex; align-items:center; gap:9px; font-size:.88rem; }
+        .user-pill i { color:var(--cor-primaria); }
+        .btn-sair { color:var(--perigo-cor); text-decoration:none; padding:3px 8px; border-radius:20px; transition:.2s; }
+        .btn-sair:hover { background:var(--perigo-cor); color:white; }
 
         /* Card */
         .card-principal { background:white; padding:30px 36px; border-radius:0 0 12px 12px; box-shadow:0 4px 15px rgba(0,0,0,.05); }
 
         /* Seletor */
-        .seletor-box { background:#f8fafc; border:2px solid #e2e8f0; border-radius:10px; padding:20px 24px; margin-bottom:22px; }
-        .seletor-box h3 { color:var(--verde); margin-bottom:12px; font-size:.95rem; font-weight:700; }
+        .seletor-box { background:var(--cinza-50); border:2px solid var(--cinza-200); border-radius:10px; padding:20px 24px; margin-bottom:22px; }
+        .seletor-box h3 { color:var(--cor-primaria); margin-bottom:12px; font-size:.95rem; font-weight:700; }
         .seletor-row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
         .seletor-row .fg { flex:1; min-width:240px; }
         .seletor-row label { font-weight:600; font-size:.875rem; margin-bottom:6px; display:block; }
-        .seletor-row select { width:100%; padding:10px 14px; border:2px solid #e2e8f0; border-radius:8px; font-size:.95rem; }
-        .seletor-row select:focus { outline:none; border-color:var(--verde); }
-        .btn-carregar { background:var(--verde); color:white; border:none; padding:10px 24px; border-radius:40px; font-weight:600; cursor:pointer; white-space:nowrap; transition:.2s; }
-        .btn-carregar:hover { background:var(--verde-escuro); }
+        .seletor-row select { width:100%; padding:10px 14px; border:2px solid var(--cinza-200); border-radius:8px; font-size:.95rem; }
+        .seletor-row select:focus { outline:none; border-color:var(--cor-primaria); }
+        .btn-carregar { background:var(--cor-primaria); color:white; border:none; padding:10px 24px; border-radius:40px; font-weight:600; cursor:pointer; white-space:nowrap; transition:.2s; }
+        .btn-carregar:hover { background:var(--cor-primaria-hover); }
 
         /* Alertas */
         .alerta { padding:13px 16px; border-radius:8px; margin-bottom:18px; display:flex; align-items:flex-start; gap:10px; font-size:.9rem; }
-        .alerta-success { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
-        .alerta-danger  { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
-        .alerta-warning { background:#fff3cd; color:#856404; border-left:4px solid #ffc107; }
-        .alerta-info    { background:#d1ecf1; color:#0c5460; border-left:4px solid #17a2b8; }
+        .alerta-success { background:var(--sucesso-fundo); color:var(--sucesso-texto); border-left:4px solid var(--sucesso-cor); }
+        .alerta-danger  { background:var(--perigo-fundo); color:var(--perigo-texto); border-left:4px solid var(--perigo-cor); }
+        .alerta-warning { background:var(--aviso-fundo); color:var(--aviso-texto); border-left:4px solid var(--aviso-cor); }
+        .alerta-info    { background:var(--info-fundo); color:var(--info-texto); border-left:4px solid var(--info-cor); }
 
         /* Banner espécie */
-        .especie-banner { background:var(--verde-claro); border-radius:10px; padding:16px 22px; margin-bottom:22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-        .especie-nome { font-size:1.25rem; font-weight:600; color:var(--verde); font-style:italic; }
+        .especie-banner { background:var(--verde-50); border-radius:10px; padding:16px 22px; margin-bottom:22px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .especie-nome { font-size:1.25rem; font-weight:600; color:var(--cor-primaria); font-style:italic; }
         .badge-status { padding:4px 12px; border-radius:20px; font-size:.75rem; font-weight:700; color:white; }
 
         /* ── PASSO 2: Seleção de exemplar ─── */
-        .exemplares-titulo { font-size:.95rem; font-weight:700; color:#444; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .exemplares-titulo { font-size:.95rem; font-weight:700; color:var(--cinza-700); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
         .exemplares-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-bottom:28px; }
 
         .ex-card {
-            border:2px solid #e2e8f0; border-radius:10px; overflow:hidden;
+            border:2px solid var(--cinza-200); border-radius:10px; overflow:hidden;
             cursor:pointer; transition:.2s; text-decoration:none; color:inherit; display:block;
         }
-        .ex-card:hover { border-color:var(--verde); box-shadow:0 4px 10px rgba(0,0,0,.08); }
-        .ex-card.selecionado { border-color:var(--verde); box-shadow:0 0 0 3px rgba(11,94,66,.2); }
+        .ex-card:hover { border-color:var(--cor-primaria); box-shadow:0 4px 10px rgba(0,0,0,.08); }
+        .ex-card.selecionado { border-color:var(--cor-primaria); box-shadow:0 0 0 3px rgba(11,94,66,.2); }
         .ex-card.aguardando  { border-left:4px solid #f59e0b; cursor:default; opacity:.8; }
-        .ex-card.rejeitado   { border-left:4px solid #dc3545; cursor:default; opacity:.7; }
+        .ex-card.rejeitado   { border-left:4px solid var(--perigo-cor); cursor:default; opacity:.7; }
 
         .ex-foto { height:100px; background:#f0f0f0; overflow:hidden; }
         .ex-foto img { width:100%; height:100%; object-fit:cover; }
-        .ex-foto-placeholder { height:100px; background:#f8fafc; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:1.8rem; }
+        .ex-foto-placeholder { height:100px; background:var(--cinza-50); display:flex; align-items:center; justify-content:center; color:#ccc; font-size:1.8rem; }
 
         .ex-body { padding:12px 14px; }
-        .ex-codigo { font-family:'Courier New',monospace; font-size:1.1rem; font-weight:900; color:var(--verde); letter-spacing:2px; }
-        .ex-local { font-size:.78rem; color:#888; margin-top:3px; }
+        .ex-codigo { font-family:'Courier New',monospace; font-size:1.1rem; font-weight:900; color:var(--cor-primaria); letter-spacing:2px; }
+        .ex-local { font-size:.78rem; color:var(--cinza-400); margin-top:3px; }
         .ex-pill { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.7rem; font-weight:700; color:white; margin-top:6px; }
-        .pill-ap { background:var(--verde); }
+        .pill-ap { background:var(--cor-primaria); }
         .pill-ag { background:#f59e0b; }
-        .pill-rj { background:#dc3545; }
+        .pill-rj { background:var(--perigo-cor); }
 
         .btn-novo-exemplar {
             border:2px dashed #c3d4e0; border-radius:10px; padding:24px 14px;
-            text-align:center; cursor:pointer; text-decoration:none; color:#888;
+            text-align:center; cursor:pointer; text-decoration:none; color:var(--cinza-400);
             display:flex; flex-direction:column; align-items:center; gap:8px;
             transition:.2s; background:#fafcfe;
         }
-        .btn-novo-exemplar:hover { border-color:var(--verde); color:var(--verde); background:var(--verde-claro); }
+        .btn-novo-exemplar:hover { border-color:var(--cor-primaria); color:var(--cor-primaria); background:var(--verde-50); }
         .btn-novo-exemplar i { font-size:1.8rem; }
         .btn-novo-exemplar span { font-size:.85rem; font-weight:600; }
 
@@ -255,15 +249,15 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
             display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
         }
         .exemplar-banner .ex-cod { font-family:'Courier New',monospace; font-size:1.2rem; font-weight:900; color:#92400e; letter-spacing:2px; }
-        .exemplar-banner .ex-det { font-size:.85rem; color:#666; }
-        .btn-trocar { background:none; border:1px solid #d0c090; padding:5px 14px; border-radius:20px; font-size:.8rem; color:#666; cursor:pointer; text-decoration:none; transition:.2s; }
+        .exemplar-banner .ex-det { font-size:.85rem; color:var(--cinza-500); }
+        .btn-trocar { background:none; border:1px solid #d0c090; padding:5px 14px; border-radius:20px; font-size:.8rem; color:var(--cinza-500); cursor:pointer; text-decoration:none; transition:.2s; }
         .btn-trocar:hover { background:#f0e8d0; color:#333; }
 
         /* Partes */
-        .partes-titulo { font-size:.95rem; font-weight:700; color:#444; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .partes-titulo { font-size:.95rem; font-weight:700; color:var(--cinza-700); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
         .partes-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:12px; margin-bottom:32px; }
-        .parte-card { border-radius:10px; border:2px solid #e2e8f0; padding:18px 12px; text-align:center; cursor:pointer; transition:.2s; background:#fafafa; }
-        .parte-card:hover { border-color:var(--verde); box-shadow:0 4px 10px rgba(0,0,0,.08); transform:translateY(-2px); }
+        .parte-card { border-radius:10px; border:2px solid var(--cinza-200); padding:18px 12px; text-align:center; cursor:pointer; transition:.2s; background:#fafafa; }
+        .parte-card:hover { border-color:var(--cor-primaria); box-shadow:0 4px 10px rgba(0,0,0,.08); transform:translateY(-2px); }
         .parte-card.fotografada { border-color:#28a745; background:#f0fff4; }
         .parte-card.dispensada  { border-color:#ffc107; background:#fffdf0; opacity:.8; cursor:default; }
         .parte-icone { font-size:1.9rem; margin-bottom:7px; }
@@ -272,63 +266,63 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
         .badge-pendente    { background:#e2e8f0; color:#555; }
         .badge-fotografada { background:#d4edda; color:#155724; }
         .badge-dispensada  { background:#fff3cd; color:#856404; }
-        .parte-total { font-size:.75rem; color:#888; margin-top:3px; }
+        .parte-total { font-size:.75rem; color:var(--cinza-400); margin-top:3px; }
 
         /* Filtros imagem */
-        .filtros-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:13px 16px; margin-bottom:16px; }
+        .filtros-box { background:var(--cinza-50); border:1px solid #e2e8f0; border-radius:8px; padding:13px 16px; margin-bottom:16px; }
         .filtros-box h5 { font-size:.83rem; font-weight:700; color:#555; margin-bottom:9px; }
         .filtros-row { display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
         .filtro-item { display:flex; flex-direction:column; gap:3px; min-width:120px; }
-        .filtro-item label { font-size:.73rem; color:#666; font-weight:600; }
-        .filtro-item input[type=range] { width:100%; accent-color:var(--verde); }
+        .filtro-item label { font-size:.73rem; color:var(--cinza-500); font-weight:600; }
+        .filtro-item input[type=range] { width:100%; accent-color:var(--cor-primaria); }
         .btn-rst { background:none; border:1px solid #c0c0c0; padding:4px 12px; border-radius:20px; font-size:.76rem; cursor:pointer; color:#555; transition:.2s; }
         .btn-rst:hover { background:#eee; }
 
         /* Galeria */
-        .galeria-titulo { font-size:.95rem; font-weight:700; color:#444; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+        .galeria-titulo { font-size:.95rem; font-weight:700; color:var(--cinza-700); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
         .fotos-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
-        .foto-card { border:2px solid #e2e8f0; border-radius:8px; overflow:hidden; background:white; transition:.2s; }
+        .foto-card { border:2px solid var(--cinza-200); border-radius:8px; overflow:hidden; background:white; transition:.2s; }
         .foto-card:hover { box-shadow:0 4px 10px rgba(0,0,0,.1); }
-        .foto-preview { height:130px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#f8fafc; }
+        .foto-preview { height:130px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--cinza-50); }
         .foto-preview img { width:100%; height:100%; object-fit:cover; transition:filter .15s; }
         .foto-info { padding:10px 12px; }
-        .foto-parte { font-weight:700; color:var(--verde); font-size:.83rem; }
-        .foto-meta  { font-size:.76rem; color:#666; margin-top:3px; line-height:1.4; }
+        .foto-parte { font-weight:700; color:var(--cor-primaria); font-size:.83rem; }
+        .foto-meta  { font-size:.76rem; color:var(--cinza-500); margin-top:3px; line-height:1.4; }
         .foto-val   { display:inline-block; padding:2px 8px; border-radius:10px; font-size:.68rem; font-weight:700; margin-top:5px; }
         .val-pendente  { background:#fff3cd; color:#856404; }
         .val-aprovado  { background:#d4edda; color:#155724; }
         .val-rejeitado { background:#f8d7da; color:#721c24; }
 
         /* Placeholder */
-        .placeholder-box { text-align:center; padding:56px 20px; background:#f8fafc; border-radius:10px; color:#718096; }
+        .placeholder-box { text-align:center; padding:56px 20px; background:var(--cinza-50); border-radius:10px; color:#718096; }
         .placeholder-box i { font-size:3.2rem; color:#cbd5e0; margin-bottom:14px; display:block; }
 
         /* Rodapé */
         .rodape-botoes { display:flex; justify-content:center; margin-top:32px; }
-        .btn-voltar { background:#6c757d; color:white; text-decoration:none; padding:11px 28px; border-radius:40px; font-weight:600; display:inline-flex; align-items:center; gap:8px; transition:.2s; }
+        .btn-voltar { background:var(--cinza-500); color:white; text-decoration:none; padding:11px 28px; border-radius:40px; font-weight:600; display:inline-flex; align-items:center; gap:8px; transition:.2s; }
         .btn-voltar:hover { background:#5a6268; color:white; }
 
         /* Modal upload */
         .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:1000; align-items:center; justify-content:center; }
         .overlay.aberto { display:flex; }
         .modal-upload { background:white; border-radius:12px; padding:30px 34px; width:100%; max-width:480px; box-shadow:0 20px 40px rgba(0,0,0,.2); position:relative; max-height:90vh; overflow-y:auto; }
-        .modal-upload h3 { color:var(--verde); margin-bottom:20px; font-size:1.1rem; }
+        .modal-upload h3 { color:var(--cor-primaria); margin-bottom:20px; font-size:1.1rem; }
         .modal-fechar { position:absolute; top:14px; right:18px; background:none; border:none; font-size:1.4rem; color:#999; cursor:pointer; }
         .modal-fechar:hover { color:#333; }
         .campo { margin-bottom:15px; }
         .campo label { display:block; font-weight:600; font-size:.875rem; margin-bottom:6px; color:#2d3748; }
-        .campo label .req { color:#dc3545; }
-        .campo input, .campo select, .campo textarea { width:100%; padding:9px 13px; border:2px solid #e2e8f0; border-radius:8px; font-size:.93rem; }
-        .campo input:focus, .campo select:focus, .campo textarea:focus { outline:none; border-color:var(--verde); }
+        .campo label .req { color:var(--perigo-cor); }
+        .campo input, .campo select, .campo textarea { width:100%; padding:9px 13px; border:2px solid var(--cinza-200); border-radius:8px; font-size:.93rem; }
+        .campo input:focus, .campo select:focus, .campo textarea:focus { outline:none; border-color:var(--cor-primaria); }
         .campo textarea { resize:vertical; min-height:65px; }
         .drop-zone { border:2px dashed #c3d4e0; border-radius:8px; padding:26px 16px; text-align:center; cursor:pointer; transition:.2s; background:#fafcfe; }
-        .drop-zone:hover,.drop-zone.sobre { border-color:var(--verde); background:var(--verde-claro); }
+        .drop-zone:hover,.drop-zone.sobre { border-color:var(--cor-primaria); background:var(--verde-50); }
         .drop-zone i { font-size:1.9rem; color:#aaa; display:block; margin-bottom:7px; }
-        .drop-zone p { font-size:.83rem; color:#666; margin:0; }
-        .drop-zone .arq-nome { font-size:.83rem; color:var(--verde); font-weight:600; margin-top:7px; display:none; }
+        .drop-zone p { font-size:.83rem; color:var(--cinza-500); margin:0; }
+        .drop-zone .arq-nome { font-size:.83rem; color:var(--cor-primaria); font-weight:600; margin-top:7px; display:none; }
         #input-arquivo { display:none; }
-        .btn-enviar { width:100%; background:var(--verde); color:white; border:none; padding:12px; border-radius:8px; font-size:.97rem; font-weight:700; cursor:pointer; margin-top:6px; transition:.2s; }
-        .btn-enviar:hover { background:var(--verde-escuro); }
+        .btn-enviar { width:100%; background:var(--cor-primaria); color:white; border:none; padding:12px; border-radius:8px; font-size:.97rem; font-weight:700; cursor:pointer; margin-top:6px; transition:.2s; }
+        .btn-enviar:hover { background:var(--cor-primaria-hover); }
         .btn-enviar:disabled { opacity:.6; cursor:not-allowed; }
 
         /* Chip do exemplar no modal */
@@ -406,7 +400,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
 
             <!-- PASSO 2: Selecionar exemplar -->
             <div class="exemplares-titulo">
-                <i class="fas fa-seedling" style="color:var(--verde)"></i>
+                <i class="fas fa-seedling" style="color:var(--cor-primaria)"></i>
                 Passo 2 — Selecione o exemplar de campo
             </div>
 
@@ -478,7 +472,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
             <!-- Banner exemplar selecionado -->
             <div class="exemplar-banner">
                 <div>
-                    <div style="font-size:.78rem;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:3px;">Exemplar selecionado</div>
+                    <div style="font-size:.78rem;font-weight:700;color:var(--cinza-400);text-transform:uppercase;margin-bottom:3px;">Exemplar selecionado</div>
                     <span class="ex-cod"><?= htmlspecialchars($exemplar['codigo']) ?></span>
                     <div class="ex-det">
                         <?= htmlspecialchars($exemplar['cidade']) ?> / <?= htmlspecialchars($exemplar['estado']) ?>
@@ -501,7 +495,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
 
             <!-- Partes -->
             <div class="partes-titulo">
-                <i class="fas fa-th-large" style="color:var(--verde)"></i>
+                <i class="fas fa-th-large" style="color:var(--cor-primaria)"></i>
                 Passo 3 — Clique na parte para enviar foto
             </div>
             <div class="partes-grid">
@@ -536,7 +530,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
                         <button class="btn-rst" onclick="rstFiltros()"><i class="fas fa-undo"></i> Resetar</button>
                     </div>
                 </div>
-                <div class="galeria-titulo"><i class="fas fa-images" style="color:var(--verde)"></i>Fotos registradas (<?= count($fotos_campo) ?>)</div>
+                <div class="galeria-titulo"><i class="fas fa-images" style="color:var(--cor-primaria)"></i>Fotos registradas (<?= count($fotos_campo) ?>)</div>
                 <div class="fotos-grid" id="galeria">
                     <?php foreach ($fotos_campo as $foto):
                         $cfg2 = $partes_config[$foto['parte_planta']] ?? ['icone'=>'📷','nome'=>$foto['parte_planta']];

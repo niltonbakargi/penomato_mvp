@@ -131,7 +131,7 @@ $labels_prio = [
         .container { max-width: 1200px; margin: 0 auto; }
 
         .header {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             padding: 18px 28px;
             border-radius: 10px;
@@ -180,9 +180,9 @@ $labels_prio = [
             border-radius: 5px;
             font-size: 0.88em;
         }
-        .filtros-bar input[type=number]:focus { outline: none; border-color: #0b5e42; }
+        .filtros-bar input[type=number]:focus { outline: none; border-color: var(--cor-primaria); }
         .btn-filtrar {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             border: none;
             padding: 7px 20px;
@@ -212,10 +212,10 @@ $labels_prio = [
         .secao-header h2 {
             font-size: 1em;
             font-weight: 700;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
         .secao-header .count {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             border-radius: 10px;
             padding: 2px 10px;
@@ -239,7 +239,7 @@ $labels_prio = [
             border-bottom: 2px solid transparent;
             margin-bottom: -1px;
         }
-        .tab.ativo { color: #0b5e42; border-bottom-color: #0b5e42; }
+        .tab.ativo { color: var(--cor-primaria); border-bottom-color: var(--cor-primaria); }
 
         .tab-content { display: none; }
         .tab-content.ativo { display: block; }
@@ -273,7 +273,7 @@ $labels_prio = [
         .badge-revisao     { background: #fff3cd; color: #856404; }
         .badge-contestacao { background: #f8d7da; color: #721c24; }
         .badge-validacao   { background: #d1ecf1; color: #0c5460; }
-        .badge-publicacao  { background: #0b5e42; color: white; }
+        .badge-publicacao  { background: var(--cor-primaria); color: white; }
         .badge-upload      { background: #e2d9f3; color: #6f42c1; }
 
         .badge-sem_dados      { background:#f0f0f0; color:#666; }

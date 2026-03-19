@@ -90,7 +90,7 @@ ob_end_clean();
         }
         
         .titulo-principal {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 1.8rem;
             font-weight: 600;
             display: flex;
@@ -149,13 +149,13 @@ ob_end_clean();
             border-radius: 16px;
             padding: 30px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            border-left: 8px solid #0b5e42;
+            border-left: 8px solid var(--cor-primaria);
         }
         
         .nome-cientifico {
             font-size: 2.2rem;
             font-weight: 700;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 10px;
             line-height: 1.2;
         }
@@ -195,7 +195,7 @@ ob_end_clean();
         }
         
         .categoria-titulo {
-            background: linear-gradient(135deg, #0b5e42 0%, #0a4c35 100%);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, #0a4c35 100%);
             color: white;
             padding: 18px 22px;
             font-size: 1.3rem;
@@ -272,7 +272,7 @@ ob_end_clean();
         }
         
         .card-referencias h3 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 1.3rem;
             margin-bottom: 15px;
             display: flex;
@@ -300,7 +300,7 @@ ob_end_clean();
         }
         
         .breadcrumb a {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             text-decoration: none;
             font-weight: 500;
         }
@@ -346,7 +346,7 @@ ob_end_clean();
         
         .divisor {
             height: 2px;
-            background: linear-gradient(90deg, #0b5e42 0%, rgba(11,94,66,0.1) 100%);
+            background: linear-gradient(90deg, var(--cor-primaria) 0%, rgba(11,94,66,0.1) 100%);
             margin: 20px 0;
         }
     </style>
@@ -358,7 +358,7 @@ ob_end_clean();
         <div class="breadcrumb">
             <a href="../Controllers/busca_caracteristicas.php">Busca de Espécies</a>
             <span>›</span>
-            <span style="color: #0b5e42; font-weight: 600;">
+            <span style="color: var(--cor-primaria); font-weight: 600;">
                 <?php echo $especie ? htmlspecialchars($especie['nome_cientifico']) : 'Detalhes'; ?>
             </span>
         </div>

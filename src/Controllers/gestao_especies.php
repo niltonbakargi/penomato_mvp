@@ -88,7 +88,7 @@ $colaboradores = $pdo->query("
         .container { max-width: 1300px; margin: 0 auto; }
 
         .header {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             padding: 18px 28px;
             border-radius: 10px;
@@ -129,9 +129,9 @@ $colaboradores = $pdo->query("
             color: #333;
             transition: all 0.15s;
         }
-        .stat-chip:hover { border-color: #0b5e42; }
-        .stat-chip.ativo { border-color: #0b5e42; background: #e8f5e9; color: #0b5e42; font-weight: 600; }
-        .stat-chip .num { font-weight: 700; color: #0b5e42; }
+        .stat-chip:hover { border-color: var(--cor-primaria); }
+        .stat-chip.ativo { border-color: var(--cor-primaria); background: #e8f5e9; color: var(--cor-primaria); font-weight: 600; }
+        .stat-chip .num { font-weight: 700; color: var(--cor-primaria); }
 
         /* Tabela */
         .table-wrap {
@@ -172,7 +172,7 @@ $colaboradores = $pdo->query("
         .badge-em_revisao   { background:#fff3cd; color:#856404; }
         .badge-revisada     { background:#c3e6cb; color:#155724; }
         .badge-contestado   { background:#f8d7da; color:#721c24; }
-        .badge-publicado    { background:#0b5e42; color:white; }
+        .badge-publicado    { background:var(--cor-primaria); color:white; }
 
         /* Prioridade inline select */
         .sel-prioridade, .sel-atribuir {
@@ -184,7 +184,7 @@ $colaboradores = $pdo->query("
             cursor: pointer;
             width: 100%;
         }
-        .sel-prioridade:focus, .sel-atribuir:focus { outline: none; border-color: #0b5e42; }
+        .sel-prioridade:focus, .sel-atribuir:focus { outline: none; border-color: var(--cor-primaria); }
 
         .prio-urgente { color: #b02a37; font-weight: 700; }
         .prio-alta    { color: #d97706; font-weight: 600; }

@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
     <style>
         /* ── Planilha de campos ── */
         .section-title {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: #fff;
             padding: 9px 14px;
             margin: 24px 0 14px;
@@ -202,9 +202,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         .input-group select:focus,
         .input-group input[type="text"]:focus,
-        .input-group textarea:focus { border-color: #0b5e42; outline: none; }
+        .input-group textarea:focus { border-color: var(--cor-primaria); outline: none; }
         .input-group textarea { resize: vertical; }
-        .auto-filled { border-color: #0b5e42 !important; background: #f0faf5; }
+        .auto-filled { border-color: var(--cor-primaria) !important; background: #f0faf5; }
         .ref-wrapper { display: flex; gap: 5px; align-items: center; }
         .ref-wrapper input { flex: 1; }
         .confirm-btn {
@@ -215,8 +215,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             cursor: pointer; padding: 0; line-height: 1; user-select: none;
             transition: background 0.15s, border-color 0.15s, color 0.15s;
         }
-        .confirm-btn:hover { border-color: #0b5e42; color: #0b5e42; }
-        .confirm-btn.confirmed { background: #0b5e42; border-color: #0b5e42; color: #fff; }
+        .confirm-btn:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
+        .confirm-btn.confirmed { background: var(--cor-primaria); border-color: var(--cor-primaria); color: #fff; }
         /* ── Prompt box ── */
         .prompt-box {
             background: #f8fafc; border: 1px solid #e2e8f0;
@@ -237,9 +237,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         .prompt-placeholder { color: #aaa; font-style: italic; font-family: inherit; font-size: 0.88rem; }
         .btn-copy { background: #17a2b8; color: white; }
         .btn-copy:hover { background: #138496; transform: translateY(-1px); }
-        .btn-copy.copied { background: #0b5e42; }
+        .btn-copy.copied { background: var(--cor-primaria); }
         .ai-section-header {
-            font-size: 1.1rem; font-weight: 700; color: #0b5e42;
+            font-size: 1.1rem; font-weight: 700; color: var(--cor-primaria);
             margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
         }
         .ai-section-sub { color: #666; font-size: 0.88rem; margin-bottom: 20px; }
@@ -267,12 +267,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             padding: 30px 40px;
             border-radius: 12px 12px 0 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-bottom: 4px solid #0b5e42;
+            border-bottom: 4px solid var(--cor-primaria);
             margin-bottom: 5px;
         }
         
         .paper-header h1 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 2rem;
             font-weight: 500;
             display: flex;
@@ -303,7 +303,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         
         .user-info i {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 1.2rem;
         }
         
@@ -335,23 +335,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             display: flex;
             align-items: center;
             gap: 15px;
-            border-left: 4px solid #0b5e42;
+            border-left: 4px solid var(--cor-primaria);
         }
         
         .current-species i {
             font-size: 2rem;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
         
         .current-species h2 {
             font-size: 1.5rem;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-style: italic;
         }
         
         .current-species span {
             margin-left: auto;
-            background-color: #0b5e42;
+            background-color: var(--cor-primaria);
             color: white;
             padding: 5px 15px;
             border-radius: 30px;
@@ -367,14 +367,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         
         .json-import-area {
             background-color: #f8fafc;
-            border: 2px dashed #0b5e42;
+            border: 2px dashed var(--cor-primaria);
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
         }
         
         .json-import-area h3 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 15px;
             display: flex;
             align-items: center;
@@ -393,7 +393,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         
         textarea:focus {
             outline: none;
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
         }
         
         .btn-group {
@@ -413,12 +413,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         
         .btn-primary {
-            background-color: #0b5e42;
+            background-color: var(--cor-primaria);
             color: white;
         }
         
         .btn-primary:hover {
-            background-color: #0a4c35;
+            background-color: var(--cor-primaria-hover);
             transform: translateY(-2px);
         }
         
@@ -469,7 +469,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         
         .modal-header {
             padding: 20px 25px;
-            background-color: #0b5e42;
+            background-color: var(--cor-primaria);
             color: white;
             border-radius: 12px 12px 0 0;
             display: flex;
@@ -510,7 +510,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         
         .campo-validacao {
             background-color: #f8fafc;
-            border-left: 4px solid #0b5e42;
+            border-left: 4px solid var(--cor-primaria);
             padding: 20px;
             margin-bottom: 20px;
             border-radius: 0 8px 8px 0;
@@ -522,7 +522,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             gap: 8px;
             font-size: 1.1rem;
             font-weight: 600;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 10px;
         }
         
@@ -555,17 +555,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         
         .opcao-item:hover {
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
         }
         
         .opcao-item.selecionado {
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
             background-color: #e6f7e6;
             font-weight: 500;
         }
         
         .opcao-item.sugerida {
-            border-left: 4px solid #0b5e42;
+            border-left: 4px solid var(--cor-primaria);
         }
         
         .opcao-item input[type="radio"] {
@@ -595,12 +595,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         
         .btn-modal-confirm {
-            background-color: #0b5e42;
+            background-color: var(--cor-primaria);
             color: white;
         }
         
         .btn-modal-confirm:hover:not(:disabled) {
-            background-color: #0a4c35;
+            background-color: var(--cor-primaria-hover);
         }
         
         .btn-modal-confirm:disabled {
@@ -620,7 +620,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         .species-title {
             font-size: 2rem;
             font-style: italic;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 10px;
             margin-bottom: 20px;
@@ -640,7 +640,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         
         .info-item strong {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             display: block;
             margin-bottom: 5px;
             font-size: 0.85rem;
@@ -649,7 +649,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         
         .section-divider {
             font-size: 1.3rem;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin: 30px 0 15px;
             padding-bottom: 5px;
             border-bottom: 1px solid #e2e8f0;
@@ -689,7 +689,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         .ref-note {
             display: inline-block;
             font-size: 0.7rem;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             background: #e8f0fe;
             padding: 2px 6px;
             border-radius: 12px;
@@ -702,12 +702,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             padding: 20px;
             background-color: #f8fafc;
             border-radius: 8px;
-            border-top: 3px solid #0b5e42;
+            border-top: 3px solid var(--cor-primaria);
         }
         
         .references-title {
             font-size: 1.1rem;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 15px;
             font-weight: 600;
         }
@@ -731,7 +731,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             counter-increment: item;
             position: absolute;
             left: 0;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 0.85rem;
         }
         
@@ -745,7 +745,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         
         .btn-save {
-            background-color: #0b5e42;
+            background-color: var(--cor-primaria);
             color: white;
             border: none;
             padding: 15px 40px;
@@ -757,7 +757,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         
         .btn-save:hover:not(:disabled) {
-            background-color: #0a4c35;
+            background-color: var(--cor-primaria-hover);
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(11,94,66,0.3);
         }

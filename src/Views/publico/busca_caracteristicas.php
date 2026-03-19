@@ -25,7 +25,7 @@ function montarWhere($dados_busca) {
         // Identificação
         'nome_cientifico_completo' => 'LIKE',
         'nome_popular' => 'LIKE',
-        'familia' => '=',
+        'familia' => 'LIKE',
         
         // Folha (campos OK)
         'forma_folha' => '=',
@@ -125,8 +125,8 @@ function contarEspecies($pdo, $where_info) {
 function buscarEspecies($pdo, $where_info, $pagina, $limite = 100) {
     $offset = ($pagina - 1) * $limite;
     
-    $sql = "SELECT 
-                c.id,
+    $sql = "SELECT
+                c.especie_id,
                 c.nome_cientifico_completo as nome_cientifico,
                 c.nome_popular,
                 c.familia
@@ -188,324 +188,264 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Busca de Espécies - Penomato</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: #f0f2f5;
-            padding: 30px 20px;
-            color: #1a2634;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
+        /* ── Página ── */
+        body { padding: 30px 20px; }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: var(--esp-8);
             flex-wrap: wrap;
-            gap: 15px;
+            gap: var(--esp-4);
         }
-        
+
         h1 {
-            color: #0b5e42;
-            font-weight: 600;
-            border-bottom: 3px solid #0b5e42;
-            padding-bottom: 15px;
+            color: var(--cor-primaria);
+            font-weight: var(--peso-semi);
+            border-bottom: 3px solid var(--cor-primaria);
+            padding-bottom: var(--esp-4);
             display: inline-block;
         }
-        
+
+        /* btn-voltar já definido no estilo.css — sobrescrita de cor para página clara */
         .btn-voltar {
-            background: #e2e8f0;
-            color: #1e293b;
-            padding: 10px 20px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background: var(--cinza-200);
+            color: var(--cinza-900);
+            padding: var(--esp-2) var(--esp-5);
+            border-radius: var(--raio-pill);
+            font-weight: var(--peso-semi);
         }
-        
-        .btn-voltar:hover {
-            background: #cbd5e1;
-        }
-        
+        .btn-voltar:hover { background: var(--cinza-300); color: var(--cinza-900); }
+
+        /* ── Formulário ── */
         .form-busca {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            margin-bottom: 30px;
+            background: var(--branco);
+            border-radius: var(--raio-lg);
+            padding: var(--esp-8);
+            box-shadow: var(--sombra-lg);
+            margin-bottom: var(--esp-8);
         }
-        
+
         .secao {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-left: 6px solid #0b5e42;
+            background: var(--cinza-50);
+            border-radius: var(--raio-md);
+            padding: var(--esp-5);
+            margin-bottom: var(--esp-6);
+            border-left: 6px solid var(--cor-primaria);
         }
-        
+
         .secao h2 {
-            font-size: 1.4rem;
-            color: #0b5e42;
-            margin-bottom: 20px;
-            font-weight: 500;
+            font-size: var(--texto-xl);
+            color: var(--cor-primaria);
+            margin-bottom: var(--esp-5);
+            font-weight: var(--peso-medio);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--esp-2);
         }
-        
+
         .grid-filtros {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: var(--esp-5);
         }
-        
-        .filtro-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
+
+        .filtro-item { display: flex; flex-direction: column; }
+
         .filtro-item label {
-            font-size: 0.85rem;
+            font-size: var(--texto-sm);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 6px;
+            font-weight: var(--peso-bold);
+            color: var(--cinza-800);
+            margin-bottom: var(--esp-1);
         }
-        
-        select, input[type="text"] {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            background-color: white;
-        }
-        
-        select:hover, input[type="text"]:hover {
-            border-color: #94a3b8;
-        }
-        
-        select:focus, input[type="text"]:focus {
-            outline: none;
-            border-color: #0b5e42;
-            box-shadow: 0 0 0 3px rgba(11,94,66,0.1);
-        }
-        
+
+        select:hover, input[type="text"]:hover { border-color: var(--cinza-400); }
+
+        /* ── Ações ── */
         .acoes-busca {
             display: flex;
-            gap: 15px;
+            gap: var(--esp-4);
             justify-content: center;
-            margin-top: 20px;
+            margin-top: var(--esp-5);
             flex-wrap: wrap;
         }
-        
-        .btn {
-            padding: 14px 32px;
+
+        .btn-buscar {
+            background: var(--cor-primaria);
+            color: var(--branco);
+            padding: var(--esp-3) var(--esp-8);
             border: none;
-            border-radius: 40px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: var(--raio-pill);
+            font-size: var(--texto-md);
+            font-weight: var(--peso-semi);
             cursor: pointer;
-            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-        }
-        
-        .btn-buscar {
-            background: #0b5e42;
-            color: white;
+            gap: var(--esp-2);
+            transition: background var(--transicao), transform var(--transicao), box-shadow var(--transicao);
             box-shadow: 0 4px 12px rgba(11,94,66,0.3);
         }
-        
         .btn-buscar:hover {
-            background: #0a4c35;
+            background: var(--cor-primaria-hover);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(11,94,66,0.4);
         }
-        
+
         .btn-limpar {
-            background: #e2e8f0;
-            color: #1e293b;
+            background: var(--cinza-200);
+            color: var(--cinza-900);
+            padding: var(--esp-3) var(--esp-8);
+            border: none;
+            border-radius: var(--raio-pill);
+            font-size: var(--texto-md);
+            font-weight: var(--peso-semi);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--esp-2);
+            transition: background var(--transicao);
         }
-        
-        .btn-limpar:hover {
-            background: #cbd5e1;
-        }
-        
+        .btn-limpar:hover { background: var(--cinza-300); }
+
+        /* ── Resultados ── */
         .resultados {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            background: var(--branco);
+            border-radius: var(--raio-lg);
+            padding: var(--esp-8);
+            box-shadow: var(--sombra-lg);
         }
-        
+
         .contador {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: var(--esp-6);
             flex-wrap: wrap;
-            gap: 15px;
+            gap: var(--esp-4);
         }
-        
+
         .badge-total {
-            background: #0b5e42;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 1.2rem;
+            background: var(--cor-primaria);
+            color: var(--branco);
+            padding: var(--esp-2) var(--esp-6);
+            border-radius: var(--raio-pill);
+            font-weight: var(--peso-semi);
+            font-size: var(--texto-lg);
         }
-        
-        .btn-mostrar {
-            background: #2563eb;
-            color: white;
-            padding: 12px 28px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-mostrar:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-        }
-        
+
         .sem-resultados {
             text-align: center;
-            padding: 50px 20px;
-            background: #fef2f2;
-            border-radius: 16px;
-            color: #991b1b;
+            padding: var(--esp-12) var(--esp-5);
+            background: var(--perigo-fundo);
+            border-radius: var(--raio-lg);
+            color: var(--perigo-texto);
         }
-        
-        .sem-resultados p {
-            margin: 10px 0;
-            font-size: 1.1rem;
-        }
-        
-        .sugestao {
-            color: #4b5563;
-            font-style: italic;
-            margin-top: 15px;
-        }
-        
-        .lista-especies {
-            list-style: none;
-            margin-top: 20px;
-        }
-        
+        .sem-resultados p { margin: var(--esp-2) 0; font-size: var(--texto-md); }
+        .sugestao { color: var(--cinza-600); font-style: italic; margin-top: var(--esp-4); }
+
+        /* ── Lista de espécies ── */
+        .lista-especies { list-style: none; margin-top: var(--esp-5); }
+
         .especie-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid #e2e8f0;
-            transition: background 0.2s;
+            padding: var(--esp-4) var(--esp-5);
+            border-bottom: 1px solid var(--cinza-200);
+            transition: background var(--transicao);
         }
-        
-        .especie-item:hover {
-            background: #f8fafc;
-        }
-        
-        .especie-info {
-            flex: 1;
-        }
-        
+        .especie-item:hover { background: var(--cinza-50); }
+
+        .especie-info { flex: 1; }
+
         .especie-nome {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #0b5e42;
+            font-size: var(--texto-md);
+            font-weight: var(--peso-semi);
+            color: var(--cor-primaria);
+            font-style: italic;
         }
-        
+
         .especie-detalhes {
-            font-size: 0.9rem;
-            color: #4b5563;
-            margin-top: 4px;
+            font-size: var(--texto-sm);
+            color: var(--cinza-600);
+            margin-top: var(--esp-1);
         }
-        
+
         .especie-link {
-            background: #e2e8f0;
-            padding: 8px 20px;
-            border-radius: 30px;
-            color: #1e293b;
+            background: var(--cinza-200);
+            padding: var(--esp-2) var(--esp-5);
+            border-radius: var(--raio-pill);
+            color: var(--cinza-900);
             text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
+            font-weight: var(--peso-medio);
+            font-size: var(--texto-sm);
+            transition: background var(--transicao), color var(--transicao);
+            white-space: nowrap;
         }
-        
-        .especie-link:hover {
-            background: #0b5e42;
-            color: white;
-        }
-        
+        .especie-link:hover { background: var(--cor-primaria); color: var(--branco); text-decoration: none; }
+
+        /* ── Paginação ── */
         .paginacao {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
-            margin-top: 40px;
+            gap: var(--esp-2);
+            margin-top: var(--esp-10);
             flex-wrap: wrap;
         }
-        
+
         .page-link {
-            padding: 10px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            padding: var(--esp-2) var(--esp-4);
+            border: 2px solid var(--cinza-200);
+            border-radius: var(--raio-md);
             text-decoration: none;
-            color: #1e293b;
-            font-weight: 500;
-            transition: all 0.2s;
-            background: white;
+            color: var(--cinza-800);
+            font-weight: var(--peso-medio);
+            font-size: var(--texto-sm);
+            transition: background var(--transicao), color var(--transicao), border-color var(--transicao);
+            background: var(--branco);
             cursor: pointer;
         }
-        
-        .page-link:hover {
-            background: #0b5e42;
-            color: white;
-            border-color: #0b5e42;
-        }
-        
+        .page-link:hover,
         .page-link.ativa {
-            background: #0b5e42;
-            color: white;
-            border-color: #0b5e42;
+            background: var(--cor-primaria);
+            color: var(--branco);
+            border-color: var(--cor-primaria);
+            text-decoration: none;
         }
-        
+
         .page-disabled {
-            padding: 10px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            color: #94a3b8;
-            background: #f1f5f9;
+            padding: var(--esp-2) var(--esp-4);
+            border: 2px solid var(--cinza-200);
+            border-radius: var(--raio-md);
+            color: var(--cinza-400);
+            background: var(--cinza-100);
+            font-size: var(--texto-sm);
         }
-        
+
+        /* ── Mensagens ── */
         .erro-mensagem {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #dc2626;
+            background: var(--perigo-fundo);
+            color: var(--perigo-texto);
+            padding: var(--esp-4);
+            border-radius: var(--raio-md);
+            margin-bottom: var(--esp-5);
+            border-left: 4px solid var(--perigo-cor);
+            font-size: var(--texto-sm);
+        }
+
+        @media (max-width: 600px) {
+            body { padding: var(--esp-4) var(--esp-3); }
+            .form-busca, .resultados { padding: var(--esp-5); }
+            .btn-buscar, .btn-limpar { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -523,8 +463,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
             <?php echo htmlspecialchars($mensagem_busca); ?>
         </div>
         <?php endif; ?>
-        
-        <form method="POST" action="" class="form-busca">
+
+        <?php if (isset($_GET['sem_resultado'])): ?>
+        <div class="alerta--aviso">
+            <i class="fas fa-exclamation-triangle"></i>
+            Nenhuma espécie publicada encontrada com esses filtros. Tente critérios mais amplos.
+        </div>
+        <?php endif; ?>
+
+        <form method="POST" action="/penomato_mvp/src/Views/publico/especie_detalhes.php" class="form-busca">
             
             <!-- Busca por nome -->
             <div class="secao">
@@ -721,6 +668,149 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                 </div>
             </div>
             
+            <!-- CARACTERÍSTICAS DO CAULE -->
+            <div class="secao">
+                <h2>🌿 Caule</h2>
+                <div class="grid-filtros">
+                    <div class="filtro-item">
+                        <label>Tipo</label>
+                        <select name="tipo_caule">
+                            <option value="todos" <?php echo (!isset($_POST['tipo_caule']) || $_POST['tipo_caule'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Ereto" <?php echo (isset($_POST['tipo_caule']) && $_POST['tipo_caule'] == 'Ereto') ? 'selected' : ''; ?>>Ereto</option>
+                            <option value="Prostrado" <?php echo (isset($_POST['tipo_caule']) && $_POST['tipo_caule'] == 'Prostrado') ? 'selected' : ''; ?>>Prostrado</option>
+                            <option value="Trepador" <?php echo (isset($_POST['tipo_caule']) && $_POST['tipo_caule'] == 'Trepador') ? 'selected' : ''; ?>>Trepador</option>
+                            <option value="Rastejante" <?php echo (isset($_POST['tipo_caule']) && $_POST['tipo_caule'] == 'Rastejante') ? 'selected' : ''; ?>>Rastejante</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Estrutura</label>
+                        <select name="estrutura_caule">
+                            <option value="todos" <?php echo (!isset($_POST['estrutura_caule']) || $_POST['estrutura_caule'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Lenhoso" <?php echo (isset($_POST['estrutura_caule']) && $_POST['estrutura_caule'] == 'Lenhoso') ? 'selected' : ''; ?>>Lenhoso</option>
+                            <option value="Herbáceo" <?php echo (isset($_POST['estrutura_caule']) && $_POST['estrutura_caule'] == 'Herbáceo') ? 'selected' : ''; ?>>Herbáceo</option>
+                            <option value="Suculento" <?php echo (isset($_POST['estrutura_caule']) && $_POST['estrutura_caule'] == 'Suculento') ? 'selected' : ''; ?>>Suculento</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Textura</label>
+                        <select name="textura_caule">
+                            <option value="todos" <?php echo (!isset($_POST['textura_caule']) || $_POST['textura_caule'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Lisa" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Lisa') ? 'selected' : ''; ?>>Lisa</option>
+                            <option value="Rugosa" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Rugosa') ? 'selected' : ''; ?>>Rugosa</option>
+                            <option value="Sulcada" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Sulcada') ? 'selected' : ''; ?>>Sulcada</option>
+                            <option value="Espinhosa" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Espinhosa') ? 'selected' : ''; ?>>Espinhosa</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Cor</label>
+                        <select name="cor_caule">
+                            <option value="todos" <?php echo (!isset($_POST['cor_caule']) || $_POST['cor_caule'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Marrom" <?php echo (isset($_POST['cor_caule']) && $_POST['cor_caule'] == 'Marrom') ? 'selected' : ''; ?>>Marrom</option>
+                            <option value="Verde" <?php echo (isset($_POST['cor_caule']) && $_POST['cor_caule'] == 'Verde') ? 'selected' : ''; ?>>Verde</option>
+                            <option value="Cinza" <?php echo (isset($_POST['cor_caule']) && $_POST['cor_caule'] == 'Cinza') ? 'selected' : ''; ?>>Cinza</option>
+                            <option value="Avermelhado" <?php echo (isset($_POST['cor_caule']) && $_POST['cor_caule'] == 'Avermelhado') ? 'selected' : ''; ?>>Avermelhado</option>
+                            <option value="Alaranjado" <?php echo (isset($_POST['cor_caule']) && $_POST['cor_caule'] == 'Alaranjado') ? 'selected' : ''; ?>>Alaranjado</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Forma</label>
+                        <select name="forma_caule">
+                            <option value="todos" <?php echo (!isset($_POST['forma_caule']) || $_POST['forma_caule'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Cilíndrico" <?php echo (isset($_POST['forma_caule']) && $_POST['forma_caule'] == 'Cilíndrico') ? 'selected' : ''; ?>>Cilíndrico</option>
+                            <option value="Quadrangular" <?php echo (isset($_POST['forma_caule']) && $_POST['forma_caule'] == 'Quadrangular') ? 'selected' : ''; ?>>Quadrangular</option>
+                            <option value="Achatado" <?php echo (isset($_POST['forma_caule']) && $_POST['forma_caule'] == 'Achatado') ? 'selected' : ''; ?>>Achatado</option>
+                            <option value="Irregular" <?php echo (isset($_POST['forma_caule']) && $_POST['forma_caule'] == 'Irregular') ? 'selected' : ''; ?>>Irregular</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Diâmetro</label>
+                        <select name="diametro_caule">
+                            <option value="todos" <?php echo (!isset($_POST['diametro_caule']) || $_POST['diametro_caule'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Fino" <?php echo (isset($_POST['diametro_caule']) && $_POST['diametro_caule'] == 'Fino') ? 'selected' : ''; ?>>Fino</option>
+                            <option value="Médio" <?php echo (isset($_POST['diametro_caule']) && $_POST['diametro_caule'] == 'Médio') ? 'selected' : ''; ?>>Médio</option>
+                            <option value="Grosso" <?php echo (isset($_POST['diametro_caule']) && $_POST['diametro_caule'] == 'Grosso') ? 'selected' : ''; ?>>Grosso</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Ramificação</label>
+                        <select name="ramificacao_caule">
+                            <option value="todos" <?php echo (!isset($_POST['ramificacao_caule']) || $_POST['ramificacao_caule'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Dicotômica" <?php echo (isset($_POST['ramificacao_caule']) && $_POST['ramificacao_caule'] == 'Dicotômica') ? 'selected' : ''; ?>>Dicotômica</option>
+                            <option value="Monopodial" <?php echo (isset($_POST['ramificacao_caule']) && $_POST['ramificacao_caule'] == 'Monopodial') ? 'selected' : ''; ?>>Monopodial</option>
+                            <option value="Simpodial" <?php echo (isset($_POST['ramificacao_caule']) && $_POST['ramificacao_caule'] == 'Simpodial') ? 'selected' : ''; ?>>Simpodial</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Modificação</label>
+                        <select name="modificacao_caule">
+                            <option value="todos" <?php echo (!isset($_POST['modificacao_caule']) || $_POST['modificacao_caule'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Estolão" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Estolão') ? 'selected' : ''; ?>>Estolão</option>
+                            <option value="Cladódio" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Cladódio') ? 'selected' : ''; ?>>Cladódio</option>
+                            <option value="Rizoma" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Rizoma') ? 'selected' : ''; ?>>Rizoma</option>
+                            <option value="Tubérculo" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Tubérculo') ? 'selected' : ''; ?>>Tubérculo</option>
+                            <option value="Espinhos" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Espinhos') ? 'selected' : ''; ?>>Espinhos</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARACTERÍSTICAS DA SEMENTE -->
+            <div class="secao">
+                <h2>🌱 Semente</h2>
+                <div class="grid-filtros">
+                    <div class="filtro-item">
+                        <label>Tipo</label>
+                        <select name="tipo_semente">
+                            <option value="todos" <?php echo (!isset($_POST['tipo_semente']) || $_POST['tipo_semente'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Alada" <?php echo (isset($_POST['tipo_semente']) && $_POST['tipo_semente'] == 'Alada') ? 'selected' : ''; ?>>Alada</option>
+                            <option value="Carnosa" <?php echo (isset($_POST['tipo_semente']) && $_POST['tipo_semente'] == 'Carnosa') ? 'selected' : ''; ?>>Carnosa</option>
+                            <option value="Dura" <?php echo (isset($_POST['tipo_semente']) && $_POST['tipo_semente'] == 'Dura') ? 'selected' : ''; ?>>Dura</option>
+                            <option value="Oleosa" <?php echo (isset($_POST['tipo_semente']) && $_POST['tipo_semente'] == 'Oleosa') ? 'selected' : ''; ?>>Oleosa</option>
+                            <option value="Peluda" <?php echo (isset($_POST['tipo_semente']) && $_POST['tipo_semente'] == 'Peluda') ? 'selected' : ''; ?>>Peluda</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Tamanho</label>
+                        <select name="tamanho_semente">
+                            <option value="todos" <?php echo (!isset($_POST['tamanho_semente']) || $_POST['tamanho_semente'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Pequena" <?php echo (isset($_POST['tamanho_semente']) && $_POST['tamanho_semente'] == 'Pequena') ? 'selected' : ''; ?>>Pequena (&lt; 5 mm)</option>
+                            <option value="Média" <?php echo (isset($_POST['tamanho_semente']) && $_POST['tamanho_semente'] == 'Média') ? 'selected' : ''; ?>>Média</option>
+                            <option value="Grande" <?php echo (isset($_POST['tamanho_semente']) && $_POST['tamanho_semente'] == 'Grande') ? 'selected' : ''; ?>>Grande (&gt; 10 mm)</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Cor</label>
+                        <select name="cor_semente">
+                            <option value="todos" <?php echo (!isset($_POST['cor_semente']) || $_POST['cor_semente'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Preta" <?php echo (isset($_POST['cor_semente']) && $_POST['cor_semente'] == 'Preta') ? 'selected' : ''; ?>>Preta</option>
+                            <option value="Marrom" <?php echo (isset($_POST['cor_semente']) && $_POST['cor_semente'] == 'Marrom') ? 'selected' : ''; ?>>Marrom</option>
+                            <option value="Branca" <?php echo (isset($_POST['cor_semente']) && $_POST['cor_semente'] == 'Branca') ? 'selected' : ''; ?>>Branca</option>
+                            <option value="Amarela" <?php echo (isset($_POST['cor_semente']) && $_POST['cor_semente'] == 'Amarela') ? 'selected' : ''; ?>>Amarela</option>
+                            <option value="Verde" <?php echo (isset($_POST['cor_semente']) && $_POST['cor_semente'] == 'Verde') ? 'selected' : ''; ?>>Verde</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Textura</label>
+                        <select name="textura_semente">
+                            <option value="todos" <?php echo (!isset($_POST['textura_semente']) || $_POST['textura_semente'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Lisa" <?php echo (isset($_POST['textura_semente']) && $_POST['textura_semente'] == 'Lisa') ? 'selected' : ''; ?>>Lisa</option>
+                            <option value="Rugosa" <?php echo (isset($_POST['textura_semente']) && $_POST['textura_semente'] == 'Rugosa') ? 'selected' : ''; ?>>Rugosa</option>
+                            <option value="Estriada" <?php echo (isset($_POST['textura_semente']) && $_POST['textura_semente'] == 'Estriada') ? 'selected' : ''; ?>>Estriada</option>
+                            <option value="Cerosa" <?php echo (isset($_POST['textura_semente']) && $_POST['textura_semente'] == 'Cerosa') ? 'selected' : ''; ?>>Cerosa</option>
+                        </select>
+                    </div>
+                    <div class="filtro-item">
+                        <label>Quantidade por fruto</label>
+                        <select name="quantidade_sementes">
+                            <option value="todos" <?php echo (!isset($_POST['quantidade_sementes']) || $_POST['quantidade_sementes'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Uma" <?php echo (isset($_POST['quantidade_sementes']) && $_POST['quantidade_sementes'] == 'Uma') ? 'selected' : ''; ?>>Uma</option>
+                            <option value="Poucas" <?php echo (isset($_POST['quantidade_sementes']) && $_POST['quantidade_sementes'] == 'Poucas') ? 'selected' : ''; ?>>Poucas</option>
+                            <option value="Muitas" <?php echo (isset($_POST['quantidade_sementes']) && $_POST['quantidade_sementes'] == 'Muitas') ? 'selected' : ''; ?>>Muitas</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <!-- OUTRAS CARACTERÍSTICAS -->
             <div class="secao">
                 <h2>⚡ Outras</h2>
@@ -746,8 +836,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
             </div>
             
             <div class="acoes-busca">
-                <button type="submit" name="buscar" value="1" class="btn btn-buscar">
-                    🔎 CONTAR ESPÉCIES
+                <button type="submit" class="btn btn-buscar">
+                    🔎 BUSCAR ESPÉCIES
                 </button>
                 <button type="button" class="btn btn-limpar" onclick="window.location.href='/penomato_mvp/src/Views/publico/busca_caracteristicas.php'">
                     🧹 LIMPAR FILTROS
@@ -755,155 +845,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
             </div>
         </form>
         
-        <?php if ($filtros_aplicados): ?>
-        <div class="resultados">
-            
-            <div class="contador">
-                <span class="badge-total">
-                    <?php echo $total_encontrado; ?> espécie<?php echo $total_encontrado != 1 ? 's' : ''; ?> encontrada<?php echo $total_encontrado != 1 ? 's' : ''; ?>
-                </span>
-                
-                <?php if ($total_encontrado > 0): ?>
-                <form method="POST" action="" style="display: inline;" id="formMostrarLista">
-                    <?php
-                    foreach ($_POST as $key => $value) {
-                        if ($key !== 'buscar' && $key !== 'pagina' && $value !== '' && $value !== 'todos') {
-                            echo '<input type="hidden" name="' . htmlspecialchars($key) . '" value="' . htmlspecialchars($value) . '">';
-                        }
-                    }
-                    ?>
-                    <input type="hidden" name="buscar" value="1">
-                    <input type="hidden" name="mostrar_lista" value="1">
-                    <button type="submit" class="btn-mostrar">
-                        📋 MOSTRAR LISTA (100 por página)
-                    </button>
-                </form>
-                <?php endif; ?>
-            </div>
-            
-            <?php if ($total_encontrado === 0): ?>
-            <div class="sem-resultados">
-                <p style="font-size: 2rem; margin-bottom: 10px;">😕</p>
-                <p><strong>Nenhuma espécie encontrada</strong></p>
-                <p>Tente remover alguns filtros ou usar termos mais gerais.</p>
-                <p class="sugestao">💡 Exemplo: busque apenas por "Folha Lanceolada"</p>
-            </div>
-            <?php endif; ?>
-            
-            <?php if (isset($_POST['mostrar_lista']) && $total_encontrado > 0): ?>
-                
-                <?php if (count($especies_encontradas) > 0): ?>
-                <ul class="lista-especies">
-                    <?php foreach ($especies_encontradas as $especie): ?>
-                    <li class="especie-item">
-                        <div class="especie-info">
-                            <div class="especie-nome">
-                                <?php echo htmlspecialchars($especie['nome_cientifico']); ?>
-                            </div>
-                            <?php if (!empty($especie['nome_popular']) || !empty($especie['familia'])): ?>
-                            <div class="especie-detalhes">
-                                <?php 
-                                $detalhes = [];
-                                if (!empty($especie['nome_popular'])) {
-                                    $detalhes[] = 'Popular: ' . htmlspecialchars($especie['nome_popular']);
-                                }
-                                if (!empty($especie['familia'])) {
-                                    $detalhes[] = 'Família: ' . htmlspecialchars($especie['familia']);
-                                }
-                                echo implode(' · ', $detalhes);
-                                ?>
-                            </div>
-                            <?php endif; ?>
-                        </div>
-                        <a href="/penomato_mvp/src/Views/publico/especie_detalhes.php?id=<?php echo $especie['id']; ?>" class="especie-link">
-                            Ver detalhes →
-                        </a>
-                    </li>
-                    <?php endforeach; ?>
-                </ul>
-                
-                <?php if ($total_encontrado > 100): 
-                    $total_paginas = ceil($total_encontrado / 100);
-                    $max_paginas_mostradas = 10;
-                    $inicio_paginacao = max(1, $pagina_atual - floor($max_paginas_mostradas / 2));
-                    $fim_paginacao = min($total_paginas, $inicio_paginacao + $max_paginas_mostradas - 1);
-                ?>
-                <div class="paginacao">
-                    <?php if ($pagina_atual > 1): ?>
-                    <form method="POST" action="" style="display: inline;">
-                        <?php foreach ($_POST as $key => $value): ?>
-                            <?php if ($key !== 'pagina'): ?>
-                            <input type="hidden" name="<?php echo htmlspecialchars($key); ?>" value="<?php echo htmlspecialchars($value); ?>">
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                        <input type="hidden" name="pagina" value="1">
-                        <input type="hidden" name="buscar" value="1">
-                        <input type="hidden" name="mostrar_lista" value="1">
-                        <button type="submit" class="page-link">«</button>
-                    </form>
-                    <?php else: ?>
-                    <span class="page-disabled">«</span>
-                    <?php endif; ?>
-                    
-                    <?php for ($i = $inicio_paginacao; $i <= $fim_paginacao; $i++): ?>
-                        <?php if ($i == $pagina_atual): ?>
-                            <span class="page-link ativa"><?php echo $i; ?></span>
-                        <?php else: ?>
-                        <form method="POST" action="" style="display: inline;">
-                            <?php foreach ($_POST as $key => $value): ?>
-                                <?php if ($key !== 'pagina'): ?>
-                                <input type="hidden" name="<?php echo htmlspecialchars($key); ?>" value="<?php echo htmlspecialchars($value); ?>">
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                            <input type="hidden" name="pagina" value="<?php echo $i; ?>">
-                            <input type="hidden" name="buscar" value="1">
-                            <input type="hidden" name="mostrar_lista" value="1">
-                            <button type="submit" class="page-link"><?php echo $i; ?></button>
-                        </form>
-                        <?php endif; ?>
-                    <?php endfor; ?>
-                    
-                    <?php if ($pagina_atual < $total_paginas): ?>
-                    <form method="POST" action="" style="display: inline;">
-                        <?php foreach ($_POST as $key => $value): ?>
-                            <?php if ($key !== 'pagina'): ?>
-                            <input type="hidden" name="<?php echo htmlspecialchars($key); ?>" value="<?php echo htmlspecialchars($value); ?>">
-                            <?php endif; ?>
-                        <?php endforeach; ?>
-                        <input type="hidden" name="pagina" value="<?php echo $total_paginas; ?>">
-                        <input type="hidden" name="buscar" value="1">
-                        <input type="hidden" name="mostrar_lista" value="1">
-                        <button type="submit" class="page-link">»</button>
-                    </form>
-                    <?php else: ?>
-                    <span class="page-disabled">»</span>
-                    <?php endif; ?>
-                </div>
-                <?php endif; ?>
-                
-                <?php else: ?>
-                <p style="text-align: center; padding: 30px; color: #4b5563;">
-                    Nenhuma espécie para exibir nesta página.
-                </p>
-                <?php endif; ?>
-            <?php endif; ?>
-            
-        </div>
-        <?php endif; ?>
         
     </div>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            <?php if ($filtros_aplicados): ?>
-            setTimeout(function() {
-                const resultados = document.querySelector('.resultados');
-                if (resultados) {
-                    resultados.scrollIntoView({ behavior: 'smooth' });
-                }
-            }, 100);
-            <?php endif; ?>
-        });
-    </script>
 </body>
 </html>

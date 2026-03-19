@@ -10,6 +10,147 @@ error_reporting(E_ALL);
 session_start();
 ob_start();
 
+// ================================================
+// FUNÇÕES PARA GERAÇÃO AUTOMÁTICA DO ARTIGO
+// ================================================
+function artRef(string $refs): string {
+    $r = trim($refs);
+    return $r !== '' ? '<sup>' . htmlspecialchars($r) . '</sup>' : '';
+}
+function artVal(?string $v, string $fb = ''): string {
+    return trim($v ?? '') !== '' ? trim($v) : $fb;
+}
+function artListar(array $itens, string $sep = ', '): string {
+    $p = [];
+    foreach ($itens as $it) {
+        $t = trim($it['texto'] ?? '');
+        if ($t === '' || strtolower($t) === 'não informado') continue;
+        $p[] = $t . artRef($it['ref'] ?? '');
+    }
+    return implode($sep, $p);
+}
+
+function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs): string {
+    $h = fn($s) => htmlspecialchars((string)($s ?? ''));
+    ob_start();
+
+    echo '<div class="artigo">';
+
+    // Cabeçalho
+    $titulo = artVal($c['nome_cientifico_completo'], $adm['nome_cientifico']);
+    echo '<h2 class="art-titulo">' . $h($titulo) . artRef($c['nome_cientifico_completo_ref'] ?? '') . '</h2>';
+    if (artVal($c['familia']))
+        echo '<p class="art-familia"><strong>Família:</strong> ' . $h($c['familia']) . artRef($c['familia_ref'] ?? '') . '</p>';
+    if (!empty($c['sinonimos'])) {
+        $sins = implode(', ', array_map(fn($s) => '<em>' . $h(trim($s)) . '</em>', explode(',', $c['sinonimos'])));
+        echo '<p class="art-sinonimos"><strong>Sinonímia:</strong> ' . $sins . artRef($c['sinonimos_ref'] ?? '') . '</p>';
+    }
+    if (!empty($c['nome_popular']))
+        echo '<p class="art-nomes"><strong>Nomes populares:</strong> ' . $h($c['nome_popular']) . artRef($c['nome_popular_ref'] ?? '') . '</p>';
+
+    echo '<h3 class="art-secao">Descrição</h3>';
+
+    // Caule
+    $cb = artListar([
+        ['texto' => artVal($c['tipo_caule']),        'ref' => $c['tipo_caule_ref'] ?? ''],
+        ['texto' => artVal($c['estrutura_caule']),   'ref' => $c['estrutura_caule_ref'] ?? ''],
+        ['texto' => artVal($c['forma_caule']),       'ref' => $c['forma_caule_ref'] ?? ''],
+        ['texto' => artVal($c['diametro_caule'])  ? 'diâmetro ' . strtolower($c['diametro_caule'])  : '', 'ref' => $c['diametro_caule_ref'] ?? ''],
+    ]);
+    $ex = array_filter([
+        artVal($c['cor_caule'])         ? 'coloração '   . strtolower($c['cor_caule'])         . artRef($c['cor_caule_ref'] ?? '')         : '',
+        artVal($c['textura_caule'])     ? 'textura '     . strtolower($c['textura_caule'])     . artRef($c['textura_caule_ref'] ?? '')     : '',
+        artVal($c['ramificacao_caule']) ? 'ramificação ' . strtolower($c['ramificacao_caule']) . artRef($c['ramificacao_caule_ref'] ?? '') : '',
+        artVal($c['modificacao_caule']) ? strtolower($c['modificacao_caule'])                  . artRef($c['modificacao_caule_ref'] ?? '') : '',
+    ]);
+    $esp = strtolower(artVal($c['possui_espinhos'], 'Não')) === 'não' ? 'desprovido de espinhos' . artRef($c['possui_espinhos_ref'] ?? '') : 'com espinhos' . artRef($c['possui_espinhos_ref'] ?? '');
+    $lat = strtolower(artVal($c['possui_latex'],    'Não')) === 'não' ? 'látex ausente'          . artRef($c['possui_latex_ref'] ?? '')    : 'com látex'   . artRef($c['possui_latex_ref'] ?? '');
+    $res = strtolower(artVal($c['possui_resina'],   'Não')) === 'não' ? 'resina ausente'         . artRef($c['possui_resina_ref'] ?? '')   : 'com resina'  . artRef($c['possui_resina_ref'] ?? '');
+    echo '<p class="art-paragrafo">Caule ' . $cb . ($ex ? ', com ' . implode(', ', $ex) : '') . ', ' . implode(', ', array_filter([$esp, $lat, $res])) . '.</p>';
+
+    // Folhas
+    $fl = artListar([
+        ['texto' => artVal($c['tipo_folha']),       'ref' => $c['tipo_folha_ref'] ?? ''],
+        ['texto' => artVal($c['filotaxia_folha']),  'ref' => $c['filotaxia_folha_ref'] ?? ''],
+        ['texto' => artVal($c['forma_folha'])    ? 'de forma '  . strtolower($c['forma_folha'])    : '', 'ref' => $c['forma_folha_ref'] ?? ''],
+        ['texto' => artVal($c['textura_folha'])  ? 'textura '   . strtolower($c['textura_folha'])  : '', 'ref' => $c['textura_folha_ref'] ?? ''],
+        ['texto' => artVal($c['margem_folha'])   ? 'margem '    . strtolower($c['margem_folha'])   : '', 'ref' => $c['margem_folha_ref'] ?? ''],
+        ['texto' => artVal($c['venacao_folha'])  ? 'venação '   . strtolower($c['venacao_folha'])  : '', 'ref' => $c['venacao_folha_ref'] ?? ''],
+        ['texto' => artVal($c['tamanho_folha'])  ? 'tamanho '   . strtolower($c['tamanho_folha'])  : '', 'ref' => $c['tamanho_folha_ref'] ?? ''],
+    ]);
+    if ($fl) echo '<p class="art-paragrafo">Folhas ' . $fl . '.</p>';
+
+    // Flores
+    $fr = artListar([
+        ['texto' => artVal($c['disposicao_flores']), 'ref' => $c['disposicao_flores_ref'] ?? ''],
+        ['texto' => artVal($c['simetria_floral']),   'ref' => $c['simetria_floral_ref'] ?? ''],
+        ['texto' => artVal($c['numero_petalas'])  ? 'com '          . strtolower($c['numero_petalas'])  : '', 'ref' => $c['numero_petalas_ref'] ?? ''],
+        ['texto' => artVal($c['cor_flores'])      ? 'de coloração ' . strtolower($c['cor_flores'])      : '', 'ref' => $c['cor_flores_ref'] ?? ''],
+        ['texto' => artVal($c['tamanho_flor'])    ? 'tamanho '      . strtolower($c['tamanho_flor'])    : '', 'ref' => $c['tamanho_flor_ref'] ?? ''],
+        ['texto' => artVal($c['aroma'])           ? 'aroma '        . strtolower($c['aroma'])           : '', 'ref' => $c['aroma_ref'] ?? ''],
+    ]);
+    if ($fr) echo '<p class="art-paragrafo">Flores ' . $fr . '.</p>';
+
+    // Frutos
+    $ft = artVal($c['tipo_fruto']) ? strtolower($c['tipo_fruto']) . artRef($c['tipo_fruto_ref'] ?? '') : '';
+    $fp = implode(', ', array_filter([
+        artVal($c['tamanho_fruto'])   ? strtolower($c['tamanho_fruto'])                    . artRef($c['tamanho_fruto_ref'] ?? '')   : '',
+        artVal($c['cor_fruto'])       ? 'de coloração ' . strtolower($c['cor_fruto'])      . artRef($c['cor_fruto_ref'] ?? '')       : '',
+        artVal($c['textura_fruto'])   ? 'textura '      . strtolower($c['textura_fruto'])  . artRef($c['textura_fruto_ref'] ?? '')   : '',
+        artVal($c['aroma_fruto'])     ? 'aroma '        . strtolower($c['aroma_fruto'])    . artRef($c['aroma_fruto_ref'] ?? '')     : '',
+        artVal($c['dispersao_fruto']) ? 'dispersão '    . strtolower($c['dispersao_fruto']). artRef($c['dispersao_fruto_ref'] ?? '') : '',
+    ]));
+    if ($ft || $fp) echo '<p class="art-paragrafo">Fruto do tipo ' . $ft . ($fp ? ', ' . $fp : '') . '.</p>';
+
+    // Sementes
+    $se = artListar([
+        ['texto' => artVal($c['tipo_semente']),       'ref' => $c['tipo_semente_ref'] ?? ''],
+        ['texto' => artVal($c['tamanho_semente'])   ? strtolower($c['tamanho_semente'])                          : '', 'ref' => $c['tamanho_semente_ref'] ?? ''],
+        ['texto' => artVal($c['cor_semente'])       ? 'de coloração ' . strtolower($c['cor_semente'])            : '', 'ref' => $c['cor_semente_ref'] ?? ''],
+        ['texto' => artVal($c['textura_semente'])   ? 'textura '      . strtolower($c['textura_semente'])        : '', 'ref' => $c['textura_semente_ref'] ?? ''],
+        ['texto' => artVal($c['quantidade_sementes'])? strtolower($c['quantidade_sementes']) . ' sementes por fruto' : '', 'ref' => $c['quantidade_sementes_ref'] ?? ''],
+    ]);
+    if ($se) echo '<p class="art-paragrafo">Sementes ' . $se . '.</p>';
+
+    // Prancha fotográfica
+    if ($imgs) {
+        echo '<h3 class="art-secao">Prancha Fotográfica</h3><div class="art-galeria">';
+        foreach ($imgs as $img) {
+            echo '<figure class="art-figura">';
+            echo '<img src="/penomato_mvp/' . htmlspecialchars($img['caminho_imagem']) . '" alt="' . $h($img['parte_planta']) . '">';
+            echo '<figcaption>' . ucfirst($h($img['parte_planta']));
+            if (!empty($img['autor_imagem'])) echo ' — ' . $h($img['autor_imagem']);
+            if (!empty($img['licenca']))      echo ' (' . $h($img['licenca']) . ')';
+            if (!empty($img['fonte_nome'])) {
+                $link = !empty($img['fonte_url'])
+                    ? '<a href="' . $h($img['fonte_url']) . '" target="_blank">' . $h($img['fonte_nome']) . '</a>'
+                    : $h($img['fonte_nome']);
+                echo '<br><small>Fonte: ' . $link . '</small>';
+            }
+            echo '</figcaption></figure>';
+        }
+        echo '</div>';
+    }
+
+    // Referências
+    $refs_txt = trim($c['referencias'] ?? '');
+    if ($refs_txt !== '') {
+        $refs_map = [];
+        foreach (preg_split('/(?=\n?\d+\.\s)/', $refs_txt, -1, PREG_SPLIT_NO_EMPTY) as $pt) {
+            if (preg_match('/^(\d+)\.\s+(.+)$/s', trim($pt), $m)) $refs_map[(int)$m[1]] = trim($m[2]);
+        }
+        if ($refs_map) {
+            ksort($refs_map);
+            echo '<h3 class="art-secao">Referências</h3><ol class="art-refs">';
+            foreach ($refs_map as $n => $t) echo '<li id="ref-' . $n . '">' . htmlspecialchars($t) . '</li>';
+            echo '</ol>';
+        }
+    }
+
+    echo '</div><!-- .artigo -->';
+    return ob_get_clean();
+}
+
 $servidor = "127.0.0.1";
 $usuario_db = "root";
 $senha_db = "";
@@ -64,6 +205,31 @@ if (!isset($dados_temporarios['usuario_id']) || $dados_temporarios['usuario_id']
 if (empty($imagens_temporarias)) {
     error_log("ERRO: Nenhuma imagem para salvar");
     header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Não há imagens para salvar."));
+    exit;
+}
+
+// ================================================
+// VERIFICAR PARTES OBRIGATÓRIAS
+// ================================================
+$partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
+$semente_ausente     = !empty($dados_temporarios['semente_ausente']);
+
+$partes_com_imagem = [];
+foreach ($imagens_temporarias as $img) {
+    $partes_com_imagem[$img['parte_planta']] = true;
+}
+
+$partes_faltando = [];
+foreach ($partes_obrigatorias as $parte) {
+    if (empty($partes_com_imagem[$parte])) {
+        $partes_faltando[] = ucfirst($parte);
+    }
+}
+
+if (!empty($partes_faltando)) {
+    $msg = 'Imagens obrigatórias ausentes: ' . implode(', ', $partes_faltando) . '. Todas as partes obrigatórias precisam de ao menos uma imagem.';
+    error_log("ERRO: Partes sem imagem: " . implode(', ', $partes_faltando));
+    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode($msg));
     exit;
 }
 
@@ -328,9 +494,60 @@ try {
     // ================================================
     $conexao->commit();
     error_log("COMMIT realizado com sucesso");
-    
+
     // ================================================
-    // 4. LIMPAR PASTA TEMPORÁRIA
+    // 4. GERAR ARTIGO RASCUNHO AUTOMATICAMENTE
+    // ================================================
+    error_log("--- Gerando artigo rascunho ---");
+    try {
+        $stmt_c = $conexao->prepare("SELECT * FROM especies_caracteristicas WHERE especie_id = ? LIMIT 1");
+        $stmt_c->bind_param("i", $especie_id);
+        $stmt_c->execute();
+        $c_art = $stmt_c->get_result()->fetch_assoc();
+        $stmt_c->close();
+
+        $stmt_a = $conexao->prepare("SELECT * FROM especies_administrativo WHERE id = ? LIMIT 1");
+        $stmt_a->bind_param("i", $especie_id);
+        $stmt_a->execute();
+        $adm_art = $stmt_a->get_result()->fetch_assoc();
+        $stmt_a->close();
+
+        $stmt_i = $conexao->prepare("
+            SELECT parte_planta, caminho_imagem, autor_imagem, licenca, fonte_nome, fonte_url
+            FROM especies_imagens
+            WHERE especie_id = ?
+            ORDER BY FIELD(parte_planta,'habito','folha','flor','fruto','caule','semente')
+        ");
+        $stmt_i->bind_param("i", $especie_id);
+        $stmt_i->execute();
+        $res_i  = $stmt_i->get_result();
+        $imgs_art = [];
+        while ($img = $res_i->fetch_assoc()) $imgs_art[] = $img;
+        $stmt_i->close();
+
+        if ($c_art && $adm_art) {
+            $html_art = gerarHtmlArtigoRascunho($adm_art, $c_art, $imgs_art);
+
+            $stmt_art = $conexao->prepare("
+                INSERT INTO artigos (especie_id, texto_html, status, gerado_em)
+                VALUES (?, ?, 'rascunho', NOW())
+                ON DUPLICATE KEY UPDATE texto_html = VALUES(texto_html), atualizado_em = NOW(), status = 'rascunho'
+            ");
+            $stmt_art->bind_param("is", $especie_id, $html_art);
+            $stmt_art->execute();
+            $stmt_art->close();
+            error_log("Artigo rascunho gerado: " . strlen($html_art) . " bytes");
+        } else {
+            error_log("Artigo não gerado: características ou dados administrativos ausentes");
+        }
+    } catch (Exception $e) {
+        error_log("Aviso: Falha ao gerar artigo rascunho: " . $e->getMessage());
+        // Não crítico — dados já foram salvos com sucesso
+    }
+
+    // ================================================
+    // 5. LIMPAR PASTA TEMPORÁRIA
+    // ================================================
     // ================================================
     if (file_exists($pasta_temp)) {
         $itens = scandir($pasta_temp);
@@ -347,7 +564,7 @@ try {
     }
     
     // ================================================
-    // 5. LIMPAR SESSÃO TEMPORÁRIA
+    // 6. LIMPAR SESSÃO TEMPORÁRIA
     // ================================================
     unset($_SESSION['importacao_temporaria']);
     error_log("Sessão temporária limpa");

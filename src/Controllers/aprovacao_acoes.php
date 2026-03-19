@@ -122,7 +122,7 @@ $labels_status_esp = [
         .container { max-width: 1000px; margin: 0 auto; }
 
         .header {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             padding: 18px 28px;
             border-radius: 10px;
@@ -163,10 +163,10 @@ $labels_status_esp = [
             box-shadow: 0 1px 3px rgba(0,0,0,0.07);
             transition: all 0.15s;
         }
-        .chip:hover { border-color: #0b5e42; }
-        .chip.ativo { border-color: #0b5e42; background: #e8f5e9; color: #0b5e42; font-weight: 700; }
-        .chip .n { font-weight: 700; color: #0b5e42; }
-        .chip.ativo .n { color: #0b5e42; }
+        .chip:hover { border-color: var(--cor-primaria); }
+        .chip.ativo { border-color: var(--cor-primaria); background: #e8f5e9; color: var(--cor-primaria); font-weight: 700; }
+        .chip .n { font-weight: 700; color: var(--cor-primaria); }
+        .chip.ativo .n { color: var(--cor-primaria); }
         .chip .n-warn { color: #d97706; font-weight: 700; }
 
         /* Cards */
@@ -180,7 +180,7 @@ $labels_status_esp = [
             border-left: 5px solid #ccc;
         }
         .card.pendente  { border-left-color: #d97706; }
-        .card.aprovado  { border-left-color: #0b5e42; }
+        .card.aprovado  { border-left-color: var(--cor-primaria); }
         .card.rejeitado { border-left-color: #dc3545; }
 
         .card-body { padding: 16px 20px; }
@@ -255,9 +255,9 @@ $labels_status_esp = [
             font-size: 0.85em;
             font-family: inherit;
         }
-        .input-motivo:focus { outline: none; border-color: #0b5e42; }
+        .input-motivo:focus { outline: none; border-color: var(--cor-primaria); }
         .btn-aprovar {
-            background: #0b5e42; color: white; border: none;
+            background: var(--cor-primaria); color: white; border: none;
             border-radius: 6px; padding: 8px 18px;
             font-size: 0.85em; font-weight: 600; cursor: pointer;
             white-space: nowrap;

@@ -149,13 +149,13 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                                              alt="Foto de perfil atual"
                                              id="fotoPreview"
                                              class="img-fluid rounded-circle"
-                                             style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #0b5e42;">
+                                             style="width: 150px; height: 150px; object-fit: cover; border: 4px solid var(--cor-primaria);">
                                     <?php elseif (file_exists(__DIR__ . '/../../../uploads/fotos_perfil/' . $usuario_id . '.png')): ?>
                                         <img src="/penomato_mvp/uploads/fotos_perfil/<?php echo $usuario_id; ?>.png?t=<?php echo time(); ?>" 
                                              alt="Foto de perfil atual"
                                              id="fotoPreview"
                                              class="img-fluid rounded-circle"
-                                             style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #0b5e42;">
+                                             style="width: 150px; height: 150px; object-fit: cover; border: 4px solid var(--cor-primaria);">
                                     <?php else: ?>
                                         <div class="avatar-placeholder" id="fotoPreviewPlaceholder">
                                             <?php echo strtoupper(substr($usuario['nome'] ?? 'U', 0, 1)); ?>
@@ -492,7 +492,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .edit-profile-card .card-header {
-        background: linear-gradient(135deg, #0b5e42 0%, #1a7a5a 100%);
+        background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
         color: white;
         padding: 25px 30px;
         border: none;
@@ -522,7 +522,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     
     .section-title i {
         font-size: 1.5rem;
-        color: #0b5e42;
+        color: var(--cor-primaria);
         background: rgba(11, 94, 66, 0.1);
         width: 40px;
         height: 40px;
@@ -547,14 +547,14 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         width: 150px;
         height: 150px;
         border-radius: 50%;
-        background: #0b5e42;
+        background: var(--cor-primaria);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 4rem;
         font-weight: 600;
-        border: 4px solid #0b5e42;
+        border: 4px solid var(--cor-primaria);
         margin: 0 auto;
     }
     
@@ -567,7 +567,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .form-control:focus, .form-select:focus {
-        border-color: #0b5e42;
+        border-color: var(--cor-primaria);
         box-shadow: 0 0 0 3px rgba(11, 94, 66, 0.1);
     }
     
@@ -583,12 +583,12 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .form-label i {
-        color: #0b5e42;
+        color: var(--cor-primaria);
     }
     
     /* Botões */
     .btn-success {
-        background: #0b5e42;
+        background: var(--cor-primaria);
         border: none;
         border-radius: 10px;
         padding: 10px 25px;
@@ -596,7 +596,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .btn-success:hover {
-        background: #0a4e36;
+        background: var(--cor-primaria-hover);
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(11, 94, 66, 0.3);
     }
@@ -719,7 +719,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     img.style.width = '150px';
                     img.style.height = '150px';
                     img.style.objectFit = 'cover';
-                    img.style.border = '4px solid #0b5e42';
+                    img.style.border = '4px solid var(--cor-primaria)';
                     img.id = 'fotoPreview';
                     parent.replaceChild(img, fotoPreviewPlaceholder);
                 }

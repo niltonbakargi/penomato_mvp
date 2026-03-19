@@ -519,7 +519,7 @@ if (!empty($mensagem_erro)) {
         <style>
             body {
                 font-family: Arial, sans-serif;
-                background: linear-gradient(135deg, #0b5e42 0%, #1a7a5a 100%);
+                background: linear-gradient(135deg, var(--cor-primaria) 0%, #1a7a5a 100%);
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
@@ -540,7 +540,7 @@ if (!empty($mensagem_erro)) {
                 margin: 20px 0;
             }
             .btn {
-                background: #0b5e42;
+                background: var(--cor-primaria);
                 color: white;
                 padding: 12px 30px;
                 border: none;
@@ -558,7 +558,7 @@ if (!empty($mensagem_erro)) {
     </head>
     <body>
         <div class="card">
-            <h2 style="color: #0b5e42;">❌ Erro no Cadastro</h2>
+            <h2 style="color: var(--cor-primaria);">❌ Erro no Cadastro</h2>
             <div class="error"><?php echo $mensagem_erro; ?></div>
             <a href="javascript:history.back()" class="btn">← Voltar e corrigir</a>
         </div>

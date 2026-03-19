@@ -10,6 +10,6 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Redirecionar para a view do colaborador
-header('Location: /penomato_mvp/src/Views/entrada_colaborador.php');
+header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
 exit;
 ?>

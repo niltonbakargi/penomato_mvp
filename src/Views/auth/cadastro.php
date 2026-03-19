@@ -28,57 +28,24 @@ unset($_SESSION['dados_cadastro']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Penomato</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
         body {
-            background: linear-gradient(135deg, #0b5e42 0%, #1a7a5a 100%);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
             min-height: 100vh;
-            padding: 30px 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: var(--esp-8) 0;
         }
-        .card-cadastro {
-            max-width: 800px;
-            margin: 0 auto;
-            border-radius: 30px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        .card-header {
-            background: #0b5e42;
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        .card-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-        }
-        .card-body {
-            padding: 40px;
-            background: white;
-        }
-        .btn-cadastrar {
-            background: #0b5e42;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 50px;
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-cadastrar:hover {
-            background: #0a4c35;
-        }
-        .form-label {
-            font-weight: 600;
-            color: #333;
-        }
-        .texto-termos {
-            font-size: 0.9rem;
-            color: #666;
-        }
+        .card-cadastro { max-width: 800px; margin: 0 auto; border-radius: var(--raio-2xl); box-shadow: 0 30px 60px rgba(0,0,0,0.3); overflow: hidden; }
+        .card-header { background: var(--cor-primaria); color: var(--branco); padding: var(--esp-8); text-align: center; border-radius: 0; }
+        .card-header h1 { font-size: var(--texto-3xl); font-weight: var(--peso-bold); color: var(--branco); }
+        .card-header p { color: rgba(255,255,255,0.85); }
+        .card-body { padding: var(--esp-10); background: var(--branco); }
+        .btn-cadastrar { background: var(--cor-primaria); color: var(--branco); border: none; padding: var(--esp-4) var(--esp-10); font-size: var(--texto-lg); font-weight: var(--peso-semi); border-radius: var(--raio-full); width: 100%; cursor: pointer; transition: var(--transicao); }
+        .btn-cadastrar:hover { background: var(--cor-primaria-hover); }
+        .form-label { font-weight: var(--peso-semi); color: var(--cinza-800); }
+        .texto-termos { font-size: var(--texto-sm); color: var(--cinza-500); }
+        .text-success { color: var(--cor-primaria) !important; }
     </style>
 </head>
 <body>

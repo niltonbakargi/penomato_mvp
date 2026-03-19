@@ -29,91 +29,79 @@ if (!isset($_SESSION['csrf_token_email'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alterar E-mail - Penomato</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-            background:linear-gradient(135deg,#0b5e42 0%,#1a7a5a 100%);
+            background:linear-gradient(135deg,var(--cor-primaria) 0%,var(--verde-600) 100%);
             min-height:100vh; display:flex;
             align-items:center; justify-content:center; padding:20px;
         }
         .container { width:100%; max-width:480px; }
         .card {
-            background:white; border-radius:20px;
+            background:var(--branco); border-radius:20px;
             box-shadow:0 20px 40px rgba(0,0,0,0.3); overflow:hidden;
             animation:slideUp 0.4s ease-out;
         }
-        @keyframes slideUp {
-            from { opacity:0; transform:translateY(30px); }
-            to   { opacity:1; transform:translateY(0); }
-        }
         .card-header {
-            background:#0b5e42; color:white;
+            background:var(--cor-primaria); color:var(--branco);
             padding:28px 30px; text-align:center;
         }
         .card-header .icone {
             font-size:2.5rem; background:rgba(255,255,255,0.2);
             width:70px; height:70px; border-radius:50%; display:flex;
             align-items:center; justify-content:center;
-            margin:0 auto 12px; border:3px solid white;
+            margin:0 auto 12px; border:3px solid var(--branco);
         }
         .card-header h1 { font-size:1.5rem; font-weight:700; margin-bottom:4px; }
         .card-header p  { color:rgba(255,255,255,0.85); font-size:0.85rem; }
         .card-body { padding:32px 36px; }
-        .alert {
-            padding:13px 15px; border-radius:10px;
-            margin-bottom:18px; font-size:0.88rem;
-            display:flex; align-items:flex-start; gap:10px;
-        }
-        .alert-error   { background:#f8d7da; color:#721c24; border-left:4px solid #dc3545; }
-        .alert-success { background:#d4edda; color:#155724; border-left:4px solid #28a745; }
         .email-atual {
-            background:#f0f9f5; border:1px solid #b2dfce; border-radius:10px;
-            padding:12px 15px; margin-bottom:22px; font-size:0.88rem; color:#0b5e42;
+            background:var(--verde-50); border:1px solid #b2dfce; border-radius:10px;
+            padding:12px 15px; margin-bottom:22px; font-size:0.88rem; color:var(--cor-primaria);
         }
-        .email-atual strong { display:block; margin-bottom:3px; color:#333; }
+        .email-atual strong { display:block; margin-bottom:3px; color:var(--cinza-800); }
         .form-group { margin-bottom:18px; }
         .form-group label {
-            display:block; font-weight:600; color:#333;
+            display:block; font-weight:600; color:var(--cinza-800);
             margin-bottom:7px; font-size:0.88rem;
         }
         .input-wrapper {
             display:flex; align-items:center;
-            border:2px solid #e0e0e0; border-radius:10px; overflow:hidden;
+            border:2px solid var(--cinza-200); border-radius:10px; overflow:hidden;
             transition:border-color 0.3s;
         }
-        .input-wrapper:focus-within { border-color:#0b5e42; }
+        .input-wrapper:focus-within { border-color:var(--cor-primaria); }
         .input-wrapper .ic {
-            padding:0 13px; color:#888; background:#f8f9fa;
+            padding:0 13px; color:var(--cinza-400); background:var(--cinza-50);
             height:44px; display:flex; align-items:center; font-size:0.95rem;
         }
         .input-wrapper input {
             flex:1; border:none; outline:none;
-            padding:11px 13px; font-size:0.92rem; color:#333;
+            padding:11px 13px; font-size:0.92rem; color:var(--cinza-800);
         }
         .toggle-pw {
-            padding:0 13px; cursor:pointer; color:#888;
+            padding:0 13px; cursor:pointer; color:var(--cinza-400);
             height:44px; display:flex; align-items:center;
-            background:#f8f9fa; transition:color 0.2s;
+            background:var(--cinza-50); transition:color 0.2s;
         }
-        .toggle-pw:hover { color:#0b5e42; }
+        .toggle-pw:hover { color:var(--cor-primaria); }
         .aviso {
             background:#fff8e1; border:1px solid #ffe082; border-radius:8px;
             padding:11px 14px; font-size:0.83rem; color:#7a5800; margin-bottom:20px;
             display:flex; gap:9px; align-items:flex-start;
         }
         .btn-submit {
-            width:100%; background:#0b5e42; color:white; border:none;
+            width:100%; background:var(--cor-primaria); color:var(--branco); border:none;
             border-radius:10px; padding:12px; font-size:0.95rem;
             font-weight:700; cursor:pointer; transition:all 0.3s;
         }
-        .btn-submit:hover { background:#0a4e36; transform:translateY(-2px); }
+        .btn-submit:hover { background:var(--cor-primaria-hover); transform:translateY(-2px); }
         .links {
             text-align:center; margin-top:18px;
-            font-size:0.85rem; color:#666;
+            font-size:0.85rem; color:var(--cinza-500);
         }
-        .links a { color:#0b5e42; text-decoration:none; font-weight:600; }
+        .links a { color:var(--cor-primaria); text-decoration:none; font-weight:600; }
         .links a:hover { text-decoration:underline; }
     </style>
 </head>
@@ -128,14 +116,14 @@ if (!isset($_SESSION['csrf_token_email'])) {
         <div class="card-body">
 
             <?php if (!empty($erro)): ?>
-                <div class="alert alert-error">
+                <div class="alerta--perigo">
                     <i class="fas fa-exclamation-circle"></i>
                     <span><?php echo $erro; ?></span>
                 </div>
             <?php endif; ?>
 
             <?php if (!empty($sucesso)): ?>
-                <div class="alert alert-success">
+                <div class="alerta--sucesso">
                     <i class="fas fa-check-circle"></i>
                     <span><?php echo $sucesso; ?></span>
                 </div>
@@ -160,7 +148,7 @@ if (!isset($_SESSION['csrf_token_email'])) {
 
                 <div class="form-group">
                     <label for="novo_email">
-                        <i class="fas fa-at" style="color:#0b5e42;margin-right:5px;"></i>Novo E-mail *
+                        <i class="fas fa-at" style="color:var(--cor-primaria);margin-right:5px;"></i>Novo E-mail *
                     </label>
                     <div class="input-wrapper">
                         <span class="ic"><i class="fas fa-envelope"></i></span>
@@ -171,7 +159,7 @@ if (!isset($_SESSION['csrf_token_email'])) {
 
                 <div class="form-group">
                     <label for="confirmar_novo_email">
-                        <i class="fas fa-at" style="color:#0b5e42;margin-right:5px;"></i>Confirmar Novo E-mail *
+                        <i class="fas fa-at" style="color:var(--cor-primaria);margin-right:5px;"></i>Confirmar Novo E-mail *
                     </label>
                     <div class="input-wrapper">
                         <span class="ic"><i class="fas fa-envelope"></i></span>
@@ -183,7 +171,7 @@ if (!isset($_SESSION['csrf_token_email'])) {
 
                 <div class="form-group">
                     <label for="senha_atual">
-                        <i class="fas fa-lock" style="color:#0b5e42;margin-right:5px;"></i>Senha Atual (confirmação) *
+                        <i class="fas fa-lock" style="color:var(--cor-primaria);margin-right:5px;"></i>Senha Atual (confirmação) *
                     </label>
                     <div class="input-wrapper">
                         <span class="ic"><i class="fas fa-key"></i></span>

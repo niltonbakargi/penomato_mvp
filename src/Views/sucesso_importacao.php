@@ -99,16 +99,10 @@ $data_importacao = !empty($especie['data_dados_internet'])
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penomato - Importação Concluída</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f5f2e9 0%, #e8e2d4 100%);
             min-height: 100vh;
             display: flex;
@@ -120,7 +114,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
         .success-container {
             max-width: 600px;
             width: 100%;
-            background: white;
+            background: var(--branco);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
@@ -128,19 +122,13 @@ $data_importacao = !empty($especie['data_dados_internet'])
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(30px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
         }
 
         .success-header {
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             padding: 40px 30px;
             text-align: center;
         }
@@ -172,15 +160,15 @@ $data_importacao = !empty($especie['data_dados_internet'])
         }
 
         .info-card {
-            background: #f8f9fa;
+            background: var(--cinza-50);
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 25px;
-            border-left: 4px solid #0b5e42;
+            border-left: 4px solid var(--cor-primaria);
         }
 
         .info-card h2 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             font-size: 1.5rem;
             margin-bottom: 15px;
             font-style: italic;
@@ -194,7 +182,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
         }
 
         .info-item {
-            background: white;
+            background: var(--branco);
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -202,7 +190,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
 
         .info-item .label {
             font-size: 0.85rem;
-            color: #666;
+            color: var(--cinza-500);
             text-transform: uppercase;
             margin-bottom: 5px;
         }
@@ -210,7 +198,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
         .info-item .value {
             font-size: 1.2rem;
             font-weight: 600;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
 
         .stats {
@@ -218,7 +206,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
             justify-content: space-around;
             margin: 30px 0;
             padding: 20px;
-            background: #e8f5e9;
+            background: var(--verde-50);
             border-radius: 12px;
         }
 
@@ -229,19 +217,19 @@ $data_importacao = !empty($especie['data_dados_internet'])
         .stat .number {
             font-size: 2rem;
             font-weight: 700;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
 
         .stat .label {
             font-size: 0.9rem;
-            color: #666;
+            color: var(--cinza-500);
         }
 
         .status-badge {
             display: inline-block;
             padding: 8px 20px;
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             border-radius: 30px;
             font-size: 1rem;
             font-weight: 600;
@@ -263,7 +251,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transicao);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -271,44 +259,30 @@ $data_importacao = !empty($especie['data_dados_internet'])
         }
 
         .btn-primary {
-            background: #0b5e42;
-            color: white;
+            background: var(--cor-primaria);
+            color: var(--branco);
             box-shadow: 0 4px 10px rgba(11,94,66,0.3);
         }
 
         .btn-primary:hover {
-            background: #0a4c35;
+            background: var(--cor-primaria-hover);
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(11,94,66,0.4);
         }
 
         .btn-secondary {
-            background: #6c757d;
-            color: white;
+            background: var(--cinza-500);
+            color: var(--branco);
         }
 
         .btn-secondary:hover {
-            background: #5a6268;
+            background: var(--cinza-600);
             transform: translateY(-2px);
-        }
-
-        .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
         }
 
         .footer {
             text-align: center;
-            color: #718096;
+            color: var(--cinza-500);
             font-size: 0.9rem;
             margin-top: 20px;
         }
@@ -325,7 +299,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
         <div class="success-body">
             
             <!-- Mensagem de sucesso adicional -->
-            <div class="alert alert-success">
+            <div class="alerta--sucesso">
                 <i class="fas fa-check-circle"></i> 
                 Todas as informações foram processadas e armazenadas permanentemente.
             </div>

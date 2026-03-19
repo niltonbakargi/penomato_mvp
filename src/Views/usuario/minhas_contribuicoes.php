@@ -281,7 +281,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-2">
-                <i class="fas fa-history me-2" style="color: #0b5e42;"></i>
+                <i class="fas fa-history me-2" style="color: var(--cor-primaria);"></i>
                 Minhas Contribuições
             </h1>
             <p class="text-muted">
@@ -644,7 +644,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
 <style>
     /* Cards de estatísticas */
     .stat-card {
-        background: white;
+        background: var(--branco);
         border-radius: 15px;
         padding: 20px;
         display: flex;
@@ -661,8 +661,8 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .stat-card.active {
-        border-color: #0b5e42;
-        background: #f0f9f5;
+        border-color: var(--cor-primaria);
+        background: var(--verde-50);
     }
     
     .stat-card-icon {
@@ -670,7 +670,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         height: 50px;
         border-radius: 12px;
         background: rgba(11, 94, 66, 0.1);
-        color: #0b5e42;
+        color: var(--cor-primaria);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -685,13 +685,13 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         display: block;
         font-size: 1.8rem;
         font-weight: 700;
-        color: #333;
+        color: var(--cinza-800);
         line-height: 1.2;
     }
     
     .stat-card-label {
         font-size: 0.85rem;
-        color: #666;
+        color: var(--cinza-500);
     }
     
     /* Card de filtros */
@@ -708,9 +708,9 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     
     /* Estado vazio */
     .empty-state {
-        border: 2px dashed #e0e0e0;
+        border: 2px dashed var(--cinza-200);
         border-radius: 20px;
-        background: #f8f9fa;
+        background: var(--cinza-50);
     }
     
     .empty-icon {
@@ -719,8 +719,8 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     
     /* Tabela */
     .table th {
-        background: #f8f9fa;
-        color: #333;
+        background: var(--cinza-50);
+        color: var(--cinza-800);
         font-weight: 600;
         font-size: 0.9rem;
         border-top: none;
@@ -736,8 +736,8 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         width: 32px;
         height: 32px;
         border-radius: 8px;
-        background: #f8f9fa;
-        color: #666;
+        background: var(--cinza-50);
+        color: var(--cinza-500);
         text-align: center;
         line-height: 32px;
         transition: all 0.3s;
@@ -745,21 +745,21 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     }
     
     .btn-icon:hover {
-        background: #0b5e42;
-        color: white;
+        background: var(--cor-primaria);
+        color: var(--branco);
     }
     
     /* Paginação */
     .pagination .page-link {
-        color: #0b5e42;
+        color: var(--cor-primaria);
         border: none;
         margin: 0 3px;
         border-radius: 8px !important;
     }
     
     .pagination .page-item.active .page-link {
-        background: #0b5e42;
-        color: white;
+        background: var(--cor-primaria);
+        color: var(--branco);
     }
     
     .pagination .page-item.disabled .page-link {
@@ -876,7 +876,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     datasets: [{
                         label: 'Contribuições',
                         data: data.valores,
-                        borderColor: '#0b5e42',
+                        borderColor: 'var(--cor-primaria)',
                         backgroundColor: 'rgba(11, 94, 66, 0.1)',
                         tension: 0.4,
                         fill: true

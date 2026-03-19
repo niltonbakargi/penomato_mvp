@@ -263,12 +263,6 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         }
 
         :root {
-            --verde-penomato: #0b5e42;
-            --verde-claro: #e8f5e9;
-            --verde-hover: #0a4c35;
-            --cinza-fundo: #f8fafc;
-            --cinza-borda: #e2e8f0;
-            --cinza-texto: #4b5563;
             --vermelho: #dc2626;
             --vermelho-claro: #fef2f2;
             --amarelo: #f59e0b;
@@ -280,7 +274,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         }
 
         body {
-            background-color: var(--cinza-fundo);
+            background-color: var(--cinza-50);
             color: #1a2634;
             line-height: 1.6;
             padding: 30px 20px;
@@ -294,7 +288,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         h1 {
             font-size: 2rem;
             font-weight: 600;
-            color: var(--verde-penomato);
+            color: var(--cor-primaria);
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -358,7 +352,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         .usuario-avatar {
             width: 48px;
             height: 48px;
-            background: var(--verde-penomato);
+            background: var(--cor-primaria);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -380,7 +374,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         }
 
         .badge-dados_internet { background: var(--azul-claro); color: #1e40af; border: 1px solid var(--azul); }
-        .badge-descrita { background: var(--verde-claro); color: #065f46; border: 1px solid var(--verde-penomato); }
+        .badge-descrita { background: var(--verde-50); color: #065f46; border: 1px solid var(--cor-primaria); }
         .badge-registrada { background: var(--verde-sucesso-claro); color: #065f46; border: 1px solid var(--verde-sucesso); }
         .badge-em_revisao { background: var(--amarelo-claro); color: #92400e; border: 1px solid var(--amarelo); }
         .badge-revisada { background: var(--verde-sucesso-claro); color: #065f46; border: 1px solid var(--verde-sucesso); }
@@ -399,7 +393,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             padding: 25px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.04);
             margin-bottom: 25px;
-            border: 1px solid var(--cinza-borda);
+            border: 1px solid var(--cinza-200);
         }
 
         /* ========== SELECT DE ESPÉCIES ========== */
@@ -408,13 +402,13 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             border-radius: 20px;
             padding: 25px;
             margin-bottom: 30px;
-            border-left: 8px solid var(--verde-penomato);
+            border-left: 8px solid var(--cor-primaria);
         }
 
         .select-grande {
             width: 100%;
             padding: 14px 18px;
-            border: 2px solid var(--cinza-borda);
+            border: 2px solid var(--cinza-200);
             border-radius: 12px;
             font-size: 1rem;
             background: white;
@@ -423,7 +417,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         }
 
         .select-grande:focus {
-            border-color: var(--verde-penomato);
+            border-color: var(--cor-primaria);
             outline: none;
             box-shadow: 0 0 0 3px rgba(11,94,66,0.1);
         }
@@ -440,12 +434,12 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             background: white;
             border-radius: 16px;
             padding: 20px;
-            border: 1px solid var(--cinza-borda);
+            border: 1px solid var(--cinza-200);
             transition: all 0.2s;
         }
 
         .parte-card:hover {
-            border-color: var(--verde-penomato);
+            border-color: var(--cor-primaria);
             box-shadow: 0 8px 20px rgba(0,0,0,0.06);
         }
 
@@ -455,7 +449,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             gap: 12px;
             margin-bottom: 15px;
             padding-bottom: 12px;
-            border-bottom: 1px solid var(--cinza-borda);
+            border-bottom: 1px solid var(--cinza-200);
         }
 
         .parte-icone {
@@ -479,21 +473,21 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         .preview-area {
             width: 100%;
             height: 80px;
-            background: var(--cinza-fundo);
+            background: var(--cinza-50);
             border-radius: 12px;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--cinza-texto);
-            border: 1px solid var(--cinza-borda);
+            color: var(--cinza-600);
+            border: 1px solid var(--cinza-200);
             font-size: 0.9rem;
         }
 
         /* ========== ÁREA DE UPLOAD ========== */
         .upload-area {
-            background: var(--cinza-fundo);
-            border: 3px dashed var(--cinza-borda);
+            background: var(--cinza-50);
+            border: 3px dashed var(--cinza-200);
             border-radius: 12px;
             padding: 15px;
             text-align: center;
@@ -503,7 +497,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         }
 
         .upload-area:hover {
-            border-color: var(--verde-penomato);
+            border-color: var(--cor-primaria);
             background: #f0fdf4;
         }
 
@@ -523,23 +517,23 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         }
 
         .btn-primary {
-            background: var(--verde-penomato);
+            background: var(--cor-primaria);
             color: white;
         }
 
         .btn-primary:hover {
-            background: var(--verde-hover);
+            background: var(--cor-primaria-hover);
             transform: translateY(-2px);
         }
 
         .btn-outline {
             background: white;
-            border: 2px solid var(--cinza-borda);
+            border: 2px solid var(--cinza-200);
             color: #1e293b;
         }
 
         .btn-outline:hover {
-            border-color: var(--verde-penomato);
+            border-color: var(--cor-primaria);
         }
 
         .btn-success {
@@ -552,7 +546,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             display: flex;
             gap: 16px;
             padding: 16px 0;
-            border-bottom: 1px solid var(--cinza-borda);
+            border-bottom: 1px solid var(--cinza-200);
         }
 
         .contribuicao-item:last-child {
@@ -574,7 +568,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
 
         .contribuicao-meta {
             font-size: 0.8rem;
-            color: var(--cinza-texto);
+            color: var(--cinza-600);
             margin-top: 4px;
         }
 
@@ -594,13 +588,13 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         .campo input, .campo textarea {
             width: 100%;
             padding: 10px 12px;
-            border: 2px solid var(--cinza-borda);
+            border: 2px solid var(--cinza-200);
             border-radius: 10px;
             font-size: 0.95rem;
         }
 
         .campo input:focus, .campo textarea:focus {
-            border-color: var(--verde-penomato);
+            border-color: var(--cor-primaria);
             outline: none;
         }
 
@@ -615,7 +609,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             border-radius: 20px;
             padding: 25px;
             margin-bottom: 25px;
-            border-left: 8px solid var(--verde-penomato);
+            border-left: 8px solid var(--cor-primaria);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -625,7 +619,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         .especie-titulo {
             font-size: 1.6rem;
             font-weight: 700;
-            color: var(--verde-penomato);
+            color: var(--cor-primaria);
         }
 
         .empty-state {
@@ -633,7 +627,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
             border-radius: 20px;
             padding: 60px;
             text-align: center;
-            border: 2px dashed var(--cinza-borda);
+            border: 2px dashed var(--cinza-200);
         }
 
         .stats-grid {
@@ -658,13 +652,13 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         .progresso-container {
             margin-top: 20px;
             padding: 20px;
-            background: var(--verde-claro);
+            background: var(--verde-50);
             border-radius: 12px;
         }
 
         .barra-progresso {
             height: 8px;
-            background: var(--cinza-borda);
+            background: var(--cinza-200);
             border-radius: 4px;
             overflow: hidden;
             margin: 10px 0;
@@ -672,7 +666,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
 
         .barra-progresso-preenchimento {
             height: 100%;
-            background: var(--verde-penomato);
+            background: var(--cor-primaria);
             transition: width 0.3s ease;
         }
 
@@ -703,7 +697,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                 <div class="usuario-avatar"><?php echo substr($nome_usuario_logado, 0, 2); ?></div>
                 <div>
                     <div style="font-weight: 600;"><?php echo htmlspecialchars($nome_usuario_logado); ?></div>
-                    <div style="font-size: 0.85rem; color: var(--cinza-texto);">Identificador</div>
+                    <div style="font-size: 0.85rem; color: var(--cinza-600);">Identificador</div>
                 </div>
             </div>
         </div>
@@ -768,7 +762,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                     <div><span style="color: var(--azul); font-weight: 600;">🔵</span> Prioritárias: <strong><?php echo count($especies_prioritarias); ?></strong></div>
                     <div><span style="color: #065f46; font-weight: 600;">✅</span> Completas: <strong><?php echo count($especies_completas); ?></strong></div>
                 </div>
-                <a href="?limpar=1" style="color: var(--cinza-texto); text-decoration: none; padding: 6px 16px; border: 1px solid var(--cinza-borda); border-radius: 30px; font-size: 0.9rem;">
+                <a href="?limpar=1" style="color: var(--cinza-600); text-decoration: none; padding: 6px 16px; border: 1px solid var(--cinza-200); border-radius: 30px; font-size: 0.9rem;">
                     🧹 Limpar seleção
                 </a>
             </div>
@@ -781,10 +775,10 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         <div class="especie-header">
             <div>
                 <div class="especie-titulo"><?php echo htmlspecialchars($especie_selecionada['nome_cientifico']); ?></div>
-                <div style="margin-top: 12px; color: var(--cinza-texto); display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="margin-top: 12px; color: var(--cinza-600); display: flex; gap: 20px; flex-wrap: wrap;">
                     <span>📌 ID: <?php echo $especie_selecionada['id']; ?></span>
                     <?php if ($especie_selecionada['prioridade']): ?>
-                    <span>🎯 Prioridade: <span style="font-weight: 600; color: var(--verde-penomato);"><?php echo strtoupper($especie_selecionada['prioridade']); ?></span></span>
+                    <span>🎯 Prioridade: <span style="font-weight: 600; color: var(--cor-primaria);"><?php echo strtoupper($especie_selecionada['prioridade']); ?></span></span>
                     <?php endif; ?>
                 </div>
             </div>
@@ -831,15 +825,15 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                         <div class="parte-stats">
                             <span>📸 <strong><?php echo $dados_parte['total']; ?></strong> imagens</span>
                             <?php if ($dados_parte['tem_imagem']): ?>
-                            <span style="color: var(--verde-penomato);">✅ possui imagem</span>
+                            <span style="color: var(--cor-primaria);">✅ possui imagem</span>
                             <?php endif; ?>
                         </div>
                         
                         <div class="preview-area">
                             <?php if ($dados_parte['tem_imagem']): ?>
-                            <span style="color: var(--verde-penomato);">✅ Já possui <?php echo $dados_parte['total']; ?> imagem(ns)</span>
+                            <span style="color: var(--cor-primaria);">✅ Já possui <?php echo $dados_parte['total']; ?> imagem(ns)</span>
                             <?php else: ?>
-                            <span style="color: var(--cinza-texto);">📸 Nenhuma imagem ainda</span>
+                            <span style="color: var(--cinza-600);">📸 Nenhuma imagem ainda</span>
                             <?php endif; ?>
                         </div>
                         
@@ -850,7 +844,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                             <div class="upload-area" onclick="document.getElementById('file_<?php echo $parte_key; ?>').click();">
                                 <span style="font-size: 1.5rem;">📂</span>
                                 <p style="font-weight: 500; margin-top: 5px;">Clique para selecionar</p>
-                                <p style="font-size: 0.75rem; color: var(--cinza-texto);">JPG, PNG · Máx 10MB</p>
+                                <p style="font-size: 0.75rem; color: var(--cinza-600);">JPG, PNG · Máx 10MB</p>
                                 <input type="file" id="file_<?php echo $parte_key; ?>" name="imagem" accept="image/*" style="display: none;" required>
                             </div>
                             
@@ -888,7 +882,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                 <!-- MINHAS CONTRIBUIÇÕES -->
                 <div class="card">
                     <h2>📋 MINHAS CONTRIBUIÇÕES</h2>
-                    <p style="font-size: 0.9rem; color: var(--cinza-texto); margin-bottom: 20px;">
+                    <p style="font-size: 0.9rem; color: var(--cinza-600); margin-bottom: 20px;">
                         Últimas imagens que você enviou
                     </p>
                     
@@ -917,7 +911,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                                     <span><?php echo date('d/m/Y H:i', strtotime($contrib['data_upload'])); ?></span>
                                 </div>
                                 <?php if ($contrib['descricao']): ?>
-                                <div style="font-size: 0.8rem; color: var(--cinza-texto); margin-top: 5px;">
+                                <div style="font-size: 0.8rem; color: var(--cinza-600); margin-top: 5px;">
                                     📝 <?php echo htmlspecialchars($contrib['descricao']); ?>
                                 </div>
                                 <?php endif; ?>
@@ -925,9 +919,9 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                         </div>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <div style="text-align: center; padding: 30px; background: var(--cinza-fundo); border-radius: 12px;">
+                        <div style="text-align: center; padding: 30px; background: var(--cinza-50); border-radius: 12px;">
                             <span style="font-size: 2rem;">📸</span>
-                            <p style="margin-top: 10px; color: var(--cinza-texto);">
+                            <p style="margin-top: 10px; color: var(--cinza-600);">
                                 Você ainda não enviou nenhuma imagem.
                             </p>
                         </div>
@@ -955,14 +949,14 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                     <div style="margin-bottom: 25px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                             <span style="font-weight: 600;">Partes obrigatórias</span>
-                            <span style="color: var(--verde-penomato); font-weight: 600;">
+                            <span style="color: var(--cor-primaria); font-weight: 600;">
                                 <?php echo $partes_com_imagem; ?>/<?php echo $total_partes; ?>
                             </span>
                         </div>
                         <div class="barra-progresso">
                             <div class="barra-progresso-preenchimento" style="width: <?php echo $percentual; ?>%;"></div>
                         </div>
-                        <div style="margin-top: 5px; font-size: 0.85rem; color: var(--cinza-texto);">
+                        <div style="margin-top: 5px; font-size: 0.85rem; color: var(--cinza-600);">
                             Progresso: <?php echo $percentual; ?>%
                         </div>
                     </div>
@@ -978,14 +972,14 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                                         echo $nomes[$p];
                                     ?>
                                 </span>
-                                <span style="color: <?php echo $resumo_imagens[$p]['tem_imagem'] ? 'var(--verde-penomato)' : 'var(--cinza-texto)'; ?>; font-weight: 600;">
+                                <span style="color: <?php echo $resumo_imagens[$p]['tem_imagem'] ? 'var(--cor-primaria)' : 'var(--cinza-600)'; ?>; font-weight: 600;">
                                     <?php echo $resumo_imagens[$p]['total']; ?> imagens
                                 </span>
                             </div>
                             <div class="barra-progresso" style="height: 6px;">
                                 <div class="barra-progresso-preenchimento" 
                                      style="width: <?php echo $resumo_imagens[$p]['tem_imagem'] ? '100%' : '0%'; ?>; 
-                                            background: <?php echo $resumo_imagens[$p]['tem_imagem'] ? 'var(--verde-penomato)' : 'var(--cinza-borda)'; ?>;">
+                                            background: <?php echo $resumo_imagens[$p]['tem_imagem'] ? 'var(--cor-primaria)' : 'var(--cinza-200)'; ?>;">
                                 </div>
                             </div>
                         </div>
@@ -997,10 +991,10 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <span style="font-size: 2rem;">🏆</span>
                             <div>
-                                <div style="font-weight: 700; color: var(--verde-penomato); margin-bottom: 5px;">
+                                <div style="font-weight: 700; color: var(--cor-primaria); margin-bottom: 5px;">
                                     Todas as partes têm imagens!
                                 </div>
-                                <div style="font-size: 0.9rem; color: var(--cinza-texto);">
+                                <div style="font-size: 0.9rem; color: var(--cinza-600);">
                                     Esta espécie está pronta para revisão.
                                     <?php if ($especie_selecionada['status'] == 'dados_internet' || $especie_selecionada['status'] == 'descrita'): ?>
                                     O sistema vai avançar automaticamente para "registrada".
@@ -1025,10 +1019,10 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         <!-- ========== MENSAGEM QUANDO NENHUMA ESPÉCIE SELECIONADA ========== -->
         <div class="empty-state">
             <span style="font-size: 4rem;">📸</span>
-            <h2 style="margin-top: 20px; color: var(--verde-penomato);">Nenhuma espécie selecionada</h2>
-            <p style="margin-top: 10px; color: var(--cinza-texto); max-width: 500px; margin-left: auto; margin-right: auto;">
+            <h2 style="margin-top: 20px; color: var(--cor-primaria);">Nenhuma espécie selecionada</h2>
+            <p style="margin-top: 10px; color: var(--cinza-600); max-width: 500px; margin-left: auto; margin-right: auto;">
                 Selecione uma espécie na lista acima para começar a enviar imagens. 
-                Dê prioridade às espécies com status <span style="background: var(--azul-claro); color: #1e40af; padding: 4px 12px; border-radius: 30px; font-weight: 600;">DADOS_INTERNET</span> ou <span style="background: var(--verde-claro); color: #065f46; padding: 4px 12px; border-radius: 30px; font-weight: 600;">DESCRITA</span>.
+                Dê prioridade às espécies com status <span style="background: var(--azul-claro); color: #1e40af; padding: 4px 12px; border-radius: 30px; font-weight: 600;">DADOS_INTERNET</span> ou <span style="background: var(--verde-50); color: #065f46; padding: 4px 12px; border-radius: 30px; font-weight: 600;">DESCRITA</span>.
             </p>
             
             <div class="stats-grid">
@@ -1042,7 +1036,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
                 <div class="stat-item">
                     <div style="font-size: 2rem; margin-bottom: 10px;">✅</div>
                     <div style="font-weight: 600;">Já completas</div>
-                    <div class="stat-value" style="color: var(--verde-penomato);">
+                    <div class="stat-value" style="color: var(--cor-primaria);">
                         <?php echo count($especies_completas); ?>
                     </div>
                 </div>
@@ -1059,7 +1053,7 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         <?php endif; ?>
         
         <!-- ========== RODAPÉ ========== -->
-        <div style="margin-top: 50px; text-align: center; color: var(--cinza-texto); font-size: 0.85rem; border-top: 1px solid var(--cinza-borda); padding-top: 30px;">
+        <div style="margin-top: 50px; text-align: center; color: var(--cinza-600); font-size: 0.85rem; border-top: 1px solid var(--cinza-200); padding-top: 30px;">
             <p>Penomato - Sistema de Documentação Botânica</p>
             <p style="margin-top: 5px;">Todas as imagens enviadas passam por validação de especialistas antes de serem publicadas.</p>
             <p style="margin-top: 5px;">📸 Créditos são mantidos integralmente aos fotógrafos.</p>
@@ -1072,20 +1066,20 @@ unset($_SESSION['mensagem_sucesso'], $_SESSION['mensagem_erro']);
         document.querySelectorAll('.upload-area').forEach(area => {
             area.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                area.style.borderColor = 'var(--verde-penomato)';
+                area.style.borderColor = 'var(--cor-primaria)';
                 area.style.background = '#f0fdf4';
             });
             
             area.addEventListener('dragleave', (e) => {
                 e.preventDefault();
-                area.style.borderColor = 'var(--cinza-borda)';
-                area.style.background = 'var(--cinza-fundo)';
+                area.style.borderColor = 'var(--cinza-200)';
+                area.style.background = 'var(--cinza-50)';
             });
             
             area.addEventListener('drop', (e) => {
                 e.preventDefault();
-                area.style.borderColor = 'var(--cinza-borda)';
-                area.style.background = 'var(--cinza-fundo)';
+                area.style.borderColor = 'var(--cinza-200)';
+                area.style.background = 'var(--cinza-50)';
                 
                 const input = area.querySelector('input[type="file"]');
                 if (input && e.dataTransfer.files.length > 0) {

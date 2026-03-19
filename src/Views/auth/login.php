@@ -35,221 +35,165 @@ unset($_SESSION['email_tentativa']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Penomato</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0b5e42 0%, #1a7a5a 100%);
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: var(--esp-5);
         }
-        
+
         .login-container {
             width: 100%;
             max-width: 450px;
         }
-        
+
         .login-card {
-            background: white;
-            border-radius: 20px;
+            background: var(--branco);
+            border-radius: var(--raio-2xl);
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             overflow: hidden;
             animation: slideUp 0.5s ease-out;
         }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
+
         .login-header {
-            background: #0b5e42;
-            color: white;
-            padding: 30px;
+            background: var(--cor-primaria);
+            color: var(--branco);
+            padding: var(--esp-8);
             text-align: center;
         }
-        
+
         .login-header i {
-            font-size: 4rem;
+            font-size: var(--texto-4xl);
             background: rgba(255,255,255,0.2);
             width: 100px;
             height: 100px;
-            border-radius: 50px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 15px;
-            border: 3px solid white;
+            margin: 0 auto var(--esp-4);
+            border: 3px solid var(--branco);
         }
-        
+
         .login-header h1 {
-            font-size: 2rem;
-            font-weight: 600;
+            font-size: var(--texto-2xl);
+            font-weight: var(--peso-semi);
+            color: var(--branco);
         }
-        
+
         .login-body {
-            padding: 40px;
+            padding: var(--esp-10);
         }
-        
-        .alert {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-        
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-        
+
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: var(--esp-6);
         }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-        
+
         .input-group {
             position: relative;
             display: flex;
             align-items: center;
         }
-        
+
         .input-icon {
             position: absolute;
-            left: 15px;
-            color: #0b5e42;
-            font-size: 1.1rem;
+            left: var(--esp-4);
+            color: var(--cor-primaria);
+            font-size: var(--texto-md);
         }
-        
-        input {
+
+        .input-group input {
             width: 100%;
-            padding: 15px 15px 15px 45px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s;
-            background-color: #f8fafc;
+            padding: var(--esp-4) var(--esp-4) var(--esp-4) var(--esp-11);
+            border: 2px solid var(--cinza-200);
+            border-radius: var(--raio-lg);
+            font-size: var(--texto-md);
+            transition: var(--transicao);
+            background-color: var(--cinza-50);
+            font-family: var(--fonte-principal);
         }
-        
-        input:focus {
-            border-color: #0b5e42;
+
+        .input-group input:focus {
+            border-color: var(--cor-primaria);
             outline: none;
-            background-color: white;
-            box-shadow: 0 0 0 3px rgba(11,94,66,0.1);
+            background-color: var(--branco);
+            box-shadow: var(--sombra-foco);
         }
-        
-        input::placeholder {
-            color: #a0aec0;
-        }
-        
+
+        .input-group input::placeholder { color: var(--cinza-400); }
+
         .btn-login {
             width: 100%;
-            padding: 15px;
-            background: #0b5e42;
-            color: white;
+            padding: var(--esp-4);
+            background: var(--cor-primaria);
+            color: var(--branco);
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: var(--raio-lg);
+            font-size: var(--texto-lg);
+            font-weight: var(--peso-semi);
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transicao);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: var(--esp-2);
+            margin-top: var(--esp-2);
         }
-        
+
         .btn-login:hover {
-            background: #0a4c35;
+            background: var(--cor-primaria-hover);
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(11,94,66,0.3);
         }
-        
-        .btn-login:active {
-            transform: translateY(0);
-        }
-        
+
+        .btn-login:active { transform: translateY(0); }
+
         .links {
             text-align: center;
-            margin-top: 25px;
+            margin-top: var(--esp-6);
         }
-        
+
         .links a {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-weight: var(--peso-semi);
+            transition: var(--transicao);
         }
-        
+
         .links a:hover {
-            color: #0a4c35;
+            color: var(--cor-primaria-hover);
             text-decoration: underline;
         }
-        
-        .separator {
-            margin: 0 10px;
-            color: #cbd5e0;
-        }
-        
+
         .back-link {
             text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 2px solid #e2e8f0;
+            margin-top: var(--esp-6);
+            padding-top: var(--esp-5);
+            border-top: 2px solid var(--cinza-200);
         }
-        
+
         .back-link a {
-            color: #718096;
+            color: var(--cinza-500);
             text-decoration: none;
-            font-size: 0.95rem;
-            transition: all 0.2s;
+            font-size: var(--texto-sm);
+            transition: var(--transicao);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--esp-2);
         }
-        
-        .back-link a:hover {
-            color: #0b5e42;
-        }
-        
+
+        .back-link a:hover { color: var(--cor-primaria); }
+
         .footer {
             text-align: center;
-            margin-top: 20px;
-            color: #718096;
-            font-size: 0.85rem;
+            margin-top: var(--esp-5);
+            color: rgba(255,255,255,0.7);
+            font-size: var(--texto-sm);
         }
     </style>
 </head>
@@ -268,14 +212,14 @@ unset($_SESSION['email_tentativa']);
                 
                 <!-- Mensagens de erro/sucesso -->
                 <?php if ($erro): ?>
-                    <div class="alert alert-error">
+                    <div class="alerta--perigo">
                         <i class="fas fa-exclamation-circle"></i>
                         <?php echo $erro; ?>
                     </div>
                 <?php endif; ?>
 
                 <?php if ($sucesso): ?>
-                    <div class="alert alert-success">
+                    <div class="alerta--sucesso">
                         <i class="fas fa-check-circle"></i>
                         <?php echo $sucesso; ?>
                     </div>

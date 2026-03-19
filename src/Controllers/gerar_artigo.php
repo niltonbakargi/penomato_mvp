@@ -326,7 +326,7 @@ if (!empty($refs_map)):
         .container { max-width: 1100px; margin: 0 auto; }
 
         .header {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             padding: 18px 28px;
             border-radius: 10px;
@@ -353,10 +353,10 @@ if (!empty($refs_map)):
 
         /* Painel lateral */
         .sidebar { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden; }
-        .sidebar-header { background: #f7f9f7; padding: 12px 16px; border-bottom: 2px solid #e0e8e0; font-size: 0.88em; font-weight: 700; color: #0b5e42; }
+        .sidebar-header { background: #f7f9f7; padding: 12px 16px; border-bottom: 2px solid #e0e8e0; font-size: 0.88em; font-weight: 700; color: var(--cor-primaria); }
         .especie-item { padding: 10px 16px; border-bottom: 1px solid #f3f3f3; font-size: 0.84em; cursor: pointer; display: flex; flex-direction: column; gap: 3px; text-decoration: none; color: #333; }
         .especie-item:hover { background: #f0fdf0; }
-        .especie-item.ativa { background: #e8f5e9; border-left: 3px solid #0b5e42; }
+        .especie-item.ativa { background: #e8f5e9; border-left: 3px solid var(--cor-primaria); }
         .especie-item .nome { font-style: italic; font-weight: 600; color: #1a3a28; }
         .especie-item .meta { font-size: 0.78em; color: #aaa; display: flex; gap: 8px; }
         .badge-artigo { background: #d4edda; color: #155724; padding: 1px 7px; border-radius: 8px; font-size: 0.75em; font-weight: 600; }
@@ -365,9 +365,9 @@ if (!empty($refs_map)):
         /* Área principal */
         .main-card { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden; }
         .main-header { background: #f7f9f7; padding: 14px 20px; border-bottom: 2px solid #e0e8e0; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-        .main-header h2 { font-size: 0.95em; font-weight: 700; color: #0b5e42; font-style: italic; }
+        .main-header h2 { font-size: 0.95em; font-weight: 700; color: var(--cor-primaria); font-style: italic; }
 
-        .btn-gerar { background: #0b5e42; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-size: 0.88em; font-weight: 600; cursor: pointer; }
+        .btn-gerar { background: var(--cor-primaria); color: white; border: none; padding: 8px 20px; border-radius: 6px; font-size: 0.88em; font-weight: 600; cursor: pointer; }
         .btn-gerar:hover { background: #094d36; }
         .btn-salvar { background: #155724; color: white; border: none; padding: 8px 20px; border-radius: 6px; font-size: 0.88em; font-weight: 600; cursor: pointer; }
         .btn-salvar:hover { background: #0d3a18; }
@@ -381,13 +381,13 @@ if (!empty($refs_map)):
         .artigo-preview { padding: 30px 40px; }
 
         .artigo { font-family: 'Georgia', serif; line-height: 1.8; color: #1a1a1a; }
-        .art-titulo { font-size: 1.3em; font-weight: 700; font-style: italic; color: #0b5e42; margin-bottom: 6px; }
+        .art-titulo { font-size: 1.3em; font-weight: 700; font-style: italic; color: var(--cor-primaria); margin-bottom: 6px; }
         .art-familia { font-size: 0.9em; color: #555; margin-bottom: 6px; }
         .art-sinonimos { font-size: 0.88em; color: #555; margin-bottom: 4px; }
         .art-nomes { font-size: 0.88em; color: #555; margin-bottom: 16px; }
-        .art-secao { font-size: 1em; font-weight: 700; color: #0b5e42; margin: 20px 0 8px; border-bottom: 1px solid #e0e8e0; padding-bottom: 4px; font-family: 'Segoe UI', sans-serif; }
+        .art-secao { font-size: 1em; font-weight: 700; color: var(--cor-primaria); margin: 20px 0 8px; border-bottom: 1px solid #e0e8e0; padding-bottom: 4px; font-family: 'Segoe UI', sans-serif; }
         .art-paragrafo { font-size: 0.95em; margin-bottom: 10px; text-align: justify; }
-        .art-paragrafo sup { font-size: 0.7em; color: #0b5e42; font-family: sans-serif; }
+        .art-paragrafo sup { font-size: 0.7em; color: var(--cor-primaria); font-family: sans-serif; }
 
         .art-galeria { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
         .art-figura { text-align: center; flex: 0 0 auto; }

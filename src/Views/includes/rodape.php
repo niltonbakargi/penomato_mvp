@@ -251,7 +251,7 @@ $versao_sistema = 'MVP 1.0';
                 width: 50px;
                 height: 50px;
                 border-radius: 50%;
-                background: #0b5e42;
+                background: var(--cor-primaria);
                 color: white;
                 border: none;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.2);
@@ -398,7 +398,7 @@ function getEstatisticasRodape() {
         color: #e0e0e0;
         padding: 50px 0 20px;
         font-size: 0.95rem;
-        border-top: 4px solid #0b5e42;
+        border-top: 4px solid var(--cor-primaria);
         margin-top: auto;
     }
     
@@ -411,7 +411,7 @@ function getEstatisticasRodape() {
     
     .footer-logo i {
         font-size: 2.5rem;
-        color: #0b5e42;
+        color: var(--cor-primaria);
         background: rgba(255,255,255,0.1);
         width: 50px;
         height: 50px;
@@ -452,7 +452,7 @@ function getEstatisticasRodape() {
     }
     
     .social-link:hover {
-        background: #0b5e42;
+        background: var(--cor-primaria);
         transform: translateY(-3px);
         color: white;
     }
@@ -472,7 +472,7 @@ function getEstatisticasRodape() {
         bottom: 0;
         width: 40px;
         height: 3px;
-        background: #0b5e42;
+        background: var(--cor-primaria);
     }
     
     .footer-links {
@@ -496,7 +496,7 @@ function getEstatisticasRodape() {
     
     .footer-links a i {
         font-size: 0.7rem;
-        color: #0b5e42;
+        color: var(--cor-primaria);
         transition: transform 0.3s;
     }
     
@@ -522,7 +522,7 @@ function getEstatisticasRodape() {
     }
     
     .contact-item i {
-        color: #0b5e42;
+        color: var(--cor-primaria);
         font-size: 1.2rem;
         min-width: 25px;
         margin-top: 3px;

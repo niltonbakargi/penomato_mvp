@@ -236,10 +236,10 @@ ob_end_clean();
         }
         
         h1 {
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 30px;
             font-weight: 600;
-            border-bottom: 3px solid #0b5e42;
+            border-bottom: 3px solid var(--cor-primaria);
             padding-bottom: 15px;
             display: inline-block;
         }
@@ -257,12 +257,12 @@ ob_end_clean();
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 6px solid #0b5e42;
+            border-left: 6px solid var(--cor-primaria);
         }
         
         .secao h2 {
             font-size: 1.4rem;
-            color: #0b5e42;
+            color: var(--cor-primaria);
             margin-bottom: 20px;
             font-weight: 500;
             display: flex;
@@ -306,7 +306,7 @@ ob_end_clean();
         
         select:focus, input[type="text"]:focus {
             outline: none;
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
             box-shadow: 0 0 0 3px rgba(11,94,66,0.1);
         }
         
@@ -332,13 +332,13 @@ ob_end_clean();
         }
         
         .btn-buscar {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             box-shadow: 0 4px 12px rgba(11,94,66,0.3);
         }
         
         .btn-buscar:hover {
-            background: #0a4c35;
+            background: var(--cor-primaria-hover);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(11,94,66,0.4);
         }
@@ -369,7 +369,7 @@ ob_end_clean();
         }
         
         .badge-total {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
             padding: 10px 24px;
             border-radius: 40px;
@@ -437,7 +437,7 @@ ob_end_clean();
         .especie-nome {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #0b5e42;
+            color: var(--cor-primaria);
         }
         
         .especie-detalhes {
@@ -457,7 +457,7 @@ ob_end_clean();
         }
         
         .especie-link:hover {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
         }
         
@@ -483,15 +483,15 @@ ob_end_clean();
         }
         
         .page-link:hover {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
         }
         
         .page-link.ativa {
-            background: #0b5e42;
+            background: var(--cor-primaria);
             color: white;
-            border-color: #0b5e42;
+            border-color: var(--cor-primaria);
         }
         
         .page-disabled {

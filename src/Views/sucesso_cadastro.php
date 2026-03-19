@@ -51,16 +51,10 @@ $status_texto = $status_amigavel[$status] ?? $status;
 <head>
     <meta charset="UTF-8">
     <title>Cadastro realizado com sucesso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
-        /* MESMO CSS (manter igual) */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             display: flex;
@@ -68,66 +62,61 @@ $status_texto = $status_amigavel[$status] ?? $status;
             align-items: center;
             padding: 20px;
         }
-        
+
         .success-container {
-            background: white;
+            background: var(--branco);
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             padding: 50px;
             max-width: 600px;
             width: 100%;
             text-align: center;
-            border-top: 5px solid #28a745;
+            border-top: 5px solid var(--sucesso-cor);
             animation: fadeIn 0.5s ease-out;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+
         .success-icon {
             font-size: 80px;
-            color: #28a745;
+            color: var(--sucesso-cor);
             margin-bottom: 20px;
         }
-        
+
         h1 {
-            color: #28a745;
+            color: var(--sucesso-cor);
             margin-bottom: 15px;
             font-size: 28px;
         }
-        
+
         .message {
-            color: #555;
+            color: var(--cinza-600);
             font-size: 18px;
             line-height: 1.6;
             margin-bottom: 25px;
         }
-        
+
         .details-box {
-            background: #f8f9fa;
+            background: var(--cinza-50);
             border-radius: 10px;
             padding: 20px;
             margin: 25px 0;
-            border-left: 4px solid #28a745;
+            border-left: 4px solid var(--sucesso-cor);
             text-align: left;
         }
-        
+
         .detail-item {
             margin: 10px 0;
             font-size: 16px;
         }
-        
+
         .detail-label {
             font-weight: bold;
-            color: #333;
+            color: var(--cinza-800);
         }
-        
+
         .detail-value {
-            color: #28a745;
+            color: var(--sucesso-cor);
         }
-        
+
         .buttons-container {
             display: flex;
             justify-content: center;
@@ -135,7 +124,7 @@ $status_texto = $status_amigavel[$status] ?? $status;
             flex-wrap: wrap;
             margin-top: 30px;
         }
-        
+
         .btn {
             display: inline-block;
             padding: 12px 30px;
@@ -143,51 +132,51 @@ $status_texto = $status_amigavel[$status] ?? $status;
             text-decoration: none;
             font-weight: bold;
             font-size: 16px;
-            transition: all 0.3s ease;
+            transition: var(--transicao);
             cursor: pointer;
             border: none;
         }
-        
+
         .btn-primary {
-            background: #28a745;
-            color: white;
+            background: var(--sucesso-cor);
+            color: var(--branco);
         }
-        
+
         .btn-primary:hover {
             background: #218838;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
-        
+
         .btn-secondary {
-            background: #6c757d;
-            color: white;
+            background: var(--cinza-500);
+            color: var(--branco);
         }
-        
+
         .btn-secondary:hover {
-            background: #5a6268;
+            background: var(--cinza-600);
             transform: translateY(-2px);
         }
-        
+
         .btn-view {
-            background: #17a2b8;
-            color: white;
+            background: var(--info-cor);
+            color: var(--branco);
         }
-        
+
         .btn-view:hover {
             background: #138496;
             transform: translateY(-2px);
         }
-        
+
         @media (max-width: 480px) {
             .success-container {
                 padding: 30px 20px;
             }
-            
+
             .buttons-container {
                 flex-direction: column;
             }
-            
+
             .btn {
                 width: 100%;
                 margin-bottom: 10px;
@@ -207,7 +196,7 @@ $status_texto = $status_amigavel[$status] ?? $status;
     <div class="message">
         As características morfológicas foram salvas no banco de dados.
         <?php if ($status == 'dados_internet'): ?>
-            <br><small style="color: #856404;">(Dados marcados como "internet" - aguardando verificação)</small>
+            <br><small style="color: var(--aviso-texto);">(Dados marcados como "internet" - aguardando verificação)</small>
         <?php endif; ?>
     </div>
     
