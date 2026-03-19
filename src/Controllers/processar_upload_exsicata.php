@@ -18,14 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $usuario_id  = (int)$_SESSION['usuario_id'];
 $usuario_nome = $_SESSION['usuario_nome'] ?? '';
 
-$especie_id      = (int)($_POST['especie_id']      ?? 0);
-$parte_planta    = trim($_POST['parte_planta']    ?? '');
-$numero_etiqueta = trim($_POST['numero_etiqueta'] ?? '');
-$data_coleta     = trim($_POST['data_coleta']     ?? '');
-$observacoes     = trim($_POST['observacoes']     ?? '');
-$licenca         = trim($_POST['licenca']         ?? 'Privado');
+$especie_id   = (int)($_POST['especie_id']   ?? 0);
+$exemplar_id  = (int)($_POST['exemplar_id']  ?? 0);
+$parte_planta = trim($_POST['parte_planta'] ?? '');
+$data_coleta  = trim($_POST['data_coleta']  ?? '');
+$observacoes  = trim($_POST['observacoes']  ?? '');
+$licenca      = trim($_POST['licenca']      ?? 'Privado');
 
-$redirect = "/penomato_mvp/src/Views/enviar_imagem.php?especie_id={$especie_id}";
+$redirect = "/penomato_mvp/src/Views/enviar_imagem.php?especie_id={$especie_id}&exemplar_id={$exemplar_id}";
 
 // ── Validações básicas ────────────────────────────────────────────────────────
 $partes_validas = ['folha', 'flor', 'fruto', 'caule', 'semente', 'habito'];
@@ -38,8 +38,8 @@ if (!in_array($parte_planta, $partes_validas)) {
     header("Location: {$redirect}&erro=" . urlencode('Parte da planta inválida.'));
     exit;
 }
-if (!$numero_etiqueta) {
-    header("Location: {$redirect}&erro=" . urlencode('Número da etiqueta é obrigatório.'));
+if (!$exemplar_id) {
+    header("Location: {$redirect}&erro=" . urlencode('Exemplar não informado.'));
     exit;
 }
 if (!$data_coleta) {
@@ -79,6 +79,20 @@ if (!$especie) {
     exit;
 }
 
+// ── Verificar exemplar aprovado ───────────────────────────────────────────────
+$stmt = $pdo->prepare("
+    SELECT id, codigo, numero_etiqueta
+    FROM exemplares
+    WHERE id = ? AND especie_id = ? AND status = 'aprovado'
+");
+$stmt->execute([$exemplar_id, $especie_id]);
+$exemplar = $stmt->fetch();
+
+if (!$exemplar) {
+    header("Location: {$redirect}&erro=" . urlencode('Exemplar não encontrado ou não aprovado.'));
+    exit;
+}
+
 // ── Salvar arquivo em disco ───────────────────────────────────────────────────
 $pasta = dirname(dirname(__DIR__)) . '/uploads/exsicatas/' . $especie_id . '/';
 if (!file_exists($pasta)) {
@@ -101,13 +115,13 @@ try {
 
     $stmt = $pdo->prepare("
         INSERT INTO especies_imagens (
-            especie_id, tipo_imagem, origem, parte_planta,
+            especie_id, exemplar_id, tipo_imagem, origem, parte_planta,
             caminho_imagem, nome_original, tamanho_bytes, mime_type,
             licenca, data_coleta, coletor_nome, coletor_id,
             id_usuario_identificador, numero_etiqueta,
             observacoes_internas, status_validacao, data_upload
         ) VALUES (
-            ?, 'provisoria', 'campo', ?,
+            ?, ?, 'provisoria', 'campo', ?,
             ?, ?, ?, ?,
             ?, ?, ?, ?,
             ?, ?,
@@ -116,10 +130,10 @@ try {
     ");
 
     $stmt->execute([
-        $especie_id, $parte_planta,
+        $especie_id, $exemplar_id, $parte_planta,
         $caminho_rel, $arquivo['name'], $arquivo['size'], $mime,
         $licenca, $data_coleta, $usuario_nome, $usuario_id,
-        $usuario_id, $numero_etiqueta,
+        $usuario_id, $exemplar['numero_etiqueta'],
         $observacoes ?: null
     ]);
 
@@ -137,9 +151,9 @@ try {
     $stmt_fotos = $pdo->prepare("
         SELECT DISTINCT parte_planta
         FROM especies_imagens
-        WHERE especie_id = ? AND origem = 'campo'
+        WHERE especie_id = ? AND exemplar_id = ? AND origem = 'campo'
     ");
-    $stmt_fotos->execute([$especie_id]);
+    $stmt_fotos->execute([$especie_id, $exemplar_id]);
     $fotografadas = $stmt_fotos->fetchAll(PDO::FETCH_COLUMN);
 
     $stmt_disp = $pdo->prepare("

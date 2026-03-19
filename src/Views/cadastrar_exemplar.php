@@ -1,0 +1,582 @@
+<?php
+// ============================================================
+// CADASTRAR EXEMPLAR
+// ============================================================
+session_start();
+require_once __DIR__ . '/../../config/banco_de_dados.php';
+
+if (!isset($_SESSION['usuario_id'])) {
+    header('Location: /penomato_mvp/src/Views/auth/login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+    exit;
+}
+
+$usuario_id   = (int)$_SESSION['usuario_id'];
+$usuario_nome = $_SESSION['usuario_nome'] ?? 'Usuário';
+
+// ── Espécies disponíveis ──────────────────────────────────────────────────────
+$especies = $pdo->query("
+    SELECT id, nome_cientifico
+    FROM especies_administrativo
+    WHERE status NOT IN ('publicado')
+    ORDER BY nome_cientifico
+")->fetchAll();
+
+// ── Especialistas disponíveis ─────────────────────────────────────────────────
+$especialistas = $pdo->query("
+    SELECT id, nome, categoria, instituicao
+    FROM usuarios
+    WHERE categoria IN ('revisor','gestor')
+      AND status_verificacao = 'verificado'
+      AND ativo = 1
+    ORDER BY nome
+")->fetchAll();
+
+// ── Espécie pré-selecionada via GET ───────────────────────────────────────────
+$especie_pre = isset($_GET['especie_id']) ? (int)$_GET['especie_id'] : 0;
+
+$mensagem_sucesso = isset($_GET['sucesso']) ? urldecode($_GET['sucesso']) : '';
+$mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Exemplar — Penomato</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --verde:        #0b5e42;
+            --verde-escuro: #0a4c35;
+            --verde-claro:  #e8f5e9;
+            --fundo:        #f5f2e9;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--fundo);
+            color: #2c3e50;
+            padding: 30px 20px;
+        }
+        .container { max-width: 860px; margin: 0 auto; }
+
+        /* Cabeçalho */
+        .cabecalho {
+            background: white;
+            padding: 26px 36px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 4px solid var(--verde);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .cabecalho h1 { color: var(--verde); font-size: 1.7rem; font-weight: 600; }
+        .cabecalho .sub { color: #666; font-style: italic; font-size: .88rem; margin-top: 3px; }
+        .user-pill {
+            background: #f8f9fa; padding: 7px 16px; border-radius: 40px;
+            display: flex; align-items: center; gap: 9px; font-size: .88rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,.07);
+        }
+        .user-pill i { color: var(--verde); }
+        .btn-sair { color: #dc3545; text-decoration: none; padding: 3px 8px; border-radius: 20px; transition: .2s; }
+        .btn-sair:hover { background: #dc3545; color: white; }
+
+        /* Card */
+        .card-form {
+            background: white;
+            padding: 36px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.05);
+        }
+
+        /* Seções */
+        .secao {
+            border: 2px solid #e8edf2;
+            border-radius: 10px;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+        .secao-titulo {
+            background: var(--verde);
+            color: white;
+            padding: 12px 20px;
+            font-weight: 700;
+            font-size: .95rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .secao-corpo { padding: 22px 24px; }
+
+        /* Campos */
+        .campo { margin-bottom: 18px; }
+        .campo:last-child { margin-bottom: 0; }
+        .campo label {
+            display: block; font-weight: 600; font-size: .875rem;
+            margin-bottom: 7px; color: #2d3748;
+        }
+        .campo label .req { color: #dc3545; }
+        .campo input, .campo select, .campo textarea {
+            width: 100%; padding: 10px 14px;
+            border: 2px solid #e2e8f0; border-radius: 8px; font-size: .95rem;
+            transition: border-color .2s;
+        }
+        .campo input:focus, .campo select:focus, .campo textarea:focus {
+            outline: none; border-color: var(--verde);
+        }
+        .campo textarea { resize: vertical; min-height: 75px; }
+        .campo .hint { font-size: .78rem; color: #888; margin-top: 5px; }
+
+        /* Grid 2 colunas */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        /* Mapa */
+        #mapa {
+            height: 340px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 14px;
+            z-index: 1;
+        }
+        .btn-gps {
+            background: var(--verde); color: white; border: none;
+            padding: 9px 20px; border-radius: 8px; font-weight: 600;
+            font-size: .875rem; cursor: pointer; display: inline-flex;
+            align-items: center; gap: 8px; margin-bottom: 16px; transition: .2s;
+        }
+        .btn-gps:hover { background: var(--verde-escuro); }
+        .btn-gps:disabled { opacity: .6; cursor: not-allowed; }
+        .coords-row { display: flex; gap: 12px; }
+        .coords-row .campo { flex: 1; }
+
+        /* Drop zone foto */
+        .drop-zone {
+            border: 2px dashed #c3d4e0; border-radius: 8px;
+            padding: 32px 20px; text-align: center; cursor: pointer;
+            transition: .2s; background: #fafcfe; position: relative;
+        }
+        .drop-zone:hover, .drop-zone.sobre { border-color: var(--verde); background: var(--verde-claro); }
+        .drop-zone i { font-size: 2.2rem; color: #b0c4d0; display: block; margin-bottom: 10px; }
+        .drop-zone p { font-size: .85rem; color: #666; margin: 0; }
+        .drop-zone .arquivo-info {
+            margin-top: 10px; font-size: .85rem;
+            color: var(--verde); font-weight: 600; display: none;
+        }
+        #input-foto { display: none; }
+        #preview-foto {
+            width: 100%; max-height: 220px; object-fit: cover;
+            border-radius: 6px; margin-top: 12px; display: none;
+        }
+
+        /* Especialista card */
+        .esp-card {
+            border: 2px solid #e2e8f0; border-radius: 8px;
+            padding: 14px 16px; cursor: pointer; transition: .2s;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .esp-card:hover { border-color: var(--verde); background: var(--verde-claro); }
+        .esp-card.selecionado { border-color: var(--verde); background: var(--verde-claro); }
+        .esp-avatar {
+            width: 42px; height: 42px; border-radius: 50%;
+            background: var(--verde); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: 700; flex-shrink: 0;
+        }
+        .esp-nome { font-weight: 700; font-size: .9rem; }
+        .esp-cat { font-size: .78rem; color: #888; }
+        .esp-radio { margin-left: auto; accent-color: var(--verde); width: 18px; height: 18px; }
+
+        /* Alertas */
+        .alerta {
+            padding: 13px 16px; border-radius: 8px; margin-bottom: 20px;
+            display: flex; align-items: flex-start; gap: 10px; font-size: .9rem;
+        }
+        .alerta-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .alerta-danger  { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .alerta-warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+
+        /* Botões rodapé */
+        .rodape { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 12px; }
+        .btn-salvar {
+            background: var(--verde); color: white; border: none;
+            padding: 13px 36px; border-radius: 40px; font-size: 1rem;
+            font-weight: 700; cursor: pointer; display: inline-flex;
+            align-items: center; gap: 10px; transition: .2s;
+        }
+        .btn-salvar:hover { background: var(--verde-escuro); }
+        .btn-salvar:disabled { opacity: .6; cursor: not-allowed; }
+        .btn-voltar {
+            background: #6c757d; color: white; text-decoration: none;
+            padding: 12px 26px; border-radius: 40px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px; transition: .2s;
+        }
+        .btn-voltar:hover { background: #5a6268; color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Cabeçalho -->
+    <div class="cabecalho">
+        <div>
+            <h1>🌿 Cadastrar Exemplar</h1>
+            <div class="sub">Registre um indivíduo de campo antes de enviar fotos das partes</div>
+        </div>
+        <div class="user-pill">
+            <i class="fas fa-user-circle"></i>
+            <span><?= htmlspecialchars($usuario_nome) ?></span>
+            <a href="/penomato_mvp/src/Controllers/auth/logout_controlador.php"
+               class="btn-sair" onclick="return confirm('Deseja sair?')">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="card-form">
+
+        <!-- Mensagens -->
+        <?php if ($mensagem_sucesso): ?>
+            <div class="alerta alerta-success">
+                <i class="fas fa-check-circle"></i>
+                <span><?= htmlspecialchars($mensagem_sucesso) ?></span>
+            </div>
+        <?php endif; ?>
+        <?php if ($mensagem_erro): ?>
+            <div class="alerta alerta-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span><?= htmlspecialchars($mensagem_erro) ?></span>
+            </div>
+        <?php endif; ?>
+
+        <form method="POST"
+              action="/penomato_mvp/src/Controllers/processar_cadastro_exemplar.php"
+              enctype="multipart/form-data"
+              id="form-exemplar">
+
+            <!-- ── SEÇÃO 1: Espécie ──────────────────────────────────── -->
+            <div class="secao">
+                <div class="secao-titulo">
+                    <i class="fas fa-leaf"></i> 1. Espécie
+                </div>
+                <div class="secao-corpo">
+                    <div class="campo">
+                        <label for="especie_id">
+                            Nome científico <span class="req">*</span>
+                        </label>
+                        <select name="especie_id" id="especie_id" required>
+                            <option value="">— selecione a espécie —</option>
+                            <?php foreach ($especies as $esp): ?>
+                                <option value="<?= $esp['id'] ?>"
+                                    <?= $especie_pre == $esp['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($esp['nome_cientifico']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="numero_etiqueta">
+                            Número da etiqueta física
+                        </label>
+                        <input type="text" name="numero_etiqueta" id="numero_etiqueta"
+                               placeholder="Ex: 47  —  número pregado na planta"
+                               maxlength="50">
+                        <div class="hint">Etiqueta de alumínio fixada no exemplar em campo.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SEÇÃO 2: Localização ─────────────────────────────── -->
+            <div class="secao">
+                <div class="secao-titulo">
+                    <i class="fas fa-map-marker-alt"></i> 2. Localização
+                </div>
+                <div class="secao-corpo">
+
+                    <button type="button" class="btn-gps" id="btn-gps" onclick="capturarGPS()">
+                        <i class="fas fa-crosshairs"></i> Usar minha localização atual
+                    </button>
+
+                    <!-- Mapa Leaflet -->
+                    <div id="mapa"></div>
+
+                    <!-- Coordenadas -->
+                    <div class="coords-row">
+                        <div class="campo">
+                            <label for="latitude">Latitude</label>
+                            <input type="number" name="latitude" id="latitude"
+                                   step="0.00000001" min="-90" max="90"
+                                   placeholder="-20.4697">
+                        </div>
+                        <div class="campo">
+                            <label for="longitude">Longitude</label>
+                            <input type="number" name="longitude" id="longitude"
+                                   step="0.00000001" min="-180" max="180"
+                                   placeholder="-54.6201">
+                        </div>
+                    </div>
+
+                    <!-- Cidade / Estado / Bioma -->
+                    <div class="grid-2">
+                        <div class="campo">
+                            <label for="cidade">Cidade <span class="req">*</span></label>
+                            <input type="text" name="cidade" id="cidade"
+                                   placeholder="Ex: Campo Grande" maxlength="150" required>
+                        </div>
+                        <div class="campo">
+                            <label for="estado">Estado <span class="req">*</span></label>
+                            <select name="estado" id="estado" required>
+                                <option value="">— UF —</option>
+                                <?php
+                                $ufs = ['AC','AL','AM','AP','BA','CE','DF','ES','GO','MA',
+                                        'MG','MS','MT','PA','PB','PE','PI','PR','RJ','RN',
+                                        'RO','RR','RS','SC','SE','SP','TO'];
+                                foreach ($ufs as $uf): ?>
+                                    <option value="<?= $uf ?>"><?= $uf ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="bioma">Bioma <span class="req">*</span></label>
+                        <select name="bioma" id="bioma" required>
+                            <option value="">— selecione —</option>
+                            <option>Cerrado</option>
+                            <option>Mata Atlântica</option>
+                            <option>Pantanal</option>
+                            <option>Caatinga</option>
+                            <option>Amazônia</option>
+                            <option>Pampa</option>
+                            <option>Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="descricao_local">Descrição do local</label>
+                        <textarea name="descricao_local" id="descricao_local"
+                                  placeholder="Ex: Margem da trilha principal, próximo ao córrego, sombra parcial..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── SEÇÃO 3: Foto de identificação ──────────────────── -->
+            <div class="secao">
+                <div class="secao-titulo">
+                    <i class="fas fa-camera"></i> 3. Foto de identificação
+                </div>
+                <div class="secao-corpo">
+                    <p style="font-size:.88rem;color:#555;margin-bottom:14px;">
+                        Foto geral do exemplar tirada no momento do cadastro em campo.
+                        Serve para o especialista confirmar que o espécime corresponde à espécie declarada.
+                        Diferente das fotos de partes — essa é a "foto de apresentação" do exemplar.
+                    </p>
+                    <div class="drop-zone" id="drop-zone"
+                         onclick="document.getElementById('input-foto').click()">
+                        <i class="fas fa-image"></i>
+                        <p>Clique ou arraste a foto aqui<br>
+                           <small style="color:#aaa">JPG ou PNG — máximo 15 MB</small></p>
+                        <div class="arquivo-info" id="arquivo-info"></div>
+                    </div>
+                    <input type="file" name="foto_identificacao" id="input-foto"
+                           accept="image/jpeg,image/jpg,image/png">
+                    <img id="preview-foto" src="" alt="Preview">
+                </div>
+            </div>
+
+            <!-- ── SEÇÃO 4: Especialista orientador ────────────────── -->
+            <div class="secao">
+                <div class="secao-titulo">
+                    <i class="fas fa-user-tie"></i> 4. Especialista orientador
+                </div>
+                <div class="secao-corpo">
+                    <p style="font-size:.88rem;color:#555;margin-bottom:16px;">
+                        O especialista selecionado será notificado para revisar este exemplar
+                        e, posteriormente, revisar o artigo gerado para esta espécie.
+                    </p>
+
+                    <?php if (empty($especialistas)): ?>
+                        <div class="alerta alerta-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Nenhum especialista cadastrado ainda. Peça ao gestor para cadastrar
+                            um usuário com categoria <strong>Revisor</strong> antes de continuar.</span>
+                        </div>
+                        <input type="hidden" name="especialista_id" value="">
+                    <?php else: ?>
+                        <input type="hidden" name="especialista_id" id="especialista_id" value="">
+                        <div style="display:flex;flex-direction:column;gap:10px;" id="lista-especialistas">
+                            <?php foreach ($especialistas as $esp): ?>
+                                <label class="esp-card" id="card-<?= $esp['id'] ?>"
+                                       onclick="selecionarEsp(<?= $esp['id'] ?>)">
+                                    <div class="esp-avatar">
+                                        <?= strtoupper(substr($esp['nome'], 0, 1)) ?>
+                                    </div>
+                                    <div>
+                                        <div class="esp-nome"><?= htmlspecialchars($esp['nome']) ?></div>
+                                        <div class="esp-cat">
+                                            <?= ucfirst($esp['categoria']) ?>
+                                            <?= $esp['instituicao'] ? ' · ' . htmlspecialchars($esp['instituicao']) : '' ?>
+                                        </div>
+                                    </div>
+                                    <input type="radio" name="_esp_radio"
+                                           value="<?= $esp['id'] ?>" class="esp-radio">
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Rodapé -->
+            <div class="rodape">
+                <a href="/penomato_mvp/src/Views/entrar_colaborador.php" class="btn-voltar">
+                    <i class="fas fa-arrow-left"></i> Voltar ao Painel
+                </a>
+                <button type="submit" class="btn-salvar" id="btn-salvar">
+                    <i class="fas fa-save"></i> Cadastrar Exemplar
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ── MAPA ───────────────────────────────────────────────────────────────────────
+const centro_brasil = [-15.7801, -47.9292]; // Brasília como ponto inicial
+const mapa = L.map('mapa').setView(centro_brasil, 4);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom: 19
+}).addTo(mapa);
+
+let marcador = null;
+
+function colocarMarcador(lat, lng) {
+    if (marcador) mapa.removeLayer(marcador);
+    marcador = L.marker([lat, lng], { draggable: true }).addTo(mapa);
+    marcador.on('dragend', () => {
+        const pos = marcador.getLatLng();
+        document.getElementById('latitude').value  = pos.lat.toFixed(8);
+        document.getElementById('longitude').value = pos.lng.toFixed(8);
+    });
+    document.getElementById('latitude').value  = lat.toFixed(8);
+    document.getElementById('longitude').value = lng.toFixed(8);
+}
+
+// Clique no mapa planta marcador
+mapa.on('click', e => {
+    colocarMarcador(e.latlng.lat, e.latlng.lng);
+});
+
+// Atualizar mapa ao digitar coordenadas manualmente
+['latitude','longitude'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        const lat = parseFloat(document.getElementById('latitude').value);
+        const lng = parseFloat(document.getElementById('longitude').value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            colocarMarcador(lat, lng);
+            mapa.setView([lat, lng], 15);
+        }
+    });
+});
+
+// ── GPS ────────────────────────────────────────────────────────────────────────
+function capturarGPS() {
+    const btn = document.getElementById('btn-gps');
+    if (!navigator.geolocation) {
+        alert('Geolocalização não suportada neste navegador.');
+        return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obtendo localização...';
+
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            colocarMarcador(lat, lng);
+            mapa.setView([lat, lng], 17);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check"></i> Localização obtida';
+        },
+        err => {
+            alert('Não foi possível obter a localização: ' + err.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-crosshairs"></i> Usar minha localização atual';
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+    );
+}
+
+// ── FOTO DE IDENTIFICAÇÃO ──────────────────────────────────────────────────────
+const dropZone   = document.getElementById('drop-zone');
+const inputFoto  = document.getElementById('input-foto');
+const arqInfo    = document.getElementById('arquivo-info');
+const previewImg = document.getElementById('preview-foto');
+
+inputFoto.addEventListener('change', () => mostrarFoto(inputFoto.files[0]));
+
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('sobre'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('sobre'));
+dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('sobre');
+    if (e.dataTransfer.files[0]) {
+        inputFoto.files = e.dataTransfer.files;
+        mostrarFoto(e.dataTransfer.files[0]);
+    }
+});
+
+function mostrarFoto(file) {
+    if (!file) return;
+    arqInfo.textContent = '✅ ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
+    arqInfo.style.display = 'block';
+    const reader = new FileReader();
+    reader.onload = e => {
+        previewImg.src = e.target.result;
+        previewImg.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+}
+
+// ── ESPECIALISTA ───────────────────────────────────────────────────────────────
+function selecionarEsp(id) {
+    document.getElementById('especialista_id').value = id;
+    document.querySelectorAll('.esp-card').forEach(c => c.classList.remove('selecionado'));
+    const card = document.getElementById('card-' + id);
+    if (card) {
+        card.classList.add('selecionado');
+        card.querySelector('input[type=radio]').checked = true;
+    }
+}
+
+// ── VALIDAÇÃO ANTES DE ENVIAR ──────────────────────────────────────────────────
+document.getElementById('form-exemplar').addEventListener('submit', function(e) {
+    const espId  = document.getElementById('especie_id').value;
+    const espHid = document.getElementById('especialista_id');
+
+    if (!espId) {
+        e.preventDefault();
+        alert('Selecione a espécie.');
+        return;
+    }
+    if (espHid && !espHid.value) {
+        e.preventDefault();
+        alert('Selecione um especialista orientador.');
+        return;
+    }
+
+    const btn = document.getElementById('btn-salvar');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+});
+</script>
+</body>
+</html>
