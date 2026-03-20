@@ -546,7 +546,82 @@ try {
     }
 
     // ================================================
-    // 5. LIMPAR PASTA TEMPORÁRIA
+    // 5. NOTIFICAR ORIENTADOR(ES) POR E-MAIL
+    // ================================================
+    error_log("--- Enviando notificações ---");
+    try {
+        require_once __DIR__ . '/../../config/email.php';
+
+        $orientador_id = (int)($dados_temporarios['orientador_id'] ?? 0);
+
+        // Buscar nome da espécie
+        $stmt_nome = $conexao->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ? LIMIT 1");
+        $stmt_nome->bind_param("i", $especie_id);
+        $stmt_nome->execute();
+        $nome_especie = $stmt_nome->get_result()->fetch_row()[0] ?? "ID $especie_id";
+        $stmt_nome->close();
+
+        $link = APP_URL . '/src/Controllers/gerar_artigo.php?especie_id=' . $especie_id;
+
+        $conteudo_email = "
+            <p>Olá,</p>
+            <p>Um novo conjunto de dados e imagens foi importado para a espécie:</p>
+            <p style='font-style:italic; font-size:17px; color:#0b5e42; font-weight:bold;'>{$nome_especie}</p>
+            <p>O artigo foi gerado automaticamente como rascunho e aguarda sua revisão.</p>
+            <p style='text-align:center; margin:24px 0;'>
+                <a href='{$link}'
+                   style='background:#0b5e42;color:#fff;padding:12px 28px;border-radius:8px;
+                          text-decoration:none;font-weight:bold;display:inline-block;'>
+                    Ver e revisar artigo
+                </a>
+            </p>
+            <p style='font-size:13px; color:#888;'>Importado por: <strong>" . htmlspecialchars($nome_usuario) . "</strong></p>
+        ";
+
+        if ($orientador_id > 0) {
+            // Notificar orientador específico
+            $stmt_or = $conexao->prepare("SELECT nome, email FROM usuarios WHERE id = ? AND ativo = 1 LIMIT 1");
+            $stmt_or->bind_param("i", $orientador_id);
+            $stmt_or->execute();
+            $or = $stmt_or->get_result()->fetch_assoc();
+            $stmt_or->close();
+
+            if ($or) {
+                $corpo = templateEmail("Nova espécie aguarda revisão", "
+                    <p>Olá, <strong>" . htmlspecialchars($or['nome']) . "</strong>!</p>
+                    <p>Você foi indicado como <strong>orientador</strong> desta espécie.</p>
+                    {$conteudo_email}
+                ");
+                enviarEmail($or['email'], "Penomato — {$nome_especie} aguarda sua revisão", $corpo);
+                error_log("E-mail enviado para orientador: " . $or['email']);
+            }
+        } else {
+            // Sem orientação: notificar todos os especialistas
+            $res_todos = $conexao->query(
+                "SELECT nome, email FROM usuarios
+                 WHERE categoria IN ('revisor','validador') AND ativo = 1
+                   AND status_verificacao = 'verificado'"
+            );
+            $enviados = 0;
+            while ($esp = $res_todos->fetch_assoc()) {
+                $corpo = templateEmail("Nova espécie disponível para orientação", "
+                    <p>Olá, <strong>" . htmlspecialchars($esp['nome']) . "</strong>!</p>
+                    <p>Uma nova espécie foi importada <strong>sem orientador definido</strong>.
+                       Qualquer especialista pode assumir a revisão.</p>
+                    {$conteudo_email}
+                ");
+                enviarEmail($esp['email'], "Penomato — {$nome_especie} sem orientador (disponível)", $corpo);
+                $enviados++;
+            }
+            error_log("E-mails enviados para {$enviados} especialistas (sem orientação)");
+        }
+    } catch (Exception $e) {
+        error_log("Aviso: Falha ao enviar notificações: " . $e->getMessage());
+        // Não crítico — dados já salvos
+    }
+
+    // ================================================
+    // 7. LIMPAR PASTA TEMPORÁRIA
     // ================================================
     // ================================================
     if (file_exists($pasta_temp)) {
@@ -564,7 +639,7 @@ try {
     }
     
     // ================================================
-    // 6. LIMPAR SESSÃO TEMPORÁRIA
+    // 8. LIMPAR SESSÃO TEMPORÁRIA
     // ================================================
     unset($_SESSION['importacao_temporaria']);
     error_log("Sessão temporária limpa");

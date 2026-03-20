@@ -42,17 +42,27 @@ $email = strtolower(trim($_POST['email'] ?? ''));
 $confirmar_email = strtolower(trim($_POST['confirmar_email'] ?? ''));
 $senha = $_POST['senha'] ?? '';
 $confirmar_senha = $_POST['confirmar_senha'] ?? '';
-$categoria   = $_POST['tipo']        ?? '';
-$subtipo     = $_POST['subtipo']     ?? null;
+$tipo_form   = $_POST['tipo']        ?? '';
 $instituicao = trim($_POST['instituicao'] ?? '');
+
+// Mapear tipo do formulário → categoria do banco + subtipo
+$mapa_perfis = [
+    'identificador' => ['categoria' => 'colaborador', 'subtipo' => 'identificador'],
+    'especialista'  => ['categoria' => 'revisor',     'subtipo' => 'especialista'],
+    'gestor'        => ['categoria' => 'gestor',       'subtipo' => 'gestor'],
+    'dev'           => ['categoria' => 'colaborador',  'subtipo' => 'dev'],
+];
+$perfil   = $mapa_perfis[$tipo_form] ?? null;
+$categoria = $perfil['categoria'] ?? '';
+$subtipo   = $perfil['subtipo']   ?? null;
 
 // Guardar dados na sessão para repopular o formulário
 $_SESSION['dados_cadastro'] = [
-    'nome' => $nome,
-    'email' => $email,
-    'confirmar_email' => $confirmar_email,
-    'tipo' => $categoria,
-    'subtipo' => $subtipo
+    'nome'           => $nome,
+    'email'          => $email,
+    'confirmar_email'=> $confirmar_email,
+    'tipo'           => $tipo_form,
+    'instituicao'    => $instituicao,
 ];
 
 // ============================================================
@@ -70,15 +80,14 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $erros[] = "E-mails não conferem.";
 }
 
-if (empty($senha) || strlen($senha) < 8) {
-    $erros[] = "Senha é obrigatória (mínimo 8 caracteres).";
+if (empty($senha)) {
+    $erros[] = "Senha é obrigatória.";
 } elseif ($senha !== $confirmar_senha) {
     $erros[] = "Senhas não conferem.";
 }
 
-$categorias_permitidas = ['gestor', 'colaborador', 'revisor', 'validador', 'visitante'];
-if (empty($categoria) || !in_array($categoria, $categorias_permitidas)) {
-    $erros[] = "Categoria de perfil é obrigatória.";
+if (!$perfil) {
+    $erros[] = "Perfil de atuação é obrigatório.";
 }
 
 // ============================================================

@@ -105,16 +105,26 @@ unset($_SESSION['dados_cadastro']);
                     
                     <!-- Perfil -->
                     <h4 class="mb-3 mt-4 text-success">👤 Perfil de Atuação</h4>
+                    <?php
+                    // Verificar se já existe um gestor cadastrado
+                    $mysqli_check = new mysqli('127.0.0.1', 'root', '', 'penomato');
+                    $mysqli_check->set_charset('utf8mb4');
+                    $res_g = $mysqli_check->query("SELECT id FROM usuarios WHERE categoria = 'gestor' LIMIT 1");
+                    $gestor_existe = ($res_g && $res_g->num_rows > 0);
+                    $mysqli_check->close();
+                    $tipo_salvo = $dados_tentativa['tipo'] ?? '';
+                    ?>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label class="form-label">Tipo de Perfil *</label>
+                            <label class="form-label">Tipo de Colaborador *</label>
                             <select name="tipo" class="form-control" required>
                                 <option value="">Selecione...</option>
-                                <option value="gestor">Gestor</option>
-                                <option value="colaborador">Colaborador</option>
-                                <option value="revisor">Revisor</option>
-                                <option value="validador">Validador</option>
-                                <option value="visitante">Visitante</option>
+                                <option value="identificador" <?php echo $tipo_salvo === 'identificador' ? 'selected' : ''; ?>>Colaborador Identificador</option>
+                                <option value="especialista"  <?php echo $tipo_salvo === 'especialista'  ? 'selected' : ''; ?>>Colaborador Especialista</option>
+                                <?php if (!$gestor_existe): ?>
+                                <option value="gestor" <?php echo $tipo_salvo === 'gestor' ? 'selected' : ''; ?>>Colaborador Gestor</option>
+                                <?php endif; ?>
+                                <option value="dev" <?php echo $tipo_salvo === 'dev' ? 'selected' : ''; ?>>Colaborador Dev</option>
                             </select>
                         </div>
                         <div class="col-md-6">

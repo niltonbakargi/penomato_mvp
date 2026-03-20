@@ -40,11 +40,25 @@ if ($conexao->connect_error) {
 $conexao->set_charset("utf8mb4");
 
 // ================================================
-// CORREÇÃO: Removida a coluna 'familia' que não existe
-// Buscar apenas id e nome_cientifico
+// BUSCAR ESPECIALISTAS (revisores e validadores ativos)
 // ================================================
-$sql = "SELECT id, nome_cientifico 
-        FROM especies_administrativo 
+$sql_esp = "SELECT id, nome, subtipo_colaborador
+            FROM usuarios
+            WHERE categoria IN ('revisor','validador')
+              AND ativo = 1
+              AND status_verificacao = 'verificado'
+            ORDER BY nome";
+$res_esp = $conexao->query($sql_esp);
+$especialistas = [];
+if ($res_esp) {
+    while ($e = $res_esp->fetch_assoc()) $especialistas[] = $e;
+}
+
+// ================================================
+// BUSCAR ESPÉCIES COM STATUS 'sem_dados'
+// ================================================
+$sql = "SELECT id, nome_cientifico
+        FROM especies_administrativo
         WHERE status = 'sem_dados'
         ORDER BY nome_cientifico";
 
@@ -68,43 +82,54 @@ $conexao->close();
 // PROCESSAR SELEÇÃO DA ESPÉCIE
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
-    
-    $especie_id = (int)$_POST['especie_id'];
-    
+
+    $especie_id   = (int)$_POST['especie_id'];
+    $orientador_id = (int)($_POST['orientador_id'] ?? 0); // 0 = sem orientação
+
     // Validar se a espécie realmente existe e tem status 'sem_dados'
-    $conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
-    $sql_check = "SELECT id, nome_cientifico, status FROM especies_administrativo WHERE id = ? AND status = 'sem_dados'";
-    $stmt = $conexao->prepare($sql_check);
+    $conexao2 = new mysqli($servidor, $usuario_db, $senha_db, $banco);
+    $conexao2->set_charset("utf8mb4");
+    $stmt = $conexao2->prepare("SELECT id, nome_cientifico FROM especies_administrativo WHERE id = ? AND status = 'sem_dados'");
     $stmt->bind_param("i", $especie_id);
     $stmt->execute();
     $resultado = $stmt->get_result();
-    
+
     if ($resultado->num_rows > 0) {
         $especie = $resultado->fetch_assoc();
-        
+        $stmt->close();
+
+        // Registrar orientador em atribuido_a (NULL se sem orientação)
+        $attr_val = $orientador_id > 0 ? $orientador_id : null;
+        $stmt2 = $conexao2->prepare("UPDATE especies_administrativo SET atribuido_a = ? WHERE id = ?");
+        $stmt2->bind_param("ii", $attr_val, $especie_id);
+        $stmt2->execute();
+        $stmt2->close();
+        $conexao2->close();
+
         // Gerar ID único para a sessão temporária
         $temp_id = uniqid('temp_', true);
-        
+
         // Armazenar na sessão
         $_SESSION['importacao_temporaria'] = [
-            'temp_id' => $temp_id,
-            'especie_id' => $especie_id,
-            'usuario_id' => $id_usuario,
-            'status_inicial' => 'sem_dados',
-            'imagens' => [],
-            'dados' => [],
-            'data_criacao' => time()
+            'temp_id'       => $temp_id,
+            'especie_id'    => $especie_id,
+            'usuario_id'    => $id_usuario,
+            'orientador_id' => $orientador_id,
+            'status_inicial'=> 'sem_dados',
+            'imagens'       => [],
+            'dados'         => [],
+            'data_criacao'  => time()
         ];
-        
+
         // Redirecionar para upload de imagens
         header("Location: upload_imagens_internet.php?temp_id=" . urlencode($temp_id));
         exit;
-        
+
     } else {
+        $stmt->close();
+        $conexao2->close();
         $erro = "Espécie inválida ou não está disponível para importação.";
     }
-    
-    $conexao->close();
 }
 ?>
 <!DOCTYPE html>
@@ -178,6 +203,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
             .especie-card { flex-direction: column; align-items: flex-start; gap: var(--esp-4); }
             .btn-select { width: 100%; justify-content: center; }
         }
+
+        /* ── Modal orientador ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.aberto { display: flex; }
+        .modal {
+            background: var(--branco); border-radius: var(--raio-lg);
+            box-shadow: var(--sombra-lg); width: 100%; max-width: 520px;
+            max-height: 90vh; overflow-y: auto; padding: var(--esp-8);
+        }
+        .modal h2 {
+            color: var(--cor-primaria); font-size: var(--texto-xl);
+            margin-bottom: var(--esp-2);
+        }
+        .modal .especie-alvo {
+            font-style: italic; color: var(--cinza-600);
+            font-size: var(--texto-sm); margin-bottom: var(--esp-6);
+            padding-bottom: var(--esp-4); border-bottom: 1px solid var(--cinza-200);
+        }
+        .orientador-opcao {
+            display: flex; align-items: center; gap: var(--esp-4);
+            padding: var(--esp-4) var(--esp-5); border-radius: var(--raio-md);
+            border: 2px solid var(--cinza-200); margin-bottom: var(--esp-3);
+            cursor: pointer; transition: var(--transicao);
+        }
+        .orientador-opcao:hover { border-color: var(--cor-primaria); background: var(--verde-50); }
+        .orientador-opcao input[type="radio"] { accent-color: var(--cor-primaria); width: 18px; height: 18px; flex-shrink: 0; }
+        .orientador-opcao .opt-nome { font-weight: var(--peso-semi); color: var(--cinza-800); }
+        .orientador-opcao .opt-sub  { font-size: var(--texto-xs); color: var(--cinza-500); }
+        .orientador-opcao.sem-orientacao { border-style: dashed; }
+        .modal-acoes {
+            display: flex; gap: var(--esp-4); justify-content: flex-end;
+            margin-top: var(--esp-6); padding-top: var(--esp-5);
+            border-top: 1px solid var(--cinza-200);
+        }
+        .btn-cancelar {
+            background: var(--cinza-200); color: var(--cinza-700);
+            border: none; padding: var(--esp-3) var(--esp-8);
+            border-radius: var(--raio-full); font-weight: var(--peso-semi);
+            cursor: pointer; transition: var(--transicao);
+        }
+        .btn-cancelar:hover { background: var(--cinza-300); }
+        .btn-confirmar {
+            background: var(--cor-primaria); color: var(--branco);
+            border: none; padding: var(--esp-3) var(--esp-8);
+            border-radius: var(--raio-full); font-weight: var(--peso-semi);
+            cursor: pointer; transition: var(--transicao);
+        }
+        .btn-confirmar:hover { background: var(--cor-primaria-hover); }
     </style>
 </head>
 <body>
@@ -234,13 +311,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
                                 </p>
                             </div>
                             
-                            <form method="POST" action="" style="margin: 0;">
-                                <input type="hidden" name="especie_id" value="<?php echo $especie['id']; ?>">
-                                <button type="submit" class="btn-select">
-                                    <i class="fas fa-arrow-right"></i>
-                                    SELECIONAR
-                                </button>
-                            </form>
+                            <button type="button" class="btn-select"
+                                onclick="abrirModal(<?php echo $especie['id']; ?>, '<?php echo addslashes(htmlspecialchars($especie['nome_cientifico'])); ?>')">
+                                <i class="fas fa-arrow-right"></i>
+                                SELECIONAR
+                            </button>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -256,6 +331,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
                 </div>
             <?php endif; ?>
             
+        </div>
+
+        <!-- ── MODAL: escolha do orientador ── -->
+        <div class="modal-overlay" id="modalOrientador">
+            <div class="modal">
+                <h2><i class="fas fa-user-tie"></i> Escolha um orientador</h2>
+                <div class="especie-alvo" id="modalEspecieNome"></div>
+
+                <form method="POST" action="" id="formOrientador">
+                    <input type="hidden" name="especie_id" id="modalEspecieId">
+                    <input type="hidden" name="orientador_id" id="inputOrientadorId" value="0">
+
+                    <!-- Opção: sem orientação -->
+                    <label class="orientador-opcao sem-orientacao">
+                        <input type="radio" name="orientador_radio" value="0" checked
+                               onchange="document.getElementById('inputOrientadorId').value=0">
+                        <div>
+                            <div class="opt-nome">🌐 Sem orientação</div>
+                            <div class="opt-sub">Qualquer especialista poderá assumir esta espécie</div>
+                        </div>
+                    </label>
+
+                    <?php foreach ($especialistas as $esp): ?>
+                    <label class="orientador-opcao">
+                        <input type="radio" name="orientador_radio" value="<?php echo $esp['id']; ?>"
+                               onchange="document.getElementById('inputOrientadorId').value=<?php echo $esp['id']; ?>">
+                        <div>
+                            <div class="opt-nome"><?php echo htmlspecialchars($esp['nome']); ?></div>
+                            <?php if (!empty($esp['subtipo_colaborador'])): ?>
+                            <div class="opt-sub"><?php echo htmlspecialchars($esp['subtipo_colaborador']); ?></div>
+                            <?php endif; ?>
+                        </div>
+                    </label>
+                    <?php endforeach; ?>
+
+                    <?php if (empty($especialistas)): ?>
+                    <p style="color:var(--cinza-500); font-size:var(--texto-sm); padding:var(--esp-4);">
+                        Nenhum especialista cadastrado ainda. A espécie ficará sem orientação.
+                    </p>
+                    <?php endif; ?>
+
+                    <div class="modal-acoes">
+                        <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+                        <button type="submit" class="btn-confirmar">
+                            <i class="fas fa-check"></i> Confirmar e continuar
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <!-- Rodapé com instruções -->
@@ -330,6 +454,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
     if (searchInput.value.length > 0) {
         clearBtn.style.display = 'inline-block';
     }
+
+    // ── Modal orientador ──────────────────────────────
+    function abrirModal(especieId, especieNome) {
+        document.getElementById('modalEspecieId').value   = especieId;
+        document.getElementById('inputOrientadorId').value = 0;
+        document.getElementById('modalEspecieNome').textContent = especieNome;
+
+        // Reset radio para "sem orientação"
+        document.querySelectorAll('input[name="orientador_radio"]').forEach(r => {
+            r.checked = (r.value === '0');
+        });
+
+        document.getElementById('modalOrientador').classList.add('aberto');
+    }
+
+    function fecharModal() {
+        document.getElementById('modalOrientador').classList.remove('aberto');
+    }
+
+    // Fechar clicando fora do modal
+    document.getElementById('modalOrientador').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal();
+    });
     </script>
 </body>
 </html>

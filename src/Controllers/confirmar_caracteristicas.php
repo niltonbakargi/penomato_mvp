@@ -168,6 +168,7 @@ ob_end_clean();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Confirmar Identificação - Penomato</title>
+  <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
