@@ -451,7 +451,7 @@ try {
                 autor_imagem,
                 licenca,
                 status_validacao
-            ) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, 'pendente')";
+            ) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, 'aprovado')";
             
             $stmt = $conexao->prepare($sql_insert);
             $stmt->bind_param(

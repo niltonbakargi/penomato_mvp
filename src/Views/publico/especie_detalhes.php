@@ -162,7 +162,6 @@ if (!empty($ids)) {
             fonte_nome, fonte_url, autor_imagem, licenca
         FROM especies_imagens
         WHERE especie_id IN ($placeholders)
-          AND status_validacao = 'aprovado'
         ORDER BY especie_id, data_upload DESC");
     $stmt_img->execute($ids);
     foreach ($stmt_img->fetchAll(PDO::FETCH_ASSOC) as $img) {
@@ -446,27 +445,27 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             border: none;
-            background: rgba(0,0,0,.5);
+            background: rgba(0,0,0,.6);
             color: white;
             font-size: 1rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 2;
+            z-index: 10;
             transition: background .2s;
         }
 
         .nav-btn:hover {
-            background: rgba(0,0,0,.75);
+            background: rgba(0,0,0,.85);
         }
 
-        .nav-prev { left: 10px; }
-        .nav-next { right: 10px; }
+        .nav-prev { left: 8px; }
+        .nav-next { right: 8px; }
 
         .carrossel-footer {
             display: flex;
@@ -530,6 +529,40 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
 
         .btn-mapa:hover {
             background: #1d4ed8;
+        }
+
+        /* ── PRANCHA FOTOGRÁFICA (override do HTML salvo no banco) ── */
+        .art-galeria {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 20px !important;
+            flex-wrap: unset !important;
+            margin: 16px 0 !important;
+        }
+        .art-figura {
+            border: 1px solid #ddd !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
+            background: #fafafa !important;
+            text-align: left !important;
+            flex: unset !important;
+        }
+        .art-figura img {
+            width: 100% !important;
+            height: auto !important;
+            object-fit: contain !important;
+            border-radius: 0 !important;
+            display: block !important;
+        }
+        .art-figura figcaption {
+            padding: 6px 10px 8px !important;
+            font-size: 0.78em !important;
+            color: #555 !important;
+            line-height: 1.5 !important;
+            max-width: unset !important;
+        }
+        @media (max-width: 600px) {
+            .art-galeria { grid-template-columns: 1fr !important; }
         }
 
         /* ── CARACTERÍSTICAS ── */
@@ -866,7 +899,8 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         }
 
         /* ── CRÉDITO DE IMAGEM ── */
-        .img-credito-wrapper { position: relative; }
+        .img-credito-wrapper { position: relative; pointer-events: none; }
+        .img-credito-wrapper img, .img-credito { pointer-events: auto; }
         .img-credito {
             background: rgba(0,0,0,.65);
             color: #e2e8f0;
@@ -967,11 +1001,11 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
 
         <!-- CARROSSEL -->
         <div class="carrossel-wrapper">
+            <button class="nav-btn nav-prev" onclick="navCarrossel(-1)"><i class="fas fa-chevron-left"></i></button>
             <div class="carrossel-tela" id="carrossel-tela">
-                <button class="nav-btn nav-prev" onclick="navCarrossel(-1)"><i class="fas fa-chevron-left"></i></button>
                 <div id="carrossel-conteudo" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
-                <button class="nav-btn nav-next" onclick="navCarrossel(1)"><i class="fas fa-chevron-right"></i></button>
             </div>
+            <button class="nav-btn nav-next" onclick="navCarrossel(1)"><i class="fas fa-chevron-right"></i></button>
             <div class="carrossel-footer">
                 <div class="partes-btns" id="partes-btns">
                     <button class="parte-btn" onclick="trocarParte('folha')">🍃 Folha</button>
@@ -1005,19 +1039,6 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
     <div id="mapa-leaflet"></div>
 </div>
 
-<!-- BROWSE POR PARTE -->
-<div class="browse-secao">
-    <div class="browse-titulo"><i class="fas fa-th-large"></i> Visualizar por parte botânica</div>
-    <div class="browse-partes">
-        <button class="browse-parte-btn ativo" onclick="selecionarBrowse('folha')">🍃 Folha</button>
-        <button class="browse-parte-btn" onclick="selecionarBrowse('flor')">🌸 Flor</button>
-        <button class="browse-parte-btn" onclick="selecionarBrowse('fruto')">🍎 Fruto</button>
-        <button class="browse-parte-btn" onclick="selecionarBrowse('caule')">🌿 Caule</button>
-        <button class="browse-parte-btn" onclick="selecionarBrowse('semente')">🌱 Semente</button>
-        <button class="browse-parte-btn" onclick="selecionarBrowse('habito')">🌳 Hábito</button>
-    </div>
-    <div class="browse-trilha" id="browse-trilha"></div>
-</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -1186,11 +1207,30 @@ function renderCarrossel() {
 }
 
 function navCarrossel(dir) {
-    var esp   = ESPECIES[especieAtual];
-    var espId = esp.id;
+    var espId = ESPECIES[especieAtual].id;
     var imgs  = (IMAGENS[espId] && IMAGENS[espId][parteCarrossel]) ? IMAGENS[espId][parteCarrossel] : [];
-    if (imgs.length === 0) return;
-    idxCarrossel = ((idxCarrossel + dir) % imgs.length + imgs.length) % imgs.length;
+
+    var novoIdx = idxCarrossel + dir;
+
+    // Ainda dentro da mesma parte
+    if (novoIdx >= 0 && novoIdx < imgs.length) {
+        idxCarrossel = novoIdx;
+        renderCarrossel();
+        return;
+    }
+
+    // Passou do limite — vai para a parte anterior/próxima com imagens
+    var partesComImagem = PARTES.filter(function(p) {
+        return IMAGENS[espId] && IMAGENS[espId][p] && IMAGENS[espId][p].length > 0;
+    });
+    if (partesComImagem.length === 0) return;
+
+    var idxParte = partesComImagem.indexOf(parteCarrossel);
+    var novaParte = partesComImagem[(idxParte + dir + partesComImagem.length) % partesComImagem.length];
+
+    parteCarrossel = novaParte;
+    var novasImgs  = IMAGENS[espId][novaParte];
+    idxCarrossel   = dir > 0 ? 0 : novasImgs.length - 1;
     renderCarrossel();
 }
 

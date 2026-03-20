@@ -288,7 +288,7 @@ for ($i = 0; $i < $total_arquivos; $i++) {
             tamanho_bytes, mime_type, fonte_nome, fonte_url,
             autor_imagem, licenca, descricao, id_usuario_identificador,
             status_validacao, data_upload
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendente', NOW())";
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprovado', NOW())";
         
         $stmt = $conexao->prepare($sql_insert);
         $stmt->bind_param(

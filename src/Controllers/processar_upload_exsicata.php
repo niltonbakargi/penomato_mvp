@@ -125,7 +125,7 @@ try {
             ?, ?, ?, ?,
             ?, ?, ?, ?,
             ?, ?,
-            ?, 'pendente', NOW()
+            ?, 'aprovado', NOW()
         )
     ");
 

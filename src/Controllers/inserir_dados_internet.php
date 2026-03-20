@@ -1845,6 +1845,15 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
                     <button type="button" class="btn btn-secondary" id="btn_limpar">🗑️ LIMPAR</button>
                 </div>
                 <div id="mensagem_json" style="display:none;" class="alert"></div>
+
+                <div id="btn_finalizar_wrapper" style="display:none; margin-top:1.5rem; text-align:center;">
+                    <button type="button" class="btn-save" onclick="document.getElementById('btn_finalizar').click()">
+                        ✅ FINALIZAR IMPORTAÇÃO
+                    </button>
+                    <p style="margin-top:8px; color:#666; font-size:0.85rem;">
+                        ⚠️ Após finalizar, todas as imagens e dados serão salvos permanentemente.
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -1960,6 +1969,7 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
             mensagemDiv.style.display = 'block';
             mensagemDiv.className = 'alert alert-success';
             mensagemDiv.innerHTML = '✅ ' + preenchidos + ' campos preenchidos! Revise a planilha acima e clique em Finalizar Importação.';
+            document.getElementById('btn_finalizar_wrapper').style.display = 'block';
 
         } catch (erro) {
             mensagemDiv.style.display = 'block';
@@ -1972,6 +1982,7 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
         if (confirm('Limpar o JSON e todos os campos da planilha?')) {
             document.getElementById('json_input').value = '';
             document.getElementById('mensagem_json').style.display = 'none';
+            document.getElementById('btn_finalizar_wrapper').style.display = 'none';
             limparPlanilha();
         }
     });

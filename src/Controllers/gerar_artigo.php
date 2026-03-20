@@ -180,113 +180,39 @@ if ($especie_id) {
 <h3 class="art-secao">Descrição</h3>
 
 <?php
-// ── CAULE ──
-$caule_partes = listar([
-    ['texto' => val($c['tipo_caule']),       'ref' => $c['tipo_caule_ref'] ?? ''],
-    ['texto' => val($c['estrutura_caule']),  'ref' => $c['estrutura_caule_ref'] ?? ''],
-    ['texto' => val($c['forma_caule']),      'ref' => $c['forma_caule_ref'] ?? ''],
-    ['texto' => val($c['diametro_caule']) ? 'diâmetro ' . strtolower($c['diametro_caule']) : '', 'ref' => $c['diametro_caule_ref'] ?? ''],
-]);
-$cor_caule   = val($c['cor_caule'])   ? 'coloração ' . strtolower($c['cor_caule'])   . ref($c['cor_caule_ref'] ?? '')   : '';
-$tex_caule   = val($c['textura_caule']) ? 'textura ' . strtolower($c['textura_caule']) . ref($c['textura_caule_ref'] ?? '') : '';
-$ram_caule   = val($c['ramificacao_caule']) ? 'ramificação ' . strtolower($c['ramificacao_caule']) . ref($c['ramificacao_caule_ref'] ?? '') : '';
-$mod_caule   = val($c['modificacao_caule']) ? strtolower($c['modificacao_caule']) . ref($c['modificacao_caule_ref'] ?? '') : '';
+require_once __DIR__ . '/../Config/gerador_texto_botanico.php';
+$paragrafos = gerar_paragrafos($c);
 
-$extras_caule = array_filter([$cor_caule, $tex_caule, $ram_caule, $mod_caule]);
+// Mapeia qual parte usa quais campos de referência
+$refs_por_parte = [
+    'caule'   => ['tipo_caule','estrutura_caule','forma_caule','textura_caule','cor_caule','diametro_caule','ramificacao_caule','modificacao_caule','possui_espinhos','possui_latex','possui_seiva','possui_resina'],
+    'folha'   => ['tipo_folha','filotaxia_folha','forma_folha','textura_folha','margem_folha','venacao_folha','tamanho_folha'],
+    'flor'    => ['cor_flores','simetria_floral','numero_petalas','disposicao_flores','tamanho_flor','aroma'],
+    'fruto'   => ['tipo_fruto','tamanho_fruto','cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto'],
+    'semente' => ['tipo_semente','tamanho_semente','cor_semente','textura_semente','quantidade_sementes'],
+    'outros'  => [],
+];
 
-$espinhos = (strtolower(val($c['possui_espinhos'], 'Não')) === 'não')
-    ? 'desprovido de espinhos' . ref($c['possui_espinhos_ref'] ?? '')
-    : 'com espinhos' . ref($c['possui_espinhos_ref'] ?? '');
-$latex = (strtolower(val($c['possui_latex'], 'Não')) === 'não')
-    ? 'látex ausente' . ref($c['possui_latex_ref'] ?? '')
-    : 'com látex' . ref($c['possui_latex_ref'] ?? '');
-$resina = (strtolower(val($c['possui_resina'], 'Não')) === 'não')
-    ? 'resina ausente' . ref($c['possui_resina_ref'] ?? '')
-    : 'com resina' . ref($c['possui_resina_ref'] ?? '');
-
-$frase_caule = 'Caule ' . $caule_partes;
-if ($extras_caule) $frase_caule .= ', com ' . implode(', ', $extras_caule);
-$frase_caule .= ', ' . implode(', ', array_filter([$espinhos, $latex, $resina])) . '.';
+foreach ($paragrafos as $parte => $texto):
+    // Coletar refs de todos os atributos desta parte
+    $nums_ref = [];
+    foreach (($refs_por_parte[$parte] ?? []) as $campo) {
+        $r = trim($c[$campo . '_ref'] ?? '');
+        if ($r !== '') {
+            foreach (explode(',', $r) as $n) {
+                $n = (int)trim($n);
+                if ($n > 0) $nums_ref[$n] = true;
+            }
+        }
+    }
+    ksort($nums_ref);
+    $sufixo_ref = !empty($nums_ref)
+        ? '<sup class="art-ref">[' . implode(',', array_keys($nums_ref)) . ']</sup>'
+        : '';
 ?>
-<p class="art-paragrafo"><?php echo $frase_caule; ?></p>
-
-<?php
-// ── FOLHAS ──
-$folha_partes = listar([
-    ['texto' => val($c['tipo_folha']),       'ref' => $c['tipo_folha_ref'] ?? ''],
-    ['texto' => val($c['filotaxia_folha']),  'ref' => $c['filotaxia_folha_ref'] ?? ''],
-    ['texto' => val($c['forma_folha']) ? 'de forma ' . strtolower($c['forma_folha']) : '', 'ref' => $c['forma_folha_ref'] ?? ''],
-    ['texto' => val($c['textura_folha']) ? 'textura ' . strtolower($c['textura_folha']) : '', 'ref' => $c['textura_folha_ref'] ?? ''],
-    ['texto' => val($c['margem_folha']) ? 'margem ' . strtolower($c['margem_folha']) : '', 'ref' => $c['margem_folha_ref'] ?? ''],
-    ['texto' => val($c['venacao_folha']) ? 'venação ' . strtolower($c['venacao_folha']) : '', 'ref' => $c['venacao_folha_ref'] ?? ''],
-    ['texto' => val($c['tamanho_folha']) ? 'tamanho ' . strtolower($c['tamanho_folha']) : '', 'ref' => $c['tamanho_folha_ref'] ?? ''],
-]);
-if ($folha_partes):
-?>
-<p class="art-paragrafo">Folhas <?php echo $folha_partes; ?>.</p>
-<?php endif; ?>
-
-<?php
-// ── FLORES ──
-$flor_partes = listar([
-    ['texto' => val($c['disposicao_flores']),  'ref' => $c['disposicao_flores_ref'] ?? ''],
-    ['texto' => val($c['simetria_floral']),    'ref' => $c['simetria_floral_ref'] ?? ''],
-    ['texto' => val($c['numero_petalas']) ? 'com ' . strtolower($c['numero_petalas']) : '', 'ref' => $c['numero_petalas_ref'] ?? ''],
-    ['texto' => val($c['cor_flores']) ? 'de coloração ' . strtolower($c['cor_flores']) : '', 'ref' => $c['cor_flores_ref'] ?? ''],
-    ['texto' => val($c['tamanho_flor']) ? 'tamanho ' . strtolower($c['tamanho_flor']) : '', 'ref' => $c['tamanho_flor_ref'] ?? ''],
-    ['texto' => val($c['aroma']) ? 'aroma ' . strtolower($c['aroma']) : '', 'ref' => $c['aroma_ref'] ?? ''],
-]);
-if ($flor_partes):
-?>
-<p class="art-paragrafo">Flores <?php echo $flor_partes; ?>.</p>
-<?php endif; ?>
-
-<?php
-// ── FRUTOS ──
-$fruto_tipo   = val($c['tipo_fruto']) ? strtolower($c['tipo_fruto']) . ref($c['tipo_fruto_ref'] ?? '') : '';
-$fruto_tam    = val($c['tamanho_fruto']) ? strtolower($c['tamanho_fruto']) . ref($c['tamanho_fruto_ref'] ?? '') : '';
-$fruto_cor    = val($c['cor_fruto']) ? 'de coloração ' . strtolower($c['cor_fruto']) . ref($c['cor_fruto_ref'] ?? '') : '';
-$fruto_tex    = val($c['textura_fruto']) ? 'textura ' . strtolower($c['textura_fruto']) . ref($c['textura_fruto_ref'] ?? '') : '';
-$fruto_aroma  = val($c['aroma_fruto']) ? 'aroma ' . strtolower($c['aroma_fruto']) . ref($c['aroma_fruto_ref'] ?? '') : '';
-$fruto_disp   = val($c['dispersao_fruto']) ? 'dispersão ' . strtolower($c['dispersao_fruto']) . ref($c['dispersao_fruto_ref'] ?? '') : '';
-
-$fruto_partes = implode(', ', array_filter([$fruto_tam, $fruto_cor, $fruto_tex, $fruto_aroma, $fruto_disp]));
-
-if ($fruto_tipo || $fruto_partes):
-?>
-<p class="art-paragrafo">Fruto do tipo <?php echo $fruto_tipo; ?><?php echo $fruto_partes ? ', ' . $fruto_partes : ''; ?>.</p>
-<?php endif; ?>
-
-<?php
-// ── SEMENTES ──
-$sem_partes = listar([
-    ['texto' => val($c['tipo_semente']),     'ref' => $c['tipo_semente_ref'] ?? ''],
-    ['texto' => val($c['tamanho_semente']) ? strtolower($c['tamanho_semente']) : '', 'ref' => $c['tamanho_semente_ref'] ?? ''],
-    ['texto' => val($c['cor_semente']) ? 'de coloração ' . strtolower($c['cor_semente']) : '', 'ref' => $c['cor_semente_ref'] ?? ''],
-    ['texto' => val($c['textura_semente']) ? 'textura ' . strtolower($c['textura_semente']) : '', 'ref' => $c['textura_semente_ref'] ?? ''],
-    ['texto' => val($c['quantidade_sementes']) ? strtolower($c['quantidade_sementes']) . ' sementes por fruto' : '', 'ref' => $c['quantidade_sementes_ref'] ?? ''],
-]);
-if ($sem_partes):
-?>
-<p class="art-paragrafo">Sementes <?php echo $sem_partes; ?>.</p>
-<?php endif; ?>
-
-<?php if ($imagens): ?>
-<h3 class="art-secao">Prancha Fotográfica</h3>
-<div class="art-galeria">
-<?php foreach ($imagens as $img): ?>
-    <figure class="art-figura">
-        <img src="/penomato_mvp/<?php echo htmlspecialchars($img['caminho_imagem']); ?>"
-             alt="<?php echo htmlspecialchars($img['parte_planta']); ?>">
-        <figcaption>
-            <?php echo ucfirst(htmlspecialchars($img['parte_planta'])); ?>
-            <?php if ($img['autor_imagem']): ?> — <?php echo htmlspecialchars($img['autor_imagem']); ?><?php endif; ?>
-            <?php if ($img['licenca']): ?> (<?php echo htmlspecialchars($img['licenca']); ?>)<?php endif; ?>
-        </figcaption>
-    </figure>
+<p class="art-paragrafo"><?php echo htmlspecialchars($texto); ?><?php echo $sufixo_ref; ?></p>
 <?php endforeach; ?>
-</div>
-<?php endif; ?>
+
 
 <?php
 // ── REFERÊNCIAS ──
@@ -295,6 +221,24 @@ if (!empty($refs_map)):
     $refs_citadas = array_intersect_key($refs_map, $todos_refs);
     ksort($refs_citadas);
 ?>
+<?php if ($imagens): ?>
+<h3 class="art-secao">Prancha Fotográfica</h3>
+<div class="art-galeria">
+<?php foreach ($imagens as $img): ?>
+    <figure class="art-figura">
+        <div class="art-figura-titulo"><?php echo ucfirst(htmlspecialchars($img['parte_planta'])); ?></div>
+        <img src="/penomato_mvp/<?php echo htmlspecialchars($img['caminho_imagem']); ?>"
+             alt="<?php echo htmlspecialchars($img['parte_planta']); ?>">
+        <figcaption>
+            <?php if ($img['autor_imagem']): ?><?php echo htmlspecialchars($img['autor_imagem']); ?><?php endif; ?>
+            <?php if ($img['licenca']): ?> (<?php echo htmlspecialchars($img['licenca']); ?>)<?php endif; ?>
+            <?php if ($img['fonte_nome']): ?> · <?php echo htmlspecialchars($img['fonte_nome']); ?><?php endif; ?>
+        </figcaption>
+    </figure>
+<?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <h3 class="art-secao">Referências</h3>
 <ol class="art-refs">
 <?php foreach ($refs_citadas as $num => $texto): ?>
@@ -389,10 +333,11 @@ if (!empty($refs_map)):
         .art-paragrafo { font-size: 0.95em; margin-bottom: 10px; text-align: justify; }
         .art-paragrafo sup { font-size: 0.7em; color: var(--cor-primaria); font-family: sans-serif; }
 
-        .art-galeria { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0; }
-        .art-figura { text-align: center; flex: 0 0 auto; }
-        .art-figura img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; display: block; }
-        .art-figura figcaption { font-size: 0.72em; color: #888; margin-top: 4px; font-family: sans-serif; max-width: 140px; }
+        .art-galeria { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 16px 0; }
+        .art-figura { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #fafafa; }
+        .art-figura-titulo { font-size: 0.8em; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: #555; padding: 8px 10px 4px; }
+        .art-figura img { width: 100%; height: auto; object-fit: contain; display: block; }
+        .art-figura figcaption { font-size: 0.75em; color: #888; padding: 6px 10px 8px; line-height: 1.4; }
 
         .art-refs { padding-left: 20px; font-size: 0.82em; color: #444; line-height: 1.7; }
         .art-refs li { margin-bottom: 4px; }
