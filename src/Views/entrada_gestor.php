@@ -205,10 +205,6 @@
             <span class="icon">✅</span>
             Aprovação de Ações
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/gerar_artigo.php'">
-            <span class="icon">📄</span>
-            Gerar Artigo
-        </div>
         <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/monitoramento.php'">
             <span class="icon">📡</span>
             Monitoramento
@@ -220,14 +216,6 @@
         <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Views/entrar_colaborador.php'">
             <span class="icon">👤</span>
             Perfil Colaborador
-        </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_painel_revisor.php'">
-            <span class="icon">🔍</span>
-            Perfil Revisor
-        </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_autenticador.php'">
-            <span class="icon">✅</span>
-            Perfil Autenticador
         </div>
     </div>
 

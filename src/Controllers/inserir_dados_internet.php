@@ -957,6 +957,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                             <option>Oval</option><option>Orbicular</option><option>Cordiforme</option>
                             <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
                             <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Lobada</option>
+                            <option>Composta pinnada</option><option>Composta bipinada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1186,7 +1187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_flor">Tamanho da Flor</label>
                         <select id="tamanho_flor" name="tamanho_flor">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Pequena</option><option>Média</option><option>Grande</option>
+                            <option>Pequena</option><option>Média</option>
                         </select>
                     </div>
                     <div class="ref-col">

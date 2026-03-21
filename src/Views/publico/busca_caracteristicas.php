@@ -442,10 +442,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
             font-size: var(--texto-sm);
         }
 
+        /* ── Barra sticky de pesquisa ── */
+        .barra-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            background: var(--branco);
+            border-bottom: 2px solid var(--cinza-200);
+            padding: var(--esp-3) var(--esp-6);
+            margin: calc(-1 * var(--esp-8)) calc(-1 * var(--esp-8)) var(--esp-6) calc(-1 * var(--esp-8));
+            border-radius: var(--raio-lg) var(--raio-lg) 0 0;
+            display: flex;
+            align-items: center;
+            gap: var(--esp-4);
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .barra-sticky .barra-titulo {
+            flex: 1;
+            font-size: var(--texto-md);
+            font-weight: var(--peso-semi);
+            color: var(--cinza-700);
+            white-space: nowrap;
+        }
+
         @media (max-width: 600px) {
             body { padding: var(--esp-4) var(--esp-3); }
             .form-busca, .resultados { padding: var(--esp-5); }
             .btn-buscar, .btn-limpar { width: 100%; justify-content: center; }
+            .barra-sticky { margin: calc(-1 * var(--esp-5)) calc(-1 * var(--esp-5)) var(--esp-5) calc(-1 * var(--esp-5)); padding: var(--esp-3) var(--esp-4); }
         }
     </style>
 </head>
@@ -472,7 +498,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
         <?php endif; ?>
 
         <form method="POST" action="/penomato_mvp/src/Views/publico/especie_detalhes.php" class="form-busca">
-            
+
+            <!-- Barra sticky de ação -->
+            <div class="barra-sticky">
+                <span class="barra-titulo"><i class="fas fa-sliders-h"></i> Filtros de características</span>
+                <button type="submit" class="btn btn-buscar">
+                    🔎 BUSCAR ESPÉCIES
+                </button>
+                <button type="button" class="btn btn-limpar" onclick="window.location.href='/penomato_mvp/src/Views/publico/busca_caracteristicas.php'">
+                    🧹 LIMPAR
+                </button>
+            </div>
+
             <!-- Busca por nome -->
             <div class="secao">
                 <h2>📌 Nome da Espécie</h2>
@@ -509,8 +546,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Oval" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Oval') ? 'selected' : ''; ?>>Oval</option>
                             <option value="Orbicular" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Orbicular') ? 'selected' : ''; ?>>Orbicular</option>
                             <option value="Cordiforme" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Cordiforme') ? 'selected' : ''; ?>>Cordiforme</option>
+                            <option value="Espatulada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Espatulada') ? 'selected' : ''; ?>>Espatulada</option>
+                            <option value="Sagitada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Sagitada') ? 'selected' : ''; ?>>Sagitada</option>
+                            <option value="Reniforme" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Reniforme') ? 'selected' : ''; ?>>Reniforme</option>
                             <option value="Obovada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Obovada') ? 'selected' : ''; ?>>Obovada</option>
                             <option value="Trilobada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Trilobada') ? 'selected' : ''; ?>>Trilobada</option>
+                            <option value="Palmada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Palmada') ? 'selected' : ''; ?>>Palmada</option>
+                            <option value="Lobada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Lobada') ? 'selected' : ''; ?>>Lobada</option>
+                            <option value="Composta pinnada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Composta pinnada') ? 'selected' : ''; ?>>Composta pinnada</option>
+                            <option value="Composta bipinada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Composta bipinada') ? 'selected' : ''; ?>>Composta bipinada</option>
                         </select>
                     </div>
                     
@@ -519,8 +563,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                         <select name="filotaxia_folha">
                             <option value="todos" <?php echo (!isset($_POST['filotaxia_folha']) || $_POST['filotaxia_folha'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
                             <option value="Alterna" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Alterna') ? 'selected' : ''; ?>>Alterna</option>
-                            <option value="Oposta" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Oposta') ? 'selected' : ''; ?>>Oposta</option>
+                            <option value="Oposta Simples" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Oposta Simples') ? 'selected' : ''; ?>>Oposta Simples</option>
+                            <option value="Oposta Decussada" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Oposta Decussada') ? 'selected' : ''; ?>>Oposta Decussada</option>
                             <option value="Verticilada" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Verticilada') ? 'selected' : ''; ?>>Verticilada</option>
+                            <option value="Rosetada" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Rosetada') ? 'selected' : ''; ?>>Rosetada</option>
+                            <option value="Dística" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Dística') ? 'selected' : ''; ?>>Dística</option>
+                            <option value="Espiralada" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Espiralada') ? 'selected' : ''; ?>>Espiralada</option>
                         </select>
                     </div>
                     
@@ -529,7 +577,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                         <select name="tipo_folha">
                             <option value="todos" <?php echo (!isset($_POST['tipo_folha']) || $_POST['tipo_folha'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
                             <option value="Simples" <?php echo (isset($_POST['tipo_folha']) && $_POST['tipo_folha'] == 'Simples') ? 'selected' : ''; ?>>Simples</option>
-                            <option value="Composta" <?php echo (isset($_POST['tipo_folha']) && $_POST['tipo_folha'] == 'Composta') ? 'selected' : ''; ?>>Composta</option>
+                            <option value="Composta pinnada" <?php echo (isset($_POST['tipo_folha']) && $_POST['tipo_folha'] == 'Composta pinnada') ? 'selected' : ''; ?>>Composta pinnada</option>
+                            <option value="Composta bipinada" <?php echo (isset($_POST['tipo_folha']) && $_POST['tipo_folha'] == 'Composta bipinada') ? 'selected' : ''; ?>>Composta bipinada</option>
+                            <option value="Composta tripinada" <?php echo (isset($_POST['tipo_folha']) && $_POST['tipo_folha'] == 'Composta tripinada') ? 'selected' : ''; ?>>Composta tripinada</option>
+                            <option value="Composta tetrapinada" <?php echo (isset($_POST['tipo_folha']) && $_POST['tipo_folha'] == 'Composta tetrapinada') ? 'selected' : ''; ?>>Composta tetrapinada</option>
                         </select>
                     </div>
                     
@@ -552,6 +603,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Coriácea" <?php echo (isset($_POST['textura_folha']) && $_POST['textura_folha'] == 'Coriácea') ? 'selected' : ''; ?>>Coriácea</option>
                             <option value="Cartácea" <?php echo (isset($_POST['textura_folha']) && $_POST['textura_folha'] == 'Cartácea') ? 'selected' : ''; ?>>Cartácea</option>
                             <option value="Membranácea" <?php echo (isset($_POST['textura_folha']) && $_POST['textura_folha'] == 'Membranácea') ? 'selected' : ''; ?>>Membranácea</option>
+                            <option value="Suculenta" <?php echo (isset($_POST['textura_folha']) && $_POST['textura_folha'] == 'Suculenta') ? 'selected' : ''; ?>>Suculenta</option>
+                            <option value="Pilosa" <?php echo (isset($_POST['textura_folha']) && $_POST['textura_folha'] == 'Pilosa') ? 'selected' : ''; ?>>Pilosa</option>
+                            <option value="Glabra" <?php echo (isset($_POST['textura_folha']) && $_POST['textura_folha'] == 'Glabra') ? 'selected' : ''; ?>>Glabra</option>
+                            <option value="Rugosa" <?php echo (isset($_POST['textura_folha']) && $_POST['textura_folha'] == 'Rugosa') ? 'selected' : ''; ?>>Rugosa</option>
+                            <option value="Cerosa" <?php echo (isset($_POST['textura_folha']) && $_POST['textura_folha'] == 'Cerosa') ? 'selected' : ''; ?>>Cerosa</option>
                         </select>
                     </div>
                     
@@ -563,6 +619,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Serrada" <?php echo (isset($_POST['margem_folha']) && $_POST['margem_folha'] == 'Serrada') ? 'selected' : ''; ?>>Serrada</option>
                             <option value="Dentada" <?php echo (isset($_POST['margem_folha']) && $_POST['margem_folha'] == 'Dentada') ? 'selected' : ''; ?>>Dentada</option>
                             <option value="Crenada" <?php echo (isset($_POST['margem_folha']) && $_POST['margem_folha'] == 'Crenada') ? 'selected' : ''; ?>>Crenada</option>
+                            <option value="Ondulada" <?php echo (isset($_POST['margem_folha']) && $_POST['margem_folha'] == 'Ondulada') ? 'selected' : ''; ?>>Ondulada</option>
+                            <option value="Lobada" <?php echo (isset($_POST['margem_folha']) && $_POST['margem_folha'] == 'Lobada') ? 'selected' : ''; ?>>Lobada</option>
+                            <option value="Partida" <?php echo (isset($_POST['margem_folha']) && $_POST['margem_folha'] == 'Partida') ? 'selected' : ''; ?>>Partida</option>
+                            <option value="Revoluta" <?php echo (isset($_POST['margem_folha']) && $_POST['margem_folha'] == 'Revoluta') ? 'selected' : ''; ?>>Revoluta</option>
+                            <option value="Involuta" <?php echo (isset($_POST['margem_folha']) && $_POST['margem_folha'] == 'Involuta') ? 'selected' : ''; ?>>Involuta</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-item">
+                        <label>Venação</label>
+                        <select name="venacao_folha">
+                            <option value="todos" <?php echo (!isset($_POST['venacao_folha']) || $_POST['venacao_folha'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Reticulada Pinnada" <?php echo (isset($_POST['venacao_folha']) && $_POST['venacao_folha'] == 'Reticulada Pinnada') ? 'selected' : ''; ?>>Reticulada Pinnada</option>
+                            <option value="Reticulada Palmada" <?php echo (isset($_POST['venacao_folha']) && $_POST['venacao_folha'] == 'Reticulada Palmada') ? 'selected' : ''; ?>>Reticulada Palmada</option>
+                            <option value="Paralela" <?php echo (isset($_POST['venacao_folha']) && $_POST['venacao_folha'] == 'Paralela') ? 'selected' : ''; ?>>Paralela</option>
+                            <option value="Peninérvea" <?php echo (isset($_POST['venacao_folha']) && $_POST['venacao_folha'] == 'Peninérvea') ? 'selected' : ''; ?>>Peninérvea</option>
+                            <option value="Dicotômica" <?php echo (isset($_POST['venacao_folha']) && $_POST['venacao_folha'] == 'Dicotômica') ? 'selected' : ''; ?>>Dicotômica</option>
+                            <option value="Curvinérvea" <?php echo (isset($_POST['venacao_folha']) && $_POST['venacao_folha'] == 'Curvinérvea') ? 'selected' : ''; ?>>Curvinérvea</option>
                         </select>
                     </div>
                 </div>
@@ -650,8 +724,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Baga" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Baga') ? 'selected' : ''; ?>>Baga</option>
                             <option value="Drupa" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Drupa') ? 'selected' : ''; ?>>Drupa</option>
                             <option value="Cápsula" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Cápsula') ? 'selected' : ''; ?>>Cápsula</option>
+                            <option value="Folículo" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Folículo') ? 'selected' : ''; ?>>Folículo</option>
                             <option value="Legume" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Legume') ? 'selected' : ''; ?>>Legume</option>
+                            <option value="Síliqua" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Síliqua') ? 'selected' : ''; ?>>Síliqua</option>
                             <option value="Aquênio" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Aquênio') ? 'selected' : ''; ?>>Aquênio</option>
+                            <option value="Sâmara" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Sâmara') ? 'selected' : ''; ?>>Sâmara</option>
+                            <option value="Cariopse" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Cariopse') ? 'selected' : ''; ?>>Cariopse</option>
+                            <option value="Pixídio" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Pixídio') ? 'selected' : ''; ?>>Pixídio</option>
+                            <option value="Hespéridio" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Hespéridio') ? 'selected' : ''; ?>>Hespéridio</option>
+                            <option value="Pepo" <?php echo (isset($_POST['tipo_fruto']) && $_POST['tipo_fruto'] == 'Pepo') ? 'selected' : ''; ?>>Pepo</option>
                         </select>
                     </div>
                     
@@ -663,6 +744,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Amarelo" <?php echo (isset($_POST['cor_fruto']) && $_POST['cor_fruto'] == 'Amarelo') ? 'selected' : ''; ?>>Amarelo</option>
                             <option value="Vermelho" <?php echo (isset($_POST['cor_fruto']) && $_POST['cor_fruto'] == 'Vermelho') ? 'selected' : ''; ?>>Vermelho</option>
                             <option value="Roxo" <?php echo (isset($_POST['cor_fruto']) && $_POST['cor_fruto'] == 'Roxo') ? 'selected' : ''; ?>>Roxo</option>
+                            <option value="Laranja" <?php echo (isset($_POST['cor_fruto']) && $_POST['cor_fruto'] == 'Laranja') ? 'selected' : ''; ?>>Laranja</option>
+                            <option value="Marrom" <?php echo (isset($_POST['cor_fruto']) && $_POST['cor_fruto'] == 'Marrom') ? 'selected' : ''; ?>>Marrom</option>
+                            <option value="Preto" <?php echo (isset($_POST['cor_fruto']) && $_POST['cor_fruto'] == 'Preto') ? 'selected' : ''; ?>>Preto</option>
+                            <option value="Branco" <?php echo (isset($_POST['cor_fruto']) && $_POST['cor_fruto'] == 'Branco') ? 'selected' : ''; ?>>Branco</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-item">
+                        <label>Tamanho</label>
+                        <select name="tamanho_fruto">
+                            <option value="todos" <?php echo (!isset($_POST['tamanho_fruto']) || $_POST['tamanho_fruto'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Pequeno" <?php echo (isset($_POST['tamanho_fruto']) && $_POST['tamanho_fruto'] == 'Pequeno') ? 'selected' : ''; ?>>Pequeno</option>
+                            <option value="Médio" <?php echo (isset($_POST['tamanho_fruto']) && $_POST['tamanho_fruto'] == 'Médio') ? 'selected' : ''; ?>>Médio</option>
+                            <option value="Grande" <?php echo (isset($_POST['tamanho_fruto']) && $_POST['tamanho_fruto'] == 'Grande') ? 'selected' : ''; ?>>Grande</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-item">
+                        <label>Textura</label>
+                        <select name="textura_fruto">
+                            <option value="todos" <?php echo (!isset($_POST['textura_fruto']) || $_POST['textura_fruto'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Lisa" <?php echo (isset($_POST['textura_fruto']) && $_POST['textura_fruto'] == 'Lisa') ? 'selected' : ''; ?>>Lisa</option>
+                            <option value="Rugosa" <?php echo (isset($_POST['textura_fruto']) && $_POST['textura_fruto'] == 'Rugosa') ? 'selected' : ''; ?>>Rugosa</option>
+                            <option value="Coriácea" <?php echo (isset($_POST['textura_fruto']) && $_POST['textura_fruto'] == 'Coriácea') ? 'selected' : ''; ?>>Coriácea</option>
+                            <option value="Peluda" <?php echo (isset($_POST['textura_fruto']) && $_POST['textura_fruto'] == 'Peluda') ? 'selected' : ''; ?>>Peluda</option>
+                            <option value="Espinhosa" <?php echo (isset($_POST['textura_fruto']) && $_POST['textura_fruto'] == 'Espinhosa') ? 'selected' : ''; ?>>Espinhosa</option>
+                            <option value="Cerosa" <?php echo (isset($_POST['textura_fruto']) && $_POST['textura_fruto'] == 'Cerosa') ? 'selected' : ''; ?>>Cerosa</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-item">
+                        <label>Dispersão</label>
+                        <select name="dispersao_fruto">
+                            <option value="todos" <?php echo (!isset($_POST['dispersao_fruto']) || $_POST['dispersao_fruto'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
+                            <option value="Zoocórica" <?php echo (isset($_POST['dispersao_fruto']) && $_POST['dispersao_fruto'] == 'Zoocórica') ? 'selected' : ''; ?>>Zoocórica (animais)</option>
+                            <option value="Anemocórica" <?php echo (isset($_POST['dispersao_fruto']) && $_POST['dispersao_fruto'] == 'Anemocórica') ? 'selected' : ''; ?>>Anemocórica (vento)</option>
+                            <option value="Hidrocórica" <?php echo (isset($_POST['dispersao_fruto']) && $_POST['dispersao_fruto'] == 'Hidrocórica') ? 'selected' : ''; ?>>Hidrocórica (água)</option>
+                            <option value="Autocórica" <?php echo (isset($_POST['dispersao_fruto']) && $_POST['dispersao_fruto'] == 'Autocórica') ? 'selected' : ''; ?>>Autocórica (própria planta)</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-item">
+                        <label>Aroma do fruto</label>
+                        <select name="aroma_fruto">
+                            <option value="todos" <?php echo (!isset($_POST['aroma_fruto']) || $_POST['aroma_fruto'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Sem cheiro" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Sem cheiro') ? 'selected' : ''; ?>>Sem cheiro</option>
+                            <option value="Aroma suave" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Aroma suave') ? 'selected' : ''; ?>>Aroma suave</option>
+                            <option value="Aroma forte" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Aroma forte') ? 'selected' : ''; ?>>Aroma forte</option>
+                            <option value="Aroma desagradável" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Aroma desagradável') ? 'selected' : ''; ?>>Aroma desagradável</option>
                         </select>
                     </div>
                 </div>
@@ -680,6 +810,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Prostrado" <?php echo (isset($_POST['tipo_caule']) && $_POST['tipo_caule'] == 'Prostrado') ? 'selected' : ''; ?>>Prostrado</option>
                             <option value="Trepador" <?php echo (isset($_POST['tipo_caule']) && $_POST['tipo_caule'] == 'Trepador') ? 'selected' : ''; ?>>Trepador</option>
                             <option value="Rastejante" <?php echo (isset($_POST['tipo_caule']) && $_POST['tipo_caule'] == 'Rastejante') ? 'selected' : ''; ?>>Rastejante</option>
+                            <option value="Subterrâneo" <?php echo (isset($_POST['tipo_caule']) && $_POST['tipo_caule'] == 'Subterrâneo') ? 'selected' : ''; ?>>Subterrâneo</option>
                         </select>
                     </div>
                     <div class="filtro-item">
@@ -698,7 +829,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Lisa" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Lisa') ? 'selected' : ''; ?>>Lisa</option>
                             <option value="Rugosa" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Rugosa') ? 'selected' : ''; ?>>Rugosa</option>
                             <option value="Sulcada" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Sulcada') ? 'selected' : ''; ?>>Sulcada</option>
+                            <option value="Fissurada" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Fissurada') ? 'selected' : ''; ?>>Fissurada</option>
+                            <option value="Cerosa" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Cerosa') ? 'selected' : ''; ?>>Cerosa</option>
                             <option value="Espinhosa" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Espinhosa') ? 'selected' : ''; ?>>Espinhosa</option>
+                            <option value="Suberosa" <?php echo (isset($_POST['textura_caule']) && $_POST['textura_caule'] == 'Suberosa') ? 'selected' : ''; ?>>Suberosa</option>
                         </select>
                     </div>
                     <div class="filtro-item">
@@ -832,9 +966,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Não" <?php echo (isset($_POST['possui_latex']) && $_POST['possui_latex'] == 'Não') ? 'selected' : ''; ?>>Não</option>
                         </select>
                     </div>
+
+                    <div class="filtro-item">
+                        <label>Possui Seiva?</label>
+                        <select name="possui_seiva">
+                            <option value="todos" <?php echo (!isset($_POST['possui_seiva']) || $_POST['possui_seiva'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Sim" <?php echo (isset($_POST['possui_seiva']) && $_POST['possui_seiva'] == 'Sim') ? 'selected' : ''; ?>>Sim</option>
+                            <option value="Não" <?php echo (isset($_POST['possui_seiva']) && $_POST['possui_seiva'] == 'Não') ? 'selected' : ''; ?>>Não</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-item">
+                        <label>Possui Resina?</label>
+                        <select name="possui_resina">
+                            <option value="todos" <?php echo (!isset($_POST['possui_resina']) || $_POST['possui_resina'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
+                            <option value="Sim" <?php echo (isset($_POST['possui_resina']) && $_POST['possui_resina'] == 'Sim') ? 'selected' : ''; ?>>Sim</option>
+                            <option value="Não" <?php echo (isset($_POST['possui_resina']) && $_POST['possui_resina'] == 'Não') ? 'selected' : ''; ?>>Não</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             
+            <!-- Botões também ao final para conveniência -->
             <div class="acoes-busca">
                 <button type="submit" class="btn btn-buscar">
                     🔎 BUSCAR ESPÉCIES

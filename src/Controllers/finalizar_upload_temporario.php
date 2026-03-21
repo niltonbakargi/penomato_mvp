@@ -561,7 +561,7 @@ try {
         $nome_especie = $stmt_nome->get_result()->fetch_row()[0] ?? "ID $especie_id";
         $stmt_nome->close();
 
-        $link = APP_URL . '/src/Controllers/gerar_artigo.php?especie_id=' . $especie_id;
+        $link = APP_URL . '/src/Controllers/artigos_fila.php';
 
         $conteudo_email = "
             <p>Olá,</p>
@@ -572,7 +572,7 @@ try {
                 <a href='{$link}'
                    style='background:#0b5e42;color:#fff;padding:12px 28px;border-radius:8px;
                           text-decoration:none;font-weight:bold;display:inline-block;'>
-                    Ver e revisar artigo
+                    Acessar fila de revisão
                 </a>
             </p>
             <p style='font-size:13px; color:#888;'>Importado por: <strong>" . htmlspecialchars($nome_usuario) . "</strong></p>

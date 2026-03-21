@@ -64,19 +64,24 @@ $todos_botoes = [
     ],
     'revisar_artigo' => [
         'icon'  => '📝',
-        'label' => 'Revisar Artigo',
-        'desc'  => 'Revise e aprove artigos científicos antes da publicação.',
-        'link'  => '#em-breve',
-        'breve' => true,
+        'label' => 'Revisar Artigos',
+        'desc'  => 'Revise artigos gerados automaticamente — fila por status (rascunho → revisão → aprovado).',
+        'link'  => '/penomato_mvp/src/Controllers/artigos_fila.php',
+    ],
+    'sugestoes' => [
+        'icon'  => '💡',
+        'label' => 'Sugestões',
+        'desc'  => 'Envie ideias e feedbacks para a equipe gestora e de desenvolvimento.',
+        'link'  => '/penomato_mvp/src/Views/sugestoes.php',
     ],
 ];
 
 // Permissões por subtipo
 $permissoes = [
-    'identificador' => ['dados_internet', 'confirmar', 'registrar_imagens'],
-    'dev'           => ['dados_internet', 'dev_tools'],
-    'especialista'  => ['dados_internet', 'confirmar', 'registrar_imagens', 'contestar', 'revisar_artigo'],
-    'gestor'        => ['dados_internet', 'confirmar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools'],
+    'identificador' => ['dados_internet', 'confirmar', 'registrar_imagens', 'sugestoes'],
+    'dev'           => ['dados_internet', 'dev_tools', 'sugestoes'],
+    'especialista'  => ['dados_internet', 'confirmar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes'],
+    'gestor'        => ['dados_internet', 'confirmar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes'],
 ];
 
 // Gestor (por categoria ou subtipo) acessa tudo
