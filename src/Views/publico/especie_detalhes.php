@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 
 // Apenas aceita POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/publico/busca_caracteristicas.php');
+    header('Location: ' . APP_BASE . '/src/Views/publico/busca_caracteristicas.php');
     exit;
 }
 
@@ -76,7 +76,7 @@ $stmt->execute($parametros);
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (empty($rows)) {
-    header('Location: /penomato_mvp/src/Views/publico/busca_caracteristicas.php?sem_resultado=1');
+    header('Location: ' . APP_BASE . '/src/Views/publico/busca_caracteristicas.php?sem_resultado=1');
     exit;
 }
 
@@ -220,6 +220,50 @@ foreach ($especies as &$esp) {
     $art = $artigos_map[$esp['id']] ?? null;
     $esp['artigo_html']   = $art ? $art['html']   : null;
     $esp['artigo_status'] = $art ? $art['status']  : null;
+}
+unset($esp);
+
+// ================================================
+// QUERY AUTORES (identificadores + orientador)
+// ================================================
+$autores_map = [];
+if (!empty($ids)) {
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $stmt_aut = $pdo->prepare("
+        SELECT
+            ea.id AS especie_id,
+            u1.nome        AS nome_identificador,
+            u1.instituicao AS inst_identificador,
+            u2.nome        AS nome_orientador,
+            u2.instituicao AS inst_orientador,
+            u2.subtipo_colaborador AS subtipo_orientador
+        FROM especies_administrativo ea
+        LEFT JOIN usuarios u1 ON u1.id = ea.autor_dados_internet_id
+        LEFT JOIN usuarios u2 ON u2.id = ea.atribuido_a
+        WHERE ea.id IN ($placeholders)
+    ");
+    $stmt_aut->execute($ids);
+    foreach ($stmt_aut->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $autores = [];
+        if (!empty($row['nome_identificador'])) {
+            $autores[] = [
+                'nome'  => $row['nome_identificador'],
+                'inst'  => $row['inst_identificador'] ?? '',
+                'papel' => 'Identificador',
+            ];
+        }
+        if (!empty($row['nome_orientador'])) {
+            $autores[] = [
+                'nome'  => $row['nome_orientador'],
+                'inst'  => $row['inst_orientador'] ?? '',
+                'papel' => 'Especialista',
+            ];
+        }
+        $autores_map[$row['especie_id']] = $autores;
+    }
+}
+foreach ($especies as &$esp) {
+    $esp['autores'] = $autores_map[$esp['id']] ?? [];
 }
 unset($esp);
 
@@ -563,6 +607,29 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         }
         @media (max-width: 600px) {
             .art-galeria { grid-template-columns: 1fr !important; }
+        }
+
+        /* ── AUTORES DO ARTIGO ── */
+        .art-autores {
+            font-size: 0.82em;
+            color: #555;
+            margin: 4px 0 14px;
+            padding: 6px 10px;
+            background: #f4f8f4;
+            border-left: 3px solid var(--cor-primaria);
+            border-radius: 4px;
+            line-height: 1.6;
+        }
+        .art-autores-label {
+            font-weight: 600;
+            color: var(--cor-primaria);
+        }
+        .art-autores-inst {
+            color: #777;
+        }
+        .art-autores-papel {
+            color: #888;
+            font-style: italic;
         }
 
         /* ── CARACTERÍSTICAS ── */
@@ -1155,6 +1222,28 @@ function renderArtigo(esp) {
     var container = document.getElementById('caract-container');
     if (esp.artigo_html) {
         container.innerHTML = esp.artigo_html;
+
+        // Injetar bloco de autores após art-nomes (ou art-titulo como fallback)
+        if (esp.autores && esp.autores.length > 0) {
+            var autoresHtml = '<div class="art-autores">';
+            autoresHtml += '<span class="art-autores-label">Autores:</span> ';
+            var partes = esp.autores.map(function(a) {
+                var txt = esc(a.nome);
+                if (a.inst) txt += ' <span class="art-autores-inst">(' + esc(a.inst) + ')</span>';
+                txt += ' <span class="art-autores-papel">[' + esc(a.papel) + ']</span>';
+                return txt;
+            });
+            autoresHtml += partes.join(' &nbsp;·&nbsp; ');
+            autoresHtml += '</div>';
+
+            // Inserir após .art-nomes se existir, senão após .art-titulo
+            var alvo = container.querySelector('.art-nomes') || container.querySelector('.art-titulo');
+            if (alvo && alvo.parentNode) {
+                var div = document.createElement('div');
+                div.innerHTML = autoresHtml;
+                alvo.parentNode.insertBefore(div.firstChild, alvo.nextSibling);
+            }
+        }
     } else {
         renderCaracteristicas(esp);
     }

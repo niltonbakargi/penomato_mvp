@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // Verificar se usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/index.php');
+    header('Location: ' . APP_BASE . '/index.php');
     exit;
 }
 

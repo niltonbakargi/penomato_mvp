@@ -18,7 +18,7 @@ $token = trim($_GET['token'] ?? '');
 
 if (empty($token) || !ctype_xdigit($token) || strlen($token) !== 64) {
     $_SESSION['mensagem_erro'] = "Link de ativação inválido.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -34,21 +34,21 @@ $registro = buscarUm(
 
 if (!$registro) {
     $_SESSION['mensagem_erro'] = "Link de ativação não encontrado. Solicite um novo cadastro.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
 if ($registro['usado']) {
     $_SESSION['mensagem_sucesso'] = "Sua conta já foi ativada anteriormente. Faça login.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
 if (strtotime($registro['expira_em']) < time()) {
-    $link_reenvio = '/penomato_mvp/src/Controllers/auth/reenviar_verificacao_controlador.php';
+    $link_reenvio$redirect = APP_BASE . '/src/Controllers/auth/reenviar_verificacao_controlador.php';
     $_SESSION['mensagem_erro'] = "Link de ativação expirado. "
         . "<a href=\"{$link_reenvio}?usuario_id={$registro['usuario_id']}\">Clique aqui para reenviar</a>.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -76,7 +76,7 @@ try {
     reverterTransacao();
     error_log("Erro ao ativar conta: " . $e->getMessage());
     $_SESSION['mensagem_erro'] = "Erro ao ativar a conta. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -84,5 +84,5 @@ try {
 // SUCESSO
 // ============================================================
 $_SESSION['mensagem_sucesso'] = "Conta ativada com sucesso! Faça login para continuar.";
-header('Location: /penomato_mvp/src/Views/auth/login.php');
+header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
 exit;

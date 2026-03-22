@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 

@@ -17,7 +17,7 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Revisor';
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? '';
 
 if (!$usuario_id) {
-    header('Location: /penomato_mvp/index.php');
+    header('Location: ' . APP_BASE . '/index.php');
     exit;
 }
 
@@ -31,7 +31,7 @@ if ($usuario_tipo !== 'revisor' && $usuario_tipo !== 'gestor') {
 // ================================================
 $especie_id = $_GET['id'] ?? 0;
 if (!$especie_id) {
-    header('Location: /penomato_mvp/src/Controllers/controlador_painel_revisor.php');
+    header('Location: ' . APP_BASE . '/src/Controllers/controlador_painel_revisor.php');
     exit;
 }
 
@@ -62,7 +62,7 @@ try {
         
         if ($stmt_lock->rowCount() === 0) {
             // Não conseguiu travar - redireciona
-            header('Location: /penomato_mvp/src/Controllers/controlador_painel_revisor.php?erro=indisponivel');
+            header('Location: ' . APP_BASE . '/src/Controllers/controlador_painel_revisor.php?erro=indisponivel');
             exit;
         }
     }

@@ -18,7 +18,7 @@ protegerPagina('Faça login para alterar sua senha.');
 
 // Apenas POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/usuario/alterar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/alterar_senha.php');
     exit;
 }
 
@@ -29,7 +29,7 @@ $csrf_token = $_POST['csrf_token'] ?? '';
 
 if (empty($csrf_token) || $csrf_token !== ($_SESSION['csrf_token'] ?? '')) {
     $_SESSION['mensagem_erro'] = "Requisição inválida. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/usuario/alterar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/alterar_senha.php');
     exit;
 }
 
@@ -62,7 +62,7 @@ if ($nova_senha !== $confirmar_senha) {
 
 if (!empty($erros)) {
     $_SESSION['mensagem_erro'] = implode('<br>', $erros);
-    header('Location: /penomato_mvp/src/Views/usuario/alterar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/alterar_senha.php');
     exit;
 }
 
@@ -78,7 +78,7 @@ $usuario = buscarUm(
 
 if (!$usuario) {
     $_SESSION['mensagem_erro'] = "Usuário não encontrado.";
-    header('Location: /penomato_mvp/src/Views/usuario/alterar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/alterar_senha.php');
     exit;
 }
 
@@ -87,14 +87,14 @@ if (!$usuario) {
 // ============================================================
 if (!password_verify($senha_atual, $usuario['senha_hash'])) {
     $_SESSION['mensagem_erro'] = "Senha atual incorreta.";
-    header('Location: /penomato_mvp/src/Views/usuario/alterar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/alterar_senha.php');
     exit;
 }
 
 // Impedir que a nova senha seja igual à atual
 if (password_verify($nova_senha, $usuario['senha_hash'])) {
     $_SESSION['mensagem_erro'] = "A nova senha não pode ser igual à senha atual.";
-    header('Location: /penomato_mvp/src/Views/usuario/alterar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/alterar_senha.php');
     exit;
 }
 
@@ -112,7 +112,7 @@ $resultado = atualizar(
 
 if (!$resultado) {
     $_SESSION['mensagem_erro'] = "Erro ao atualizar a senha. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/usuario/alterar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/alterar_senha.php');
     exit;
 }
 
@@ -124,5 +124,5 @@ session_destroy();
 session_start();
 
 $_SESSION['mensagem_sucesso'] = "Senha alterada com sucesso! Faça login com sua nova senha.";
-header('Location: /penomato_mvp/src/Views/auth/login.php');
+header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
 exit;

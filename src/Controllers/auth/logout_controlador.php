@@ -58,7 +58,7 @@ function fazerLogout($redirecionar = true) {
     if ($redirecionar) {
         session_start();
         $_SESSION['mensagem_sucesso'] = "Você saiu do sistema com sucesso.";
-        header('Location: /penomato_mvp/src/Views/auth/login.php');
+        header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
         exit;
     }
 }

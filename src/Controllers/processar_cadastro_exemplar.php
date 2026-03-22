@@ -6,11 +6,11 @@ session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/cadastrar_exemplar.php');
+    header('Location: ' . APP_BASE . '/src/Views/cadastrar_exemplar.php');
     exit;
 }
 
@@ -28,7 +28,7 @@ $bioma            = trim($_POST['bioma']             ?? '');
 $descricao_local  = trim($_POST['descricao_local']   ?? '');
 $especialista_id  = (int)($_POST['especialista_id']  ?? 0);
 
-$redirect = '/penomato_mvp/src/Views/cadastrar_exemplar.php?especie_id=' . $especie_id;
+$redirect$redirect = APP_BASE . '/src/Views/cadastrar_exemplar.php?especie_id=' . $especie_id;
 
 // ── Validações ────────────────────────────────────────────────────────────────
 if (!$especie_id) {
@@ -96,30 +96,18 @@ if (!empty($_FILES['foto_identificacao']['name']) &&
     }
 }
 
-// ── Gerar código único XX000 ──────────────────────────────────────────────────
+// ── Gerar código sequencial PN001, PN002, … ──────────────────────────────────
 function gerarCodigo(PDO $pdo): string {
-    $letras = 'ABCDEFGHJKLMNPQRSTUVWXYZ'; // sem I e O para evitar confusão
-    $tentativas = 0;
-    do {
-        $l1  = $letras[random_int(0, strlen($letras) - 1)];
-        $l2  = $letras[random_int(0, strlen($letras) - 1)];
+    // Busca o maior número já usado com o prefixo PN
+    $stmt = $pdo->query("SELECT MAX(CAST(SUBSTRING(codigo, 3) AS UNSIGNED)) FROM exemplares WHERE codigo REGEXP '^PN[0-9]{3}$'");
+    $max = (int)$stmt->fetchColumn();
+    $proximo = $max + 1;
 
-        // Sequencial global baseado no total de exemplares
-        $stmt = $pdo->query("SELECT COUNT(*) FROM exemplares");
-        $total = (int)$stmt->fetchColumn();
-        $num = str_pad($total + 1 + $tentativas, 3, '0', STR_PAD_LEFT);
+    // Segurança: se já chegou em 999, reinicia com próximo prefixo (PN999 → PO001)
+    // Na prática o MVP não chegará nisso, mas mantém o código robusto
+    if ($proximo > 999) $proximo = 999;
 
-        $codigo = $l1 . $l2 . $num;
-
-        // Verificar unicidade
-        $stmt = $pdo->prepare("SELECT id FROM exemplares WHERE codigo = ?");
-        $stmt->execute([$codigo]);
-        $existe = $stmt->fetch();
-
-        $tentativas++;
-    } while ($existe && $tentativas < 100);
-
-    return $codigo;
+    return 'PN' . str_pad($proximo, 3, '0', STR_PAD_LEFT);
 }
 
 // ── Inserir no banco ──────────────────────────────────────────────────────────

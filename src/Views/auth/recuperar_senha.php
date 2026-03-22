@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Se já estiver logado, redireciona
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
+    header('Location: ' . APP_BASE . '/src/Views/entrar_colaborador.php');
     exit;
 }
 

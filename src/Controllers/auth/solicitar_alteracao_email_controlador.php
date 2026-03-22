@@ -17,7 +17,7 @@ require_once __DIR__ . '/verificar_acesso.php';
 protegerPagina();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
     exit;
 }
 
@@ -28,7 +28,7 @@ $csrf = $_POST['csrf_token'] ?? '';
 
 if (empty($csrf) || $csrf !== ($_SESSION['csrf_token_email'] ?? '')) {
     $_SESSION['mensagem_erro'] = "Requisição inválida. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
     exit;
 }
 unset($_SESSION['csrf_token_email']);
@@ -66,7 +66,7 @@ if (empty($senha_atual)) {
 
 if (!empty($erros)) {
     $_SESSION['mensagem_erro'] = implode('<br>', $erros);
-    header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
     exit;
 }
 
@@ -80,7 +80,7 @@ $usuario = buscarUm(
 
 if (!$usuario || !password_verify($senha_atual, $usuario['senha_hash'])) {
     $_SESSION['mensagem_erro'] = "Senha incorreta.";
-    header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
     exit;
 }
 
@@ -94,7 +94,7 @@ $existente = buscarUm(
 
 if ($existente) {
     $_SESSION['mensagem_erro'] = "Este e-mail já está em uso por outra conta.";
-    header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
     exit;
 }
 
@@ -155,5 +155,5 @@ enviarEmail(
 // REDIRECIONAR
 // ============================================================
 $_SESSION['mensagem_sucesso'] = "Link de confirmação enviado para <strong>{$novo_email}</strong>. Verifique sua caixa de entrada.";
-header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
 exit;

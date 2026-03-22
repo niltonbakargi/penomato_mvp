@@ -8,7 +8,7 @@ session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -21,7 +21,7 @@ $tem_acesso = in_array($usuario_tipo, ['gestor', 'revisor'])
            || ($usuario_tipo === 'colaborador' && in_array($usuario_subtipo, ['especialista', 'gestor']));
 
 if (!$tem_acesso) {
-    header('Location: /penomato_mvp/index.php');
+    header('Location: ' . APP_BASE . '/index.php');
     exit;
 }
 

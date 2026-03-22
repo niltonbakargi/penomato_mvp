@@ -22,7 +22,7 @@ require_once __DIR__ . '/verificar_acesso.php';
 // VERIFICAR SE JÁ ESTÁ LOGADO
 // ============================================================
 if (estaLogado()) {
-    header('Location: /penomato_mvp/perfil');
+    header('Location: ' . APP_BASE . '/perfil');
     exit;
 }
 
@@ -30,7 +30,7 @@ if (estaLogado()) {
 // VERIFICAR SE VEIO POR POST
 // ============================================================
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/cadastro');
+    header('Location: ' . APP_BASE . '/cadastro');
     exit;
 }
 
@@ -109,7 +109,7 @@ if (empty($erros)) {
 // ============================================================
 if (!empty($erros)) {
     $_SESSION['mensagem_erro'] = implode('<br>', $erros);
-    header('Location: /penomato_mvp/cadastro');
+    header('Location: ' . APP_BASE . '/cadastro');
     exit;
 }
 
@@ -143,13 +143,13 @@ try {
     $_SESSION['mensagem_sucesso'] = "Cadastro realizado com sucesso! Faça login para continuar.";
     unset($_SESSION['dados_cadastro']);
 
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
     
 } catch (Exception $e) {
     error_log("Erro no cadastro: " . $e->getMessage());
     $_SESSION['mensagem_erro'] = "Erro ao realizar cadastro. Tente novamente.";
-    header('Location: /penomato_mvp/cadastro');
+    header('Location: ' . APP_BASE . '/cadastro');
     exit;
 }
 ?>

@@ -6,11 +6,11 @@ session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/revisor/revisar_exemplar.php');
+    header('Location: ' . APP_BASE . '/src/Views/revisor/revisar_exemplar.php');
     exit;
 }
 
@@ -21,7 +21,7 @@ $motivo      = trim($_POST['motivo_rejeicao'] ?? '');
 $filtro      = in_array($_POST['filtro'] ?? '', ['aguardando_revisao','aprovado','rejeitado','todos'])
                ? $_POST['filtro'] : 'aguardando_revisao';
 
-$redirect = '/penomato_mvp/src/Views/revisor/revisar_exemplar.php?filtro=' . $filtro;
+$redirect$redirect = APP_BASE . '/src/Views/revisor/revisar_exemplar.php?filtro=' . $filtro;
 
 // ── Validações básicas ────────────────────────────────────────────────────────
 if (!$exemplar_id || !in_array($acao, ['aprovar', 'rejeitar'])) {

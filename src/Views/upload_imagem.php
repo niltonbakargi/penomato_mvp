@@ -30,7 +30,7 @@ $id_usuario_logado = $_SESSION['usuario_id'] ?? null;
 $nome_usuario_logado = "Usuário";
 
 if (!$id_usuario_logado) {
-    header('Location: /penomato_mvp/index.php');
+    header('Location: ' . APP_BASE . '/index.php');
     exit;
 }
 

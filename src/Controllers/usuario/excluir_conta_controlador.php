@@ -17,7 +17,7 @@ protegerPagina();
 
 // Apenas POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 
@@ -28,7 +28,7 @@ $csrf = $_POST['csrf_token'] ?? '';
 
 if (empty($csrf) || $csrf !== ($_SESSION['csrf_token_exclusao'] ?? '')) {
     $_SESSION['mensagem_erro'] = "Requisição inválida. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 unset($_SESSION['csrf_token_exclusao']);
@@ -40,7 +40,7 @@ $confirmacao = trim($_POST['confirmacao_exclusao'] ?? '');
 
 if ($confirmacao !== 'EXCLUIR') {
     $_SESSION['mensagem_erro'] = "Digite EXCLUIR para confirmar a exclusão.";
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 
@@ -57,7 +57,7 @@ $usuario = buscarUm(
 
 if (!$usuario || !password_verify($senha_exclusao, $usuario['senha_hash'])) {
     $_SESSION['mensagem_erro'] = "Senha incorreta. A conta não foi excluída.";
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 
@@ -105,7 +105,7 @@ try {
     reverterTransacao();
     error_log("Erro ao excluir conta: " . $e->getMessage());
     $_SESSION['mensagem_erro'] = "Erro ao excluir a conta. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 
@@ -117,5 +117,5 @@ session_destroy();
 session_start();
 
 $_SESSION['mensagem_sucesso'] = "Sua conta foi excluída. Obrigado por ter feito parte do Penomato.";
-header('Location: /penomato_mvp/src/Views/auth/login.php');
+header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
 exit;

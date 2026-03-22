@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 
 // Apenas POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/auth/recuperar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
     exit;
 }
 
@@ -29,7 +29,7 @@ $confirmar_senha = $_POST['confirmar_senha'] ?? '';
 // ============================================================
 if (empty($token) || !ctype_xdigit($token) || strlen($token) !== 64) {
     $_SESSION['mensagem_erro'] = "Link inválido. Solicite um novo link de recuperação.";
-    header('Location: /penomato_mvp/src/Views/auth/recuperar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
     exit;
 }
 
@@ -46,19 +46,19 @@ $registro = buscarUm(
 
 if (!$registro) {
     $_SESSION['mensagem_erro'] = "Link inválido. Solicite um novo link de recuperação.";
-    header('Location: /penomato_mvp/src/Views/auth/recuperar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
     exit;
 }
 
 if ($registro['usado']) {
     $_SESSION['mensagem_erro'] = "Este link já foi utilizado. Solicite um novo.";
-    header('Location: /penomato_mvp/src/Views/auth/recuperar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
     exit;
 }
 
 if (strtotime($registro['expira_em']) < time()) {
     $_SESSION['mensagem_erro'] = "Este link expirou. Solicite um novo link de recuperação.";
-    header('Location: /penomato_mvp/src/Views/auth/recuperar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
     exit;
 }
 
@@ -77,7 +77,7 @@ if ($nova_senha !== $confirmar_senha) {
 
 if (!empty($erros)) {
     $_SESSION['mensagem_erro'] = implode('<br>', $erros);
-    header('Location: /penomato_mvp/src/Views/auth/redefinir_senha.php?token=' . urlencode($token));
+    header('Location: ' . APP_BASE . '/src/Views/auth/redefinir_senha.php?token=' . urlencode($token));
     exit;
 }
 
@@ -95,7 +95,7 @@ try {
     reverterTransacao();
     error_log("Erro ao redefinir senha: " . $e->getMessage());
     $_SESSION['mensagem_erro'] = "Erro ao redefinir a senha. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/auth/redefinir_senha.php?token=' . urlencode($token));
+    header('Location: ' . APP_BASE . '/src/Views/auth/redefinir_senha.php?token=' . urlencode($token));
     exit;
 }
 
@@ -103,5 +103,5 @@ try {
 // SUCESSO — REDIRECIONAR PARA LOGIN
 // ============================================================
 $_SESSION['mensagem_sucesso'] = "Senha redefinida com sucesso! Faça login com sua nova senha.";
-header('Location: /penomato_mvp/src/Views/auth/login.php');
+header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
 exit;

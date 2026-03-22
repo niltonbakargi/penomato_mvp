@@ -5,11 +5,11 @@
 session_start();
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/index.php');
+    header('Location: ' . APP_BASE . '/index.php');
     exit;
 }
 
 // Redirecionar para a view do autenticador
-header('Location: /penomato_mvp/src/Views/entrada_autenticador.php');
+header('Location: ' . APP_BASE . '/src/Views/entrada_autenticador.php');
 exit;
 ?>

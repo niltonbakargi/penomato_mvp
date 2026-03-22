@@ -30,7 +30,7 @@ function estaLogado() {
 // VERIFICAR AUTENTICAÇÃO
 // ================================================
 if (!estaLogado()) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 

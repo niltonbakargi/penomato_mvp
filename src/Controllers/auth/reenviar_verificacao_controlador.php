@@ -39,7 +39,7 @@ if ($usuario_id > 0) {
     );
 } else {
     $_SESSION['mensagem_erro'] = "Dados inválidos para reenvio.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -100,5 +100,5 @@ if ($usuario && $usuario['status_verificacao'] === 'pendente') {
 // REDIRECIONAR (mesma mensagem sempre)
 // ============================================================
 $_SESSION['mensagem_sucesso'] = $mensagem_padrao;
-header('Location: /penomato_mvp/src/Views/auth/login.php');
+header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
 exit;

@@ -47,7 +47,7 @@ $usuario = buscarUm(
 // Se não encontrar o usuário, redirecionar
 if (!$usuario) {
     $_SESSION['mensagem_erro'] = "Usuário não encontrado.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 

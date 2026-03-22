@@ -22,6 +22,11 @@ if ($is_prod) {
 
     require_once $config_prod;
 
+    // Corrige links hardcoded /penomato_mvp/ → / em toda a saída HTML
+    ob_start(function ($buffer) {
+        return str_replace('/penomato_mvp/', '/', $buffer);
+    });
+
     // Erros: apenas log, nunca exibir ao usuário
     ini_set('display_errors', '0');
     ini_set('log_errors', '1');

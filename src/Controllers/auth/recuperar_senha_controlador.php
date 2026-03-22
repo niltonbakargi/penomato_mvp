@@ -14,7 +14,7 @@ require_once __DIR__ . '/../../../config/email.php';
 
 // Apenas POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/auth/recuperar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
     exit;
 }
 
@@ -25,7 +25,7 @@ $email = strtolower(trim($_POST['email'] ?? ''));
 
 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $_SESSION['mensagem_erro'] = "Informe um e-mail válido.";
-    header('Location: /penomato_mvp/src/Views/auth/recuperar_senha.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
     exit;
 }
 
@@ -101,5 +101,5 @@ if ($usuario) {
 // REDIRECIONAR (mesma mensagem independente de encontrar o email)
 // ============================================================
 $_SESSION['mensagem_sucesso'] = $mensagem_padrao;
-header('Location: /penomato_mvp/src/Views/auth/recuperar_senha.php');
+header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
 exit;

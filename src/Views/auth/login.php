@@ -9,9 +9,9 @@ session_start();
 // Se já estiver logado, redireciona baseado no tipo de usuário
 if (isset($_SESSION['usuario_id'])) {
     if ($_SESSION['usuario_tipo'] === 'gestor') {
-        header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
+        header('Location: ' . APP_BASE . '/src/Controllers/controlador_gestor.php');
     } else {
-        header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
+        header('Location: ' . APP_BASE . '/src/Views/entrar_colaborador.php');
     }
     exit;
 }

@@ -32,7 +32,7 @@ require_once __DIR__ . '/../auth/verificar_acesso.php';
 
 if (!estaLogado()) {
     $_SESSION['mensagem_erro'] = "Faça login para editar seu perfil.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -41,7 +41,7 @@ if (!estaLogado()) {
 // ============================================================
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/usuario/meu_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/meu_perfil.php');
     exit;
 }
 
@@ -53,7 +53,7 @@ if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) ||
     $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
     
     $_SESSION['mensagem_erro'] = "Erro de segurança. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 
@@ -85,7 +85,7 @@ $usuario_atual = buscarUm(
 
 if (!$usuario_atual) {
     $_SESSION['mensagem_erro'] = "Usuário não encontrado.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -157,7 +157,7 @@ if (!empty($dados['orcid'])) {
 if (!empty($erros)) {
     $_SESSION['dados_edicao']['erros'] = $erros;
     $_SESSION['mensagem_erro'] = "Corrija os erros no formulário.";
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 
@@ -186,14 +186,14 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
         $erro_foto = $erros_upload[$foto['error']] ?? 'Erro desconhecido no upload.';
         
         $_SESSION['mensagem_erro'] = $erro_foto;
-        header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+        header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
         exit;
     }
     
     // Verificar tamanho
     if ($foto['size'] > FOTO_MAX_SIZE) {
         $_SESSION['mensagem_erro'] = "A foto deve ter no máximo 2MB.";
-        header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+        header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
         exit;
     }
     
@@ -206,7 +206,7 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
     
     if (!in_array($mime_type, $tipos_permitidos)) {
         $_SESSION['mensagem_erro'] = "Formato não permitido. Use JPG, PNG ou GIF.";
-        header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+        header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
         exit;
     }
     
@@ -288,7 +288,7 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
             unlink($caminho_temp);
         }
         $_SESSION['mensagem_erro'] = "Erro ao processar a foto. Tente novamente.";
-        header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+        header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
         exit;
     }
 }
@@ -363,7 +363,7 @@ try {
     // Limpar dados de edição da sessão
     unset($_SESSION['dados_edicao']);
     
-    header('Location: /penomato_mvp/src/Views/usuario/meu_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/meu_perfil.php');
     exit;
     
 } catch (Exception $e) {
@@ -379,7 +379,7 @@ try {
     }
     
     $_SESSION['mensagem_erro'] = "Erro ao atualizar perfil. Por favor, tente novamente.";
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 

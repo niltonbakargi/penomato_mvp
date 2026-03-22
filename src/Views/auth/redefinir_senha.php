@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 
 // Se já estiver logado, redireciona
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
+    header('Location: ' . APP_BASE . '/src/Views/entrar_colaborador.php');
     exit;
 }
 

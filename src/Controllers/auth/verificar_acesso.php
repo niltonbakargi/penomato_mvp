@@ -140,7 +140,7 @@ function protegerPagina($mensagem = 'Faça login para acessar esta página.') {
         $_SESSION['mensagem_erro'] = $mensagem;
         
         // Redirecionar para login
-        header('Location: /penomato_mvp/src/Views/auth/login.php');
+        header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
         exit;
     }
 }
@@ -152,7 +152,8 @@ function protegerPagina($mensagem = 'Faça login para acessar esta página.') {
  * @param string $destino URL para redirecionar se logado
  * @return void
  */
-function protegerPaginaVisitante($destino = '/penomato_mvp/src/Views/usuario/meu_perfil.php') {
+function protegerPaginaVisitante($destino = null) {
+    if ($destino === null) $destino = APP_BASE . '/src/Views/usuario/meu_perfil.php';
     if (sessaoValida()) {
         header("Location: $destino");
         exit;
@@ -240,7 +241,7 @@ function usuarioEhProprietario($id_recurso, $tabela, $coluna_usuario = 'autor_da
 function permitirApenas($tipos, $mensagem = 'Acesso negado. Você não tem permissão para acessar esta página.') {
     if (!usuarioTemTipo($tipos)) {
         $_SESSION['mensagem_erro'] = $mensagem;
-        header('Location: /penomato_mvp/src/Views/publico/busca_caracteristicas.php');
+        header('Location: ' . APP_BASE . '/src/Views/publico/busca_caracteristicas.php');
         exit;
     }
 }
@@ -255,7 +256,7 @@ function permitirApenas($tipos, $mensagem = 'Acesso negado. Você não tem permi
 function permitirApenasSubtipo($subtipos, $mensagem = 'Acesso negado. Você não tem permissão para esta ação.') {
     if (!usuarioTemSubtipo($subtipos)) {
         $_SESSION['mensagem_erro'] = $mensagem;
-        header('Location: /penomato_mvp/src/Views/publico/busca_caracteristicas.php');
+        header('Location: ' . APP_BASE . '/src/Views/publico/busca_caracteristicas.php');
         exit;
     }
 }

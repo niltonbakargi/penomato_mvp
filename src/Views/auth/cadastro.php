@@ -8,7 +8,7 @@ session_start();
 
 // Se já estiver logado, redireciona
 if (isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
+    header('Location: ' . APP_BASE . '/src/Controllers/controlador_gestor.php');
     exit;
 }
 

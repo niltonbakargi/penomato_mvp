@@ -6,7 +6,7 @@ session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php?redirect=' . urlencode($_SERVER['REQUEST_URI']));
     exit;
 }
 
@@ -36,6 +36,12 @@ $especie_pre = isset($_GET['especie_id']) ? (int)$_GET['especie_id'] : 0;
 
 $mensagem_sucesso = isset($_GET['sucesso']) ? urldecode($_GET['sucesso']) : '';
 $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
+
+// ── Pré-visualização do próximo código ───────────────────────────────────────
+$stmt_prox = $pdo->query("SELECT MAX(CAST(SUBSTRING(codigo, 3) AS UNSIGNED)) FROM exemplares WHERE codigo REGEXP '^PN[0-9]{3}$'");
+$proximo_num = (int)$stmt_prox->fetchColumn() + 1;
+if ($proximo_num > 999) $proximo_num = 999;
+$proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -257,6 +263,24 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
                     <i class="fas fa-leaf"></i> 1. Espécie
                 </div>
                 <div class="secao-corpo">
+
+                    <!-- Identificador gerado automaticamente -->
+                    <div class="campo" style="margin-bottom: var(--esp-6);">
+                        <label style="text-transform:uppercase;font-size:var(--texto-xs);letter-spacing:.05em;font-weight:var(--peso-bold);color:var(--cinza-600);">
+                            Identificador do Exemplar
+                        </label>
+                        <div style="display:flex;align-items:center;gap:var(--esp-3);margin-top:var(--esp-2);">
+                            <span style="font-size:2rem;font-weight:var(--peso-bold);font-family:monospace;
+                                         color:var(--cor-primaria);background:var(--cinza-50);
+                                         border:2px solid var(--cor-primaria);border-radius:var(--raio-md);
+                                         padding:var(--esp-2) var(--esp-6);letter-spacing:.15em;">
+                                <?php echo htmlspecialchars($proximo_codigo); ?>
+                            </span>
+                            <span style="font-size:var(--texto-xs);color:var(--cinza-500);line-height:1.4;">
+                                Gerado automaticamente<br>pelo sistema em sequência.
+                            </span>
+                        </div>
+                    </div>
                     <div class="campo">
                         <label for="especie_id">
                             Nome científico <span class="req">*</span>

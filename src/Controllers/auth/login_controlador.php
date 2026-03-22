@@ -19,9 +19,9 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 if (isset($_SESSION['usuario_id'])) {
     // Redirecionar baseado no tipo de usuário
     if ($_SESSION['usuario_tipo'] === 'gestor') {
-        header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
+        header('Location: ' . APP_BASE . '/src/Controllers/controlador_gestor.php');
     } else {
-        header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
+        header('Location: ' . APP_BASE . '/src/Views/entrar_colaborador.php');
     }
     exit;
 }
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erro = "Muitas tentativas falhas. Aguarde " . BF_JANELA_MINUTOS . " minutos e tente novamente.";
         $_SESSION['mensagem_erro']   = $erro;
         $_SESSION['email_tentativa'] = $email;
-        header('Location: /penomato_mvp/src/Views/auth/login.php');
+        header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
         exit;
     }
 
@@ -92,20 +92,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // BLOQUEAR CONTA NÃO VERIFICADA
             // ------------------------------------------------
             if ($usuario['status_verificacao'] === 'pendente') {
-                $link_reenvio = '/penomato_mvp/src/Controllers/auth/reenviar_verificacao_controlador.php';
+                $link_reenvio$redirect = APP_BASE . '/src/Controllers/auth/reenviar_verificacao_controlador.php';
                 $erro = "Sua conta ainda não foi verificada. "
                       . "Verifique seu e-mail ou "
                       . "<a href=\"{$link_reenvio}?email=" . urlencode($email) . "\">clique aqui para reenviar o link</a>.";
                 $_SESSION['mensagem_erro'] = $erro;
                 $_SESSION['email_tentativa'] = $email;
-                header('Location: /penomato_mvp/src/Views/auth/login.php');
+                header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
                 exit;
             }
 
             if ($usuario['status_verificacao'] === 'bloqueado') {
                 $erro = "Esta conta foi bloqueada. Entre em contato com o suporte.";
                 $_SESSION['mensagem_erro'] = $erro;
-                header('Location: /penomato_mvp/src/Views/auth/login.php');
+                header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
                 exit;
             }
 
@@ -131,9 +131,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // REDIRECIONAR BASEADO NO TIPO DE USUÁRIO
             // ------------------------------------------------
             if ($usuario['categoria'] === 'gestor') {
-                header('Location: /penomato_mvp/src/Controllers/controlador_gestor.php');
+                header('Location: ' . APP_BASE . '/src/Controllers/controlador_gestor.php');
             } else {
-                header('Location: /penomato_mvp/src/Views/entrar_colaborador.php');
+                header('Location: ' . APP_BASE . '/src/Views/entrar_colaborador.php');
             }
             exit;
 
@@ -172,5 +172,5 @@ if (!empty($erro)) {
 
 // Se tiver redirect, mantém na URL
 $redirect_param = $redirect ? '?redirect=' . urlencode($redirect) : '';
-header('Location: /penomato_mvp/src/Views/auth/login.php' . $redirect_param);
+header('Location: ' . APP_BASE . '/src/Views/auth/login.php' . $redirect_param);
 exit;

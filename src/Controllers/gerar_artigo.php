@@ -2,11 +2,11 @@
 // DEPRECATED — Geração de artigos agora é automática (finalizar_upload_temporario.php).
 // Redireciona para a fila de artigos por status.
 session_start();
-header('Location: /penomato_mvp/src/Controllers/artigos_fila.php');
+header('Location: ' . APP_BASE . '/src/Controllers/artigos_fila.php');
 exit;
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 

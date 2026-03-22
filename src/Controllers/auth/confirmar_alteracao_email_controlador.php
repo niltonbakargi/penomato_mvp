@@ -19,7 +19,7 @@ $token = trim($_GET['token'] ?? '');
 
 if (empty($token) || !ctype_xdigit($token) || strlen($token) !== 64) {
     $_SESSION['mensagem_erro'] = "Link de confirmação inválido.";
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -35,19 +35,19 @@ $registro = buscarUm(
 
 if (!$registro) {
     $_SESSION['mensagem_erro'] = "Link não encontrado. Solicite a alteração novamente.";
-    header('Location: /penomato_mvp/src/Views/usuario/editar_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;
 }
 
 if ($registro['usado']) {
     $_SESSION['mensagem_alerta'] = "Este link já foi utilizado. Seu e-mail já foi alterado.";
-    header('Location: /penomato_mvp/src/Views/usuario/meu_perfil.php');
+    header('Location: ' . APP_BASE . '/src/Views/usuario/meu_perfil.php');
     exit;
 }
 
 if (strtotime($registro['expira_em']) < time()) {
     $_SESSION['mensagem_erro'] = "Link expirado. Solicite a alteração de e-mail novamente.";
-    header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
     exit;
 }
 
@@ -65,7 +65,7 @@ if ($conflito) {
         [':id' => $registro['id']]
     );
     $_SESSION['mensagem_erro'] = "O e-mail solicitado já foi utilizado por outra conta. Solicite a alteração novamente.";
-    header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
     exit;
 }
 
@@ -93,7 +93,7 @@ try {
     reverterTransacao();
     error_log("Erro ao confirmar alteração de e-mail: " . $e->getMessage());
     $_SESSION['mensagem_erro'] = "Erro ao alterar o e-mail. Tente novamente.";
-    header('Location: /penomato_mvp/src/Views/auth/solicitar_alteracao_email.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/solicitar_alteracao_email.php');
     exit;
 }
 
@@ -108,5 +108,5 @@ if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] == $registro['usua
 // SUCESSO
 // ============================================================
 $_SESSION['mensagem_sucesso'] = "E-mail alterado com sucesso para <strong>" . htmlspecialchars($registro['novo_email']) . "</strong>.";
-header('Location: /penomato_mvp/src/Views/usuario/meu_perfil.php');
+header('Location: ' . APP_BASE . '/src/Views/usuario/meu_perfil.php');
 exit;

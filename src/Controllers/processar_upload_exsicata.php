@@ -6,12 +6,12 @@ session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/enviar_imagem.php');
+    header('Location: ' . APP_BASE . '/src/Views/enviar_imagem.php');
     exit;
 }
 
@@ -25,7 +25,7 @@ $data_coleta  = trim($_POST['data_coleta']  ?? '');
 $observacoes  = trim($_POST['observacoes']  ?? '');
 $licenca      = trim($_POST['licenca']      ?? 'Privado');
 
-$redirect = "/penomato_mvp/src/Views/enviar_imagem.php?especie_id={$especie_id}&exemplar_id={$exemplar_id}";
+$redirect = APP_BASE . "/src/Views/enviar_imagem.php?especie_id={$especie_id}&exemplar_id={$exemplar_id}";
 
 // ── Validações básicas ────────────────────────────────────────────────────────
 $partes_validas = ['folha', 'flor', 'fruto', 'caule', 'semente', 'habito'];
