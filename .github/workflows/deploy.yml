@@ -1,0 +1,70 @@
+name: Deploy para HostGator
+
+on:
+  push:
+    branches:
+      - main   # dispara só quando o push vai para a branch principal
+
+jobs:
+  deploy:
+    name: Enviar arquivos via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Baixa o código do repositório
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      # 2. Instala dependências PHP (PHPMailer etc.)
+      - name: Instalar dependências Composer
+        run: composer install --no-dev --optimize-autoloader
+
+      # 3. Cria o config/producao.php a partir dos Secrets do GitHub
+      #    (o arquivo real está no .gitignore — o servidor precisa dele)
+      - name: Criar config/producao.php
+        run: |
+          cat > config/producao.php << 'PHPEOF'
+          <?php
+          define('APP_ENV',  'prod');
+          define('APP_URL',  'https://penomato.app.br');
+          define('APP_BASE', '');
+
+          define('DB_HOST',    '${{ secrets.DB_HOST }}');
+          define('DB_NAME',    '${{ secrets.DB_NAME }}');
+          define('DB_USER',    '${{ secrets.DB_USER }}');
+          define('DB_PASS',    '${{ secrets.DB_PASS }}');
+          define('DB_CHARSET', 'utf8mb4');
+          PHPEOF
+
+      # 4. Envia os arquivos para o HostGator via FTP
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server:      ${{ secrets.FTP_SERVER }}
+          username:    ${{ secrets.FTP_USERNAME }}
+          password:    ${{ secrets.FTP_PASSWORD }}
+          protocol:    ftps         # FTP com criptografia (recomendado)
+          port:        21
+          server-dir:  public_html/ # pasta raiz no HostGator
+          local-dir:   ./           # raiz do repositório
+          dangerous-clean-slate: false  # NÃO apaga arquivos extras no servidor
+                                        # (protege uploads/, logs/ existentes)
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            database/**
+            docs/**
+            logs/**
+            tests/**
+            scripts/**
+            uploads/**
+            penomato/**
+            penomato.zip
+            *.ps1
+            mapear_estrutura.php
+            gerar_hash.php
+            penomato_kanban.html
+            mapeamento_estrutura.*
+            arquivos_para_ajustar.txt
+            config/database.php
