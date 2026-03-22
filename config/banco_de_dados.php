@@ -14,12 +14,8 @@
 // CONFIGURAÇÕES DO BANCO DE DADOS
 // ============================================================
 
-// Configurações locais (XAMPP padrão)
-define('DB_HOST', 'localhost');           // Servidor do banco
-define('DB_NAME', 'penomato');            // Nome do banco de dados
-define('DB_USER', 'root');                 // Usuário do MySQL (XAMPP padrão)
-define('DB_PASS', '');                     // Senha do MySQL (XAMPP padrão = vazio)
-define('DB_CHARSET', 'utf8mb4');           // Charset UTF-8 (suporte a emojis e acentos)
+// Carrega ambiente (dev ou prod) — define DB_HOST, DB_NAME, DB_USER, DB_PASS, APP_URL
+require_once __DIR__ . '/app.php';
 
 // ============================================================
 // CONEXÃO COM O BANCO DE DADOS
@@ -54,16 +50,16 @@ try {
     error_log("Erro de conexão com banco de dados: " . $e->getMessage());
     
     // Mensagem amigável para o usuário (sem detalhes técnicos)
+    $msg_dev = (defined('APP_ENV') && APP_ENV === 'dev')
+        ? '<p style="color:#856404;background:#fff3cd;padding:10px;border-radius:3px;">
+               <strong>Dev:</strong> verifique se o XAMPP está rodando e o banco \'penomato\' existe.
+           </p>'
+        : '';
     die("
-        <div style='font-family: Arial; padding: 20px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; margin: 20px;'>
-            <h2 style='color: #721c24;'>🔴 Erro de conexão com o banco de dados</h2>
-            <p style='color: #721c24;'>Não foi possível conectar ao banco de dados. Por favor, tente novamente mais tarde.</p>
-            <p style='color: #856404; background: #fff3cd; padding: 10px; border-radius: 3px;'>
-                <strong>Dicas:</strong><br>
-                1. Verifique se o XAMPP está rodando (Apache e MySQL)<br>
-                2. Confirme se o banco de dados 'penomato' existe<br>
-                3. Veja o log de erros em C:\xampp\php\logs\php_error_log
-            </p>
+        <div style='font-family:Arial;padding:20px;background:#f8d7da;border:1px solid #f5c6cb;border-radius:5px;margin:20px;'>
+            <h2 style='color:#721c24;'>Erro de conexão</h2>
+            <p style='color:#721c24;'>Não foi possível conectar ao banco de dados. Tente novamente mais tarde.</p>
+            {$msg_dev}
         </div>
     ");
 }

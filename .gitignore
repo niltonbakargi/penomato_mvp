@@ -10,7 +10,7 @@
 error_log
 
 # ================================
-# Dependências
+# Dependï¿½ncias
 # ================================
 /vendor/
 /node_modules/
@@ -19,13 +19,15 @@ package-lock.json
 yarn.lock
 
 # ================================
-# Ambiente e Configurações
+# Ambiente e Configuraï¿½ï¿½es
 # ================================
 .env
 .env.local
 .env.*.local
 !.env.example
 config/database.php
+config/producao.php
+uploads/
 
 # ================================
 # IDE e Editores
@@ -52,7 +54,7 @@ desktop.ini
 .cache/
 
 # ================================
-# Uploads e Dados do Usuário
+# Uploads e Dados do Usuï¿½rio
 # ================================
 /public/uploads/
 /storage/*
