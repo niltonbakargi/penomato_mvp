@@ -3,6 +3,7 @@
  * INDEX - PENOMATO MVP
  */
 
+require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/src/Controllers/auth/verificar_acesso.php';
 
 $logado      = sessaoValida();

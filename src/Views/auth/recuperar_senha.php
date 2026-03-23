@@ -2,6 +2,11 @@
 // ============================================================
 // RECUPERAÇÃO DE SENHA - PENOMATO
 // ============================================================
+
+if (!defined('APP_ENV')) {
+    require_once __DIR__ . '/../../../config/app.php';
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

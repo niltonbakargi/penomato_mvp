@@ -14,6 +14,11 @@
 // INICIALIZAÇÃO
 // ============================================================
 
+// Carregar configuração de ambiente (dev/prod) — define APP_BASE, ob_start em prod
+if (!defined('APP_ENV')) {
+    require_once __DIR__ . '/../../../config/app.php';
+}
+
 // Garantir que a sessão está iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

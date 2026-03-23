@@ -4,6 +4,10 @@
  * Versão simplificada para o MVP
  */
 
+if (!defined('APP_ENV')) {
+    require_once __DIR__ . '/../../../config/app.php';
+}
+
 session_start();
 
 // Se já estiver logado, redireciona

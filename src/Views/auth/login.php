@@ -3,6 +3,10 @@
 // LOGIN - PENOMATO (VERSÃO CORRIGIDA)
 // ============================================================
 
+if (!defined('APP_ENV')) {
+    require_once __DIR__ . '/../../../config/app.php';
+}
+
 // Iniciar sessão
 session_start();
 
