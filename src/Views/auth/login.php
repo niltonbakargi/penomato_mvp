@@ -1,4 +1,9 @@
 <?php
+// DEBUG TEMPORÁRIO — remover após corrigir
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
+// FIM DEBUG
+
 // ============================================================
 // LOGIN - PENOMATO (VERSÃO CORRIGIDA)
 // ============================================================
