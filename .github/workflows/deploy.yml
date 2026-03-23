@@ -45,7 +45,7 @@ jobs:
           password:    ${{ secrets.FTP_PASSWORD }}
           protocol:    ftp
           port:        21
-          server-dir:  ../penomato.app.br/
+          server-dir:  /
           local-dir:   ./           # raiz do repositório
           dangerous-clean-slate: false  # NÃO apaga arquivos extras no servidor
                                         # (protege uploads/, logs/ existentes)
