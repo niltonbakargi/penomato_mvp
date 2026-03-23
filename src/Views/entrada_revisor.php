@@ -201,6 +201,8 @@
         <div class="actions-bar">
             <button class="btn" onclick="abrirModalNovaRevisao()">➕ NOVA REVISÃO</button>
             <button class="btn btn-secondary" onclick="carregarRevisoesAndamento()">📂 CONTINUAR</button>
+            <a href="/penomato_mvp/src/Views/revisor/revisar_exemplar.php" class="btn btn-outline">🔬 Revisar Exemplares</a>
+            <a href="/penomato_mvp/src/Views/revisor/mapa_exemplares.php" class="btn btn-outline">🗺️ Mapa de Exemplares</a>
         </div>
 
         <!-- CONTEÚDO PRINCIPAL -->

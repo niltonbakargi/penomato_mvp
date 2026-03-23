@@ -44,6 +44,12 @@ $todos_botoes = [
         'desc'  => 'Verifique e confirme as informações vindas da internet antes de registrá-las.',
         'link'  => '/penomato_mvp/src/Controllers/confirmar_caracteristicas.php',
     ],
+    'cadastrar_exemplar' => [
+        'icon'  => '🌿',
+        'label' => 'Cadastrar Exemplar',
+        'desc'  => 'Registre um indivíduo de campo com localização e foto antes de enviar fotos das partes.',
+        'link'  => '/penomato_mvp/src/Views/cadastrar_exemplar.php',
+    ],
     'registrar_imagens' => [
         'icon'  => '📷',
         'label' => 'Registrar Imagens',
@@ -78,10 +84,10 @@ $todos_botoes = [
 
 // Permissões por subtipo
 $permissoes = [
-    'identificador' => ['dados_internet', 'confirmar', 'registrar_imagens', 'sugestoes'],
+    'identificador' => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'sugestoes'],
     'dev'           => ['dados_internet', 'dev_tools', 'sugestoes'],
-    'especialista'  => ['dados_internet', 'confirmar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes'],
-    'gestor'        => ['dados_internet', 'confirmar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes'],
+    'especialista'  => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes'],
+    'gestor'        => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes'],
 ];
 
 // Gestor (por categoria ou subtipo) acessa tudo

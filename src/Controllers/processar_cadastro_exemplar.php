@@ -28,7 +28,7 @@ $bioma            = trim($_POST['bioma']             ?? '');
 $descricao_local  = trim($_POST['descricao_local']   ?? '');
 $especialista_id  = (int)($_POST['especialista_id']  ?? 0);
 
-$redirect$redirect = APP_BASE . '/src/Views/cadastrar_exemplar.php?especie_id=' . $especie_id;
+$redirect = APP_BASE . '/src/Views/cadastrar_exemplar.php?especie_id=' . $especie_id;
 
 // ── Validações ────────────────────────────────────────────────────────────────
 if (!$especie_id) {

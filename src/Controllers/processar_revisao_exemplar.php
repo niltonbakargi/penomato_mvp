@@ -21,7 +21,7 @@ $motivo      = trim($_POST['motivo_rejeicao'] ?? '');
 $filtro      = in_array($_POST['filtro'] ?? '', ['aguardando_revisao','aprovado','rejeitado','todos'])
                ? $_POST['filtro'] : 'aguardando_revisao';
 
-$redirect$redirect = APP_BASE . '/src/Views/revisor/revisar_exemplar.php?filtro=' . $filtro;
+$redirect = APP_BASE . '/src/Views/revisor/revisar_exemplar.php?filtro=' . $filtro;
 
 // ── Validações básicas ────────────────────────────────────────────────────────
 if (!$exemplar_id || !in_array($acao, ['aprovar', 'rejeitar'])) {
