@@ -43,7 +43,7 @@ jobs:
           server:      ${{ secrets.FTP_SERVER }}
           username:    ${{ secrets.FTP_USERNAME }}
           password:    ${{ secrets.FTP_PASSWORD }}
-          protocol:    ftpes        # FTP com TLS explícito (porta 21)
+          protocol:    ftps-legacy  # TLS explícito porta 21
           port:        21
           server-dir:  public_html/ # pasta raiz no HostGator
           local-dir:   ./           # raiz do repositório
