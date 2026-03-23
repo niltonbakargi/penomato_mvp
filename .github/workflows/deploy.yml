@@ -41,6 +41,13 @@ jobs:
           define('DB_CHARSET', 'utf8mb4');
           PHPEOF
 
+      # 3b. Verifica se o producao.php foi gerado
+      - name: Verificar producao.php
+        run: |
+          echo "--- Conteúdo do producao.php (secrets mascarados) ---"
+          cat config/producao.php
+          echo "--- Fim ---"
+
       # 4. Envia os arquivos para o HostGator via FTP
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
