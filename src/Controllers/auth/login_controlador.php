@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // BLOQUEAR CONTA NÃO VERIFICADA
             // ------------------------------------------------
             if ($usuario['status_verificacao'] === 'pendente') {
-                $link_reenvio$redirect = APP_BASE . '/src/Controllers/auth/reenviar_verificacao_controlador.php';
+                $link_reenvio = APP_BASE . '/src/Controllers/auth/reenviar_verificacao_controlador.php';
                 $erro = "Sua conta ainda não foi verificada. "
                       . "Verifique seu e-mail ou "
                       . "<a href=\"{$link_reenvio}?email=" . urlencode($email) . "\">clique aqui para reenviar o link</a>.";

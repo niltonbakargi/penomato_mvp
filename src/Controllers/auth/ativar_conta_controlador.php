@@ -45,7 +45,7 @@ if ($registro['usado']) {
 }
 
 if (strtotime($registro['expira_em']) < time()) {
-    $link_reenvio$redirect = APP_BASE . '/src/Controllers/auth/reenviar_verificacao_controlador.php';
+    $link_reenvio = APP_BASE . '/src/Controllers/auth/reenviar_verificacao_controlador.php';
     $_SESSION['mensagem_erro'] = "Link de ativação expirado. "
         . "<a href=\"{$link_reenvio}?usuario_id={$registro['usuario_id']}\">Clique aqui para reenviar</a>.";
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
