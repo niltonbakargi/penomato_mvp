@@ -22,17 +22,22 @@ jobs:
       # 3. Cria o config/producao.php a partir dos Secrets do GitHub
       #    (o arquivo real está no .gitignore — o servidor precisa dele)
       - name: Criar config/producao.php
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
         run: |
-          cat > config/producao.php << 'PHPEOF'
+          cat > config/producao.php << PHPEOF
           <?php
           define('APP_ENV',  'prod');
           define('APP_URL',  'https://penomato.app.br');
           define('APP_BASE', '');
 
-          define('DB_HOST',    '${{ secrets.DB_HOST }}');
-          define('DB_NAME',    '${{ secrets.DB_NAME }}');
-          define('DB_USER',    '${{ secrets.DB_USER }}');
-          define('DB_PASS',    '${{ secrets.DB_PASS }}');
+          define('DB_HOST',    '${DB_HOST}');
+          define('DB_NAME',    '${DB_NAME}');
+          define('DB_USER',    '${DB_USER}');
+          define('DB_PASS',    '${DB_PASS}');
           define('DB_CHARSET', 'utf8mb4');
           PHPEOF
 
