@@ -52,6 +52,7 @@ jobs:
           exclude: |
             **/.git*
             **/.git*/**
+            **/.claude/**
             **/node_modules/**
             database/**
             docs/**
