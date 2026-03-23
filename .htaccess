@@ -1,5 +1,10 @@
-# .htaccess SIMPLIFICADO - PENOMATO MVP
+# .htaccess - PENOMATO MVP
 RewriteEngine On
+RewriteBase /
+
+# Redireciona /penomato_mvp/X → /X (resolve links hardcoded do ambiente dev)
+RewriteCond %{REQUEST_URI} ^/penomato_mvp/(.*)$ [NC]
+RewriteRule ^penomato_mvp/(.*)$ /$1 [R=301,L]
 
 # Redirecionar tudo para index.php (menos arquivos reais)
 RewriteCond %{REQUEST_FILENAME} !-f
