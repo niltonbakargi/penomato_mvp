@@ -1,0 +1,190 @@
+<?php
+/**
+ * CONTROLADOR DE CADASTRO - VERSÃO SIMPLIFICADA
+ */
+
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Ativar exibição de erros (remova em produção)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once __DIR__ . '/../../../config/banco_de_dados.php';
+require_once __DIR__ . '/../../../config/email.php';
+require_once __DIR__ . '/verificar_acesso.php';
+
+// ============================================================
+// VERIFICAR SE JÁ ESTÁ LOGADO
+// ============================================================
+if (estaLogado()) {
+    header('Location: ' . APP_BASE . '/perfil');
+    exit;
+}
+
+// ============================================================
+// VERIFICAR SE VEIO POR POST
+// ============================================================
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ' . APP_BASE . '/cadastro');
+    exit;
+}
+
+// ============================================================
+// RECEBER DADOS
+// ============================================================
+$nome = trim($_POST['nome'] ?? '');
+$email = strtolower(trim($_POST['email'] ?? ''));
+$confirmar_email = strtolower(trim($_POST['confirmar_email'] ?? ''));
+$senha = $_POST['senha'] ?? '';
+$confirmar_senha = $_POST['confirmar_senha'] ?? '';
+$tipo_form   = $_POST['tipo']        ?? '';
+$instituicao = trim($_POST['instituicao'] ?? '');
+
+// Mapear tipo do formulário → categoria do banco + subtipo
+$mapa_perfis = [
+    'identificador' => ['categoria' => 'colaborador', 'subtipo' => 'identificador'],
+    'especialista'  => ['categoria' => 'revisor',     'subtipo' => 'especialista'],
+    'gestor'        => ['categoria' => 'gestor',       'subtipo' => 'gestor'],
+    'dev'           => ['categoria' => 'colaborador',  'subtipo' => 'dev'],
+];
+$perfil   = $mapa_perfis[$tipo_form] ?? null;
+$categoria = $perfil['categoria'] ?? '';
+$subtipo   = $perfil['subtipo']   ?? null;
+
+// Guardar dados na sessão para repopular o formulário
+$_SESSION['dados_cadastro'] = [
+    'nome'           => $nome,
+    'email'          => $email,
+    'confirmar_email'=> $confirmar_email,
+    'tipo'           => $tipo_form,
+    'instituicao'    => $instituicao,
+];
+
+// ============================================================
+// VALIDAÇÕES BÁSICAS
+// ============================================================
+$erros = [];
+
+if (empty($nome) || strlen($nome) < 3) {
+    $erros[] = "Nome completo é obrigatório (mínimo 3 caracteres).";
+}
+
+if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $erros[] = "E-mail válido é obrigatório.";
+} elseif ($email !== $confirmar_email) {
+    $erros[] = "E-mails não conferem.";
+}
+
+if (empty($senha)) {
+    $erros[] = "Senha é obrigatória.";
+} elseif ($senha !== $confirmar_senha) {
+    $erros[] = "Senhas não conferem.";
+}
+
+if (!$perfil) {
+    $erros[] = "Perfil de atuação é obrigatório.";
+}
+
+// ============================================================
+// VERIFICAR SE EMAIL JÁ EXISTE
+// ============================================================
+if (empty($erros)) {
+    $existe = buscarUm(
+        "SELECT id FROM usuarios WHERE email = :email",
+        [':email' => $email]
+    );
+    
+    if ($existe) {
+        $erros[] = "Este e-mail já está cadastrado.";
+    }
+}
+
+// ============================================================
+// SE HOUVER ERROS, VOLTAR
+// ============================================================
+if (!empty($erros)) {
+    $_SESSION['mensagem_erro'] = implode('<br>', $erros);
+    header('Location: ' . APP_BASE . '/cadastro');
+    exit;
+}
+
+// ============================================================
+// INSERIR USUÁRIO NO BANCO
+// ============================================================
+try {
+    $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+    
+    $dados_insert = [
+        'nome'               => $nome,
+        'email'              => $email,
+        'senha_hash'         => $senha_hash,
+        'categoria'          => $categoria,
+        'subtipo_colaborador' => $subtipo,
+        'instituicao'        => $instituicao ?: null,
+        'status_verificacao' => 'pendente',
+        'ativo'              => 0,
+        'data_cadastro'      => date('Y-m-d H:i:s'),
+    ];
+
+    $usuario_id = inserir('usuarios', $dados_insert);
+
+    if (!$usuario_id) {
+        throw new Exception("Erro ao inserir usuário.");
+    }
+
+    // ============================================================
+    // GERAR TOKEN E ENVIAR E-MAIL DE CONFIRMAÇÃO
+    // ============================================================
+    $token = bin2hex(random_bytes(32)); // 64 chars hex
+    $expira_em = date('Y-m-d H:i:s', time() + 86400); // 24 horas
+
+    inserir('tokens_verificacao_email', [
+        'usuario_id' => $usuario_id,
+        'token'      => $token,
+        'expira_em'  => $expira_em,
+        'usado'      => 0,
+        'criado_em'  => date('Y-m-d H:i:s'),
+    ]);
+
+    $link_ativacao = APP_URL . '/src/Controllers/auth/ativar_conta_controlador.php?token=' . $token;
+
+    $conteudo_email = "
+        <p>Olá, <strong>" . htmlspecialchars($nome) . "</strong>!</p>
+        <p>Obrigado por se cadastrar no <strong>Penomato</strong>.</p>
+        <p>Para ativar sua conta, clique no botão abaixo. O link é válido por <strong>24 horas</strong>.</p>
+        <p style='margin-top:24px;text-align:center;'>
+            <a href='{$link_ativacao}'
+               style='background:#0b5e42;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:16px;'>
+                Confirmar meu e-mail
+            </a>
+        </p>
+        <p style='margin-top:20px;font-size:13px;color:#888;'>
+            Se o botão não funcionar, copie e cole este link no navegador:<br>
+            <a href='{$link_ativacao}' style='color:#0b5e42;'>{$link_ativacao}</a>
+        </p>
+        <p style='font-size:13px;color:#888;'>Se você não criou esta conta, ignore este e-mail.</p>";
+
+    enviarEmail($email, 'Confirme seu e-mail — Penomato', templateEmail('Confirme seu cadastro', $conteudo_email));
+
+    // ============================================================
+    // SUCESSO - REDIRECIONAR PARA LOGIN
+    // ============================================================
+    $_SESSION['mensagem_sucesso'] = "Cadastro realizado! Enviamos um link de confirmação para <strong>{$email}</strong>. Verifique sua caixa de entrada.";
+    unset($_SESSION['dados_cadastro']);
+
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
+    exit;
+    
+} catch (Exception $e) {
+    error_log("Erro no cadastro: " . $e->getMessage());
+    $_SESSION['mensagem_erro'] = "Erro ao realizar cadastro. Tente novamente.";
+    header('Location: ' . APP_BASE . '/cadastro');
+    exit;
+}
+?>
