@@ -4,6 +4,7 @@
 // ============================================================
 session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
+require_once __DIR__ . '/../../config/email.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
@@ -72,6 +73,22 @@ try {
 
         $pdo->commit();
 
+        // Notificar quem cadastrou o exemplar
+        $stmt_cad = $pdo->prepare("SELECT u.email, u.nome FROM usuarios u JOIN exemplares e ON e.cadastrado_por = u.id WHERE e.id = ?");
+        $stmt_cad->execute([$exemplar_id]);
+        $cadastrador = $stmt_cad->fetch();
+        if ($cadastrador) {
+            $conteudo_email = "
+                <p>Olá, <strong>" . htmlspecialchars($cadastrador['nome']) . "</strong>!</p>
+                <p>Seu exemplar <strong>{$exemplar['codigo']}</strong> foi <strong style='color:#0b5e42;'>APROVADO</strong> pelo especialista.</p>
+                <p>Os colaboradores já podem enviar fotos das partes do exemplar. Acesse a plataforma para acompanhar.</p>";
+            enviarEmail(
+                $cadastrador['email'],
+                'Exemplar aprovado — Penomato',
+                templateEmail('Exemplar aprovado na revisão', $conteudo_email)
+            );
+        }
+
         $msg = "Exemplar {$exemplar['codigo']} aprovado. Os colaboradores já podem enviar fotos das partes.";
         header("Location: {$redirect}&sucesso=" . urlencode($msg));
 
@@ -92,6 +109,23 @@ try {
         $stmt_hist->execute([$exemplar['especie_id'], $usuario_id, $motivo]);
 
         $pdo->commit();
+
+        // Notificar quem cadastrou o exemplar
+        $stmt_cad = $pdo->prepare("SELECT u.email, u.nome FROM usuarios u JOIN exemplares e ON e.cadastrado_por = u.id WHERE e.id = ?");
+        $stmt_cad->execute([$exemplar_id]);
+        $cadastrador = $stmt_cad->fetch();
+        if ($cadastrador) {
+            $conteudo_email = "
+                <p>Olá, <strong>" . htmlspecialchars($cadastrador['nome']) . "</strong>!</p>
+                <p>Seu exemplar <strong>{$exemplar['codigo']}</strong> foi <strong style='color:#dc3545;'>REJEITADO</strong> na revisão.</p>
+                <p><strong>Motivo:</strong> " . htmlspecialchars($motivo) . "</p>
+                <p>Corrija os problemas apontados e recadastre o exemplar se necessário.</p>";
+            enviarEmail(
+                $cadastrador['email'],
+                'Exemplar rejeitado — Penomato',
+                templateEmail('Exemplar rejeitado na revisão', $conteudo_email)
+            );
+        }
 
         $msg = "Exemplar {$exemplar['codigo']} rejeitado. O colaborador será informado do motivo.";
         header("Location: {$redirect}&sucesso=" . urlencode($msg));

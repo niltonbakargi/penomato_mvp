@@ -4,6 +4,7 @@
 // ============================================================
 session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
+require_once __DIR__ . '/../../config/email.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
@@ -145,6 +146,37 @@ try {
     $stmt_hist->execute([$especie_id, $usuario_id, $codigo]);
 
     $pdo->commit();
+
+    // Notificar o especialista sobre o novo exemplar aguardando revisão
+    $stmt_esp = $pdo->prepare("SELECT nome, email FROM usuarios WHERE id = ?");
+    $stmt_esp->execute([$especialista_id]);
+    $especialista = $stmt_esp->fetch();
+    if ($especialista) {
+        $stmt_esp_nome = $pdo->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ?");
+        $stmt_esp_nome->execute([$especie_id]);
+        $nome_especie = $stmt_esp_nome->fetchColumn() ?: 'espécie não identificada';
+
+        $conteudo_email = "
+            <p>Olá, <strong>" . htmlspecialchars($especialista['nome']) . "</strong>!</p>
+            <p>Um novo exemplar foi cadastrado e aguarda sua revisão:</p>
+            <table style='margin:16px 0;border-collapse:collapse;width:100%;'>
+                <tr><td style='padding:6px 12px;background:#f4f4f4;font-weight:600;'>Código</td><td style='padding:6px 12px;'>{$codigo}</td></tr>
+                <tr><td style='padding:6px 12px;background:#f4f4f4;font-weight:600;'>Espécie</td><td style='padding:6px 12px;'><em>" . htmlspecialchars($nome_especie) . "</em></td></tr>
+                <tr><td style='padding:6px 12px;background:#f4f4f4;font-weight:600;'>Local</td><td style='padding:6px 12px;'>" . htmlspecialchars($cidade) . ", " . htmlspecialchars($estado) . "</td></tr>
+                <tr><td style='padding:6px 12px;background:#f4f4f4;font-weight:600;'>Cadastrado por</td><td style='padding:6px 12px;'>" . htmlspecialchars($usuario_nome) . "</td></tr>
+            </table>
+            <p>
+                <a href='" . APP_URL . "/src/Views/revisor/revisar_exemplar.php'
+                   style='background:#0b5e42;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;'>
+                    Revisar exemplar
+                </a>
+            </p>";
+        enviarEmail(
+            $especialista['email'],
+            "Novo exemplar para revisão ({$codigo}) — Penomato",
+            templateEmail('Exemplar aguardando sua revisão', $conteudo_email)
+        );
+    }
 
     $msg = "Exemplar {$codigo} cadastrado com sucesso! Aguardando revisão do especialista.";
     header("Location: {$redirect}&sucesso=" . urlencode($msg));

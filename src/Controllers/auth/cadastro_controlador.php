@@ -17,6 +17,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../../../config/banco_de_dados.php';
 require_once __DIR__ . '/verificar_acesso.php';
+require_once __DIR__ . '/../../../config/email.php';
 
 // ============================================================
 // VERIFICAR SE JÁ ESTÁ LOGADO
@@ -136,6 +137,21 @@ try {
     if (!$usuario_id) {
         throw new Exception("Erro ao inserir usuário.");
     }
+
+    // ============================================================
+    // EMAIL DE BOAS-VINDAS
+    // ============================================================
+    $conteudo_email = "
+        <p>Olá, <strong>" . htmlspecialchars($nome) . "</strong>!</p>
+        <p>Seu cadastro no <strong>Penomato</strong> foi realizado com sucesso.</p>
+        <p>Você se cadastrou como <strong>" . htmlspecialchars(ucfirst($categoria)) . "</strong> e já pode acessar a plataforma.</p>
+        <p style='margin-top:20px;'>
+            <a href='" . APP_URL . "/src/Views/auth/login.php'
+               style='background:#0b5e42;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;'>
+                Acessar a plataforma
+            </a>
+        </p>";
+    enviarEmail($email, 'Bem-vindo ao Penomato!', templateEmail('Cadastro realizado com sucesso', $conteudo_email));
 
     // ============================================================
     // SUCESSO - REDIRECIONAR PARA LOGIN

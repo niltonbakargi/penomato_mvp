@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
+require_once __DIR__ . '/../../config/email.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
@@ -20,6 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($item_id && in_array($acao, ['aprovar', 'rejeitar'])) {
         $status = $acao === 'aprovar' ? 'aprovado' : 'rejeitado';
 
+        // Buscar dados da ação e do solicitante ANTES de atualizar
+        $stmt_item = $pdo->prepare("
+            SELECT f.tipo, f.especie_id, f.usuario_id,
+                   u.email AS usuario_email, u.nome AS usuario_nome,
+                   e.nome_cientifico
+            FROM fila_aprovacao f
+            JOIN usuarios u ON u.id = f.usuario_id
+            JOIN especies_administrativo e ON e.id = f.especie_id
+            WHERE f.id = ?
+        ");
+        $stmt_item->execute([$item_id]);
+        $row = $stmt_item->fetch(PDO::FETCH_ASSOC);
+
         $stmt = $pdo->prepare("
             UPDATE fila_aprovacao
             SET status = ?, motivo_rejeicao = ?, data_decisao = NOW(), gestor_id = ?
@@ -27,13 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->execute([$status, $motivo ?: null, $gestor_id, $item_id]);
 
-        // Se aprovado, avança o status da espécie conforme o tipo da ação
-        if ($status === 'aprovado') {
-            $item = $pdo->prepare("SELECT tipo, especie_id FROM fila_aprovacao WHERE id = ?");
-            $item->execute([$item_id]);
-            $row = $item->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $tipo_label = $labels_tipo[$row['tipo']] ?? $row['tipo'];
 
-            if ($row) {
+            // Se aprovado, avança o status da espécie conforme o tipo da ação
+            if ($status === 'aprovado') {
                 $novo_status = match($row['tipo']) {
                     'dados_internet' => 'dados_internet',
                     'confirmacao'    => 'identificado',
@@ -46,6 +58,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $pdo->prepare("UPDATE especies_administrativo SET status = ? WHERE id = ?")
                         ->execute([$novo_status, $row['especie_id']]);
                 }
+
+                $conteudo_email = "
+                    <p>Olá, <strong>" . htmlspecialchars($row['usuario_nome']) . "</strong>!</p>
+                    <p>Sua solicitação de <strong>" . htmlspecialchars($tipo_label) . "</strong>
+                    para a espécie <em>" . htmlspecialchars($row['nome_cientifico']) . "</em>
+                    foi <strong style='color:#0b5e42;'>APROVADA</strong>.</p>
+                    <p>Acesse a plataforma para acompanhar o progresso.</p>";
+                enviarEmail(
+                    $row['usuario_email'],
+                    'Solicitação aprovada — Penomato',
+                    templateEmail('Sua solicitação foi aprovada', $conteudo_email)
+                );
+
+            } else {
+                $conteudo_email = "
+                    <p>Olá, <strong>" . htmlspecialchars($row['usuario_nome']) . "</strong>!</p>
+                    <p>Sua solicitação de <strong>" . htmlspecialchars($tipo_label) . "</strong>
+                    para a espécie <em>" . htmlspecialchars($row['nome_cientifico']) . "</em>
+                    foi <strong style='color:#dc3545;'>REJEITADA</strong>.</p>"
+                    . ($motivo ? "<p><strong>Motivo:</strong> " . htmlspecialchars($motivo) . "</p>" : "")
+                    . "<p>Em caso de dúvidas, entre em contato com o gestor.</p>";
+                enviarEmail(
+                    $row['usuario_email'],
+                    'Solicitação rejeitada — Penomato',
+                    templateEmail('Solicitação não aprovada', $conteudo_email)
+                );
             }
         }
     }

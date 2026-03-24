@@ -6,6 +6,7 @@ session_start();
 
 // Carregar configuração do banco
 require_once __DIR__ . '/../../config/banco_de_dados.php';
+require_once __DIR__ . '/../../config/email.php';
 
 // Verificar se usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
@@ -92,10 +93,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aceitar_membro'])) {
     $categoria  = trim($_POST['categoria_aceitar'] ?? 'colaborador');
 
     if ($membro_id) {
+        // Buscar dados do membro antes de atualizar
+        $stmt_m = $pdo->prepare("SELECT email, nome FROM usuarios WHERE id = ?");
+        $stmt_m->execute([$membro_id]);
+        $membro = $stmt_m->fetch(PDO::FETCH_ASSOC);
+
         $stmt = $pdo->prepare("UPDATE usuarios SET status_verificacao = 'verificado', ativo = 1, categoria = ? WHERE id = ?");
         $stmt->execute([$categoria, $membro_id]);
         $msg_aceitar[] = ['tipo' => 'ok', 'texto' => "Membro aceito com sucesso." . ($motivacao ? " Motivo: $motivacao" : '')];
         $total_usuarios = $pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
+
+        // Notificar o membro
+        if ($membro) {
+            $conteudo_email = "
+                <p>Olá, <strong>" . htmlspecialchars($membro['nome']) . "</strong>!</p>
+                <p>Seu cadastro no <strong>Penomato</strong> foi <strong style='color:#0b5e42;'>ACEITO</strong>!</p>
+                <p>Sua conta foi ativada como <strong>" . htmlspecialchars(ucfirst($categoria)) . "</strong> e você já pode acessar a plataforma.</p>"
+                . ($motivacao ? "<p><strong>Observações:</strong> " . htmlspecialchars($motivacao) . "</p>" : "")
+                . "<p style='margin-top:20px;'>
+                    <a href='" . APP_URL . "/src/Views/auth/login.php'
+                       style='background:#0b5e42;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;'>
+                        Acessar a plataforma
+                    </a>
+                </p>";
+            enviarEmail($membro['email'], 'Cadastro aceito — Penomato', templateEmail('Bem-vindo ao Penomato!', $conteudo_email));
+        }
     } else {
         $msg_aceitar[] = ['tipo' => 'err', 'texto' => 'Selecione um membro.'];
     }
@@ -110,10 +132,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_membro'])) {
     $motivacao = trim($_POST['motivacao_excluir'] ?? '');
 
     if ($membro_id && $membro_id != ($_SESSION['usuario_id'] ?? 0)) {
+        // Buscar dados do membro ANTES de deletar
+        $stmt_m = $pdo->prepare("SELECT email, nome FROM usuarios WHERE id = ?");
+        $stmt_m->execute([$membro_id]);
+        $membro_excluir = $stmt_m->fetch(PDO::FETCH_ASSOC);
+
         $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = ?");
         $stmt->execute([$membro_id]);
         $msg_excluir[] = ['tipo' => 'ok', 'texto' => "Membro removido." . ($motivacao ? " Motivo: $motivacao" : '')];
         $total_usuarios = $pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
+
+        // Notificar o membro removido
+        if ($membro_excluir) {
+            $conteudo_email = "
+                <p>Olá, <strong>" . htmlspecialchars($membro_excluir['nome']) . "</strong>.</p>
+                <p>Informamos que seu acesso ao <strong>Penomato</strong> foi <strong style='color:#dc3545;'>removido</strong>.</p>"
+                . ($motivacao ? "<p><strong>Motivo:</strong> " . htmlspecialchars($motivacao) . "</p>" : "")
+                . "<p>Para mais informações, entre em contato com a equipe gestora.</p>";
+            enviarEmail($membro_excluir['email'], 'Acesso removido — Penomato', templateEmail('Notificação de remoção', $conteudo_email));
+        }
     } else {
         $msg_excluir[] = ['tipo' => 'err', 'texto' => 'Selecione um membro válido (você não pode excluir a si mesmo).'];
     }
