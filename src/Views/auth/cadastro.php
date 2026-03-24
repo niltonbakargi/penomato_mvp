@@ -122,6 +122,7 @@ unset($_SESSION['dados_cadastro']);
                                 <option value="">Selecione...</option>
                                 <option value="identificador" <?php echo $tipo_salvo === 'identificador' ? 'selected' : ''; ?>>Identificador</option>
                                 <option value="especialista"  <?php echo $tipo_salvo === 'especialista'  ? 'selected' : ''; ?>>Especialista</option>
+                                <option value="dev"           <?php echo $tipo_salvo === 'dev'           ? 'selected' : ''; ?>>Desenvolvedor</option>
                             </select>
                         </div>
                         <div class="col-md-6">
