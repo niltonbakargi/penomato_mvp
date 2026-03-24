@@ -21,8 +21,8 @@
         }
 
         .header {
-            background: var(--cor-primaria);
-            color: var(--branco);
+            background: #0b5e42;
+            color: #ffffff;
             padding: 24px 40px;
             border-radius: 12px;
             margin-bottom: 40px;
@@ -30,8 +30,8 @@
             width: 100%;
             max-width: 620px;
         }
-        .header h1 { font-size: 1.7em; font-weight: 700; }
-        .header p { font-size: 1em; opacity: 0.9; margin-top: 6px; }
+        .header h1 { font-size: 1.7em; font-weight: 700; color: #ffffff; }
+        .header p { font-size: 1em; color: #d4f0e4; margin-top: 6px; }
 
         .btn-grid {
             display: grid;
