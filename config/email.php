@@ -17,9 +17,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // CONFIGURAÇÕES DA APLICAÇÃO
 // ============================================================
 
-define('EMAIL_REMETENTE',      'seuemail@gmail.com');  // ← seu Gmail aqui
+define('EMAIL_REMETENTE',      'noreply@penomato.app.br');
 define('EMAIL_NOME_REMETENTE', 'Penomato');
-define('APP_URL',              'http://localhost/penomato_mvp');
+define('APP_URL',              'https://penomato.app.br');
 define('APP_NOME',             'Penomato');
 
 // ============================================================
@@ -35,11 +35,11 @@ define('APP_NOME',             'Penomato');
 //   User: seu@gmail.com  | Pass: senha de app (não a senha normal)
 // ============================================================
 
-define('SMTP_HOST',       'smtp.gmail.com');
-define('SMTP_PORT',       587);
-define('SMTP_USER',       'seuemail@gmail.com');        // ← seu Gmail aqui
-define('SMTP_PASS',       'xxxx xxxx xxxx xxxx');       // ← senha de app aqui
-define('SMTP_ENCRYPTION', PHPMailer::ENCRYPTION_STARTTLS);
+define('SMTP_HOST',       'mail.penomato.app.br');
+define('SMTP_PORT',       465);
+define('SMTP_USER',       'noreply@penomato.app.br');
+define('SMTP_PASS',       'd^^HT[zIdy41');
+define('SMTP_ENCRYPTION', PHPMailer::ENCRYPTION_SMTPS);
 
 // ============================================================
 // FUNÇÃO PRINCIPAL
