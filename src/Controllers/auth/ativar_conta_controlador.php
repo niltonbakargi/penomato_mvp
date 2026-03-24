@@ -59,7 +59,7 @@ iniciarTransacao();
 try {
     atualizar(
         'usuarios',
-        ['status_verificacao' => 'verificado'],
+        ['status_verificacao' => 'verificado', 'ativo' => 1],
         'id = :id',
         [':id' => $registro['usuario_id']]
     );

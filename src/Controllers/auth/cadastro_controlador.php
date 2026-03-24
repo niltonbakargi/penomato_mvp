@@ -127,36 +127,55 @@ try {
         'categoria'          => $categoria,
         'subtipo_colaborador' => $subtipo,
         'instituicao'        => $instituicao ?: null,
-        'status_verificacao' => 'verificado',
-        'ativo'              => 1,
+        'status_verificacao' => 'pendente',
+        'ativo'              => 0,
         'data_cadastro'      => date('Y-m-d H:i:s'),
     ];
-    
+
     $usuario_id = inserir('usuarios', $dados_insert);
-    
+
     if (!$usuario_id) {
         throw new Exception("Erro ao inserir usuário.");
     }
 
     // ============================================================
-    // EMAIL DE BOAS-VINDAS
+    // GERAR TOKEN E ENVIAR EMAIL DE CONFIRMAÇÃO
     // ============================================================
+    $token = bin2hex(random_bytes(32)); // 64 chars hex
+    $expira_em = date('Y-m-d H:i:s', time() + 86400); // 24 horas
+
+    inserir('tokens_verificacao_email', [
+        'usuario_id' => $usuario_id,
+        'token'      => $token,
+        'expira_em'  => $expira_em,
+        'usado'      => 0,
+        'criado_em'  => date('Y-m-d H:i:s'),
+    ]);
+
+    $link_ativacao = APP_URL . '/src/Controllers/auth/ativar_conta_controlador.php?token=' . $token;
+
     $conteudo_email = "
         <p>Olá, <strong>" . htmlspecialchars($nome) . "</strong>!</p>
-        <p>Seu cadastro no <strong>Penomato</strong> foi realizado com sucesso.</p>
-        <p>Você se cadastrou como <strong>" . htmlspecialchars(ucfirst($categoria)) . "</strong> e já pode acessar a plataforma.</p>
-        <p style='margin-top:20px;'>
-            <a href='" . APP_URL . "/src/Views/auth/login.php'
-               style='background:#0b5e42;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:600;'>
-                Acessar a plataforma
+        <p>Obrigado por se cadastrar no <strong>Penomato</strong> como <strong>" . htmlspecialchars(ucfirst($categoria)) . "</strong>.</p>
+        <p>Para ativar sua conta, clique no botão abaixo. O link é válido por <strong>24 horas</strong>.</p>
+        <p style='margin-top:24px;text-align:center;'>
+            <a href='{$link_ativacao}'
+               style='background:#0b5e42;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:16px;'>
+                Confirmar meu e-mail
             </a>
-        </p>";
-    enviarEmail($email, 'Bem-vindo ao Penomato!', templateEmail('Cadastro realizado com sucesso', $conteudo_email));
+        </p>
+        <p style='margin-top:20px;font-size:13px;color:#888;'>
+            Se o botão não funcionar, copie e cole este link no navegador:<br>
+            <a href='{$link_ativacao}' style='color:#0b5e42;'>{$link_ativacao}</a>
+        </p>
+        <p style='font-size:13px;color:#888;'>Se você não criou esta conta, ignore este e-mail.</p>";
+
+    enviarEmail($email, 'Confirme seu e-mail — Penomato', templateEmail('Confirme seu cadastro', $conteudo_email));
 
     // ============================================================
     // SUCESSO - REDIRECIONAR PARA LOGIN
     // ============================================================
-    $_SESSION['mensagem_sucesso'] = "Cadastro realizado com sucesso! Faça login para continuar.";
+    $_SESSION['mensagem_sucesso'] = "Cadastro realizado! Enviamos um link de confirmação para <strong>{$email}</strong>. Verifique sua caixa de entrada.";
     unset($_SESSION['dados_cadastro']);
 
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
