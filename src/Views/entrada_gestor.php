@@ -10,35 +10,35 @@
     <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
         body {
-            background-color: #f0f4f0;
+            background-color: #e8ede8;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 30px 20px;
-            color: #1e2e1e;
+            color: #1a2a1a;
         }
 
         .header {
             background: var(--cor-primaria);
             color: var(--branco);
-            padding: 20px 40px;
+            padding: 24px 40px;
             border-radius: 12px;
             margin-bottom: 40px;
             text-align: center;
             width: 100%;
-            max-width: 600px;
+            max-width: 620px;
         }
-        .header h1 { font-size: 1.4em; font-weight: 600; }
-        .header p { font-size: 0.9em; opacity: 0.8; margin-top: 4px; }
+        .header h1 { font-size: 1.7em; font-weight: 700; }
+        .header p { font-size: 1em; opacity: 0.9; margin-top: 6px; }
 
         .btn-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 16px;
             width: 100%;
-            max-width: 600px;
+            max-width: 620px;
         }
 
         .action-btn {
@@ -49,31 +49,33 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
-            font-weight: 600;
-            color: var(--cor-primaria);
-            font-size: 0.95em;
+            font-weight: 700;
+            color: #0a4a34;
+            font-size: 1.05em;
         }
         .action-btn:hover {
             background: var(--cor-primaria);
             color: var(--branco);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(11,94,66,0.2);
+            box-shadow: 0 6px 16px rgba(11,94,66,0.25);
         }
-        .action-btn .icon { font-size: 2em; margin-bottom: 10px; display: block; }
+        .action-btn .icon { font-size: 1.8em; margin-bottom: 10px; display: block; }
 
-        .action-btn.danger { border-color: var(--perigo-cor); color: var(--perigo-cor); }
+        .action-btn.danger { border-color: var(--perigo-cor); color: #b02020; }
         .action-btn.danger:hover { background: var(--perigo-cor); color: var(--branco); }
 
         .btn-sair {
             margin-top: 30px;
             background: none;
-            border: none;
-            color: var(--cinza-400);
-            font-size: 0.9em;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            color: #555;
+            font-size: 1em;
             cursor: pointer;
-            text-decoration: underline;
+            padding: 8px 20px;
+            transition: all 0.2s;
         }
-        .btn-sair:hover { color: var(--perigo-cor); }
+        .btn-sair:hover { color: var(--perigo-cor); border-color: var(--perigo-cor); background: #fff0f0; }
 
         /* ── MODAL ── */
         .modal-overlay {
