@@ -99,42 +99,51 @@ unset($_SESSION['dados_cadastro']);
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Senha *</label>
-                            <input type="password" name="senha" class="form-control" required>
+                            <input type="password" name="senha" id="senha" class="form-control" required minlength="8">
+                            <small class="text-muted">Mínimo 8 caracteres.</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Confirmar Senha *</label>
-                            <input type="password" name="confirmar_senha" class="form-control" required>
+                            <input type="password" name="confirmar_senha" id="confirmar_senha" class="form-control" required>
+                            <small id="senha-feedback" class="text-muted"></small>
                         </div>
                     </div>
                     
                     <!-- Perfil -->
                     <h4 class="mb-3 mt-4 text-success">👤 Perfil de Atuação</h4>
                     <?php
-                    // Verificar se já existe um gestor cadastrado
-                    $mysqli_check = new mysqli('127.0.0.1', 'root', '', 'penomato');
-                    $mysqli_check->set_charset('utf8mb4');
-                    $res_g = $mysqli_check->query("SELECT id FROM usuarios WHERE categoria = 'gestor' LIMIT 1");
-                    $gestor_existe = ($res_g && $res_g->num_rows > 0);
-                    $mysqli_check->close();
+                    require_once __DIR__ . '/../../../config/banco_de_dados.php';
+                    $gestor_existe = (bool) buscarUm("SELECT id FROM usuarios WHERE categoria = 'gestor' LIMIT 1", []);
                     $tipo_salvo = $dados_tentativa['tipo'] ?? '';
                     ?>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Tipo de Colaborador *</label>
-                            <select name="tipo" class="form-control" required>
-                                <option value="">Selecione...</option>
-                                <option value="identificador" <?php echo $tipo_salvo === 'identificador' ? 'selected' : ''; ?>>Colaborador Identificador</option>
-                                <option value="especialista"  <?php echo $tipo_salvo === 'especialista'  ? 'selected' : ''; ?>>Colaborador Especialista</option>
-                                <?php if (!$gestor_existe): ?>
-                                <option value="gestor" <?php echo $tipo_salvo === 'gestor' ? 'selected' : ''; ?>>Colaborador Gestor</option>
-                                <?php endif; ?>
-                                <option value="dev" <?php echo $tipo_salvo === 'dev' ? 'selected' : ''; ?>>Colaborador Dev</option>
-                            </select>
+
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <div class="border rounded p-3 h-100 <?php echo $tipo_salvo === 'identificador' ? 'border-success' : ''; ?>" style="cursor:pointer;" onclick="document.getElementById('tipo_identificador').checked=true;selecionarPerfil('identificador')">
+                                        <input type="radio" name="tipo" value="identificador" id="tipo_identificador" class="d-none" <?php echo $tipo_salvo === 'identificador' ? 'checked' : ''; ?> required>
+                                        <div class="fw-bold mb-1">🌿 Colaborador Identificador</div>
+                                        <small class="text-muted">Acesso imediato após confirmar o e-mail. Registra exemplares em campo e envia fotos das partes da planta.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="border rounded p-3 h-100 <?php echo $tipo_salvo === 'especialista' ? 'border-success' : ''; ?>" style="cursor:pointer;" onclick="document.getElementById('tipo_especialista').checked=true;selecionarPerfil('especialista')">
+                                        <input type="radio" name="tipo" value="especialista" id="tipo_especialista" class="d-none" <?php echo $tipo_salvo === 'especialista' ? 'checked' : ''; ?>>
+                                        <div class="fw-bold mb-1">🔬 Colaborador Especialista</div>
+                                        <small class="text-muted">Requer aprovação do gestor. Revisa e valida dados botânicos registrados pelos identificadores.</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
                             <label class="form-label">Instituição (opcional)</label>
                             <input type="text" name="instituicao" class="form-control"
-                                   value="<?php echo htmlspecialchars($dados_tentativa['instituicao'] ?? ''); ?>">
+                                   value="<?php echo htmlspecialchars($dados_tentativa['instituicao'] ?? ''); ?>"
+                                   placeholder="Ex: UFMS, UEMS, EMBRAPA...">
                         </div>
                     </div>
                     
@@ -144,7 +153,7 @@ unset($_SESSION['dados_cadastro']);
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="termos" id="termos" required>
                                 <label class="form-check-label texto-termos" for="termos">
-                                    Li e aceito os Termos de Uso *
+                                    Li e aceito os <a href="/penomato_mvp/src/Views/publico/termos.php" target="_blank">Termos de Uso</a> *
                                 </label>
                             </div>
                         </div>
@@ -164,5 +173,32 @@ unset($_SESSION['dados_cadastro']);
             </div>
         </div>
     </div>
+<script>
+function selecionarPerfil(tipo) {
+    document.querySelectorAll('.border.rounded').forEach(el => {
+        el.classList.remove('border-success', 'bg-light');
+    });
+    const el = document.getElementById('tipo_' + tipo).closest('.border.rounded');
+    el.classList.add('border-success', 'bg-light');
+}
+
+// Highlight inicial
+document.addEventListener('DOMContentLoaded', function() {
+    const checked = document.querySelector('input[name="tipo"]:checked');
+    if (checked) selecionarPerfil(checked.value);
+
+    // Validação de senha em tempo real
+    document.getElementById('confirmar_senha').addEventListener('input', function() {
+        const fb = document.getElementById('senha-feedback');
+        if (this.value === document.getElementById('senha').value) {
+            fb.textContent = '✔ Senhas conferem';
+            fb.style.color = '#0b5e42';
+        } else {
+            fb.textContent = '✖ Senhas não conferem';
+            fb.style.color = '#dc3545';
+        }
+    });
+});
+</script>
 </body>
 </html>
