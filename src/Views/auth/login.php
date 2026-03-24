@@ -113,7 +113,7 @@ unset($_SESSION['email_tentativa']);
 
         .input-group input {
             width: 100%;
-            padding: var(--esp-4) var(--esp-4) var(--esp-4) var(--esp-11);
+            padding: var(--esp-4);
             border: 2px solid var(--cinza-200);
             border-radius: var(--raio-lg);
             font-size: var(--texto-md);
@@ -240,13 +240,12 @@ unset($_SESSION['email_tentativa']);
                     <div class="form-group">
                         <label>E-mail</label>
                         <div class="input-group">
-                            <i class="fas fa-envelope input-icon"></i>
-                            <input 
-                                type="email" 
-                                name="email" 
-                                placeholder="seu@email.com" 
-                                value="<?php echo htmlspecialchars($email_tentativa); ?>" 
-                                required 
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="seu@email.com"
+                                value="<?php echo htmlspecialchars($email_tentativa); ?>"
+                                required
                                 autofocus
                             >
                         </div>
@@ -255,11 +254,10 @@ unset($_SESSION['email_tentativa']);
                     <div class="form-group">
                         <label>Senha</label>
                         <div class="input-group">
-                            <i class="fas fa-lock input-icon"></i>
-                            <input 
-                                type="password" 
-                                name="senha" 
-                                placeholder="••••••••" 
+                            <input
+                                type="password"
+                                name="senha"
+                                placeholder="••••••••"
                                 required
                             >
                         </div>
