@@ -410,7 +410,9 @@ $url_painel = ($tipo === 'gestor')
                     <!-- Rodapé -->
                     <div class="footer">
                         © <?php echo date('Y'); ?> Penomato<br>
-                        Em parceria com Dr. Norton Hayd Rêgo — UEMS Aquidauana MS — Bioma Cerrado
+                        Desenvolvido como Projeto Integrador do Curso de Tecnologia da Informação da UFMS,
+                        em parceria com o Grupo de Estudos em Botânica e Recursos Florestais da UEMS,
+                        com orientação e apoio do Prof. Dr. Norton Hayd Rêgo.
                     </div>
 
                 </div>
