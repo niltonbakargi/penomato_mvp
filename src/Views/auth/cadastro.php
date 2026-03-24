@@ -113,33 +113,18 @@ unset($_SESSION['dados_cadastro']);
                     <h4 class="mb-3 mt-4 text-success">👤 Perfil de Atuação</h4>
                     <?php
                     require_once __DIR__ . '/../../../config/banco_de_dados.php';
-                    $gestor_existe = (bool) buscarUm("SELECT id FROM usuarios WHERE categoria = 'gestor' LIMIT 1", []);
                     $tipo_salvo = $dados_tentativa['tipo'] ?? '';
                     ?>
-
-                    <div class="row mb-2">
-                        <div class="col-12">
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <div class="border rounded p-3 h-100 <?php echo $tipo_salvo === 'identificador' ? 'border-success' : ''; ?>" style="cursor:pointer;" onclick="document.getElementById('tipo_identificador').checked=true;selecionarPerfil('identificador')">
-                                        <input type="radio" name="tipo" value="identificador" id="tipo_identificador" class="d-none" <?php echo $tipo_salvo === 'identificador' ? 'checked' : ''; ?> required>
-                                        <div class="fw-bold mb-1">🌿 Colaborador Identificador</div>
-                                        <small class="text-muted">Acesso imediato após confirmar o e-mail. Registra exemplares em campo e envia fotos das partes da planta.</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="border rounded p-3 h-100 <?php echo $tipo_salvo === 'especialista' ? 'border-success' : ''; ?>" style="cursor:pointer;" onclick="document.getElementById('tipo_especialista').checked=true;selecionarPerfil('especialista')">
-                                        <input type="radio" name="tipo" value="especialista" id="tipo_especialista" class="d-none" <?php echo $tipo_salvo === 'especialista' ? 'checked' : ''; ?>>
-                                        <div class="fw-bold mb-1">🔬 Colaborador Especialista</div>
-                                        <small class="text-muted">Requer aprovação do gestor. Revisa e valida dados botânicos registrados pelos identificadores.</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="row mb-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Colaborador *</label>
+                            <select name="tipo" class="form-control" required>
+                                <option value="">Selecione...</option>
+                                <option value="identificador" <?php echo $tipo_salvo === 'identificador' ? 'selected' : ''; ?>>Identificador</option>
+                                <option value="especialista"  <?php echo $tipo_salvo === 'especialista'  ? 'selected' : ''; ?>>Especialista</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label">Instituição (opcional)</label>
                             <input type="text" name="instituicao" class="form-control"
                                    value="<?php echo htmlspecialchars($dados_tentativa['instituicao'] ?? ''); ?>"
@@ -174,20 +159,7 @@ unset($_SESSION['dados_cadastro']);
         </div>
     </div>
 <script>
-function selecionarPerfil(tipo) {
-    document.querySelectorAll('.border.rounded').forEach(el => {
-        el.classList.remove('border-success', 'bg-light');
-    });
-    const el = document.getElementById('tipo_' + tipo).closest('.border.rounded');
-    el.classList.add('border-success', 'bg-light');
-}
-
-// Highlight inicial
 document.addEventListener('DOMContentLoaded', function() {
-    const checked = document.querySelector('input[name="tipo"]:checked');
-    if (checked) selecionarPerfil(checked.value);
-
-    // Validação de senha em tempo real
     document.getElementById('confirmar_senha').addEventListener('input', function() {
         const fb = document.getElementById('senha-feedback');
         if (this.value === document.getElementById('senha').value) {
