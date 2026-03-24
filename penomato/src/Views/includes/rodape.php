@@ -588,7 +588,7 @@ function getEstatisticasRodape() {
         padding-bottom: 10px;
         margin-bottom: 10px;
     }
-
+    
     /* Responsividade */
     @media (max-width: 768px) {
         .footer-penomato {
