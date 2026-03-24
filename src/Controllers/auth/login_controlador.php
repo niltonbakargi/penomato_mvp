@@ -102,6 +102,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
+            if ($usuario['status_verificacao'] === 'aguardando_gestor') {
+                $erro = "Seu e-mail foi confirmado! Seu cadastro aguarda aprovação do gestor. Você receberá um e-mail quando for liberado.";
+                $_SESSION['mensagem_erro'] = $erro;
+                $_SESSION['email_tentativa'] = $email;
+                header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
+                exit;
+            }
+
             if ($usuario['status_verificacao'] === 'bloqueado') {
                 $erro = "Esta conta foi bloqueada. Entre em contato com o suporte.";
                 $_SESSION['mensagem_erro'] = $erro;

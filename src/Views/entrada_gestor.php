@@ -240,7 +240,12 @@
                 <div class="pendente-lista">
                     Aguardando aprovação:
                     <?php foreach ($membros_pendentes as $p): ?>
-                        <span><?php echo htmlspecialchars($p['nome']); ?></span>
+                        <span>
+                            <?php echo htmlspecialchars($p['nome']); ?>
+                            <?php if ($p['status_verificacao'] === 'aguardando_gestor'): ?>
+                                ✉️
+                            <?php endif; ?>
+                        </span>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
