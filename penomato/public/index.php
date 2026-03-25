@@ -1,3 +1,0 @@
-<?php
-// Redireciona para a aplicação principal
-require_once __DIR__ . '/../src/index.php';

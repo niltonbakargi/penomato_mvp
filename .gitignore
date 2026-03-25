@@ -15,8 +15,6 @@ error_log
 /vendor/
 /node_modules/
 /composer.lock
-penomato/vendor/
-penomato/composer.lock
 package-lock.json
 yarn.lock
 
@@ -29,7 +27,6 @@ yarn.lock
 !.env.example
 config/database.php
 config/producao.php
-penomato/config/producao.php
 uploads/
 
 # ================================
