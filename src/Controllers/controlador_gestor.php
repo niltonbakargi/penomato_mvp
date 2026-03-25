@@ -94,10 +94,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aceitar_membro'])) {
 
     if ($membro_id) {
         // Buscar dados do membro antes de atualizar
-        $stmt_m = $pdo->prepare("SELECT email, nome FROM usuarios WHERE id = ?");
+        $stmt_m = $pdo->prepare("SELECT email, nome, status_verificacao FROM usuarios WHERE id = ?");
         $stmt_m->execute([$membro_id]);
         $membro = $stmt_m->fetch(PDO::FETCH_ASSOC);
 
+        // Só aprova quem confirmou o e-mail
+        if (!$membro || $membro['status_verificacao'] !== 'aguardando_gestor') {
+            $msg_aceitar[] = ['tipo' => 'err', 'texto' => 'Este membro ainda não confirmou o e-mail. A aprovação só é possível após a confirmação.'];
+        } else {
         $stmt = $pdo->prepare("UPDATE usuarios SET status_verificacao = 'verificado', ativo = 1, categoria = ? WHERE id = ?");
         $stmt->execute([$categoria, $membro_id]);
         $msg_aceitar[] = ['tipo' => 'ok', 'texto' => "Membro aceito com sucesso." . ($motivacao ? " Motivo: $motivacao" : '')];
@@ -118,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aceitar_membro'])) {
                 </p>";
             enviarEmail($membro['email'], 'Cadastro aceito — Penomato', templateEmail('Bem-vindo ao Penomato!', $conteudo_email));
         }
+        } // fim else aguardando_gestor
     } else {
         $msg_aceitar[] = ['tipo' => 'err', 'texto' => 'Selecione um membro.'];
     }
@@ -159,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_membro'])) {
 // ================================================
 // BUSCAR LISTA DE MEMBROS PARA OS FORMULÁRIOS
 // ================================================
-$membros_pendentes = $pdo->query("SELECT id, nome, email, categoria, status_verificacao, data_cadastro FROM usuarios WHERE status_verificacao = 'pendente' OR ativo = 0 ORDER BY data_cadastro DESC")->fetchAll(PDO::FETCH_ASSOC);
+$membros_pendentes = $pdo->query("SELECT id, nome, email, categoria, status_verificacao, data_cadastro FROM usuarios WHERE status_verificacao = 'aguardando_gestor' ORDER BY data_cadastro DESC")->fetchAll(PDO::FETCH_ASSOC);
 $membros_ativos    = $pdo->query("SELECT id, nome, email, categoria FROM usuarios WHERE ativo = 1 AND status_verificacao = 'verificado' ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
 
 // Carregar a view

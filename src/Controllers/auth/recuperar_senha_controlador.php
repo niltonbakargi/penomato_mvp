@@ -33,7 +33,7 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
 // VERIFICAR SE EXISTE NO BANCO (SEM REVELAR AO USUÁRIO)
 // ============================================================
 $usuario = buscarUm(
-    "SELECT id, nome FROM usuarios WHERE email = :email AND ativo = 1 LIMIT 1",
+    "SELECT id, nome FROM usuarios WHERE email = :email AND ativo = 1 AND status_verificacao = 'verificado' LIMIT 1",
     [':email' => $email]
 );
 
