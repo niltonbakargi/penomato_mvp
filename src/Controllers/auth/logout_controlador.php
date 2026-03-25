@@ -6,6 +6,8 @@
  * Também expõe fazerLogout() para uso interno (ex: expiração de sessão).
  */
 
+require_once __DIR__ . '/../../../config/app.php';
+
 // ============================================================
 // FUNÇÃO AUXILIAR (deve ser definida antes do código de execução
 // para que require_once deste arquivo apenas carregue a função
