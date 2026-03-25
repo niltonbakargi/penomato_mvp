@@ -95,6 +95,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
                             <span class="icone-input"><i class="fas fa-at"></i></span>
                             <input type="email" id="email" name="email"
                                    placeholder="seu@email.com"
+                                   value="<?php echo htmlspecialchars(filter_var($_GET['email'] ?? '', FILTER_SANITIZE_EMAIL)); ?>"
                                    required autofocus>
                         </div>
                     </div>

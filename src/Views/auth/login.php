@@ -271,7 +271,7 @@ unset($_SESSION['email_tentativa']);
                 
                 <!-- Links -->
                 <div class="links">
-                    <a href="/penomato_mvp/src/Views/auth/recuperar_senha.php">
+                    <a href="/penomato_mvp/src/Views/auth/recuperar_senha.php?email=<?php echo urlencode($email_tentativa); ?>">
                         <i class="fas fa-key"></i> Esqueceu sua senha?
                     </a>
                     &nbsp;·&nbsp;
