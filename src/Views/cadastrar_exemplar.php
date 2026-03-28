@@ -322,7 +322,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                                            justify-content:center;gap:8px;">
                                 <i class="fas fa-camera"></i> Tirar foto agora
                                 <small style="font-weight:400;opacity:.85;display:block;font-size:.72rem;">
-                                    captura GPS da foto
+                                    usa localização atual
                                 </small>
                             </button>
                             <button type="button" onclick="abrirGaleria()"
@@ -332,7 +332,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                                            justify-content:center;gap:8px;">
                                 <i class="fas fa-images"></i> Escolher da galeria
                                 <small style="font-weight:400;opacity:.7;display:block;font-size:.72rem;">
-                                    usa localização atual
+                                    captura GPS da foto
                                 </small>
                             </button>
                         </div>
@@ -562,14 +562,14 @@ const inputFoto  = document.getElementById('input-foto');
 let _tentarExif = false;
 
 function abrirCamera() {
-    _tentarExif = true;
+    _tentarExif = false; // câmera via browser não preserva EXIF → usa geolocalização
     inputFoto.setAttribute('capture', 'environment');
     inputFoto.value = '';
     inputFoto.click();
 }
 
 function abrirGaleria() {
-    _tentarExif = false;
+    _tentarExif = true; // galeria preserva EXIF da foto → lê GPS da imagem
     inputFoto.removeAttribute('capture');
     inputFoto.value = '';
     inputFoto.click();
