@@ -563,28 +563,54 @@ async function mostrarFoto(file) {
     };
     reader.readAsDataURL(file);
 
-    // Extração de GPS do EXIF da foto
+    // Extração de GPS — tenta browser primeiro, depois servidor, depois geolocalização
     const aviso = document.getElementById('gps-foto-aviso');
+    aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
+        + '<i class="fas fa-spinner fa-spin"></i> <span>Lendo coordenadas GPS da foto...</span></div>';
+    aviso.style.display = 'block';
+
+    // 1. Tenta EXIF no browser (funciona no PC)
     try {
         const gps = await exifr.gps(file);
         if (gps && gps.latitude != null && gps.longitude != null) {
-            document.getElementById('latitude').value  = gps.latitude.toFixed(8);
-            document.getElementById('longitude').value = gps.longitude.toFixed(8);
-            colocarMarcador(gps.latitude, gps.longitude);
-            mapa.setView([gps.latitude, gps.longitude], 17);
-            aviso.innerHTML = '<div class="alerta alerta-success" style="margin:0;">'
-                + '<i class="fas fa-satellite-dish"></i>'
-                + ' <span>Coordenadas extraídas automaticamente da foto: '
-                + gps.latitude.toFixed(6) + ', ' + gps.longitude.toFixed(6)
-                + '</span></div>';
-            aviso.style.display = 'block';
-        } else {
-            tentarGeolocalizacao(aviso);
+            aplicarCoordenadas(gps.latitude, gps.longitude, aviso, 'foto (browser)');
+            return;
         }
     } catch (err) {
-        console.error('exifr erro:', err);
-        tentarGeolocalizacao(aviso);
+        console.warn('exifr browser:', err);
     }
+
+    // 2. Tenta EXIF no servidor via AJAX (funciona no mobile)
+    try {
+        const fd = new FormData();
+        fd.append('foto', file);
+        const resp = await fetch('/penomato_mvp/src/Controllers/ler_exif_gps.php', {
+            method: 'POST', body: fd
+        });
+        const json = await resp.json();
+        if (json.ok) {
+            aplicarCoordenadas(json.lat, json.lng, aviso, 'foto (servidor)');
+            return;
+        }
+        console.warn('exifr servidor:', json.erro);
+    } catch (err) {
+        console.warn('exifr servidor fetch:', err);
+    }
+
+    // 3. Fallback: geolocalização do dispositivo
+    tentarGeolocalizacao(aviso);
+}
+
+function aplicarCoordenadas(lat, lng, aviso, origem) {
+    document.getElementById('latitude').value  = lat.toFixed(8);
+    document.getElementById('longitude').value = lng.toFixed(8);
+    colocarMarcador(lat, lng);
+    mapa.setView([lat, lng], 17);
+    aviso.innerHTML = '<div class="alerta alerta-success" style="margin:0;">'
+        + '<i class="fas fa-satellite-dish"></i>'
+        + ' <span>Coordenadas extraídas da ' + origem + ': '
+        + lat.toFixed(6) + ', ' + lng.toFixed(6) + '</span></div>';
+    aviso.style.display = 'block';
 }
 
 function tentarGeolocalizacao(aviso) {
