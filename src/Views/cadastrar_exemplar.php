@@ -309,6 +309,9 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                 </div>
             </div>
 
+            <!-- GPS feedback da foto -->
+            <div id="gps-foto-aviso" style="display:none;margin-bottom:6px;"></div>
+
             <!-- ── SEÇÃO 2: Localização ─────────────────────────────── -->
             <div class="secao">
                 <div class="secao-titulo">
@@ -404,7 +407,6 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                     <input type="file" name="foto_identificacao" id="input-foto"
                            accept="image/jpeg,image/jpg,image/png">
                     <img id="preview-foto" src="" alt="Preview">
-                    <div id="gps-foto-aviso" style="display:none;margin-top:12px;"></div>
                 </div>
             </div>
 
