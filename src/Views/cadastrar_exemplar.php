@@ -562,14 +562,16 @@ const inputFoto  = document.getElementById('input-foto');
 let _tentarExif = false;
 
 function abrirCamera() {
-    _tentarExif = false; // câmera via browser não preserva EXIF → usa geolocalização
-    inputFoto.setAttribute('capture', 'environment');
+    // Dispara geolocalização imediatamente — não depende do arquivo para ter as coordenadas
+    _tentarExif = false;
+    inputFoto.removeAttribute('capture');
     inputFoto.value = '';
+    tentarGeolocalizacao(document.getElementById('gps-foto-aviso'));
     inputFoto.click();
 }
 
 function abrirGaleria() {
-    _tentarExif = true; // galeria preserva EXIF da foto → lê GPS da imagem
+    _tentarExif = true; // galeria preserva EXIF → lê GPS da foto
     inputFoto.removeAttribute('capture');
     inputFoto.value = '';
     inputFoto.click();
@@ -612,8 +614,8 @@ async function processarFoto(file, tentarExif) {
         } catch (_) {}
     }
 
-    // Geolocalização (câmera sem GPS ou galeria)
-    tentarGeolocalizacao(aviso);
+    // Geolocalização já foi disparada em abrirCamera() — não duplica
+    if (tentarExif) tentarGeolocalizacao(aviso);
 }
 
 function aplicarCoordenadas(lat, lng, aviso, origem) {
