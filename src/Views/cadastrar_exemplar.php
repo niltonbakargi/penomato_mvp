@@ -569,28 +569,26 @@ async function processarFoto(file) {
     reader.readAsDataURL(file);
 
     const aviso = document.getElementById('gps-foto-aviso');
+    aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
+        + '<i class="fas fa-spinner fa-spin"></i> Lendo GPS da foto...</div>';
+    aviso.style.display = 'block';
 
-    if (tentarExif) {
-        aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
-            + '<i class="fas fa-spinner fa-spin"></i> Lendo GPS da foto...</div>';
-        aviso.style.display = 'block';
+    // 1. EXIF no browser
+    try {
+        const gps = await lerGpsExif(file);
+        if (gps) { aplicarCoordenadas(gps.lat, gps.lng, aviso, 'foto'); return; }
+    } catch (_) {}
 
-        // 1. EXIF no browser
-        try {
-            const gps = await lerGpsExif(file);
-            if (gps) { aplicarCoordenadas(gps.lat, gps.lng, aviso, 'foto'); return; }
-        } catch (_) {}
+    // 2. EXIF no servidor
+    try {
+        const fd = new FormData();
+        fd.append('foto', file);
+        const json = await fetch('/penomato_mvp/src/Controllers/ler_exif_gps.php',
+            { method: 'POST', body: fd }).then(r => r.json());
+        if (json.ok) { aplicarCoordenadas(json.lat, json.lng, aviso, 'foto'); return; }
+    } catch (_) {}
 
-        // 2. EXIF no servidor
-        try {
-            const fd = new FormData();
-            fd.append('foto', file);
-            const json = await fetch('/penomato_mvp/src/Controllers/ler_exif_gps.php',
-                { method: 'POST', body: fd }).then(r => r.json());
-            if (json.ok) { aplicarCoordenadas(json.lat, json.lng, aviso, 'foto'); return; }
-        } catch (_) {}
-    }
-
+    // 3. Fallback: geolocalização do dispositivo
     tentarGeolocalizacao(aviso);
 }
 
