@@ -52,8 +52,8 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <!-- leitor de GPS do EXIF (parser binário próprio, sem dependências) -->
-    <script src="/penomato_mvp/assets/js/exif_gps.js"></script>
+    <!-- exifr: leitura de metadados GPS da foto (build UMD para browser) -->
+    <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -311,26 +311,18 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                         <p style="font-size:.88rem;color:#555;margin-bottom:10px;margin-top:2px;">
                             Foto geral do exemplar tirada no momento do cadastro em campo.
                             Serve para o especialista confirmar que o espécime corresponde à espécie declarada.
+                            Diferente das fotos de partes — essa é a "foto de apresentação" do exemplar.
                         </p>
-
-                        <!-- Botão de captura -->
-                        <div style="margin-bottom:12px;">
-                            <button type="button" onclick="abrirGaleria()"
-                                    style="width:100%;padding:12px 16px;background:var(--cor-primaria);
-                                           color:white;border:none;border-radius:8px;font-weight:600;
-                                           font-size:.9rem;cursor:pointer;display:flex;align-items:center;
-                                           justify-content:center;gap:8px;">
-                                <i class="fas fa-camera"></i> Selecionar foto
-                            </button>
+                        <div class="drop-zone" id="drop-zone"
+                             onclick="document.getElementById('input-foto').click()">
+                            <i class="fas fa-image"></i>
+                            <p>Clique ou arraste a foto aqui<br>
+                               <small style="color:#aaa">JPG ou PNG — máximo 15 MB</small></p>
+                            <div class="arquivo-info" id="arquivo-info"></div>
                         </div>
-
-                        <!-- Input único — capture trocado via JS -->
                         <input type="file" name="foto_identificacao" id="input-foto"
-                               accept="image/*" style="display:none">
-
-                        <div class="arquivo-info" id="arquivo-info" style="margin-bottom:8px;"></div>
-                        <img id="preview-foto" src="" alt="Preview"
-                             style="width:100%;max-height:220px;object-fit:cover;border-radius:6px;display:none;">
+                               accept="image/jpeg,image/jpg,image/png">
+                        <img id="preview-foto" src="" alt="Preview">
                     </div>
                 </div>
             </div>
@@ -541,111 +533,64 @@ function capturarGPS() {
 }
 
 // ── FOTO DE IDENTIFICAÇÃO ──────────────────────────────────────────────────────
+const dropZone   = document.getElementById('drop-zone');
+const inputFoto  = document.getElementById('input-foto');
 const arqInfo    = document.getElementById('arquivo-info');
 const previewImg = document.getElementById('preview-foto');
-const inputFoto  = document.getElementById('input-foto');
 
-// Câmera direta (capture="environment") → tenta GPS do EXIF da foto fresca
-let _tentarExif = true;
+inputFoto.addEventListener('change', () => mostrarFoto(inputFoto.files[0]));
 
-function abrirGaleria() {
-    inputFoto.removeAttribute('capture');
-    inputFoto.value = '';
-    inputFoto.click();
-}
-
-inputFoto.addEventListener('change', function() {
-    const file = this.files[0];
-    if (!file) return;
-    processarFoto(file);
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('sobre'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('sobre'));
+dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('sobre');
+    if (e.dataTransfer.files[0]) {
+        inputFoto.files = e.dataTransfer.files;
+        mostrarFoto(e.dataTransfer.files[0]);
+    }
 });
 
-async function processarFoto(file) {
+async function mostrarFoto(file) {
+    if (!file) return;
     arqInfo.textContent = '✅ ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
     arqInfo.style.display = 'block';
 
+    // Preview
     const reader = new FileReader();
-    reader.onload = e => { previewImg.src = e.target.result; previewImg.style.display = 'block'; };
+    reader.onload = e => {
+        previewImg.src = e.target.result;
+        previewImg.style.display = 'block';
+    };
     reader.readAsDataURL(file);
 
+    // Extração de GPS do EXIF da foto
     const aviso = document.getElementById('gps-foto-aviso');
-    aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
-        + '<i class="fas fa-spinner fa-spin"></i> Lendo GPS da foto...</div>';
-    aviso.style.display = 'block';
-
-    // 1. EXIF no browser
     try {
-        const gps = await lerGpsExif(file);
-        if (gps) { aplicarCoordenadas(gps.lat, gps.lng, aviso, 'foto'); return; }
-    } catch (_) {}
-
-    // 2. EXIF no servidor
-    try {
-        const fd = new FormData();
-        fd.append('foto', file);
-        const json = await fetch('/penomato_mvp/src/Controllers/ler_exif_gps.php',
-            { method: 'POST', body: fd }).then(r => r.json());
-        if (json.ok) { aplicarCoordenadas(json.lat, json.lng, aviso, 'foto'); return; }
-    } catch (_) {}
-
-    // 3. Fallback: geolocalização do dispositivo
-    tentarGeolocalizacao(aviso);
-}
-
-function aplicarCoordenadas(lat, lng, aviso, origem) {
-    document.getElementById('latitude').value  = lat.toFixed(8);
-    document.getElementById('longitude').value = lng.toFixed(8);
-    colocarMarcador(lat, lng);
-    mapa.setView([lat, lng], 17);
-    aviso.innerHTML = '<div class="alerta alerta-success" style="margin:0;">'
-        + '<i class="fas fa-satellite-dish"></i>'
-        + ' <span>Coordenadas extraídas da ' + origem + ': '
-        + lat.toFixed(6) + ', ' + lng.toFixed(6) + '</span></div>';
-    aviso.style.display = 'block';
-}
-
-function tentarGeolocalizacao(aviso) {
-    if (!navigator.geolocation) {
-        aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
-            + '<i class="fas fa-exclamation-triangle"></i>'
-            + ' <span>GPS não disponível. Ajuste o marcador no mapa manualmente.</span></div>';
-        aviso.style.display = 'block';
-        return;
-    }
-    aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
-        + '<i class="fas fa-spinner fa-spin"></i>'
-        + ' <span>GPS não encontrado na foto. Obtendo localização do dispositivo...</span></div>';
-    aviso.style.display = 'block';
-
-    const btn = document.getElementById('btn-gps');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obtendo localização...';
-
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            colocarMarcador(lat, lng);
-            mapa.setView([lat, lng], 17);
-            document.getElementById('latitude').value  = lat.toFixed(8);
-            document.getElementById('longitude').value = lng.toFixed(8);
+        const gps = await exifr.gps(file);
+        if (gps && gps.latitude != null && gps.longitude != null) {
+            document.getElementById('latitude').value  = gps.latitude.toFixed(8);
+            document.getElementById('longitude').value = gps.longitude.toFixed(8);
+            colocarMarcador(gps.latitude, gps.longitude);
+            mapa.setView([gps.latitude, gps.longitude], 17);
             aviso.innerHTML = '<div class="alerta alerta-success" style="margin:0;">'
                 + '<i class="fas fa-satellite-dish"></i>'
-                + ' <span>Localização obtida pelo dispositivo: '
-                + lat.toFixed(6) + ', ' + lng.toFixed(6) + '</span></div>';
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-check"></i> Localização obtida';
-        },
-        err => {
-            console.error('geolocation erro:', err);
+                + ' <span>Coordenadas extraídas automaticamente da foto: '
+                + gps.latitude.toFixed(6) + ', ' + gps.longitude.toFixed(6)
+                + '</span></div>';
+            aviso.style.display = 'block';
+        } else {
             aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
                 + '<i class="fas fa-exclamation-triangle"></i>'
-                + ' <span>Não foi possível obter o GPS. Ajuste o marcador no mapa manualmente.</span></div>';
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-crosshairs"></i> Usar minha localização atual';
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-    );
+                + ' <span>Foto sem dados de GPS. Ative a localização na câmera ou ajuste o marcador no mapa manualmente.</span></div>';
+            aviso.style.display = 'block';
+        }
+    } catch (err) {
+        console.error('exifr erro:', err);
+        aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
+            + '<i class="fas fa-exclamation-triangle"></i>'
+            + ' <span>Não foi possível ler o GPS da foto. Ajuste o marcador no mapa manualmente.</span></div>';
+        aviso.style.display = 'block';
+    }
 }
 
 // ── ESPECIALISTA ───────────────────────────────────────────────────────────────
