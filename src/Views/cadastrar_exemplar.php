@@ -315,8 +315,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
 
                         <!-- Botões de captura -->
                         <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-                            <button type="button"
-                                    onclick="document.getElementById('input-foto-camera').click()"
+                            <button type="button" onclick="abrirCamera()"
                                     style="flex:1;min-width:160px;padding:12px 16px;background:var(--cor-primaria);
                                            color:white;border:none;border-radius:8px;font-weight:600;
                                            font-size:.9rem;cursor:pointer;display:flex;align-items:center;
@@ -326,8 +325,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                                     captura GPS da foto
                                 </small>
                             </button>
-                            <button type="button"
-                                    onclick="document.getElementById('input-foto-galeria').click()"
+                            <button type="button" onclick="abrirGaleria()"
                                     style="flex:1;min-width:160px;padding:12px 16px;background:var(--cinza-200);
                                            color:var(--cinza-800);border:none;border-radius:8px;font-weight:600;
                                            font-size:.9rem;cursor:pointer;display:flex;align-items:center;
@@ -339,17 +337,9 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                             </button>
                         </div>
 
-                        <!-- Input câmera direta (capture GPS) -->
-                        <input type="file" id="input-foto-camera"
-                               accept="image/*" capture="environment"
-                               style="display:none">
-                        <!-- Input galeria -->
-                        <input type="file" id="input-foto-galeria"
-                               accept="image/jpeg,image/jpg,image/png"
-                               style="display:none">
-                        <!-- Campo real submetido no form -->
+                        <!-- Input único — capture trocado via JS -->
                         <input type="file" name="foto_identificacao" id="input-foto"
-                               accept="image/jpeg,image/jpg,image/png" style="display:none">
+                               accept="image/*" style="display:none">
 
                         <div class="arquivo-info" id="arquivo-info" style="margin-bottom:8px;"></div>
                         <img id="preview-foto" src="" alt="Preview"
@@ -569,26 +559,27 @@ const previewImg = document.getElementById('preview-foto');
 const inputFoto  = document.getElementById('input-foto');
 
 // Câmera direta (capture="environment") → tenta GPS do EXIF da foto fresca
-document.getElementById('input-foto-camera').addEventListener('change', function() {
-    const file = this.files[0];
-    if (!file) return;
-    copiarParaInputPrincipal(file);
-    processarFoto(file, true); // vem da câmera → tenta EXIF
-});
+let _tentarExif = false;
 
-// Galeria → pula EXIF (browser remove), vai direto para geolocalização
-document.getElementById('input-foto-galeria').addEventListener('change', function() {
-    const file = this.files[0];
-    if (!file) return;
-    copiarParaInputPrincipal(file);
-    processarFoto(file, false); // vem da galeria → pula EXIF
-});
-
-function copiarParaInputPrincipal(file) {
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    inputFoto.files = dt.files;
+function abrirCamera() {
+    _tentarExif = true;
+    inputFoto.setAttribute('capture', 'environment');
+    inputFoto.value = '';
+    inputFoto.click();
 }
+
+function abrirGaleria() {
+    _tentarExif = false;
+    inputFoto.removeAttribute('capture');
+    inputFoto.value = '';
+    inputFoto.click();
+}
+
+inputFoto.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    processarFoto(file, _tentarExif);
+});
 
 async function processarFoto(file, tentarExif) {
     arqInfo.textContent = '✅ ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
