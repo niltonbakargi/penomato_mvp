@@ -397,12 +397,6 @@ $url_painel = ($tipo === 'gestor')
                                 <i class="fas fa-clipboard-check"></i> Fila de Revisão
                             </a>
                         </div>
-                        <?php elseif ($tipo === 'validador'): ?>
-                        <div class="quick-links">
-                            <a href="/penomato_mvp/src/Views/validador/painel_validador.php">
-                                <i class="fas fa-check-double"></i> Fila de Validação
-                            </a>
-                        </div>
                         <?php endif; ?>
 
                     <?php endif; ?>

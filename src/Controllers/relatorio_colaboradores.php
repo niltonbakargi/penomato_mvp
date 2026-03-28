@@ -177,7 +177,6 @@ $total_contrib  = array_sum(array_column($colaboradores, 'total_especies'));
         }
         .cat-colaborador { background: #d4edda; color: #155724; }
         .cat-revisor     { background: #fff3cd; color: #856404; }
-        .cat-validador   { background: #d1ecf1; color: #0c5460; }
         .cat-gestor      { background: var(--cor-primaria); color: white; }
         .cat-visitante   { background: #f0f0f0; color: #666; }
 

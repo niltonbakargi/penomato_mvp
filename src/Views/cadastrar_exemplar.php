@@ -52,6 +52,8 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- exifr: leitura de metadados GPS da foto -->
+    <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.cjs"></script>
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -402,6 +404,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                     <input type="file" name="foto_identificacao" id="input-foto"
                            accept="image/jpeg,image/jpg,image/png">
                     <img id="preview-foto" src="" alt="Preview">
+                    <div id="gps-foto-aviso" style="display:none;margin-top:12px;"></div>
                 </div>
             </div>
 
@@ -551,16 +554,46 @@ dropZone.addEventListener('drop', e => {
     }
 });
 
-function mostrarFoto(file) {
+async function mostrarFoto(file) {
     if (!file) return;
     arqInfo.textContent = '✅ ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
     arqInfo.style.display = 'block';
+
+    // Preview
     const reader = new FileReader();
     reader.onload = e => {
         previewImg.src = e.target.result;
         previewImg.style.display = 'block';
     };
     reader.readAsDataURL(file);
+
+    // Extração de GPS do EXIF da foto
+    const aviso = document.getElementById('gps-foto-aviso');
+    try {
+        const gps = await exifr.gps(file);
+        if (gps && gps.latitude != null && gps.longitude != null) {
+            document.getElementById('latitude').value  = gps.latitude.toFixed(8);
+            document.getElementById('longitude').value = gps.longitude.toFixed(8);
+            colocarMarcador(gps.latitude, gps.longitude);
+            mapa.setView([gps.latitude, gps.longitude], 17);
+            aviso.innerHTML = '<div class="alerta alerta-success" style="margin:0;">'
+                + '<i class="fas fa-satellite-dish"></i>'
+                + ' <span>Coordenadas extraídas automaticamente da foto: '
+                + gps.latitude.toFixed(6) + ', ' + gps.longitude.toFixed(6)
+                + '</span></div>';
+            aviso.style.display = 'block';
+        } else {
+            aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
+                + '<i class="fas fa-exclamation-triangle"></i>'
+                + ' <span>Foto sem dados de GPS. Ative a localização na câmera ou ajuste o marcador no mapa manualmente.</span></div>';
+            aviso.style.display = 'block';
+        }
+    } catch (_) {
+        aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
+            + '<i class="fas fa-exclamation-triangle"></i>'
+            + ' <span>Não foi possível ler o GPS da foto. Ajuste o marcador no mapa manualmente.</span></div>';
+        aviso.style.display = 'block';
+    }
 }
 
 // ── ESPECIALISTA ───────────────────────────────────────────────────────────────

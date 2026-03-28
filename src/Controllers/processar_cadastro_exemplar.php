@@ -111,6 +111,23 @@ function gerarCodigo(PDO $pdo): string {
     return 'PN' . str_pad($proximo, 3, '0', STR_PAD_LEFT);
 }
 
+// ── Fallback: extrair GPS do EXIF da foto se coordenadas não vieram do form ───
+if (($latitude === null || $longitude === null) && $caminho_foto && function_exists('exif_read_data')) {
+    $caminho_disk_leitura = dirname(dirname(__DIR__)) . '/' . $caminho_foto;
+    $exif = @exif_read_data($caminho_disk_leitura);
+    if ($exif && isset($exif['GPSLatitude'], $exif['GPSLongitude'])) {
+        $fracaoParaDecimal = fn($v) => ($p = explode('/', $v)) && count($p) == 2
+            ? (float)$p[0] / max(1, (float)$p[1]) : (float)$v;
+        $somarGraus = fn($arr) => $fracaoParaDecimal($arr[0])
+            + $fracaoParaDecimal($arr[1]) / 60
+            + $fracaoParaDecimal($arr[2]) / 3600;
+        $latitude  = $somarGraus($exif['GPSLatitude']);
+        $longitude = $somarGraus($exif['GPSLongitude']);
+        if (($exif['GPSLatitudeRef']  ?? 'N') === 'S') $latitude  *= -1;
+        if (($exif['GPSLongitudeRef'] ?? 'E') === 'W') $longitude *= -1;
+    }
+}
+
 // ── Inserir no banco ──────────────────────────────────────────────────────────
 try {
     $pdo->beginTransaction();

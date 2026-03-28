@@ -821,7 +821,6 @@ function traduzirTipo($tipo) {
         'gestor' => 'Gestor',
         'colaborador' => 'Colaborador',
         'revisor' => 'Revisor',
-        'validador' => 'Validador',
         'visitante' => 'Visitante'
     ];
     return $traducoes[$tipo] ?? $tipo;

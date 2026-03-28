@@ -461,16 +461,6 @@ function menuAtivo($url, $pagina_atual) {
                 </li>
                 <?php endif; ?>
                 
-                <!-- Menu para VALIDADOR -->
-                <?php if (estaLogado() && in_array(getTipoUsuario(), ['validador', 'gestor'])): ?>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/validador/painel_validador.php', $pagina_atual); ?>" 
-                       href="/penomato_mvp/src/Views/validador/painel_validador.php">
-                        <i class="fas fa-star"></i> Painel Validador
-                    </a>
-                </li>
-                <?php endif; ?>
-                
                 <!-- Menu para GESTOR -->
                 <?php if (estaLogado() && getTipoUsuario() === 'gestor'): ?>
                 <li class="nav-item dropdown">
@@ -691,7 +681,6 @@ function traduzirTipo($tipo) {
         'gestor' => 'Gestor',
         'colaborador' => 'Colaborador',
         'revisor' => 'Revisor',
-        'validador' => 'Validador',
         'visitante' => 'Visitante'
     ];
     

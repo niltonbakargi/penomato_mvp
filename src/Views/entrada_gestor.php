@@ -267,7 +267,6 @@
                 <select name="categoria_aceitar">
                     <option value="colaborador">Colaborador</option>
                     <option value="revisor">Revisor</option>
-                    <option value="validador">Validador</option>
                     <option value="gestor">Gestor</option>
                 </select>
 

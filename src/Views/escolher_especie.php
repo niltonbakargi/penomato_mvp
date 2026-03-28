@@ -40,11 +40,11 @@ if ($conexao->connect_error) {
 $conexao->set_charset("utf8mb4");
 
 // ================================================
-// BUSCAR ESPECIALISTAS (revisores e validadores ativos)
+// BUSCAR ESPECIALISTAS (revisores ativos)
 // ================================================
 $sql_esp = "SELECT id, nome, subtipo_colaborador
             FROM usuarios
-            WHERE categoria IN ('revisor','validador')
+            WHERE categoria IN ('revisor')
               AND ativo = 1
               AND status_verificacao = 'verificado'
             ORDER BY nome";

@@ -599,7 +599,7 @@ try {
             // Sem orientação: notificar todos os especialistas
             $res_todos = $conexao->query(
                 "SELECT nome, email FROM usuarios
-                 WHERE categoria IN ('revisor','validador') AND ativo = 1
+                 WHERE categoria IN ('revisor') AND ativo = 1
                    AND status_verificacao = 'verificado'"
             );
             $enviados = 0;

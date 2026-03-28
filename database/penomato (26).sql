@@ -356,7 +356,7 @@ CREATE TABLE `usuarios` (
   `nome` varchar(150) NOT NULL,
   `email` varchar(150) NOT NULL,
   `senha_hash` varchar(255) NOT NULL,
-  `categoria` enum('gestor','colaborador','revisor','validador','visitante') DEFAULT 'visitante',
+  `categoria` enum('gestor','colaborador','revisor','visitante') DEFAULT 'visitante',
   `subtipo_colaborador` varchar(100) DEFAULT NULL,
   `bio` text DEFAULT NULL,
   `status_verificacao` enum('pendente','verificado','bloqueado') DEFAULT 'pendente',

@@ -304,10 +304,6 @@ function getMenuPorTipo() {
             $menu_logado[] = ['nome' => 'Painel Revisor', 'url' => '/penomato_mvp/src/Views/revisor/painel_revisor.php', 'icone' => '✅'];
             break;
             
-        case 'validador':
-            $menu_logado[] = ['nome' => 'Painel Validador', 'url' => '/penomato_mvp/src/Views/validador/painel_validador.php', 'icone' => '🏆'];
-            break;
-            
         case 'colaborador':
             $menu_logado[] = ['nome' => 'Cadastrar Espécie', 'url' => '/penomato_mvp/src/Views/colaborador/cadastrar_caracteristicas.php', 'icone' => '📝'];
             $menu_logado[] = ['nome' => 'Upload Imagens', 'url' => '/penomato_mvp/src/Views/colaborador/upload_imagem.php', 'icone' => '📸'];

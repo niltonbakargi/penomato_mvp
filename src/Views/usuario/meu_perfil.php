@@ -478,13 +478,6 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     </a>
                     <?php endif; ?>
                     
-                    <?php if (in_array(getTipoUsuario(), ['validador', 'gestor'])): ?>
-                    <a href="/penomato_mvp/src/Views/validador/painel_validador.php" class="list-group-item">
-                        <i class="fas fa-star text-primary"></i>
-                        <span>Validações</span>
-                        <span class="badge bg-danger rounded-pill ms-auto"><?php echo contarPendenciasValidacao(); ?></span>
-                    </a>
-                    <?php endif; ?>
                 </div>
             </div>
             
@@ -1038,7 +1031,6 @@ function traduzirTipo($tipo) {
         'gestor' => 'Gestor',
         'colaborador' => 'Colaborador',
         'revisor' => 'Revisor',
-        'validador' => 'Validador',
         'visitante' => 'Visitante'
     ];
     return $traducoes[$tipo] ?? $tipo;
