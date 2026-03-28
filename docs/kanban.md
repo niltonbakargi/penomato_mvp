@@ -70,9 +70,32 @@
 
 ---
 
+## Diretrizes de Uso por Dispositivo
+
+| Perfil | Dispositivo | Motivo |
+|---|---|---|
+| Usuário público (sem login) | Mobile ou desktop | Consulta de espécies, ficha pública, mapa |
+| Colaborador / Revisor / Gestor | Desktop (recomendado) | Trabalho científico exige tela maior e precisão |
+
+---
+
+## Evolução Tecnológica Natural
+
+### v2.0 — Stack moderna (pós-TCC)
+- **Backend:** Laravel (PHP com framework) — rotas, ORM, filas de e-mail
+- **Frontend web:** React ou Vue — SPA desacoplada consumindo API REST
+- **Motivação:** formulários assíncronos, upload com progresso, mapa reativo
+
+### v3.0 — App móvel
+- **Tecnologia:** React Native — único código para iOS e Android
+- **Motivo da escolha:** acesso nativo à câmera com EXIF completo (resolve GPS de fotos), modo offline para coleta em campo, e reaproveitamento do código React do frontend web
+- **Funcionalidades alvo:** coleta em campo (foto + GPS), rascunho offline, sincronização ao conectar
+
+---
+
 ## BACKLOG — Visão de Produto (futuro)
 
-- [ ] App móvel com GPS nativo e modo offline (coleta em campo sem internet)
+- [ ] App móvel com GPS nativo e modo offline (React Native — v3.0)
 - [ ] Integração com LLM por bioma para identificação assistida
 - [ ] Expansão para outros biomas (Pantanal, Amazônia, Mata Atlântica)
 - [ ] Game de identificação (mecânica Pokémon Go florestal)
