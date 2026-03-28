@@ -306,6 +306,24 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                                maxlength="50">
                         <div class="hint">Etiqueta de alumínio fixada no exemplar em campo.</div>
                     </div>
+                    <div class="campo">
+                        <label>Foto de identificação</label>
+                        <p style="font-size:.88rem;color:#555;margin-bottom:10px;margin-top:2px;">
+                            Foto geral do exemplar tirada no momento do cadastro em campo.
+                            Serve para o especialista confirmar que o espécime corresponde à espécie declarada.
+                            Diferente das fotos de partes — essa é a "foto de apresentação" do exemplar.
+                        </p>
+                        <div class="drop-zone" id="drop-zone"
+                             onclick="document.getElementById('input-foto').click()">
+                            <i class="fas fa-image"></i>
+                            <p>Clique ou arraste a foto aqui<br>
+                               <small style="color:#aaa">JPG ou PNG — máximo 15 MB</small></p>
+                            <div class="arquivo-info" id="arquivo-info"></div>
+                        </div>
+                        <input type="file" name="foto_identificacao" id="input-foto"
+                               accept="image/jpeg,image/jpg,image/png">
+                        <img id="preview-foto" src="" alt="Preview">
+                    </div>
                 </div>
             </div>
 
@@ -386,34 +404,10 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                 </div>
             </div>
 
-            <!-- ── SEÇÃO 3: Foto de identificação ──────────────────── -->
+            <!-- ── SEÇÃO 3: Especialista orientador ────────────────── -->
             <div class="secao">
                 <div class="secao-titulo">
-                    <i class="fas fa-camera"></i> 3. Foto de identificação
-                </div>
-                <div class="secao-corpo">
-                    <p style="font-size:.88rem;color:#555;margin-bottom:14px;">
-                        Foto geral do exemplar tirada no momento do cadastro em campo.
-                        Serve para o especialista confirmar que o espécime corresponde à espécie declarada.
-                        Diferente das fotos de partes — essa é a "foto de apresentação" do exemplar.
-                    </p>
-                    <div class="drop-zone" id="drop-zone"
-                         onclick="document.getElementById('input-foto').click()">
-                        <i class="fas fa-image"></i>
-                        <p>Clique ou arraste a foto aqui<br>
-                           <small style="color:#aaa">JPG ou PNG — máximo 15 MB</small></p>
-                        <div class="arquivo-info" id="arquivo-info"></div>
-                    </div>
-                    <input type="file" name="foto_identificacao" id="input-foto"
-                           accept="image/jpeg,image/jpg,image/png">
-                    <img id="preview-foto" src="" alt="Preview">
-                </div>
-            </div>
-
-            <!-- ── SEÇÃO 4: Especialista orientador ────────────────── -->
-            <div class="secao">
-                <div class="secao-titulo">
-                    <i class="fas fa-user-tie"></i> 4. Especialista orientador
+                    <i class="fas fa-user-tie"></i> 3. Especialista orientador
                 </div>
                 <div class="secao-corpo">
                     <p style="font-size:.88rem;color:#555;margin-bottom:16px;">
