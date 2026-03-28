@@ -313,27 +313,14 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                             Serve para o especialista confirmar que o espécime corresponde à espécie declarada.
                         </p>
 
-                        <!-- Botões de captura -->
-                        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-                            <button type="button" onclick="abrirCamera()"
-                                    style="flex:1;min-width:160px;padding:12px 16px;background:var(--cor-primaria);
+                        <!-- Botão de captura -->
+                        <div style="margin-bottom:12px;">
+                            <button type="button" onclick="abrirGaleria()"
+                                    style="width:100%;padding:12px 16px;background:var(--cor-primaria);
                                            color:white;border:none;border-radius:8px;font-weight:600;
                                            font-size:.9rem;cursor:pointer;display:flex;align-items:center;
                                            justify-content:center;gap:8px;">
-                                <i class="fas fa-camera"></i> Tirar foto agora
-                                <small style="font-weight:400;opacity:.85;display:block;font-size:.72rem;">
-                                    usa localização atual
-                                </small>
-                            </button>
-                            <button type="button" onclick="abrirGaleria()"
-                                    style="flex:1;min-width:160px;padding:12px 16px;background:var(--cinza-200);
-                                           color:var(--cinza-800);border:none;border-radius:8px;font-weight:600;
-                                           font-size:.9rem;cursor:pointer;display:flex;align-items:center;
-                                           justify-content:center;gap:8px;">
-                                <i class="fas fa-images"></i> Escolher da galeria
-                                <small style="font-weight:400;opacity:.7;display:block;font-size:.72rem;">
-                                    captura GPS da foto
-                                </small>
+                                <i class="fas fa-camera"></i> Selecionar foto
                             </button>
                         </div>
 
@@ -559,19 +546,9 @@ const previewImg = document.getElementById('preview-foto');
 const inputFoto  = document.getElementById('input-foto');
 
 // Câmera direta (capture="environment") → tenta GPS do EXIF da foto fresca
-let _tentarExif = false;
-
-function abrirCamera() {
-    // Dispara geolocalização imediatamente — não depende do arquivo para ter as coordenadas
-    _tentarExif = false;
-    inputFoto.removeAttribute('capture');
-    inputFoto.value = '';
-    tentarGeolocalizacao(document.getElementById('gps-foto-aviso'));
-    inputFoto.click();
-}
+let _tentarExif = true;
 
 function abrirGaleria() {
-    _tentarExif = true; // galeria preserva EXIF → lê GPS da foto
     inputFoto.removeAttribute('capture');
     inputFoto.value = '';
     inputFoto.click();
@@ -580,10 +557,10 @@ function abrirGaleria() {
 inputFoto.addEventListener('change', function() {
     const file = this.files[0];
     if (!file) return;
-    processarFoto(file, _tentarExif);
+    processarFoto(file);
 });
 
-async function processarFoto(file, tentarExif) {
+async function processarFoto(file) {
     arqInfo.textContent = '✅ ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
     arqInfo.style.display = 'block';
 
@@ -614,8 +591,7 @@ async function processarFoto(file, tentarExif) {
         } catch (_) {}
     }
 
-    // Geolocalização já foi disparada em abrirCamera() — não duplica
-    if (tentarExif) tentarGeolocalizacao(aviso);
+    tentarGeolocalizacao(aviso);
 }
 
 function aplicarCoordenadas(lat, lng, aviso, origem) {
