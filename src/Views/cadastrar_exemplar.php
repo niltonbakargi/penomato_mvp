@@ -572,7 +572,8 @@ async function mostrarFoto(file) {
     // 1. Tenta EXIF no browser (funciona no PC)
     try {
         const gps = await exifr.gps(file);
-        if (gps && gps.latitude != null && gps.longitude != null) {
+        if (gps && gps.latitude != null && gps.longitude != null
+                && !(gps.latitude === 0 && gps.longitude === 0)) {
             aplicarCoordenadas(gps.latitude, gps.longitude, aviso, 'foto (browser)');
             return;
         }
