@@ -563,25 +563,31 @@ async function mostrarFoto(file) {
     };
     reader.readAsDataURL(file);
 
-    // Extração de GPS — tenta browser primeiro, depois servidor, depois geolocalização
+    // Extração de GPS — tenta browser, depois servidor, depois geolocalização
     const aviso = document.getElementById('gps-foto-aviso');
-    aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
-        + '<i class="fas fa-spinner fa-spin"></i> <span>Lendo coordenadas GPS da foto...</span></div>';
-    aviso.style.display = 'block';
+    const log = [];
 
-    console.log('[GPS] iniciando leitura para:', file.name, file.size, 'bytes');
+    function mostrarLog() {
+        aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;font-size:.82rem;">'
+            + '<strong>GPS — diagnóstico:</strong><br>' + log.join('<br>') + '</div>';
+        aviso.style.display = 'block';
+    }
+
+    log.push('📷 Arquivo: ' + file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)');
+    mostrarLog();
 
     // 1. Tenta EXIF no browser — parser binário próprio
     try {
         const gps = await lerGpsExif(file);
-        console.log('[GPS] browser resultado:', gps);
         if (gps) {
             aplicarCoordenadas(gps.lat, gps.lng, aviso, 'foto (browser)');
             return;
         }
+        log.push('1. Browser: sem GPS no EXIF');
     } catch (err) {
-        console.warn('[GPS] browser erro:', err);
+        log.push('1. Browser: erro — ' + err.message);
     }
+    mostrarLog();
 
     // 2. Tenta EXIF no servidor via AJAX
     try {
@@ -591,17 +597,19 @@ async function mostrarFoto(file) {
             method: 'POST', body: fd
         });
         const json = await resp.json();
-        console.log('[GPS] servidor resultado:', json);
         if (json.ok) {
             aplicarCoordenadas(json.lat, json.lng, aviso, 'foto (servidor)');
             return;
         }
+        log.push('2. Servidor: ' + json.erro);
     } catch (err) {
-        console.warn('[GPS] servidor erro:', err);
+        log.push('2. Servidor: erro — ' + err.message);
     }
+    mostrarLog();
 
     // 3. Fallback: geolocalização do dispositivo
-    console.log('[GPS] nenhum EXIF encontrado, tentando geolocalização');
+    log.push('3. Tentando localização do dispositivo...');
+    mostrarLog();
     tentarGeolocalizacao(aviso);
 }
 
