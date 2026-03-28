@@ -52,8 +52,8 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <!-- exifr: leitura de metadados GPS da foto (build UMD para browser) -->
-    <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
+    <!-- leitor de GPS do EXIF (parser binário próprio, sem dependências) -->
+    <script src="/penomato_mvp/assets/js/exif_gps.js"></script>
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
@@ -569,16 +569,15 @@ async function mostrarFoto(file) {
         + '<i class="fas fa-spinner fa-spin"></i> <span>Lendo coordenadas GPS da foto...</span></div>';
     aviso.style.display = 'block';
 
-    // 1. Tenta EXIF no browser (funciona no PC)
+    // 1. Tenta EXIF no browser — parser binário próprio (funciona no PC e Android)
     try {
-        const gps = await exifr.gps(file);
-        if (gps && gps.latitude != null && gps.longitude != null
-                && !(gps.latitude === 0 && gps.longitude === 0)) {
-            aplicarCoordenadas(gps.latitude, gps.longitude, aviso, 'foto (browser)');
+        const gps = await lerGpsExif(file);
+        if (gps) {
+            aplicarCoordenadas(gps.lat, gps.lng, aviso, 'foto (browser)');
             return;
         }
     } catch (err) {
-        console.warn('exifr browser:', err);
+        console.warn('exif_gps browser:', err);
     }
 
     // 2. Tenta EXIF no servidor via AJAX (funciona no mobile)
