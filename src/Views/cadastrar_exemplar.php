@@ -311,18 +311,49 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
                         <p style="font-size:.88rem;color:#555;margin-bottom:10px;margin-top:2px;">
                             Foto geral do exemplar tirada no momento do cadastro em campo.
                             Serve para o especialista confirmar que o espécime corresponde à espécie declarada.
-                            Diferente das fotos de partes — essa é a "foto de apresentação" do exemplar.
                         </p>
-                        <div class="drop-zone" id="drop-zone"
-                             onclick="document.getElementById('input-foto').click()">
-                            <i class="fas fa-image"></i>
-                            <p>Clique ou arraste a foto aqui<br>
-                               <small style="color:#aaa">JPG ou PNG — máximo 15 MB</small></p>
-                            <div class="arquivo-info" id="arquivo-info"></div>
+
+                        <!-- Botões de captura -->
+                        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+                            <button type="button"
+                                    onclick="document.getElementById('input-foto-camera').click()"
+                                    style="flex:1;min-width:160px;padding:12px 16px;background:var(--cor-primaria);
+                                           color:white;border:none;border-radius:8px;font-weight:600;
+                                           font-size:.9rem;cursor:pointer;display:flex;align-items:center;
+                                           justify-content:center;gap:8px;">
+                                <i class="fas fa-camera"></i> Tirar foto agora
+                                <small style="font-weight:400;opacity:.85;display:block;font-size:.72rem;">
+                                    captura GPS da foto
+                                </small>
+                            </button>
+                            <button type="button"
+                                    onclick="document.getElementById('input-foto-galeria').click()"
+                                    style="flex:1;min-width:160px;padding:12px 16px;background:var(--cinza-200);
+                                           color:var(--cinza-800);border:none;border-radius:8px;font-weight:600;
+                                           font-size:.9rem;cursor:pointer;display:flex;align-items:center;
+                                           justify-content:center;gap:8px;">
+                                <i class="fas fa-images"></i> Escolher da galeria
+                                <small style="font-weight:400;opacity:.7;display:block;font-size:.72rem;">
+                                    usa localização atual
+                                </small>
+                            </button>
                         </div>
+
+                        <!-- Input câmera direta (capture GPS) -->
+                        <input type="file" id="input-foto-camera"
+                               accept="image/*" capture="environment"
+                               style="display:none">
+                        <!-- Input galeria -->
+                        <input type="file" id="input-foto-galeria"
+                               accept="image/jpeg,image/jpg,image/png"
+                               style="display:none">
+                        <!-- Campo real submetido no form -->
                         <input type="file" name="foto_identificacao" id="input-foto"
-                               accept="image/jpeg,image/jpg,image/png">
-                        <img id="preview-foto" src="" alt="Preview">
+                               accept="image/jpeg,image/jpg,image/png" style="display:none">
+
+                        <div class="arquivo-info" id="arquivo-info" style="margin-bottom:8px;"></div>
+                        <img id="preview-foto" src="" alt="Preview"
+                             style="width:100%;max-height:220px;object-fit:cover;border-radius:6px;display:none;">
                     </div>
                 </div>
             </div>
@@ -533,83 +564,64 @@ function capturarGPS() {
 }
 
 // ── FOTO DE IDENTIFICAÇÃO ──────────────────────────────────────────────────────
-const dropZone   = document.getElementById('drop-zone');
-const inputFoto  = document.getElementById('input-foto');
 const arqInfo    = document.getElementById('arquivo-info');
 const previewImg = document.getElementById('preview-foto');
+const inputFoto  = document.getElementById('input-foto');
 
-inputFoto.addEventListener('change', () => mostrarFoto(inputFoto.files[0]));
-
-dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('sobre'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('sobre'));
-dropZone.addEventListener('drop', e => {
-    e.preventDefault(); dropZone.classList.remove('sobre');
-    if (e.dataTransfer.files[0]) {
-        inputFoto.files = e.dataTransfer.files;
-        mostrarFoto(e.dataTransfer.files[0]);
-    }
+// Câmera direta (capture="environment") → tenta GPS do EXIF da foto fresca
+document.getElementById('input-foto-camera').addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    copiarParaInputPrincipal(file);
+    processarFoto(file, true); // vem da câmera → tenta EXIF
 });
 
-async function mostrarFoto(file) {
+// Galeria → pula EXIF (browser remove), vai direto para geolocalização
+document.getElementById('input-foto-galeria').addEventListener('change', function() {
+    const file = this.files[0];
     if (!file) return;
+    copiarParaInputPrincipal(file);
+    processarFoto(file, false); // vem da galeria → pula EXIF
+});
+
+function copiarParaInputPrincipal(file) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    inputFoto.files = dt.files;
+}
+
+async function processarFoto(file, tentarExif) {
     arqInfo.textContent = '✅ ' + file.name + ' (' + (file.size/1024/1024).toFixed(1) + ' MB)';
     arqInfo.style.display = 'block';
 
-    // Preview
     const reader = new FileReader();
-    reader.onload = e => {
-        previewImg.src = e.target.result;
-        previewImg.style.display = 'block';
-    };
+    reader.onload = e => { previewImg.src = e.target.result; previewImg.style.display = 'block'; };
     reader.readAsDataURL(file);
 
-    // Extração de GPS — tenta browser, depois servidor, depois geolocalização
     const aviso = document.getElementById('gps-foto-aviso');
-    const log = [];
 
-    function mostrarLog() {
-        aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;font-size:.82rem;">'
-            + '<strong>GPS — diagnóstico:</strong><br>' + log.join('<br>') + '</div>';
+    if (tentarExif) {
+        aviso.innerHTML = '<div class="alerta alerta-warning" style="margin:0;">'
+            + '<i class="fas fa-spinner fa-spin"></i> Lendo GPS da foto...</div>';
         aviso.style.display = 'block';
+
+        // 1. EXIF no browser
+        try {
+            const gps = await lerGpsExif(file);
+            if (gps) { aplicarCoordenadas(gps.lat, gps.lng, aviso, 'foto'); return; }
+        } catch (_) {}
+
+        // 2. EXIF no servidor
+        try {
+            const fd = new FormData();
+            fd.append('foto', file);
+            const json = await fetch('/penomato_mvp/src/Controllers/ler_exif_gps.php',
+                { method: 'POST', body: fd }).then(r => r.json());
+            if (json.ok) { aplicarCoordenadas(json.lat, json.lng, aviso, 'foto'); return; }
+        } catch (_) {}
     }
 
-    log.push('📷 Arquivo: ' + file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)');
-    mostrarLog();
-
-    // 1. Tenta EXIF no browser — parser binário próprio
-    try {
-        const gps = await lerGpsExif(file);
-        if (gps) {
-            aplicarCoordenadas(gps.lat, gps.lng, aviso, 'foto (browser)');
-            return;
-        }
-        log.push('1. Browser: sem GPS no EXIF');
-    } catch (err) {
-        log.push('1. Browser: erro — ' + err.message);
-    }
-    mostrarLog();
-
-    // 2. Tenta EXIF no servidor via AJAX
-    try {
-        const fd = new FormData();
-        fd.append('foto', file);
-        const resp = await fetch('/penomato_mvp/src/Controllers/ler_exif_gps.php', {
-            method: 'POST', body: fd
-        });
-        const json = await resp.json();
-        if (json.ok) {
-            aplicarCoordenadas(json.lat, json.lng, aviso, 'foto (servidor)');
-            return;
-        }
-        log.push('2. Servidor: ' + json.erro);
-    } catch (err) {
-        log.push('2. Servidor: erro — ' + err.message);
-    }
-    mostrarLog();
-
-    // 3. Fallback: geolocalização do dispositivo
-    log.push('3. Tentando localização do dispositivo...');
-    mostrarLog();
+    // Geolocalização (câmera sem GPS ou galeria)
     tentarGeolocalizacao(aviso);
 }
 
