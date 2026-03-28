@@ -46,7 +46,7 @@ if (($exif['GPSLatitudeRef']  ?? 'N') === 'S') $lat *= -1;
 if (($exif['GPSLongitudeRef'] ?? 'E') === 'W') $lng *= -1;
 
 if (abs($lat) < 0.0001 && abs($lng) < 0.0001) {
-    echo json_encode(['ok' => false, 'erro' => 'GPS zerado no EXIF', 'raw' => $exif['GPSLatitude']]);
+    echo json_encode(['ok' => false, 'erro' => 'GPS zerado no EXIF']);
     exit;
 }
 

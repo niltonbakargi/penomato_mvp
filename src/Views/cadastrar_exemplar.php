@@ -226,7 +226,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
     <div class="cabecalho">
         <div>
             <h1>🌿 Cadastrar Exemplar</h1>
-            <div class="sub">Registre um indivíduo de campo antes de enviar fotos das partes <small style="opacity:.5">v4</small></div>
+            <div class="sub">Registre um indivíduo de campo antes de enviar fotos das partes</div>
         </div>
         <div class="user-pill">
             <i class="fas fa-user-circle"></i>
