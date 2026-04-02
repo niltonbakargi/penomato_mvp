@@ -10,15 +10,14 @@ ALTER TABLE `especies_caracteristicas`
 
     -- ── FOLHA ─────────────────────────────────────────────────────
     MODIFY COLUMN `forma_folha` ENUM(
-        'Lanceolada','Linear','Elíptica','Oval','Orbicular',
+        'Lanceolada','Linear','Elíptica','Ovada','Orbicular',
         'Cordiforme','Espatulada','Sagitada','Reniforme','Obovada',
-        'Trilobada','Palmada','Lobada',
-        'Composta pinnada','Composta bipinada'
+        'Trilobada','Palmada','Lobada'
     ) DEFAULT NULL,
 
     MODIFY COLUMN `filotaxia_folha` ENUM(
         'Alterna','Oposta Simples','Oposta Decussada',
-        'Verticilada','Rosetada','Dística','Espiralada'
+        'Verticilada','Dística','Espiralada'
     ) DEFAULT NULL,
 
     MODIFY COLUMN `tipo_folha` ENUM(
@@ -28,8 +27,8 @@ ALTER TABLE `especies_caracteristicas`
     ) DEFAULT NULL,
 
     MODIFY COLUMN `tamanho_folha` ENUM(
-        'Microfilos (< 2 cm)','Nanofilos (2–7 cm)',
-        'Mesofilos (7–20 cm)','Macrófilos (20–50 cm)',
+        'Microfilas (< 2 cm)','Nanofilas (2–7 cm)',
+        'Mesofilas (7–20 cm)','Macrófilas (20–50 cm)',
         'Megafilas (> 50 cm)'
     ) DEFAULT NULL,
 

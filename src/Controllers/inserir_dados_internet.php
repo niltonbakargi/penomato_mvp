@@ -65,10 +65,10 @@ if (!$conexao->connect_error) {
 // LISTA DE VALORES PADRONIZADOS PARA VALIDAÇÃO
 // ================================================
 $opcoes_validas = [
-    'forma_folha' => ['Lanceolada', 'Linear', 'Elíptica', 'Oval', 'Orbicular', 'Cordiforme', 'Espatulada', 'Sagitada', 'Reniforme', 'Obovada', 'Trilobada', 'Palmada', 'Lobada', 'Composta pinnada', 'Composta bipinada'],
-    'filotaxia_folha' => ['Alterna', 'Oposta Simples', 'Oposta Decussada', 'Verticilada', 'Rosetada', 'Dística', 'Espiralada'],
+    'forma_folha' => ['Lanceolada', 'Linear', 'Elíptica', 'Ovada', 'Orbicular', 'Cordiforme', 'Espatulada', 'Sagitada', 'Reniforme', 'Obovada', 'Trilobada', 'Palmada', 'Lobada'],
+    'filotaxia_folha' => ['Alterna', 'Oposta Simples', 'Oposta Decussada', 'Verticilada', 'Dística', 'Espiralada'],
     'tipo_folha' => ['Simples', 'Composta pinnada', 'Composta bipinada', 'Composta tripinada', 'Composta tetrapinada'],
-    'tamanho_folha' => ['Microfilos (< 2 cm)', 'Nanofilos (2–7 cm)', 'Mesofilos (7–20 cm)', 'Macrófilos (20–50 cm)', 'Megafilas (> 50 cm)'],
+    'tamanho_folha' => ['Microfilas (< 2 cm)', 'Nanofilas (2–7 cm)', 'Mesofilas (7–20 cm)', 'Macrófilas (20–50 cm)', 'Megafilas (> 50 cm)'],
     'textura_folha' => ['Coriácea', 'Cartácea', 'Membranácea', 'Suculenta', 'Pilosa', 'Glabra', 'Rugosa', 'Cerosa'],
     'margem_folha' => ['Inteira', 'Serrada', 'Dentada', 'Crenada', 'Ondulada', 'Lobada', 'Partida', 'Revoluta', 'Involuta'],
     'venacao_folha' => ['Reticulada Pinnada', 'Reticulada Palmada', 'Paralela', 'Peninérvea', 'Dicotômica', 'Curvinérvea'],
@@ -954,10 +954,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <select id="forma_folha" name="forma_folha">
                             <option value="" disabled selected>Selecione…</option>
                             <option>Lanceolada</option><option>Linear</option><option>Elíptica</option>
-                            <option>Oval</option><option>Orbicular</option><option>Cordiforme</option>
+                            <option>Ovada</option><option>Orbicular</option><option>Cordiforme</option>
                             <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
                             <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Lobada</option>
-                            <option>Composta pinnada</option><option>Composta bipinada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -975,7 +974,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <select id="filotaxia_folha" name="filotaxia_folha">
                             <option value="" disabled selected>Selecione…</option>
                             <option>Alterna</option><option>Oposta Simples</option><option>Oposta Decussada</option>
-                            <option>Verticilada</option><option>Rosetada</option><option>Dística</option><option>Espiralada</option>
+                            <option>Verticilada</option><option>Dística</option><option>Espiralada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1010,10 +1009,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_folha">Tamanho</label>
                         <select id="tamanho_folha" name="tamanho_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="Microfilos (< 2 cm)">Microfilos (&lt; 2 cm)</option>
-                            <option value="Nanofilos (2–7 cm)">Nanofilos (2–7 cm)</option>
-                            <option value="Mesofilos (7–20 cm)">Mesofilos (7–20 cm)</option>
-                            <option value="Macrófilos (20–50 cm)">Macrófilos (20–50 cm)</option>
+                            <option value="Microfilas (< 2 cm)">Microfilas (&lt; 2 cm)</option>
+                            <option value="Nanofilas (2–7 cm)">Nanofilas (2–7 cm)</option>
+                            <option value="Mesofilas (7–20 cm)">Mesofilas (7–20 cm)</option>
+                            <option value="Macrófilas (20–50 cm)">Macrófilas (20–50 cm)</option>
                             <option value="Megafilas (> 50 cm)">Megafilas (&gt; 50 cm)</option>
                         </select>
                     </div>
@@ -1701,8 +1700,8 @@ REGRAS OBRIGATÓRIAS — leia antes de responder:
 
 CAMPOS DE SELEÇÃO E SUAS OPÇÕES VÁLIDAS:
 
-forma_folha: Acicular | Cordiforme | Elíptica | Lanceolada | Linear | Lobada | Obovada | Orbicular | Oval | Ovalada | Palmada | Reniforme | Sagitada | Trifoliada
-filotaxia_folha: Alterna | Alterna dística | Alterna espiralada | Oposta | Oposta decussada | Rosulada | Verticilada
+forma_folha: Acicular | Cordiforme | Elíptica | Lanceolada | Linear | Lobada | Obovada | Orbicular | Ovada | Palmada | Reniforme | Sagitada | Trifoliada
+filotaxia_folha: Alterna | Alterna dística | Alterna espiralada | Oposta | Oposta decussada | Verticilada
 tipo_folha: Simples | Composta bipinada | Composta digitada | Composta imparipinada | Composta paripinada | Composta pinnada | Composta trifoliada | Composta tripinada
 tamanho_folha: Microfila | Nanofila | Mesofila | Macrofila | Megafila
 textura_folha: Cartácea | Coriácea | Glabra | Membranácea | Pilosa | Pubescente | Rugosa | Suculenta | Tomentosa | Cerosa

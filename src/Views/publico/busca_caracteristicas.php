@@ -543,7 +543,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Lanceolada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Lanceolada') ? 'selected' : ''; ?>>Lanceolada</option>
                             <option value="Linear" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Linear') ? 'selected' : ''; ?>>Linear</option>
                             <option value="Elíptica" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Elíptica') ? 'selected' : ''; ?>>Elíptica</option>
-                            <option value="Oval" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Oval') ? 'selected' : ''; ?>>Oval</option>
+                            <option value="Ovada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Ovada') ? 'selected' : ''; ?>>Ovada</option>
                             <option value="Orbicular" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Orbicular') ? 'selected' : ''; ?>>Orbicular</option>
                             <option value="Cordiforme" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Cordiforme') ? 'selected' : ''; ?>>Cordiforme</option>
                             <option value="Espatulada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Espatulada') ? 'selected' : ''; ?>>Espatulada</option>
@@ -553,11 +553,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Trilobada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Trilobada') ? 'selected' : ''; ?>>Trilobada</option>
                             <option value="Palmada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Palmada') ? 'selected' : ''; ?>>Palmada</option>
                             <option value="Lobada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Lobada') ? 'selected' : ''; ?>>Lobada</option>
-                            <option value="Composta pinnada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Composta pinnada') ? 'selected' : ''; ?>>Composta pinnada</option>
-                            <option value="Composta bipinada" <?php echo (isset($_POST['forma_folha']) && $_POST['forma_folha'] == 'Composta bipinada') ? 'selected' : ''; ?>>Composta bipinada</option>
                         </select>
                     </div>
-                    
+
                     <div class="filtro-item">
                         <label>Filotaxia</label>
                         <select name="filotaxia_folha">
@@ -566,7 +564,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                             <option value="Oposta Simples" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Oposta Simples') ? 'selected' : ''; ?>>Oposta Simples</option>
                             <option value="Oposta Decussada" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Oposta Decussada') ? 'selected' : ''; ?>>Oposta Decussada</option>
                             <option value="Verticilada" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Verticilada') ? 'selected' : ''; ?>>Verticilada</option>
-                            <option value="Rosetada" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Rosetada') ? 'selected' : ''; ?>>Rosetada</option>
                             <option value="Dística" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Dística') ? 'selected' : ''; ?>>Dística</option>
                             <option value="Espiralada" <?php echo (isset($_POST['filotaxia_folha']) && $_POST['filotaxia_folha'] == 'Espiralada') ? 'selected' : ''; ?>>Espiralada</option>
                         </select>
@@ -588,10 +585,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
                         <label>Tamanho</label>
                         <select name="tamanho_folha">
                             <option value="todos" <?php echo (!isset($_POST['tamanho_folha']) || $_POST['tamanho_folha'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
-                            <option value="Microfilos (< 2 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Microfilos (< 2 cm)') ? 'selected' : ''; ?>>Microfilos (&lt; 2 cm)</option>
-                            <option value="Nanofilos (2–7 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Nanofilos (2–7 cm)') ? 'selected' : ''; ?>>Nanofilos (2–7 cm)</option>
-                            <option value="Mesofilos (7–20 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Mesofilos (7–20 cm)') ? 'selected' : ''; ?>>Mesofilos (7–20 cm)</option>
-                            <option value="Macrófilos (20–50 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Macrófilos (20–50 cm)') ? 'selected' : ''; ?>>Macrófilos (20–50 cm)</option>
+                            <option value="Microfilas (< 2 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Microfilas (< 2 cm)') ? 'selected' : ''; ?>>Microfilas (&lt; 2 cm)</option>
+                            <option value="Nanofilas (2–7 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Nanofilas (2–7 cm)') ? 'selected' : ''; ?>>Nanofilas (2–7 cm)</option>
+                            <option value="Mesofilas (7–20 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Mesofilas (7–20 cm)') ? 'selected' : ''; ?>>Mesofilas (7–20 cm)</option>
+                            <option value="Macrófilas (20–50 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Macrófilas (20–50 cm)') ? 'selected' : ''; ?>>Macrófilas (20–50 cm)</option>
                             <option value="Megafilas (> 50 cm)" <?php echo (isset($_POST['tamanho_folha']) && $_POST['tamanho_folha'] == 'Megafilas (> 50 cm)') ? 'selected' : ''; ?>>Megafilas (&gt; 50 cm)</option>
                         </select>
                     </div>

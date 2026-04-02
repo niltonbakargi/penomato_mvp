@@ -23,7 +23,7 @@ return [
         'Lanceolada'       => 'lanceoladas',
         'Linear'           => 'lineares',
         'Elíptica'         => 'elípticas',
-        'Oval'             => 'ovais',
+        'Ovada'            => 'ovadas',
         'Orbicular'        => 'orbiculares',
         'Cordiforme'       => 'cordiformes',
         'Espatulada'       => 'espatuladas',
@@ -33,8 +33,6 @@ return [
         'Trilobada'        => 'trilobadas',
         'Palmada'          => 'palmadas',
         'Lobada'           => 'lobadas',
-        'Composta pinnada' => 'compostas pinadas',
-        'Composta bipinada'=> 'compostas bipinadas',
     ],
 
     'filotaxia_folha' => [
@@ -42,7 +40,6 @@ return [
         'Oposta Simples'    => 'dispostas de modo oposto simples',
         'Oposta Decussada'  => 'dispostas de modo oposto decussado',
         'Verticilada'       => 'verticiladas',
-        'Rosetada'          => 'organizadas em roseta',
         'Dística'           => 'dísticas',
         'Espiralada'        => 'dispostas em espiral',
     ],
@@ -56,10 +53,10 @@ return [
     ],
 
     'tamanho_folha' => [
-        'Microfilos (< 2 cm)'  => 'microfilas, com menos de 2 cm de comprimento',
-        'Nanofilos (2–7 cm)'   => 'nanofilas, entre 2 e 7 cm de comprimento',
-        'Mesofilos (7–20 cm)'  => 'mesofilas, entre 7 e 20 cm de comprimento',
-        'Macrófilos (20–50 cm)'=> 'macrófilas, entre 20 e 50 cm de comprimento',
+        'Microfilas (< 2 cm)'  => 'microfilas, com menos de 2 cm de comprimento',
+        'Nanofilas (2–7 cm)'   => 'nanofilas, entre 2 e 7 cm de comprimento',
+        'Mesofilas (7–20 cm)'  => 'mesofilas, entre 7 e 20 cm de comprimento',
+        'Macrófilas (20–50 cm)'=> 'macrófilas, entre 20 e 50 cm de comprimento',
         'Megafilas (> 50 cm)'  => 'megafilas, com mais de 50 cm de comprimento',
     ],
 

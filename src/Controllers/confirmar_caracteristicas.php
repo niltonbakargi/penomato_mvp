@@ -494,7 +494,7 @@ ob_end_clean();
       <select id="forma_folha" name="forma_folha">
         <option value="" disabled selected>Selecione…</option>
         <option>Lanceolada</option><option>Linear</option><option>Elíptica</option>
-        <option>Oval</option><option>Orbicular</option><option>Cordiforme</option>
+        <option>Ovada</option><option>Orbicular</option><option>Cordiforme</option>
         <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
         <option>Obovada</option><option>Trilobada</option><option>Palmada</option>
         <option>Lobada</option>
@@ -515,7 +515,7 @@ ob_end_clean();
       <select id="filotaxia_folha" name="filotaxia_folha">
         <option value="" disabled selected>Selecione…</option>
         <option>Alterna</option><option>Oposta Simples</option><option>Oposta Decussada</option>
-        <option>Verticilada</option><option>Rosetada</option><option>Dística</option>
+        <option>Verticilada</option><option>Dística</option>
         <option>Espiralada</option>
       </select>
     </div>
@@ -552,10 +552,10 @@ ob_end_clean();
       <label for="tamanho_folha">Tamanho</label>
       <select id="tamanho_folha" name="tamanho_folha">
         <option value="" disabled selected>Selecione…</option>
-        <option value="Microfilos (< 2 cm)">Microfilos (&lt; 2 cm)</option>
-        <option value="Nanofilos (2–7 cm)">Nanofilos (2–7 cm)</option>
-        <option value="Mesofilos (7–20 cm)">Mesofilos (7–20 cm)</option>
-        <option value="Macrófilos (20–50 cm)">Macrófilos (20–50 cm)</option>
+        <option value="Microfilas (< 2 cm)">Microfilas (&lt; 2 cm)</option>
+        <option value="Nanofilas (2–7 cm)">Nanofilas (2–7 cm)</option>
+        <option value="Mesofilas (7–20 cm)">Mesofilas (7–20 cm)</option>
+        <option value="Macrófilas (20–50 cm)">Macrófilas (20–50 cm)</option>
         <option value="Megafilas (> 50 cm)">Megafilas (&gt; 50 cm)</option>
       </select>
     </div>
