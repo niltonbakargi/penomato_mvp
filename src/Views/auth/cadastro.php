@@ -114,12 +114,16 @@ unset($_SESSION['dados_cadastro']);
                     <?php
                     require_once __DIR__ . '/../../../config/banco_de_dados.php';
                     $tipo_salvo = $dados_tentativa['tipo'] ?? '';
+                    $gestor_existe = buscarUm("SELECT id FROM usuarios WHERE categoria = 'gestor' LIMIT 1");
                     ?>
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Tipo de Colaborador *</label>
                             <select name="tipo" class="form-control" required>
                                 <option value="">Selecione...</option>
+                                <?php if (!$gestor_existe): ?>
+                                <option value="gestor"       <?php echo $tipo_salvo === 'gestor'       ? 'selected' : ''; ?>>Gestor</option>
+                                <?php endif; ?>
                                 <option value="identificador" <?php echo $tipo_salvo === 'identificador' ? 'selected' : ''; ?>>Identificador</option>
                                 <option value="especialista"  <?php echo $tipo_salvo === 'especialista'  ? 'selected' : ''; ?>>Especialista</option>
                                 <option value="dev"           <?php echo $tipo_salvo === 'dev'           ? 'selected' : ''; ?>>Desenvolvedor</option>

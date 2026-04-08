@@ -91,6 +91,14 @@ if (!$perfil) {
     $erros[] = "Perfil de atuação é obrigatório.";
 }
 
+// Impede cadastro de segundo gestor (proteção no backend)
+if ($tipo_form === 'gestor') {
+    $gestor_existe = buscarUm("SELECT id FROM usuarios WHERE categoria = 'gestor' LIMIT 1");
+    if ($gestor_existe) {
+        $erros[] = "Já existe um gestor cadastrado no sistema.";
+    }
+}
+
 // ============================================================
 // VERIFICAR SE EMAIL JÁ EXISTE
 // ============================================================
@@ -120,6 +128,9 @@ if (!empty($erros)) {
 try {
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
     
+    // Gestor é ativado imediatamente (primeiro acesso ao sistema)
+    $is_gestor = ($categoria === 'gestor');
+
     $dados_insert = [
         'nome'               => $nome,
         'email'              => $email,
@@ -127,8 +138,8 @@ try {
         'categoria'          => $categoria,
         'subtipo_colaborador' => $subtipo,
         'instituicao'        => $instituicao ?: null,
-        'status_verificacao' => 'pendente',
-        'ativo'              => 0,
+        'status_verificacao' => $is_gestor ? 'verificado' : 'pendente',
+        'ativo'              => $is_gestor ? 1 : 0,
         'data_cadastro'      => date('Y-m-d H:i:s'),
     ];
 
@@ -139,43 +150,49 @@ try {
     }
 
     // ============================================================
-    // GERAR TOKEN E ENVIAR EMAIL DE CONFIRMAÇÃO
+    // GERAR TOKEN E ENVIAR EMAIL DE CONFIRMAÇÃO (não gestor)
     // ============================================================
-    $token = bin2hex(random_bytes(32)); // 64 chars hex
-    $expira_em = date('Y-m-d H:i:s', time() + 86400); // 24 horas
+    if (!$is_gestor) {
+        $token = bin2hex(random_bytes(32)); // 64 chars hex
+        $expira_em = date('Y-m-d H:i:s', time() + 86400); // 24 horas
 
-    inserir('tokens_verificacao_email', [
-        'usuario_id' => $usuario_id,
-        'token'      => $token,
-        'expira_em'  => $expira_em,
-        'usado'      => 0,
-        'criado_em'  => date('Y-m-d H:i:s'),
-    ]);
+        inserir('tokens_verificacao_email', [
+            'usuario_id' => $usuario_id,
+            'token'      => $token,
+            'expira_em'  => $expira_em,
+            'usado'      => 0,
+            'criado_em'  => date('Y-m-d H:i:s'),
+        ]);
 
-    $link_ativacao = APP_URL . '/src/Controllers/auth/ativar_conta_controlador.php?token=' . $token;
+        $link_ativacao = APP_URL . '/src/Controllers/auth/ativar_conta_controlador.php?token=' . $token;
 
-    $conteudo_email = "
-        <p>Olá, <strong>" . htmlspecialchars($nome) . "</strong>!</p>
-        <p>Obrigado por se cadastrar no <strong>Penomato</strong> como <strong>" . htmlspecialchars(ucfirst($categoria)) . "</strong>.</p>
-        <p>Para ativar sua conta, clique no botão abaixo. O link é válido por <strong>24 horas</strong>.</p>
-        <p style='margin-top:24px;text-align:center;'>
-            <a href='{$link_ativacao}'
-               style='background:#0b5e42;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:16px;'>
-                Confirmar meu e-mail
-            </a>
-        </p>
-        <p style='margin-top:20px;font-size:13px;color:#888;'>
-            Se o botão não funcionar, copie e cole este link no navegador:<br>
-            <a href='{$link_ativacao}' style='color:#0b5e42;'>{$link_ativacao}</a>
-        </p>
-        <p style='font-size:13px;color:#888;'>Se você não criou esta conta, ignore este e-mail.</p>";
+        $conteudo_email = "
+            <p>Olá, <strong>" . htmlspecialchars($nome) . "</strong>!</p>
+            <p>Obrigado por se cadastrar no <strong>Penomato</strong> como <strong>" . htmlspecialchars(ucfirst($categoria)) . "</strong>.</p>
+            <p>Para ativar sua conta, clique no botão abaixo. O link é válido por <strong>24 horas</strong>.</p>
+            <p style='margin-top:24px;text-align:center;'>
+                <a href='{$link_ativacao}'
+                   style='background:#0b5e42;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:16px;'>
+                    Confirmar meu e-mail
+                </a>
+            </p>
+            <p style='margin-top:20px;font-size:13px;color:#888;'>
+                Se o botão não funcionar, copie e cole este link no navegador:<br>
+                <a href='{$link_ativacao}' style='color:#0b5e42;'>{$link_ativacao}</a>
+            </p>
+            <p style='font-size:13px;color:#888;'>Se você não criou esta conta, ignore este e-mail.</p>";
 
-    enviarEmail($email, 'Confirme seu e-mail — Penomato', templateEmail('Confirme seu cadastro', $conteudo_email));
+        enviarEmail($email, 'Confirme seu e-mail — Penomato', templateEmail('Confirme seu cadastro', $conteudo_email));
+    }
 
     // ============================================================
     // SUCESSO - REDIRECIONAR PARA LOGIN
     // ============================================================
-    $_SESSION['mensagem_sucesso'] = "Cadastro realizado! Enviamos um link de confirmação para <strong>{$email}</strong>. Verifique sua caixa de entrada.";
+    if ($is_gestor) {
+        $_SESSION['mensagem_sucesso'] = "Conta de gestor criada com sucesso! Você já pode fazer login.";
+    } else {
+        $_SESSION['mensagem_sucesso'] = "Cadastro realizado! Enviamos um link de confirmação para <strong>{$email}</strong>. Verifique sua caixa de entrada.";
+    }
     unset($_SESSION['dados_cadastro']);
 
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
