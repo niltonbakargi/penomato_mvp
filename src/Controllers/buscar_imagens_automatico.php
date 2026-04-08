@@ -177,7 +177,7 @@ function pontuar(array $c): int
 // BUSCA 1 — iNaturalist
 // Retorna observações research_grade com foto, no Brasil
 // ============================================================
-function buscar_inaturalist(string $nome, string $parte_en): array
+function buscar_inaturalist(string $nome): array
 {
     $url = 'https://api.inaturalist.org/v1/observations?' . http_build_query([
         'taxon_name'    => $nome,
@@ -242,12 +242,12 @@ function buscar_inaturalist(string $nome, string $parte_en): array
 // BUSCA 2 — Wikimedia Commons
 // Busca por nome científico + termo da parte em inglês
 // ============================================================
-function buscar_wikimedia(string $nome, string $parte_en): array
+function buscar_wikimedia(string $nome): array
 {
     $url = 'https://commons.wikimedia.org/w/api.php?' . http_build_query([
         'action'       => 'query',
         'generator'    => 'search',
-        'gsrsearch'    => "$nome $parte_en",
+        'gsrsearch'    => $nome,
         'gsrnamespace' => 6,        // Namespace de arquivos
         'gsrlimit'     => 12,
         'prop'         => 'imageinfo',
@@ -305,8 +305,8 @@ function buscar_wikimedia(string $nome, string $parte_en): array
 // ============================================================
 // EXECUTAR BUSCAS
 // ============================================================
-$candidatas_inat = buscar_inaturalist($nome_cientifico, $termo_en);
-$candidatas_wiki = buscar_wikimedia($nome_cientifico, $termo_en);
+$candidatas_inat = buscar_inaturalist($nome_cientifico);
+$candidatas_wiki = buscar_wikimedia($nome_cientifico);
 
 $todas = array_merge($candidatas_inat, $candidatas_wiki);
 
