@@ -658,6 +658,247 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 justify-content: center;
             }
         }
+
+        /* ================================================ */
+        /* CARROSSEL DE BUSCA AUTOMÁTICA                    */
+        /* ================================================ */
+        .parte-card { cursor: pointer; }
+
+        .carrossel-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--esp-5);
+        }
+        .carrossel-overlay.aberto { display: flex; }
+
+        .carrossel-container {
+            background: var(--branco);
+            border-radius: var(--raio-lg);
+            box-shadow: var(--sombra-lg);
+            width: 100%;
+            max-width: 700px;
+            max-height: 95vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .carrossel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--esp-5) var(--esp-8);
+            border-bottom: 2px solid var(--cor-primaria);
+            position: sticky;
+            top: 0;
+            background: var(--branco);
+            z-index: 10;
+        }
+        .carrossel-header h2 {
+            color: var(--cor-primaria);
+            font-size: var(--texto-xl);
+            margin: 0;
+        }
+        .btn-fechar-carrossel {
+            background: none;
+            border: 2px solid var(--cinza-300);
+            border-radius: var(--raio-full);
+            width: 36px; height: 36px;
+            font-size: var(--texto-lg);
+            cursor: pointer;
+            color: var(--cinza-600);
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transicao);
+        }
+        .btn-fechar-carrossel:hover { background: var(--perigo-fundo); color: var(--perigo-cor); border-color: var(--perigo-cor); }
+
+        .carrossel-corpo { padding: var(--esp-6) var(--esp-8); }
+
+        /* Loading */
+        .carrossel-loading { text-align: center; padding: var(--esp-16) 0; }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 5px solid var(--cinza-200);
+            border-top-color: var(--cor-primaria);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto var(--esp-5);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Sem resultados */
+        .carrossel-vazio { text-align: center; padding: var(--esp-10) 0; color: var(--cinza-600); }
+        .carrossel-vazio p { margin-bottom: var(--esp-5); font-size: var(--texto-lg); }
+
+        /* Navegação da imagem */
+        .carrossel-nav-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--esp-4);
+            font-size: var(--texto-sm);
+            color: var(--cinza-500);
+        }
+
+        .carrossel-imagem-wrap {
+            display: flex;
+            align-items: center;
+            gap: var(--esp-3);
+            margin-bottom: var(--esp-5);
+        }
+        .btn-nav-carrossel {
+            background: var(--cinza-100);
+            border: 2px solid var(--cinza-200);
+            border-radius: var(--raio-full);
+            width: 44px; height: 44px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transicao);
+        }
+        .btn-nav-carrossel:hover { background: var(--verde-50); border-color: var(--cor-primaria); }
+
+        .carrossel-imagem {
+            flex: 1;
+            position: relative;
+            background: var(--cinza-50);
+            border-radius: var(--raio-md);
+            overflow: hidden;
+            min-height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--cinza-200);
+        }
+        .carrossel-imagem img {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            cursor: zoom-in;
+        }
+        .carrossel-badge-status {
+            position: absolute;
+            top: 8px; left: 8px;
+            padding: 4px 12px;
+            border-radius: var(--raio-full);
+            font-size: var(--texto-xs);
+            font-weight: var(--peso-semi);
+            display: none;
+        }
+        .carrossel-badge-status.selecionada { display: block; background: var(--sucesso-fundo); color: var(--sucesso-texto); }
+        .carrossel-badge-status.principal   { display: block; background: #fff3cd; color: #856404; }
+
+        /* Metadados */
+        .carrossel-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--esp-2) var(--esp-5);
+            background: var(--cinza-50);
+            border-radius: var(--raio-md);
+            padding: var(--esp-4) var(--esp-5);
+            margin-bottom: var(--esp-5);
+            font-size: var(--texto-sm);
+        }
+        .meta-item { display: flex; align-items: flex-start; gap: var(--esp-2); color: var(--cinza-700); }
+        .meta-item i { color: var(--cor-primaria); margin-top: 2px; flex-shrink: 0; }
+        .meta-item a { color: var(--cor-primaria); text-decoration: none; }
+        .meta-item a:hover { text-decoration: underline; }
+
+        /* Botões de ação */
+        .carrossel-acoes {
+            display: flex;
+            gap: var(--esp-4);
+            justify-content: center;
+            margin-bottom: var(--esp-6);
+        }
+        .btn-usar {
+            background: var(--cor-primaria); color: var(--branco);
+            border: none; padding: var(--esp-3) var(--esp-8);
+            border-radius: var(--raio-full); font-weight: var(--peso-semi);
+            cursor: pointer; font-size: var(--texto-md); transition: var(--transicao);
+        }
+        .btn-usar:hover:not(:disabled) { background: var(--cor-primaria-hover); transform: translateY(-1px); }
+        .btn-usar:disabled { background: var(--cinza-300); cursor: not-allowed; }
+        .btn-descartar {
+            background: var(--branco); color: var(--perigo-cor);
+            border: 2px solid var(--perigo-cor);
+            padding: var(--esp-3) var(--esp-8);
+            border-radius: var(--raio-full); font-weight: var(--peso-semi);
+            cursor: pointer; font-size: var(--texto-md); transition: var(--transicao);
+        }
+        .btn-descartar:hover { background: var(--perigo-fundo); }
+
+        /* Thumbnails selecionadas */
+        .carrossel-selecionadas {
+            border-top: 1px solid var(--cinza-200);
+            padding-top: var(--esp-5);
+            margin-bottom: var(--esp-5);
+        }
+        .carrossel-selecionadas h4 { color: var(--cinza-700); margin-bottom: var(--esp-4); font-size: var(--texto-sm); }
+        .thumbs-grid {
+            display: flex;
+            gap: var(--esp-3);
+            flex-wrap: wrap;
+        }
+        .thumb-item {
+            position: relative;
+            width: 80px; height: 80px;
+            border-radius: var(--raio-md);
+            overflow: hidden;
+            border: 3px solid var(--cinza-200);
+            cursor: pointer;
+            transition: var(--transicao);
+        }
+        .thumb-item:hover { border-color: var(--cor-primaria); }
+        .thumb-item.principal { border-color: #ffc107; box-shadow: 0 0 0 2px #ffc107; }
+        .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-estrela {
+            position: absolute; top: 2px; right: 2px;
+            background: rgba(255,193,7,0.9);
+            border-radius: 50%; width: 20px; height: 20px;
+            font-size: 12px;
+            display: none; align-items: center; justify-content: center;
+        }
+        .thumb-item.principal .thumb-estrela { display: flex; }
+        .thumb-remover {
+            position: absolute; bottom: 2px; right: 2px;
+            background: rgba(220,53,69,0.85);
+            color: white; border: none;
+            border-radius: 50%; width: 20px; height: 20px;
+            font-size: 11px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Botão confirmar */
+        .carrossel-rodape {
+            border-top: 1px solid var(--cinza-200);
+            padding-top: var(--esp-5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--esp-4);
+        }
+        .btn-manual-link {
+            background: none; border: none;
+            color: var(--cinza-500); text-decoration: underline;
+            cursor: pointer; font-size: var(--texto-sm);
+        }
+        .btn-manual-link:hover { color: var(--cinza-700); }
+        .btn-confirmar-selecao {
+            background: var(--sucesso-cor); color: var(--branco);
+            border: none; padding: var(--esp-3) var(--esp-8);
+            border-radius: var(--raio-full); font-weight: var(--peso-semi);
+            cursor: pointer; font-size: var(--texto-md); transition: var(--transicao);
+        }
+        .btn-confirmar-selecao:hover:not(:disabled) { background: #218838; transform: translateY(-1px); }
+        .btn-confirmar-selecao:disabled { background: var(--cinza-300); cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -741,19 +982,21 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 foreach ($partes as $key => $parte):
                     $contagem = $contagem_por_parte[$key] ?? 0;
                     $classe = 'parte-card';
-                    if ($key == $parte_selecionada) $classe .= ' selecionado';
                     if ($contagem > 0 && in_array($key, $partes_obrigatorias)) $classe .= ' completa';
                 ?>
-                <a href="?temp_id=<?php echo urlencode($temp_id); ?>&parte=<?php echo $key; ?>" class="<?php echo $classe; ?>">
+                <button type="button"
+                        class="<?php echo $classe; ?>"
+                        data-parte="<?php echo $key; ?>"
+                        onclick="iniciarBusca('<?php echo $key; ?>')">
                     <div class="parte-icone"><?php echo $parte['icone']; ?></div>
                     <div class="parte-nome"><?php echo $parte['nome']; ?></div>
                     <div class="parte-contagem">
-                        <span><?php echo $contagem; ?></span> imagem(ns)
+                        <span id="count-<?php echo $key; ?>"><?php echo $contagem; ?></span> imagem(ns)
                     </div>
                     <?php if ($parte['obrigatoria'] && $contagem == 0): ?>
-                        <div style="font-size: 0.8rem; color: var(--perigo-cor); margin-top: 5px;">⛔ Obrigatória</div>
+                        <div style="font-size:0.8rem;color:var(--perigo-cor);margin-top:5px;">⛔ Obrigatória</div>
                     <?php endif; ?>
-                </a>
+                </button>
                 <?php endforeach; ?>
             </div>
 
@@ -877,9 +1120,351 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         </div>
     </div>
 
+    <!-- ================================================ -->
+    <!-- MODAL: CARROSSEL DE BUSCA AUTOMÁTICA             -->
+    <!-- ================================================ -->
+    <div id="carrosselModal" class="carrossel-overlay">
+        <div class="carrossel-container">
+
+            <!-- Cabeçalho -->
+            <div class="carrossel-header">
+                <h2 id="carrosselTitulo">🔍 Buscando imagens...</h2>
+                <button class="btn-fechar-carrossel" onclick="fecharCarrossel()" title="Fechar">✕</button>
+            </div>
+
+            <div class="carrossel-corpo">
+
+                <!-- Estado: carregando -->
+                <div id="carrosselLoading" class="carrossel-loading">
+                    <div class="spinner"></div>
+                    <p style="color:var(--cinza-600);">Buscando no iNaturalist e Wikimedia Commons...</p>
+                </div>
+
+                <!-- Estado: sem resultados -->
+                <div id="carrosselVazio" style="display:none;" class="carrossel-vazio">
+                    <p>😕 Nenhuma imagem encontrada nas fontes automáticas.</p>
+                    <button onclick="abrirFormManual()" class="btn btn-secondary" style="margin:0 auto;">
+                        ✏️ Adicionar manualmente
+                    </button>
+                </div>
+
+                <!-- Estado: carrossel com imagens -->
+                <div id="carrosselConteudo" style="display:none;">
+
+                    <!-- Contador de navegação -->
+                    <div class="carrossel-nav-topo">
+                        <span id="carrosselCounter">1 / 5</span>
+                        <span style="color:var(--cinza-400);font-size:var(--texto-xs);">Clique na imagem para abrir em tamanho original</span>
+                    </div>
+
+                    <!-- Imagem + botões de navegação -->
+                    <div class="carrossel-imagem-wrap">
+                        <button class="btn-nav-carrossel" onclick="navegarCarrossel(-1)" title="Anterior">‹</button>
+
+                        <div class="carrossel-imagem">
+                            <img id="carrosselImg" src="" alt="Candidata" title="Clique para abrir em tamanho original">
+                            <div id="carrosselBadge" class="carrossel-badge-status"></div>
+                        </div>
+
+                        <button class="btn-nav-carrossel" onclick="navegarCarrossel(1)" title="Próxima">›</button>
+                    </div>
+
+                    <!-- Metadados -->
+                    <div class="carrossel-meta">
+                        <div class="meta-item"><i class="fas fa-user"></i><span id="metaAutor">—</span></div>
+                        <div class="meta-item"><i class="fas fa-balance-scale"></i><span id="metaLicenca">—</span></div>
+                        <div class="meta-item"><i class="fas fa-database"></i><span id="metaFonte">—</span></div>
+                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i><span id="metaLocal">—</span></div>
+                        <div class="meta-item"><i class="fas fa-calendar"></i><span id="metaData">—</span></div>
+                        <div class="meta-item"><i class="fas fa-star"></i><span id="metaPontuacao">—</span> pts</div>
+                    </div>
+
+                    <!-- Ações -->
+                    <div class="carrossel-acoes">
+                        <button onclick="descartarAtual()" class="btn-descartar">✕ Descartar</button>
+                        <button onclick="usarAtual()" class="btn-usar" id="btnUsar">✓ Usar esta</button>
+                    </div>
+
+                    <!-- Thumbnails das selecionadas -->
+                    <div class="carrossel-selecionadas">
+                        <h4>
+                            Selecionadas: <span id="countSelecionadas">0</span>/5
+                            <small style="color:var(--cinza-400);font-weight:normal;margin-left:8px;">⭐ = aparece no artigo • clique para trocar principal</small>
+                        </h4>
+                        <div class="thumbs-grid" id="thumbsSelecionadas"></div>
+                    </div>
+
+                    <!-- Rodapé: confirmar ou manual -->
+                    <div class="carrossel-rodape">
+                        <button onclick="abrirFormManual()" class="btn-manual-link">✏️ Adicionar manualmente</button>
+                        <button onclick="confirmarSelecao()" class="btn-confirmar-selecao" id="btnConfirmar" disabled>
+                            ⬇️ Baixar e salvar selecionadas
+                        </button>
+                    </div>
+
+                </div><!-- /carrosselConteudo -->
+            </div><!-- /carrossel-corpo -->
+        </div><!-- /carrossel-container -->
+    </div><!-- /carrosselModal -->
+
     <script>
     // ================================================
-    // SCRIPT PARA COLAR IMAGEM (Ctrl+V)
+    // CARROSSEL — estado
+    // ================================================
+    let carrosselParte = '';
+    let candidatas     = [];
+    let indiceAtual    = 0;
+    let selecionadas   = [];   // [{id, thumbnail, principal}]
+    let principalId    = null;
+
+    const ESPECIE_ID = <?php echo (int)$especie_id; ?>;
+    const TEMP_ID    = <?php echo json_encode($temp_id); ?>;
+
+    // ------------------------------------------------
+    // Abrir busca ao clicar numa parte
+    // ------------------------------------------------
+    function iniciarBusca(parte) {
+        carrosselParte = parte;
+        candidatas     = [];
+        selecionadas   = [];
+        indiceAtual    = 0;
+        principalId    = null;
+
+        const nomes = {
+            folha:'Folha', flor:'Flor', fruto:'Fruto', caule:'Caule',
+            semente:'Semente', habito:'Hábito',
+            exsicata_completa:'Exsicata', detalhe:'Detalhe'
+        };
+
+        document.getElementById('carrosselTitulo').textContent =
+            '🔍 Buscando imagens para: ' + (nomes[parte] || parte);
+
+        document.getElementById('carrosselLoading').style.display  = 'block';
+        document.getElementById('carrosselVazio').style.display     = 'none';
+        document.getElementById('carrosselConteudo').style.display  = 'none';
+        document.getElementById('carrosselModal').classList.add('aberto');
+
+        const fd = new FormData();
+        fd.append('especie_id',   ESPECIE_ID);
+        fd.append('parte_planta', parte);
+        fd.append('temp_id',      TEMP_ID);
+
+        fetch('../Controllers/buscar_imagens_automatico.php', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('carrosselLoading').style.display = 'none';
+                if (!data.sucesso || !data.candidatas || data.candidatas.length === 0) {
+                    document.getElementById('carrosselVazio').style.display = 'block';
+                    return;
+                }
+                candidatas  = data.candidatas;
+                indiceAtual = 0;
+                document.getElementById('carrosselConteudo').style.display = 'block';
+                renderCandidataAtual();
+            })
+            .catch(() => {
+                document.getElementById('carrosselLoading').style.display = 'none';
+                document.getElementById('carrosselVazio').style.display   = 'block';
+            });
+    }
+
+    // ------------------------------------------------
+    // Renderizar imagem atual no carrossel
+    // ------------------------------------------------
+    function renderCandidataAtual() {
+        const c = candidatas[indiceAtual];
+        if (!c) return;
+
+        const img = document.getElementById('carrosselImg');
+        img.src     = c.url_thumbnail || c.url_foto;
+        img.onclick = () => window.open(c.url_foto, '_blank');
+
+        document.getElementById('carrosselCounter').textContent =
+            (indiceAtual + 1) + ' / ' + candidatas.length;
+        document.getElementById('metaAutor').textContent      = c.autor        || 'Não informado';
+        document.getElementById('metaLicenca').textContent    = c.licenca      || 'Não informada';
+        document.getElementById('metaFonte').textContent      = c.fonte_nome   || c.fonte;
+        document.getElementById('metaLocal').textContent      = c.local_coleta || '—';
+        document.getElementById('metaData').textContent       = c.data_observacao || '—';
+        document.getElementById('metaPontuacao').textContent  = c.pontuacao;
+
+        // Badge e botão usar
+        const badge   = document.getElementById('carrosselBadge');
+        const btnUsar = document.getElementById('btnUsar');
+        const sel     = selecionadas.find(s => s.id == c.id);
+
+        badge.className = 'carrossel-badge-status';
+        if (sel) {
+            badge.textContent = sel.principal ? '⭐ Principal (artigo)' : '✓ Selecionada';
+            badge.classList.add(sel.principal ? 'principal' : 'selecionada');
+            btnUsar.textContent = '✓ Já selecionada';
+            btnUsar.disabled    = true;
+        } else {
+            badge.textContent = '';
+            btnUsar.textContent = '✓ Usar esta';
+            btnUsar.disabled    = selecionadas.length >= 5;
+        }
+    }
+
+    // ------------------------------------------------
+    // Navegação
+    // ------------------------------------------------
+    function navegarCarrossel(dir) {
+        indiceAtual = (indiceAtual + dir + candidatas.length) % candidatas.length;
+        renderCandidataAtual();
+    }
+
+    // ------------------------------------------------
+    // Usar imagem atual
+    // ------------------------------------------------
+    function usarAtual() {
+        const c = candidatas[indiceAtual];
+        if (!c || selecionadas.find(s => s.id == c.id) || selecionadas.length >= 5) return;
+
+        const ehPrincipal = selecionadas.length === 0;
+        if (ehPrincipal) principalId = c.id;
+
+        selecionadas.push({
+            id:        c.id,
+            thumbnail: c.url_thumbnail || c.url_foto,
+            principal: ehPrincipal,
+        });
+
+        renderThumbs();
+
+        // Avança automaticamente
+        if (indiceAtual < candidatas.length - 1) indiceAtual++;
+        renderCandidataAtual();
+    }
+
+    // ------------------------------------------------
+    // Descartar e avançar
+    // ------------------------------------------------
+    function descartarAtual() {
+        if (indiceAtual < candidatas.length - 1) indiceAtual++;
+        renderCandidataAtual();
+    }
+
+    // ------------------------------------------------
+    // Marcar principal (para o artigo)
+    // ------------------------------------------------
+    function marcarPrincipal(id) {
+        principalId  = id;
+        selecionadas = selecionadas.map(s => ({ ...s, principal: s.id == id }));
+        renderThumbs();
+        renderCandidataAtual();
+    }
+
+    // ------------------------------------------------
+    // Remover da seleção
+    // ------------------------------------------------
+    function removerSelecionada(id) {
+        selecionadas = selecionadas.filter(s => s.id != id);
+        if (principalId == id) {
+            principalId = selecionadas.length > 0 ? selecionadas[0].id : null;
+            if (selecionadas.length > 0) selecionadas[0].principal = true;
+        }
+        renderThumbs();
+        renderCandidataAtual();
+    }
+
+    // ------------------------------------------------
+    // Renderizar thumbnails selecionadas
+    // ------------------------------------------------
+    function renderThumbs() {
+        document.getElementById('countSelecionadas').textContent = selecionadas.length;
+        document.getElementById('btnConfirmar').disabled = selecionadas.length === 0;
+
+        document.getElementById('thumbsSelecionadas').innerHTML = selecionadas.map(s => `
+            <div class="thumb-item ${s.principal ? 'principal' : ''}"
+                 onclick="marcarPrincipal(${s.id})"
+                 title="${s.principal ? 'Principal do artigo' : 'Clique para usar no artigo'}">
+                <img src="${s.thumbnail}" alt="">
+                <div class="thumb-estrela">⭐</div>
+                <button class="thumb-remover"
+                        onclick="event.stopPropagation();removerSelecionada(${s.id})"
+                        title="Remover">✕</button>
+            </div>
+        `).join('');
+    }
+
+    // ------------------------------------------------
+    // Confirmar e baixar
+    // ------------------------------------------------
+    function confirmarSelecao() {
+        if (selecionadas.length === 0) return;
+
+        const btn = document.getElementById('btnConfirmar');
+        btn.textContent = '⏳ Baixando...';
+        btn.disabled    = true;
+
+        const fd = new FormData();
+        fd.append('temp_id',        TEMP_ID);
+        fd.append('candidatos_ids', JSON.stringify(selecionadas.map(s => s.id)));
+        fd.append('principal_id',   principalId || 0);
+
+        fetch('../Controllers/salvar_imagens_selecionadas.php', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                if (data.sucesso) {
+                    // Atualiza contador do card da parte
+                    const span = document.getElementById('count-' + carrosselParte);
+                    if (span) span.textContent = parseInt(span.textContent || 0) + data.salvas;
+
+                    const card = document.querySelector('[data-parte="' + carrosselParte + '"]');
+                    if (card && data.salvas > 0) card.classList.add('completa');
+
+                    fecharCarrossel();
+                    mostrarAlertaSucesso(data.salvas + ' imagem(ns) salva(s) para ' + carrosselParte + '!');
+                } else {
+                    alert('Erro: ' + (data.erro || 'Tente novamente.'));
+                    btn.textContent = '⬇️ Baixar e salvar selecionadas';
+                    btn.disabled    = false;
+                }
+            })
+            .catch(() => {
+                alert('Erro de conexão. Tente novamente.');
+                btn.textContent = '⬇️ Baixar e salvar selecionadas';
+                btn.disabled    = false;
+            });
+    }
+
+    // ------------------------------------------------
+    // Fechar modal
+    // ------------------------------------------------
+    function fecharCarrossel() {
+        document.getElementById('carrosselModal').classList.remove('aberto');
+        candidatas   = [];
+        selecionadas = [];
+    }
+
+    // Fechar clicando fora
+    document.getElementById('carrosselModal').addEventListener('click', function(e) {
+        if (e.target === this) fecharCarrossel();
+    });
+
+    // ------------------------------------------------
+    // Fallback: abrir formulário manual (Ctrl+V)
+    // ------------------------------------------------
+    function abrirFormManual() {
+        fecharCarrossel();
+        window.location.href = '?temp_id=' + encodeURIComponent(TEMP_ID) + '&parte=' + carrosselParte;
+    }
+
+    // ------------------------------------------------
+    // Alerta de sucesso temporário
+    // ------------------------------------------------
+    function mostrarAlertaSucesso(msg) {
+        const div = document.createElement('div');
+        div.className = 'alerta--sucesso';
+        div.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:9999;padding:14px 28px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,0.15);';
+        div.textContent = '✅ ' + msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3500);
+    }
+
+    // ================================================
+    // SCRIPT PARA COLAR IMAGEM (Ctrl+V) — fallback manual
     // ================================================
     const colarArea = document.getElementById('colarArea');
     const colarInput = document.getElementById('colarInput');
