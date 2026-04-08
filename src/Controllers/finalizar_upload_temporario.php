@@ -151,10 +151,11 @@ function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs): string {
     return ob_get_clean();
 }
 
-$servidor = "127.0.0.1";
-$usuario_db = "root";
-$senha_db = "";
-$banco = "penomato";
+require_once __DIR__ . '/../../config/app.php';
+$servidor   = DB_HOST;
+$usuario_db = DB_USER;
+$senha_db   = DB_PASS;
+$banco      = DB_NAME;
 
 // ================================================
 // VERIFICAR SE USUÁRIO ESTÁ LOGADO

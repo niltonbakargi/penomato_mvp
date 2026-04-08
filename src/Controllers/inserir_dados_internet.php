@@ -23,10 +23,11 @@ if (!isset($_SESSION['usuario_id'])) {
 $id_usuario = $_SESSION['usuario_id'];
 $nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
 
-$servidor = "127.0.0.1";
-$usuario_db = "root";
-$senha_db = "";
-$banco = "penomato";
+require_once __DIR__ . '/../../config/app.php';
+$servidor   = DB_HOST;
+$usuario_db = DB_USER;
+$senha_db   = DB_PASS;
+$banco      = DB_NAME;
 
 // ================================================
 // VERIFICAR SESSÃO TEMPORÁRIA

@@ -11,10 +11,11 @@ error_reporting(E_ALL);
 session_start();
 ob_start();
 
-$servidor = "127.0.0.1";
-$usuario_db = "root";
-$senha_db = "";
-$banco = "penomato";
+require_once __DIR__ . '/../../config/app.php';
+$servidor   = DB_HOST;
+$usuario_db = DB_USER;
+$senha_db   = DB_PASS;
+$banco      = DB_NAME;
 
 // ================================================
 // CONFIGURAÇÕES DE UPLOAD
