@@ -27,23 +27,10 @@ $usuario_id = (int)$_SESSION['usuario_id'];
 // VALIDAR INPUTS
 // ============================================================
 $especie_id = (int)($_POST['especie_id'] ?? 0);
-$parte      = trim($_POST['parte_planta'] ?? '');
-$temp_id    = trim($_POST['temp_id'] ?? '');
+$pagina     = max(1, (int)($_POST['pagina'] ?? 1));
 
-$partes_validas = ['folha','flor','fruto','caule','semente','habito','exsicata_completa','detalhe'];
-
-if (!$especie_id || !in_array($parte, $partes_validas, true) || empty($temp_id)) {
+if (!$especie_id) {
     echo json_encode(['sucesso' => false, 'erro' => 'Parâmetros inválidos']);
-    exit;
-}
-
-// Confirmar que o temp_id pertence a este usuário
-if (
-    !isset($_SESSION['importacao_temporaria']) ||
-    $_SESSION['importacao_temporaria']['temp_id']    !== $temp_id ||
-    (int)$_SESSION['importacao_temporaria']['usuario_id'] !== $usuario_id
-) {
-    echo json_encode(['sucesso' => false, 'erro' => 'Sessão de importação inválida']);
     exit;
 }
 
@@ -60,22 +47,6 @@ if (!$especie) {
 }
 
 $nome_cientifico = $especie['nome_cientifico'];
-
-// ============================================================
-// MAPA: parte da planta → termo de busca em inglês
-// ============================================================
-$termos_en = [
-    'folha'             => 'leaf',
-    'flor'              => 'flower',
-    'fruto'             => 'fruit',
-    'caule'             => 'stem',
-    'semente'           => 'seed',
-    'habito'            => 'habit',
-    'exsicata_completa' => 'herbarium specimen',
-    'detalhe'           => 'detail',
-];
-
-$termo_en = $termos_en[$parte];
 
 // ============================================================
 // FUNÇÃO: requisição HTTP com cURL
@@ -177,13 +148,14 @@ function pontuar(array $c): int
 // BUSCA 1 — iNaturalist
 // Retorna observações research_grade com foto, no Brasil
 // ============================================================
-function buscar_inaturalist(string $nome): array
+function buscar_inaturalist(string $nome, int $pagina = 1): array
 {
     $url = 'https://api.inaturalist.org/v1/observations?' . http_build_query([
         'taxon_name'    => $nome,
         'quality_grade' => 'research',
         'photos'        => 'true',
-        'per_page'      => 20,
+        'per_page'      => 15,
+        'page'          => $pagina,
         'place_id'      => 6744,    // Brasil
         'order'         => 'desc',
         'order_by'      => 'votes',
@@ -242,14 +214,15 @@ function buscar_inaturalist(string $nome): array
 // BUSCA 2 — Wikimedia Commons
 // Busca por nome científico + termo da parte em inglês
 // ============================================================
-function buscar_wikimedia(string $nome): array
+function buscar_wikimedia(string $nome, int $pagina = 1): array
 {
     $url = 'https://commons.wikimedia.org/w/api.php?' . http_build_query([
         'action'       => 'query',
         'generator'    => 'search',
         'gsrsearch'    => $nome,
         'gsrnamespace' => 6,        // Namespace de arquivos
-        'gsrlimit'     => 12,
+        'gsrlimit'     => 10,
+        'gsroffset'    => ($pagina - 1) * 10,
         'prop'         => 'imageinfo',
         'iiprop'       => 'url|user|extmetadata|size',
         'iiurlwidth'   => 800,      // Gera thumbnail de 800px
@@ -305,8 +278,8 @@ function buscar_wikimedia(string $nome): array
 // ============================================================
 // EXECUTAR BUSCAS
 // ============================================================
-$candidatas_inat = buscar_inaturalist($nome_cientifico);
-$candidatas_wiki = buscar_wikimedia($nome_cientifico);
+$candidatas_inat = buscar_inaturalist($nome_cientifico, $pagina);
+$candidatas_wiki = buscar_wikimedia($nome_cientifico, $pagina);
 
 $todas = array_merge($candidatas_inat, $candidatas_wiki);
 
@@ -315,13 +288,13 @@ if (empty($todas)) {
         'sucesso'    => true,
         'total'      => 0,
         'candidatas' => [],
-        'aviso'      => 'Nenhuma imagem encontrada nas fontes consultadas.',
+        'aviso'      => 'Nenhuma imagem encontrada.',
     ]);
     exit;
 }
 
 // ============================================================
-// PONTUAR E ORDENAR
+// PONTUAR, ORDENAR E RETORNAR TOP 10
 // ============================================================
 foreach ($todas as &$c) {
     $c['pontuacao'] = pontuar($c);
@@ -330,57 +303,15 @@ unset($c);
 
 usort($todas, fn($a, $b) => $b['pontuacao'] <=> $a['pontuacao']);
 
-$top5 = array_slice($todas, 0, 5);
-
-// ============================================================
-// SALVAR NO BANCO — limpa candidatas pendentes anteriores e insere novas
-// ============================================================
-$pdo->prepare(
-    "DELETE FROM temp_imagens_candidatas
-     WHERE temp_id = ? AND parte_planta = ? AND status = 'pendente'"
-)->execute([$temp_id, $parte]);
-
-$sql_insert = "
-    INSERT INTO temp_imagens_candidatas
-        (especie_id, usuario_id, temp_id, parte_planta,
-         url_foto, url_thumbnail,
-         fonte, fonte_url, fonte_nome, id_externo,
-         autor, licenca,
-         local_coleta, latitude, longitude,
-         data_observacao, largura_px, altura_px, pontuacao)
-    VALUES
-        (?, ?, ?, ?,
-         ?, ?,
-         ?, ?, ?, ?,
-         ?, ?,
-         ?, ?, ?,
-         ?, ?, ?, ?)
-";
-
-$stmt = $pdo->prepare($sql_insert);
-$candidatas_salvas = [];
-
-foreach ($top5 as $c) {
-    $stmt->execute([
-        $especie_id, $usuario_id, $temp_id, $parte,
-        $c['url_foto'],      $c['url_thumbnail'],
-        $c['fonte'],         $c['fonte_url'],  $c['fonte_nome'], $c['id_externo'],
-        $c['autor'],         $c['licenca'],
-        $c['local_coleta'],  $c['latitude'],   $c['longitude'],
-        $c['data_observacao'], $c['largura_px'], $c['altura_px'], $c['pontuacao'],
-    ]);
-
-    $c['id'] = (int)$pdo->lastInsertId();
-    $candidatas_salvas[] = $c;
-}
+$top10 = array_slice($todas, 0, 10);
 
 // ============================================================
 // RESPOSTA
 // ============================================================
 echo json_encode([
     'sucesso'    => true,
-    'total'      => count($candidatas_salvas),
-    'parte'      => $parte,
+    'total'      => count($top10),
+    'pagina'     => $pagina,
     'especie'    => $nome_cientifico,
-    'candidatas' => $candidatas_salvas,
+    'candidatas' => $top10,
 ]);

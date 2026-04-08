@@ -660,11 +660,9 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         /* ================================================ */
-        /* CARROSSEL DE BUSCA AUTOMÁTICA                    */
+        /* MODAL: BUSCA AUTOMÁTICA DE IMAGENS               */
         /* ================================================ */
-        .parte-card { cursor: pointer; }
-
-        .carrossel-overlay {
+        .busca-overlay {
             display: none;
             position: fixed;
             inset: 0;
@@ -674,37 +672,48 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             justify-content: center;
             padding: var(--esp-5);
         }
-        .carrossel-overlay.aberto { display: flex; }
+        .busca-overlay.aberto { display: flex; }
 
-        .carrossel-container {
+        .busca-container {
             background: var(--branco);
             border-radius: var(--raio-lg);
             box-shadow: var(--sombra-lg);
             width: 100%;
-            max-width: 700px;
+            max-width: 660px;
             max-height: 95vh;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
         }
 
-        .carrossel-header {
+        .busca-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: var(--esp-5) var(--esp-8);
+            padding: var(--esp-4) var(--esp-6);
             border-bottom: 2px solid var(--cor-primaria);
             position: sticky;
             top: 0;
             background: var(--branco);
             z-index: 10;
+            gap: var(--esp-3);
         }
-        .carrossel-header h2 {
+        .busca-header h2 {
             color: var(--cor-primaria);
-            font-size: var(--texto-xl);
+            font-size: var(--texto-lg);
             margin: 0;
+            white-space: nowrap;
         }
-        .btn-fechar-carrossel {
+        .busca-especie-nome {
+            color: var(--cinza-500);
+            font-style: italic;
+            font-size: var(--texto-sm);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .btn-fechar-busca {
             background: none;
             border: 2px solid var(--cinza-300);
             border-radius: var(--raio-full);
@@ -713,192 +722,120 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             cursor: pointer;
             color: var(--cinza-600);
             display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
             transition: var(--transicao);
         }
-        .btn-fechar-carrossel:hover { background: var(--perigo-fundo); color: var(--perigo-cor); border-color: var(--perigo-cor); }
+        .btn-fechar-busca:hover { background: var(--perigo-fundo); color: var(--perigo-cor); border-color: var(--perigo-cor); }
 
-        .carrossel-corpo { padding: var(--esp-6) var(--esp-8); }
+        .busca-corpo { padding: var(--esp-5) var(--esp-6); }
 
         /* Loading */
-        .carrossel-loading { text-align: center; padding: var(--esp-16) 0; }
+        .busca-loading { text-align: center; padding: var(--esp-12) 0; }
         .spinner {
             width: 48px; height: 48px;
             border: 5px solid var(--cinza-200);
             border-top-color: var(--cor-primaria);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin: 0 auto var(--esp-5);
+            margin: 0 auto var(--esp-4);
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Sem resultados */
-        .carrossel-vazio { text-align: center; padding: var(--esp-10) 0; color: var(--cinza-600); }
-        .carrossel-vazio p { margin-bottom: var(--esp-5); font-size: var(--texto-lg); }
+        /* Sem resultados / sem mais */
+        .busca-vazio, .busca-sem-mais { text-align: center; padding: var(--esp-8) 0; color: var(--cinza-600); }
+        .busca-vazio p, .busca-sem-mais p { margin-bottom: var(--esp-4); font-size: var(--texto-lg); }
 
-        /* Navegação da imagem */
-        .carrossel-nav-topo {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: var(--esp-4);
+        /* Contador */
+        .busca-counter {
+            text-align: center;
             font-size: var(--texto-sm);
             color: var(--cinza-500);
+            margin-bottom: var(--esp-3);
         }
 
-        .carrossel-imagem-wrap {
-            display: flex;
-            align-items: center;
-            gap: var(--esp-3);
-            margin-bottom: var(--esp-5);
-        }
-        .btn-nav-carrossel {
-            background: var(--cinza-100);
-            border: 2px solid var(--cinza-200);
-            border-radius: var(--raio-full);
-            width: 44px; height: 44px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            transition: var(--transicao);
-        }
-        .btn-nav-carrossel:hover { background: var(--verde-50); border-color: var(--cor-primaria); }
-
-        .carrossel-imagem {
-            flex: 1;
-            position: relative;
+        /* Imagem */
+        .busca-img-wrap {
             background: var(--cinza-50);
             border-radius: var(--raio-md);
-            overflow: hidden;
-            min-height: 260px;
+            border: 2px solid var(--cinza-200);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--cinza-200);
+            min-height: 240px;
+            max-height: 320px;
+            overflow: hidden;
+            margin-bottom: var(--esp-3);
         }
-        .carrossel-imagem img {
+        .busca-img-wrap img {
             max-width: 100%;
             max-height: 300px;
             object-fit: contain;
             cursor: zoom-in;
         }
-        .carrossel-badge-status {
-            position: absolute;
-            top: 8px; left: 8px;
-            padding: 4px 12px;
-            border-radius: var(--raio-full);
-            font-size: var(--texto-xs);
-            font-weight: var(--peso-semi);
-            display: none;
-        }
-        .carrossel-badge-status.selecionada { display: block; background: var(--sucesso-fundo); color: var(--sucesso-texto); }
-        .carrossel-badge-status.principal   { display: block; background: #fff3cd; color: #856404; }
 
-        /* Metadados */
-        .carrossel-meta {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        /* Metadata */
+        .busca-meta {
+            display: flex;
+            flex-wrap: wrap;
             gap: var(--esp-2) var(--esp-5);
             background: var(--cinza-50);
             border-radius: var(--raio-md);
-            padding: var(--esp-4) var(--esp-5);
-            margin-bottom: var(--esp-5);
-            font-size: var(--texto-sm);
+            padding: var(--esp-3) var(--esp-4);
+            margin-bottom: var(--esp-4);
+            font-size: var(--texto-xs);
+            color: var(--cinza-600);
         }
-        .meta-item { display: flex; align-items: flex-start; gap: var(--esp-2); color: var(--cinza-700); }
-        .meta-item i { color: var(--cor-primaria); margin-top: 2px; flex-shrink: 0; }
-        .meta-item a { color: var(--cor-primaria); text-decoration: none; }
-        .meta-item a:hover { text-decoration: underline; }
+        .busca-meta-item { display: flex; align-items: center; gap: 4px; }
+        .busca-meta-item i { color: var(--cor-primaria); font-size: 0.7rem; }
 
-        /* Botões de ação */
-        .carrossel-acoes {
+        /* Part assignment buttons */
+        .partes-atribuicao {
             display: flex;
-            gap: var(--esp-4);
-            justify-content: center;
-            margin-bottom: var(--esp-6);
-        }
-        .btn-usar {
-            background: var(--cor-primaria); color: var(--branco);
-            border: none; padding: var(--esp-3) var(--esp-8);
-            border-radius: var(--raio-full); font-weight: var(--peso-semi);
-            cursor: pointer; font-size: var(--texto-md); transition: var(--transicao);
-        }
-        .btn-usar:hover:not(:disabled) { background: var(--cor-primaria-hover); transform: translateY(-1px); }
-        .btn-usar:disabled { background: var(--cinza-300); cursor: not-allowed; }
-        .btn-descartar {
-            background: var(--branco); color: var(--perigo-cor);
-            border: 2px solid var(--perigo-cor);
-            padding: var(--esp-3) var(--esp-8);
-            border-radius: var(--raio-full); font-weight: var(--peso-semi);
-            cursor: pointer; font-size: var(--texto-md); transition: var(--transicao);
-        }
-        .btn-descartar:hover { background: var(--perigo-fundo); }
-
-        /* Thumbnails selecionadas */
-        .carrossel-selecionadas {
-            border-top: 1px solid var(--cinza-200);
-            padding-top: var(--esp-5);
-            margin-bottom: var(--esp-5);
-        }
-        .carrossel-selecionadas h4 { color: var(--cinza-700); margin-bottom: var(--esp-4); font-size: var(--texto-sm); }
-        .thumbs-grid {
-            display: flex;
-            gap: var(--esp-3);
             flex-wrap: wrap;
+            gap: var(--esp-2);
+            justify-content: center;
+            margin-bottom: var(--esp-4);
         }
-        .thumb-item {
-            position: relative;
-            width: 80px; height: 80px;
-            border-radius: var(--raio-md);
-            overflow: hidden;
-            border: 3px solid var(--cinza-200);
+        .btn-parte-atribuir {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--raio-full);
+            border: 2px solid var(--cinza-200);
+            background: var(--branco);
             cursor: pointer;
+            font-size: var(--texto-sm);
+            font-weight: var(--peso-semi);
+            color: var(--cinza-700);
             transition: var(--transicao);
         }
-        .thumb-item:hover { border-color: var(--cor-primaria); }
-        .thumb-item.principal { border-color: #ffc107; box-shadow: 0 0 0 2px #ffc107; }
-        .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
-        .thumb-estrela {
-            position: absolute; top: 2px; right: 2px;
-            background: rgba(255,193,7,0.9);
-            border-radius: 50%; width: 20px; height: 20px;
-            font-size: 12px;
-            display: none; align-items: center; justify-content: center;
+        .btn-parte-atribuir:hover:not(:disabled) {
+            border-color: var(--cor-primaria);
+            background: var(--verde-50);
+            color: var(--cor-primaria);
         }
-        .thumb-item.principal .thumb-estrela { display: flex; }
-        .thumb-remover {
-            position: absolute; bottom: 2px; right: 2px;
-            background: rgba(220,53,69,0.85);
-            color: white; border: none;
-            border-radius: 50%; width: 20px; height: 20px;
-            font-size: 11px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+        .btn-parte-atribuir.tem-imagem {
+            border-color: var(--sucesso-cor);
+            background: var(--sucesso-fundo);
+            color: var(--sucesso-texto);
         }
+        .btn-parte-atribuir:disabled { opacity: 0.5; cursor: not-allowed; }
+        .parte-count { font-size: 0.75rem; opacity: 0.8; }
 
-        /* Botão confirmar */
-        .carrossel-rodape {
-            border-top: 1px solid var(--cinza-200);
-            padding-top: var(--esp-5);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: var(--esp-4);
+        /* Descartar */
+        .busca-descartar { text-align: center; }
+        .btn-descartar-img {
+            background: none;
+            border: 2px solid var(--cinza-300);
+            color: var(--cinza-600);
+            padding: 8px 24px;
+            border-radius: var(--raio-full);
+            cursor: pointer;
+            font-size: var(--texto-sm);
+            transition: var(--transicao);
         }
-        .btn-manual-link {
-            background: none; border: none;
-            color: var(--cinza-500); text-decoration: underline;
-            cursor: pointer; font-size: var(--texto-sm);
-        }
-        .btn-manual-link:hover { color: var(--cinza-700); }
-        .btn-confirmar-selecao {
-            background: var(--sucesso-cor); color: var(--branco);
-            border: none; padding: var(--esp-3) var(--esp-8);
-            border-radius: var(--raio-full); font-weight: var(--peso-semi);
-            cursor: pointer; font-size: var(--texto-md); transition: var(--transicao);
-        }
-        .btn-confirmar-selecao:hover:not(:disabled) { background: #218838; transform: translateY(-1px); }
-        .btn-confirmar-selecao:disabled { background: var(--cinza-300); cursor: not-allowed; }
+        .btn-descartar-img:hover { border-color: var(--perigo-cor); color: var(--perigo-cor); background: var(--perigo-fundo); }
     </style>
 </head>
 <body>
@@ -964,8 +901,13 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 <div class="alert alert-danger">❌ <?php echo $mensagem_erro; ?></div>
             <?php endif; ?>
 
-            <!-- Grid de partes da planta -->
-            <h3 style="margin: 20px 0 10px;">📍 SELECIONE UMA PARTE PARA ADICIONAR IMAGENS</h3>
+            <!-- Botão de busca automática -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0 10px;flex-wrap:wrap;gap:10px;">
+                <h3 style="margin:0;">📍 PARTES DA PLANTA</h3>
+                <button type="button" onclick="abrirBusca()" class="btn btn-primary" style="padding:10px 24px;font-size:1rem;">
+                    🔍 Buscar Imagens Automaticamente
+                </button>
+            </div>
             <div class="partes-grid">
                 <?php
                 $partes = [
@@ -984,10 +926,8 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                     $classe = 'parte-card';
                     if ($contagem > 0 && in_array($key, $partes_obrigatorias)) $classe .= ' completa';
                 ?>
-                <button type="button"
-                        class="<?php echo $classe; ?>"
-                        data-parte="<?php echo $key; ?>"
-                        onclick="iniciarBusca('<?php echo $key; ?>')">
+                <div class="<?php echo $classe; ?>"
+                     data-parte="<?php echo $key; ?>">
                     <div class="parte-icone"><?php echo $parte['icone']; ?></div>
                     <div class="parte-nome"><?php echo $parte['nome']; ?></div>
                     <div class="parte-contagem">
@@ -996,9 +936,9 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                     <?php if ($parte['obrigatoria'] && $contagem == 0): ?>
                         <div style="font-size:0.8rem;color:var(--perigo-cor);margin-top:5px;">⛔ Obrigatória</div>
                     <?php endif; ?>
-                </button>
+                </div>
                 <?php endforeach; ?>
-            </div>
+            </div><!-- /partes-grid -->
 
             <!-- Formulário de upload para a parte selecionada -->
             <?php if ($parte_selecionada && isset($partes[$parte_selecionada])): 
@@ -1121,335 +1061,319 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
     </div>
 
     <!-- ================================================ -->
-    <!-- MODAL: CARROSSEL DE BUSCA AUTOMÁTICA             -->
+    <!-- MODAL: BUSCA AUTOMÁTICA DE IMAGENS               -->
     <!-- ================================================ -->
-    <div id="carrosselModal" class="carrossel-overlay">
-        <div class="carrossel-container">
+    <div id="buscaModal" class="busca-overlay">
+        <div class="busca-container">
 
             <!-- Cabeçalho -->
-            <div class="carrossel-header">
-                <h2 id="carrosselTitulo">🔍 Buscando imagens...</h2>
-                <button class="btn-fechar-carrossel" onclick="fecharCarrossel()" title="Fechar">✕</button>
+            <div class="busca-header">
+                <h2>🔍 Busca Automática</h2>
+                <span id="buscaNomeEspecie" class="busca-especie-nome"></span>
+                <button id="btnFecharBusca" class="btn-fechar-busca" onclick="fecharBusca()" title="Fechar">✕</button>
             </div>
 
-            <div class="carrossel-corpo">
+            <div class="busca-corpo">
 
-                <!-- Estado: carregando -->
-                <div id="carrosselLoading" class="carrossel-loading">
+                <!-- Loading -->
+                <div id="buscaLoading" class="busca-loading">
                     <div class="spinner"></div>
                     <p style="color:var(--cinza-600);">Buscando no iNaturalist e Wikimedia Commons...</p>
                 </div>
 
-                <!-- Estado: sem resultados -->
-                <div id="carrosselVazio" style="display:none;" class="carrossel-vazio">
+                <!-- Sem resultados -->
+                <div id="buscaVazio" style="display:none;" class="busca-vazio">
                     <p>😕 Nenhuma imagem encontrada nas fontes automáticas.</p>
-                    <button onclick="abrirFormManual()" class="btn btn-secondary" style="margin:0 auto;">
-                        ✏️ Adicionar manualmente
-                    </button>
+                    <button onclick="document.getElementById('buscaModal').classList.remove('aberto')" class="btn btn-secondary" style="margin:0 auto;">Fechar</button>
                 </div>
 
-                <!-- Estado: carrossel com imagens -->
-                <div id="carrosselConteudo" style="display:none;">
+                <!-- Sem mais imagens -->
+                <div id="buscaSemMais" style="display:none;" class="busca-sem-mais">
+                    <p>📭 Sem mais imagens disponíveis.</p>
+                    <button onclick="fecharBusca()" class="btn btn-primary" style="margin:0 auto;">✓ Fechar e salvar</button>
+                </div>
 
-                    <!-- Contador de navegação -->
-                    <div class="carrossel-nav-topo">
-                        <span id="carrosselCounter">1 / 5</span>
-                        <span style="color:var(--cinza-400);font-size:var(--texto-xs);">Clique na imagem para abrir em tamanho original</span>
-                    </div>
+                <!-- Imagem + ações -->
+                <div id="buscaConteudo" style="display:none;">
 
-                    <!-- Imagem + botões de navegação -->
-                    <div class="carrossel-imagem-wrap">
-                        <button class="btn-nav-carrossel" onclick="navegarCarrossel(-1)" title="Anterior">‹</button>
+                    <!-- Contador -->
+                    <div class="busca-counter" id="buscaCounter">1 / 10</div>
 
-                        <div class="carrossel-imagem">
-                            <img id="carrosselImg" src="" alt="Candidata" title="Clique para abrir em tamanho original">
-                            <div id="carrosselBadge" class="carrossel-badge-status"></div>
-                        </div>
-
-                        <button class="btn-nav-carrossel" onclick="navegarCarrossel(1)" title="Próxima">›</button>
+                    <!-- Imagem -->
+                    <div class="busca-img-wrap">
+                        <img id="buscaImg" src="" alt="Imagem candidata" title="Clique para abrir em tamanho original">
                     </div>
 
                     <!-- Metadados -->
-                    <div class="carrossel-meta">
-                        <div class="meta-item"><i class="fas fa-user"></i><span id="metaAutor">—</span></div>
-                        <div class="meta-item"><i class="fas fa-balance-scale"></i><span id="metaLicenca">—</span></div>
-                        <div class="meta-item"><i class="fas fa-database"></i><span id="metaFonte">—</span></div>
-                        <div class="meta-item"><i class="fas fa-map-marker-alt"></i><span id="metaLocal">—</span></div>
-                        <div class="meta-item"><i class="fas fa-calendar"></i><span id="metaData">—</span></div>
-                        <div class="meta-item"><i class="fas fa-star"></i><span id="metaPontuacao">—</span> pts</div>
+                    <div class="busca-meta">
+                        <div class="busca-meta-item"><i class="fas fa-user"></i><span id="buscaMetaAutor">—</span></div>
+                        <div class="busca-meta-item"><i class="fas fa-balance-scale"></i><span id="buscaMetaLicenca">—</span></div>
+                        <div class="busca-meta-item"><i class="fas fa-database"></i><span id="buscaMetaFonte">—</span></div>
                     </div>
 
-                    <!-- Ações -->
-                    <div class="carrossel-acoes">
-                        <button onclick="descartarAtual()" class="btn-descartar">✕ Descartar</button>
-                        <button onclick="usarAtual()" class="btn-usar" id="btnUsar">✓ Usar esta</button>
+                    <!-- Botões de parte (gerados por JS) -->
+                    <div class="partes-atribuicao" id="partesAtribuicao"></div>
+
+                    <!-- Descartar -->
+                    <div class="busca-descartar">
+                        <button onclick="descartarImagem()" class="btn-descartar-img">→ Descartar esta imagem</button>
                     </div>
 
-                    <!-- Thumbnails das selecionadas -->
-                    <div class="carrossel-selecionadas">
-                        <h4>
-                            Selecionadas: <span id="countSelecionadas">0</span>/5
-                            <small style="color:var(--cinza-400);font-weight:normal;margin-left:8px;">⭐ = aparece no artigo • clique para trocar principal</small>
-                        </h4>
-                        <div class="thumbs-grid" id="thumbsSelecionadas"></div>
-                    </div>
-
-                    <!-- Rodapé: confirmar ou manual -->
-                    <div class="carrossel-rodape">
-                        <button onclick="abrirFormManual()" class="btn-manual-link">✏️ Adicionar manualmente</button>
-                        <button onclick="confirmarSelecao()" class="btn-confirmar-selecao" id="btnConfirmar" disabled>
-                            ⬇️ Baixar e salvar selecionadas
-                        </button>
-                    </div>
-
-                </div><!-- /carrosselConteudo -->
-            </div><!-- /carrossel-corpo -->
-        </div><!-- /carrossel-container -->
-    </div><!-- /carrosselModal -->
+                </div><!-- /buscaConteudo -->
+            </div><!-- /busca-corpo -->
+        </div><!-- /busca-container -->
+    </div><!-- /buscaModal -->
 
     <script>
     // ================================================
-    // CARROSSEL — estado
+    // BUSCA AUTOMÁTICA — estado global
     // ================================================
-    let carrosselParte = '';
-    let candidatas     = [];
-    let indiceAtual    = 0;
-    let selecionadas   = [];   // [{id, thumbnail, principal}]
-    let principalId    = null;
-
     const ESPECIE_ID = <?php echo (int)$especie_id; ?>;
     const TEMP_ID    = <?php echo json_encode($temp_id); ?>;
+    const NOME_CIENT = <?php echo json_encode($especie['nome_cientifico']); ?>;
+
+    const PARTES_INFO = {
+        folha:             { icone: '🍃', nome: 'Folha',    obrigatoria: true  },
+        flor:              { icone: '🌸', nome: 'Flor',     obrigatoria: true  },
+        fruto:             { icone: '🍎', nome: 'Fruto',    obrigatoria: true  },
+        caule:             { icone: '🌿', nome: 'Caule',    obrigatoria: true  },
+        semente:           { icone: '🌱', nome: 'Semente',  obrigatoria: false },
+        habito:            { icone: '🌳', nome: 'Hábito',   obrigatoria: true  },
+        exsicata_completa: { icone: '📋', nome: 'Exsicata', obrigatoria: false },
+        detalhe:           { icone: '🔍', nome: 'Detalhe',  obrigatoria: false },
+    };
+
+    let busca = {
+        imagens:     [],
+        indice:      0,
+        pagina:      1,
+        carregando:  false,
+        atribuicoes: {},   // {parte: [imageObj, ...]}
+    };
 
     // ------------------------------------------------
-    // Abrir busca ao clicar numa parte
+    // Abrir modal de busca
     // ------------------------------------------------
-    function iniciarBusca(parte) {
-        carrosselParte = parte;
-        candidatas     = [];
-        selecionadas   = [];
-        indiceAtual    = 0;
-        principalId    = null;
+    function abrirBusca() {
+        busca = { imagens: [], indice: 0, pagina: 1, carregando: false, atribuicoes: {} };
 
-        const nomes = {
-            folha:'Folha', flor:'Flor', fruto:'Fruto', caule:'Caule',
-            semente:'Semente', habito:'Hábito',
-            exsicata_completa:'Exsicata', detalhe:'Detalhe'
-        };
+        document.getElementById('buscaModal').classList.add('aberto');
+        document.getElementById('buscaNomeEspecie').textContent = NOME_CIENT;
 
-        document.getElementById('carrosselTitulo').textContent =
-            '🔍 Buscando imagens para: ' + (nomes[parte] || parte);
+        mostrarEstadoBusca('loading');
+        carregarImagens();
+    }
 
-        document.getElementById('carrosselLoading').style.display  = 'block';
-        document.getElementById('carrosselVazio').style.display     = 'none';
-        document.getElementById('carrosselConteudo').style.display  = 'none';
-        document.getElementById('carrosselModal').classList.add('aberto');
+    // ------------------------------------------------
+    // Carregar página de imagens da API
+    // ------------------------------------------------
+    function carregarImagens() {
+        if (busca.carregando) return;
+        busca.carregando = true;
 
         const fd = new FormData();
-        fd.append('especie_id',   ESPECIE_ID);
-        fd.append('parte_planta', parte);
-        fd.append('temp_id',      TEMP_ID);
+        fd.append('especie_id', ESPECIE_ID);
+        fd.append('pagina',     busca.pagina);
 
         fetch('../Controllers/buscar_imagens_automatico.php', { method: 'POST', body: fd })
             .then(r => r.json())
             .then(data => {
-                document.getElementById('carrosselLoading').style.display = 'none';
+                busca.carregando = false;
                 if (!data.sucesso || !data.candidatas || data.candidatas.length === 0) {
-                    document.getElementById('carrosselVazio').style.display = 'block';
+                    if (busca.imagens.length === 0) {
+                        mostrarEstadoBusca('vazio');
+                    } else {
+                        mostrarEstadoBusca('sem-mais');
+                    }
                     return;
                 }
-                candidatas  = data.candidatas;
-                indiceAtual = 0;
-                document.getElementById('carrosselConteudo').style.display = 'block';
-                renderCandidataAtual();
+                busca.imagens.push(...data.candidatas);
+                busca.pagina++;
+                mostrarEstadoBusca('imagem');
+                mostrarImagemAtual();
             })
             .catch(() => {
-                document.getElementById('carrosselLoading').style.display = 'none';
-                document.getElementById('carrosselVazio').style.display   = 'block';
+                busca.carregando = false;
+                mostrarEstadoBusca(busca.imagens.length === 0 ? 'vazio' : 'sem-mais');
             });
     }
 
     // ------------------------------------------------
-    // Renderizar imagem atual no carrossel
+    // Alternar estado do modal
     // ------------------------------------------------
-    function renderCandidataAtual() {
-        const c = candidatas[indiceAtual];
-        if (!c) return;
+    function mostrarEstadoBusca(estado) {
+        document.getElementById('buscaLoading').style.display   = estado === 'loading'  ? 'block' : 'none';
+        document.getElementById('buscaVazio').style.display     = estado === 'vazio'    ? 'block' : 'none';
+        document.getElementById('buscaSemMais').style.display   = estado === 'sem-mais' ? 'block' : 'none';
+        document.getElementById('buscaConteudo').style.display  = estado === 'imagem'   ? 'block' : 'none';
+    }
 
-        const img = document.getElementById('carrosselImg');
+    // ------------------------------------------------
+    // Mostrar imagem atual
+    // ------------------------------------------------
+    function mostrarImagemAtual() {
+        const c = busca.imagens[busca.indice];
+        if (!c) {
+            if (!busca.carregando) {
+                mostrarEstadoBusca('loading');
+                carregarImagens();
+            }
+            return;
+        }
+
+        mostrarEstadoBusca('imagem');
+
+        document.getElementById('buscaCounter').textContent =
+            (busca.indice + 1) + ' / ' + busca.imagens.length;
+
+        const img = document.getElementById('buscaImg');
         img.src     = c.url_thumbnail || c.url_foto;
         img.onclick = () => window.open(c.url_foto, '_blank');
 
-        document.getElementById('carrosselCounter').textContent =
-            (indiceAtual + 1) + ' / ' + candidatas.length;
-        document.getElementById('metaAutor').textContent      = c.autor        || 'Não informado';
-        document.getElementById('metaLicenca').textContent    = c.licenca      || 'Não informada';
-        document.getElementById('metaFonte').textContent      = c.fonte_nome   || c.fonte;
-        document.getElementById('metaLocal').textContent      = c.local_coleta || '—';
-        document.getElementById('metaData').textContent       = c.data_observacao || '—';
-        document.getElementById('metaPontuacao').textContent  = c.pontuacao;
+        document.getElementById('buscaMetaAutor').textContent   = c.autor      || '—';
+        document.getElementById('buscaMetaLicenca').textContent = c.licenca    || '—';
+        document.getElementById('buscaMetaFonte').textContent   = c.fonte_nome || c.fonte || '—';
 
-        // Badge e botão usar
-        const badge   = document.getElementById('carrosselBadge');
-        const btnUsar = document.getElementById('btnUsar');
-        const sel     = selecionadas.find(s => s.id == c.id);
+        renderBotaoPartes();
+    }
 
-        badge.className = 'carrossel-badge-status';
-        if (sel) {
-            badge.textContent = sel.principal ? '⭐ Principal (artigo)' : '✓ Selecionada';
-            badge.classList.add(sel.principal ? 'principal' : 'selecionada');
-            btnUsar.textContent = '✓ Já selecionada';
-            btnUsar.disabled    = true;
+    // ------------------------------------------------
+    // Renderizar botões de atribuição de parte
+    // ------------------------------------------------
+    function renderBotaoPartes() {
+        const container = document.getElementById('partesAtribuicao');
+        container.innerHTML = Object.entries(PARTES_INFO).map(([key, info]) => {
+            const count = (busca.atribuicoes[key] || []).length;
+            const cheia = count >= 5;
+            return `<button class="btn-parte-atribuir ${count > 0 ? 'tem-imagem' : ''}"
+                            onclick="atribuirParte('${key}')"
+                            ${cheia ? 'disabled' : ''}>
+                        ${info.icone} ${info.nome}
+                        <span class="parte-count">${count}/5</span>
+                    </button>`;
+        }).join('');
+    }
+
+    // ------------------------------------------------
+    // Atribuir imagem atual a uma parte
+    // ------------------------------------------------
+    function atribuirParte(parte) {
+        const c = busca.imagens[busca.indice];
+        if (!c) return;
+        if (!busca.atribuicoes[parte]) busca.atribuicoes[parte] = [];
+        if (busca.atribuicoes[parte].length >= 5) return;
+
+        const ehPrincipal = busca.atribuicoes[parte].length === 0 ? 1 : 0;
+        busca.atribuicoes[parte].push({ ...c, principal: ehPrincipal });
+
+        // Atualiza contador no card da parte (página principal)
+        const span = document.getElementById('count-' + parte);
+        if (span) span.textContent = busca.atribuicoes[parte].length;
+
+        avancarImagem();
+        verificarAutoFechamento();
+    }
+
+    // ------------------------------------------------
+    // Descartar imagem e avançar
+    // ------------------------------------------------
+    function descartarImagem() {
+        avancarImagem();
+    }
+
+    // ------------------------------------------------
+    // Avançar para a próxima imagem
+    // ------------------------------------------------
+    function avancarImagem() {
+        busca.indice++;
+        if (busca.indice >= busca.imagens.length) {
+            mostrarEstadoBusca('loading');
+            carregarImagens();
         } else {
-            badge.textContent = '';
-            btnUsar.textContent = '✓ Usar esta';
-            btnUsar.disabled    = selecionadas.length >= 5;
+            mostrarImagemAtual();
         }
     }
 
     // ------------------------------------------------
-    // Navegação
+    // Verificar auto-fechamento (todas obrigatórias preenchidas)
     // ------------------------------------------------
-    function navegarCarrossel(dir) {
-        indiceAtual = (indiceAtual + dir + candidatas.length) % candidatas.length;
-        renderCandidataAtual();
-    }
+    function verificarAutoFechamento() {
+        const todasCompletas = Object.entries(PARTES_INFO)
+            .filter(([, info]) => info.obrigatoria)
+            .every(([key]) => busca.atribuicoes[key] && busca.atribuicoes[key].length > 0);
 
-    // ------------------------------------------------
-    // Usar imagem atual
-    // ------------------------------------------------
-    function usarAtual() {
-        const c = candidatas[indiceAtual];
-        if (!c || selecionadas.find(s => s.id == c.id) || selecionadas.length >= 5) return;
-
-        const ehPrincipal = selecionadas.length === 0;
-        if (ehPrincipal) principalId = c.id;
-
-        selecionadas.push({
-            id:        c.id,
-            thumbnail: c.url_thumbnail || c.url_foto,
-            principal: ehPrincipal,
-        });
-
-        renderThumbs();
-
-        // Avança automaticamente
-        if (indiceAtual < candidatas.length - 1) indiceAtual++;
-        renderCandidataAtual();
-    }
-
-    // ------------------------------------------------
-    // Descartar e avançar
-    // ------------------------------------------------
-    function descartarAtual() {
-        if (indiceAtual < candidatas.length - 1) indiceAtual++;
-        renderCandidataAtual();
-    }
-
-    // ------------------------------------------------
-    // Marcar principal (para o artigo)
-    // ------------------------------------------------
-    function marcarPrincipal(id) {
-        principalId  = id;
-        selecionadas = selecionadas.map(s => ({ ...s, principal: s.id == id }));
-        renderThumbs();
-        renderCandidataAtual();
-    }
-
-    // ------------------------------------------------
-    // Remover da seleção
-    // ------------------------------------------------
-    function removerSelecionada(id) {
-        selecionadas = selecionadas.filter(s => s.id != id);
-        if (principalId == id) {
-            principalId = selecionadas.length > 0 ? selecionadas[0].id : null;
-            if (selecionadas.length > 0) selecionadas[0].principal = true;
+        if (todasCompletas) {
+            setTimeout(() => fecharBusca(), 400);
         }
-        renderThumbs();
-        renderCandidataAtual();
     }
 
     // ------------------------------------------------
-    // Renderizar thumbnails selecionadas
+    // Fechar modal e salvar atribuições
     // ------------------------------------------------
-    function renderThumbs() {
-        document.getElementById('countSelecionadas').textContent = selecionadas.length;
-        document.getElementById('btnConfirmar').disabled = selecionadas.length === 0;
-
-        document.getElementById('thumbsSelecionadas').innerHTML = selecionadas.map(s => `
-            <div class="thumb-item ${s.principal ? 'principal' : ''}"
-                 onclick="marcarPrincipal(${s.id})"
-                 title="${s.principal ? 'Principal do artigo' : 'Clique para usar no artigo'}">
-                <img src="${s.thumbnail}" alt="">
-                <div class="thumb-estrela">⭐</div>
-                <button class="thumb-remover"
-                        onclick="event.stopPropagation();removerSelecionada(${s.id})"
-                        title="Remover">✕</button>
-            </div>
-        `).join('');
+    function fecharBusca() {
+        const total = Object.values(busca.atribuicoes).reduce((s, a) => s + a.length, 0);
+        if (total === 0) {
+            document.getElementById('buscaModal').classList.remove('aberto');
+            return;
+        }
+        salvarAtribuicoes();
     }
 
     // ------------------------------------------------
-    // Confirmar e baixar
+    // POST das atribuições para salvar_atribuicoes.php
     // ------------------------------------------------
-    function confirmarSelecao() {
-        if (selecionadas.length === 0) return;
+    function salvarAtribuicoes() {
+        const btnFechar = document.getElementById('btnFecharBusca');
+        if (btnFechar) { btnFechar.textContent = '⏳'; btnFechar.disabled = true; }
 
-        const btn = document.getElementById('btnConfirmar');
-        btn.textContent = '⏳ Baixando...';
-        btn.disabled    = true;
+        const lista = [];
+        for (const [parte, imgs] of Object.entries(busca.atribuicoes)) {
+            for (const img of imgs) {
+                lista.push({
+                    parte:           parte,
+                    url_foto:        img.url_foto,
+                    url_thumbnail:   img.url_thumbnail,
+                    fonte_nome:      img.fonte_nome,
+                    fonte_url:       img.fonte_url,
+                    autor:           img.autor,
+                    licenca:         img.licenca,
+                    local_coleta:    img.local_coleta,
+                    data_observacao: img.data_observacao,
+                    principal:       img.principal,
+                });
+            }
+        }
 
         const fd = new FormData();
-        fd.append('temp_id',        TEMP_ID);
-        fd.append('candidatos_ids', JSON.stringify(selecionadas.map(s => s.id)));
-        fd.append('principal_id',   principalId || 0);
+        fd.append('temp_id',          TEMP_ID);
+        fd.append('atribuicoes_json', JSON.stringify(lista));
 
-        fetch('../Controllers/salvar_imagens_selecionadas.php', { method: 'POST', body: fd })
+        fetch('../Controllers/salvar_atribuicoes.php', { method: 'POST', body: fd })
             .then(r => r.json())
             .then(data => {
+                document.getElementById('buscaModal').classList.remove('aberto');
                 if (data.sucesso) {
-                    // Atualiza contador do card da parte
-                    const span = document.getElementById('count-' + carrosselParte);
-                    if (span) span.textContent = parseInt(span.textContent || 0) + data.salvas;
-
-                    const card = document.querySelector('[data-parte="' + carrosselParte + '"]');
-                    if (card && data.salvas > 0) card.classList.add('completa');
-
-                    fecharCarrossel();
-                    mostrarAlertaSucesso(data.salvas + ' imagem(ns) salva(s) para ' + carrosselParte + '!');
+                    for (const [parte, imgs] of Object.entries(busca.atribuicoes)) {
+                        if (imgs.length > 0) {
+                            const card = document.querySelector('[data-parte="' + parte + '"]');
+                            if (card) card.classList.add('completa');
+                        }
+                    }
+                    mostrarAlertaSucesso(data.salvas + ' imagem(ns) salva(s)!');
                 } else {
-                    alert('Erro: ' + (data.erro || 'Tente novamente.'));
-                    btn.textContent = '⬇️ Baixar e salvar selecionadas';
-                    btn.disabled    = false;
+                    alert('Erro ao salvar: ' + (data.erro || 'Tente novamente.'));
                 }
             })
             .catch(() => {
-                alert('Erro de conexão. Tente novamente.');
-                btn.textContent = '⬇️ Baixar e salvar selecionadas';
-                btn.disabled    = false;
+                document.getElementById('buscaModal').classList.remove('aberto');
+                alert('Erro de conexão ao salvar imagens.');
             });
     }
 
-    // ------------------------------------------------
-    // Fechar modal
-    // ------------------------------------------------
-    function fecharCarrossel() {
-        document.getElementById('carrosselModal').classList.remove('aberto');
-        candidatas   = [];
-        selecionadas = [];
-    }
-
-    // Fechar clicando fora
-    document.getElementById('carrosselModal').addEventListener('click', function(e) {
-        if (e.target === this) fecharCarrossel();
+    // Fechar clicando fora do container
+    document.getElementById('buscaModal').addEventListener('click', function(e) {
+        if (e.target === this) fecharBusca();
     });
-
-    // ------------------------------------------------
-    // Fallback: abrir formulário manual (Ctrl+V)
-    // ------------------------------------------------
-    function abrirFormManual() {
-        fecharCarrossel();
-        window.location.href = '?temp_id=' + encodeURIComponent(TEMP_ID) + '&parte=' + carrosselParte;
-    }
 
     // ------------------------------------------------
     // Alerta de sucesso temporário
