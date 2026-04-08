@@ -440,8 +440,13 @@ try {
             // ================================================
             // INSERT NA TABELA especies_imagens
             // ================================================
+            $origem_img   = $img['origem'] ?? 'upload';
+            $principal_img = (int)($img['principal'] ?? 0);
+
             $sql_insert = "INSERT INTO especies_imagens (
                 especie_id,
+                tipo_imagem,
+                origem,
                 parte_planta,
                 caminho_imagem,
                 id_usuario_identificador,
@@ -451,13 +456,15 @@ try {
                 fonte_url,
                 autor_imagem,
                 licenca,
+                principal,
                 status_validacao
-            ) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, 'aprovado')";
-            
+            ) VALUES (?, 'provisoria', ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, 'aprovado')";
+
             $stmt = $conexao->prepare($sql_insert);
             $stmt->bind_param(
-                "ississsss",
+                "issiisssssi",
                 $especie_id,
+                $origem_img,
                 $img['parte_planta'],
                 $caminho_relativo,
                 $id_usuario,
@@ -465,7 +472,8 @@ try {
                 $img['fonte_nome'],
                 $img['fonte_url'],
                 $img['autor_imagem'],
-                $img['licenca']
+                $img['licenca'],
+                $principal_img
             );
             
             if ($stmt->execute()) {
