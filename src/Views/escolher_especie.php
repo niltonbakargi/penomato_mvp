@@ -117,7 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
             'usuario_id'    => $id_usuario,
             'orientador_id' => $orientador_id,
             'status_inicial'=> 'sem_dados',
-            'imagens'       => [],
             'dados'         => [],
             'data_criacao'  => time()
         ];

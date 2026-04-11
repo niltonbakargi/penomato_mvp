@@ -177,60 +177,24 @@ if (empty($temp_id) || !isset($_SESSION['importacao_temporaria']) || $_SESSION['
     exit;
 }
 
-$dados_temporarios = $_SESSION['importacao_temporaria'];
-$especie_id = $dados_temporarios['especie_id'];
+$dados_temporarios     = $_SESSION['importacao_temporaria'];
+$especie_id            = $dados_temporarios['especie_id'];
 $dados_caracteristicas = $dados_temporarios['dados'] ?? [];
-$imagens_temporarias = $dados_temporarios['imagens'] ?? [];
 
 // ================================================
-// LOG INICIAL - DIAGNÓSTICO
+// LOG INICIAL
 // ================================================
 error_log("========== INICIANDO FINALIZAÇÃO ==========");
 error_log("Temp ID: " . $temp_id);
 error_log("Espécie ID: " . $especie_id);
-error_log("Total imagens na sessão: " . count($imagens_temporarias));
 error_log("Total campos características: " . count($dados_caracteristicas));
 
 // ================================================
-// VERIFICAR SE O USUÁRIO DA SESSÃO É O MESMO DA IMPORTAÇÃO
+// VERIFICAR PERMISSÃO
 // ================================================
 if (!isset($dados_temporarios['usuario_id']) || $dados_temporarios['usuario_id'] != $id_usuario) {
     error_log("ERRO: Usuário sem permissão");
     header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Você não tem permissão para finalizar esta importação."));
-    exit;
-}
-
-// ================================================
-// VERIFICAR SE HÁ IMAGENS PARA SALVAR
-// ================================================
-if (empty($imagens_temporarias)) {
-    error_log("ERRO: Nenhuma imagem para salvar");
-    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Não há imagens para salvar."));
-    exit;
-}
-
-// ================================================
-// VERIFICAR PARTES OBRIGATÓRIAS
-// ================================================
-$partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
-$semente_ausente     = !empty($dados_temporarios['semente_ausente']);
-
-$partes_com_imagem = [];
-foreach ($imagens_temporarias as $img) {
-    $partes_com_imagem[$img['parte_planta']] = true;
-}
-
-$partes_faltando = [];
-foreach ($partes_obrigatorias as $parte) {
-    if (empty($partes_com_imagem[$parte])) {
-        $partes_faltando[] = ucfirst($parte);
-    }
-}
-
-if (!empty($partes_faltando)) {
-    $msg = 'Imagens obrigatórias ausentes: ' . implode(', ', $partes_faltando) . '. Todas as partes obrigatórias precisam de ao menos uma imagem.';
-    error_log("ERRO: Partes sem imagem: " . implode(', ', $partes_faltando));
-    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode($msg));
     exit;
 }
 
@@ -244,56 +208,11 @@ if (empty($dados_caracteristicas)) {
 }
 
 // ================================================
-// VERIFICAR PASTAS
+// VERIFICAR PARTES OBRIGATÓRIAS (via banco de dados)
 // ================================================
-$pasta_temp = dirname(dirname(__DIR__)) . '/uploads/temp/' . $temp_id . '/';
-$pasta_definitiva = dirname(dirname(__DIR__)) . '/uploads/exsicatas/' . $especie_id . '/';
-
-error_log("Pasta temp: " . $pasta_temp);
-error_log("Pasta definitiva: " . $pasta_definitiva);
-
-// Verificar se pasta temporária existe
-if (!file_exists($pasta_temp)) {
-    error_log("ERRO: Pasta temporária não encontrada");
-    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Pasta temporária não encontrada."));
-    exit;
-}
-
-// Listar arquivos na pasta temp
-$arquivos_temp = scandir($pasta_temp);
-error_log("Arquivos na pasta temp: " . implode(", ", $arquivos_temp));
-
-// ================================================
-// VERIFICAR ARQUIVOS ANTES DE COMEÇAR
-// ================================================
-$imagens_validas = [];
-foreach ($imagens_temporarias as $i => $img) {
-    $nome_arquivo = basename($img['caminho_temporario']);
-    $caminho_completo = $pasta_temp . $nome_arquivo;
-    
-    error_log("Verificando imagem $i - Parte: " . $img['parte_planta']);
-    error_log("  Nome: " . $nome_arquivo);
-    error_log("  Caminho: " . $caminho_completo);
-    error_log("  Existe? " . (file_exists($caminho_completo) ? "SIM" : "NÃO"));
-    
-    if (file_exists($caminho_completo)) {
-        $imagens_validas[] = $img;
-    } else {
-        error_log("  REMOVIDA: Imagem fantasma - " . $nome_arquivo);
-    }
-}
-
-$imagens_temporarias = $imagens_validas;
-$_SESSION['importacao_temporaria']['imagens'] = $imagens_validas;
-
-error_log("Imagens válidas após verificação: " . count($imagens_temporarias));
-
-// Verificar se ainda há imagens após limpeza
-if (empty($imagens_temporarias)) {
-    error_log("ERRO: Nenhuma imagem válida encontrada");
-    header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Nenhuma imagem válida encontrada para salvar."));
-    exit;
-}
+// As imagens já foram salvas em especies_imagens durante o upload.
+// Aqui só consultamos para confirmar que as partes obrigatórias estão presentes.
+// A verificação de partes ocorre após conectar ao banco (abaixo).
 
 // ================================================
 // CONECTAR AO BANCO
@@ -398,106 +317,41 @@ try {
     error_log("Status atualizado para 'dados_internet'");
     
     // ================================================
-    // 3. SALVAR IMAGENS (MOVER DA PASTA TEMP PARA DEFINITIVA)
+    // 3. (IMAGENS JÁ SALVAS) — verificar partes obrigatórias no BD
     // ================================================
-    error_log("--- Processando imagens ---");
-    
-    // Criar pasta definitiva se não existir
-    if (!file_exists($pasta_definitiva)) {
-        mkdir($pasta_definitiva, 0777, true);
-        error_log("Pasta definitiva criada: " . $pasta_definitiva);
+    $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
+
+    $stmt_partes = $conexao->prepare(
+        "SELECT DISTINCT parte_planta
+           FROM especies_imagens
+          WHERE especie_id = ? AND status_validacao = 'aprovado'"
+    );
+    $stmt_partes->bind_param("i", $especie_id);
+    $stmt_partes->execute();
+    $res_partes = $stmt_partes->get_result();
+    $partes_com_imagem = [];
+    while ($row = $res_partes->fetch_assoc()) {
+        $partes_com_imagem[$row['parte_planta']] = true;
     }
-    
-    $imagens_salvas = 0;
-    $imagens_falhas = [];
-    
-    foreach ($imagens_temporarias as $i => $img) {
-        
-        $nome_arquivo = basename($img['caminho_temporario']);
-        $caminho_temp = $pasta_temp . $nome_arquivo;
-        $caminho_definitivo = $pasta_definitiva . $nome_arquivo;
-        $caminho_relativo = 'uploads/exsicatas/' . $especie_id . '/' . $nome_arquivo;
-        
-        error_log("--- Imagem $i ---");
-        error_log("Parte: " . $img['parte_planta']);
-        error_log("Nome: " . $nome_arquivo);
-        error_log("Temp: " . $caminho_temp);
-        error_log("Definitivo: " . $caminho_definitivo);
-        error_log("Arquivo existe? " . (file_exists($caminho_temp) ? "SIM" : "NÃO"));
-        error_log("Tamanho: " . (file_exists($caminho_temp) ? filesize($caminho_temp) . " bytes" : "N/A"));
-        
-        // Mover arquivo
-        if (rename($caminho_temp, $caminho_definitivo)) {
-            error_log("RENAME SUCESSO: Arquivo movido");
-            
-            // Verificar se o arquivo foi movido corretamente
-            if (file_exists($caminho_definitivo)) {
-                error_log("Arquivo confirmado no destino: " . $caminho_definitivo);
-            } else {
-                error_log("ALERTA: Arquivo não encontrado no destino após rename");
-            }
-            
-            // ================================================
-            // INSERT NA TABELA especies_imagens
-            // ================================================
-            $origem_img   = $img['origem'] ?? 'upload';
-            $principal_img = (int)($img['principal'] ?? 0);
+    $stmt_partes->close();
 
-            $sql_insert = "INSERT INTO especies_imagens (
-                especie_id,
-                tipo_imagem,
-                origem,
-                parte_planta,
-                caminho_imagem,
-                id_usuario_identificador,
-                data_upload,
-                descricao,
-                fonte_nome,
-                fonte_url,
-                autor_imagem,
-                licenca,
-                principal,
-                status_validacao
-            ) VALUES (?, 'provisoria', ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, 'aprovado')";
-
-            $stmt = $conexao->prepare($sql_insert);
-            $stmt->bind_param(
-                "issiisssssi",
-                $especie_id,
-                $origem_img,
-                $img['parte_planta'],
-                $caminho_relativo,
-                $id_usuario,
-                $img['descricao'],
-                $img['fonte_nome'],
-                $img['fonte_url'],
-                $img['autor_imagem'],
-                $img['licenca'],
-                $principal_img
-            );
-            
-            if ($stmt->execute()) {
-                $imagens_salvas++;
-                error_log("INSERT SUCESSO: ID " . $stmt->insert_id);
-            } else {
-                error_log("INSERT FALHOU: " . $stmt->error);
-                $imagens_falhas[] = $nome_arquivo . " (erro banco: " . $stmt->error . ")";
-            }
-            $stmt->close();
-            
-        } else {
-            $erro_rename = error_get_last();
-            error_log("RENAME FALHOU: " . ($erro_rename['message'] ?? 'Erro desconhecido'));
-            $imagens_falhas[] = $nome_arquivo . " (erro mover arquivo)";
+    $partes_faltando = [];
+    foreach ($partes_obrigatorias as $parte) {
+        if (empty($partes_com_imagem[$parte])) {
+            $partes_faltando[] = ucfirst($parte);
         }
     }
-    
-    error_log("--- Resumo imagens ---");
-    error_log("Salvas com sucesso: " . $imagens_salvas);
-    if (!empty($imagens_falhas)) {
-        error_log("Falhas: " . implode(", ", $imagens_falhas));
+
+    if (!empty($partes_faltando)) {
+        $msg = 'Imagens obrigatórias ausentes: ' . implode(', ', $partes_faltando) . '. Adicione ao menos uma imagem para cada parte obrigatória.';
+        error_log("ERRO: Partes sem imagem: " . implode(', ', $partes_faltando));
+        $conexao->rollback();
+        header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode($msg));
+        exit;
     }
-    
+
+    error_log("Partes obrigatórias confirmadas no banco");
+
     // ================================================
     // COMMIT - TUDO OK
     // ================================================
@@ -630,31 +484,21 @@ try {
     }
 
     // ================================================
-    // 7. LIMPAR PASTA TEMPORÁRIA
+    // 7. CONTAR IMAGENS SALVAS E LIMPAR SESSÃO
     // ================================================
-    // ================================================
-    if (file_exists($pasta_temp)) {
-        $itens = scandir($pasta_temp);
-        foreach ($itens as $item) {
-            if ($item == '.' || $item == '..') continue;
-            $caminho_item = $pasta_temp . $item;
-            if (is_file($caminho_item)) {
-                unlink($caminho_item);
-                error_log("Arquivo temporário removido: " . $item);
-            }
-        }
-        rmdir($pasta_temp);
-        error_log("Pasta temporária removida: " . $pasta_temp);
-    }
-    
-    // ================================================
-    // 8. LIMPAR SESSÃO TEMPORÁRIA
-    // ================================================
+    $stmt_count = $conexao->prepare(
+        "SELECT COUNT(*) FROM especies_imagens WHERE especie_id = ? AND status_validacao = 'aprovado'"
+    );
+    $stmt_count->bind_param("i", $especie_id);
+    $stmt_count->execute();
+    $stmt_count->bind_result($imagens_salvas);
+    $stmt_count->fetch();
+    $stmt_count->close();
+
     unset($_SESSION['importacao_temporaria']);
     error_log("Sessão temporária limpa");
-    
     error_log("========== FINALIZAÇÃO CONCLUÍDA COM SUCESSO ==========");
-    
+
     // ================================================
     // REDIRECIONAR PARA PÁGINA DE SUCESSO
     // ================================================

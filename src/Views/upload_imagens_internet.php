@@ -68,31 +68,31 @@ if ($resultado->num_rows === 0) {
 
 $especie = $resultado->fetch_assoc();
 $stmt->close();
-$conexao->close();
 
 // ================================================
-// INICIALIZAR ESTRUTURA DE IMAGENS NA SESSÃO
-// ================================================
-if (!isset($_SESSION['importacao_temporaria']['imagens'])) {
-    $_SESSION['importacao_temporaria']['imagens'] = [];
-}
-
-$imagens_temporarias = $_SESSION['importacao_temporaria']['imagens'];
-
-// ================================================
-// CONTAGEM POR PARTE (BASEADO NAS IMAGENS TEMPORÁRIAS)
+// CONTAGEM POR PARTE — VEM DO BANCO DE DADOS
 // ================================================
 $contagem_por_parte = [
     'folha' => 0, 'flor' => 0, 'fruto' => 0, 'caule' => 0,
     'semente' => 0, 'habito' => 0, 'exsicata_completa' => 0, 'detalhe' => 0
 ];
 
-foreach ($imagens_temporarias as $img) {
-    $parte = $img['parte_planta'];
-    if (isset($contagem_por_parte[$parte])) {
-        $contagem_por_parte[$parte]++;
+$stmt_prog = $conexao->prepare(
+    "SELECT parte_planta, COUNT(*) AS total
+       FROM especies_imagens
+      WHERE especie_id = ? AND status_validacao = 'aprovado'
+      GROUP BY parte_planta"
+);
+$stmt_prog->bind_param("i", $especie_id);
+$stmt_prog->execute();
+$res_prog = $stmt_prog->get_result();
+while ($row = $res_prog->fetch_assoc()) {
+    if (isset($contagem_por_parte[$row['parte_planta']])) {
+        $contagem_por_parte[$row['parte_planta']] = (int)$row['total'];
     }
 }
+$stmt_prog->close();
+$conexao->close();
 
 // ================================================
 // DEFINIR STATUS DAS IMAGENS

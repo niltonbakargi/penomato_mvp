@@ -1,10 +1,9 @@
 <?php
 // ============================================================
-// SALVAR ATRIBUIÇÕES (TEMPORÁRIO)
-// Chamado via AJAX POST quando o modal de busca automática fecha.
-// Baixa cada imagem para a pasta TEMPORÁRIA (uploads/temp/{temp_id}/)
-// e registra na sessão — exatamente como o fluxo de colar/upload.
-// O finalizar_upload_temporario.php move tudo para o definitivo.
+// SALVAR ATRIBUIÇÕES — DIRETO NO BANCO
+// Chamado via AJAX quando o modal de busca automática fecha.
+// Baixa cada imagem aprovada, salva em disco e insere em especies_imagens.
+// Retorna JSON.
 // ============================================================
 
 session_start();
@@ -24,12 +23,11 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = (int)$_SESSION['usuario_id'];
 
 // ============================================================
-// INPUTS
+// VALIDAR SESSÃO
 // ============================================================
 $temp_id = trim($_POST['temp_id'] ?? '');
 $json    = trim($_POST['atribuicoes_json'] ?? '[]');
 
-// Validar sessão
 if (
     !isset($_SESSION['importacao_temporaria']) ||
     $_SESSION['importacao_temporaria']['temp_id']         !== $temp_id ||
@@ -39,6 +37,8 @@ if (
     exit;
 }
 
+$especie_id = (int)$_SESSION['importacao_temporaria']['especie_id'];
+
 $atribuicoes = json_decode($json, true);
 if (!is_array($atribuicoes) || empty($atribuicoes)) {
     echo json_encode(['sucesso' => false, 'erro' => 'Nenhuma atribuição recebida']);
@@ -46,26 +46,23 @@ if (!is_array($atribuicoes) || empty($atribuicoes)) {
 }
 
 // ============================================================
-// PASTA TEMPORÁRIA  (mesmo padrão do fluxo de colar)
+// PREPARAR DIRETÓRIO DE DESTINO
 // ============================================================
-$pasta_temp   = dirname(dirname(__DIR__)) . '/uploads/temp/' . $temp_id . '/';
-$rel_temp_dir = 'uploads/temp/' . $temp_id . '/';
+$dir_upload   = __DIR__ . '/../../uploads/exsicatas/' . $especie_id . '/';
+$dir_relativo = 'uploads/exsicatas/' . $especie_id . '/';
 
-if (!is_dir($pasta_temp)) {
-    mkdir($pasta_temp, 0755, true);
+if (!is_dir($dir_upload)) {
+    mkdir($dir_upload, 0755, true);
 }
 
-// ============================================================
-// MIME → extensão
-// ============================================================
+$partes_validas = ['folha','flor','fruto','caule','semente','habito','exsicata_completa','detalhe'];
+
 $mime_para_ext = [
     'image/jpeg' => 'jpg',
     'image/png'  => 'png',
     'image/gif'  => 'gif',
     'image/webp' => 'webp',
 ];
-
-$partes_validas = ['folha','flor','fruto','caule','semente','habito','exsicata_completa','detalhe'];
 
 // ============================================================
 // PROCESSAR CADA ATRIBUIÇÃO
@@ -111,36 +108,49 @@ foreach ($atribuicoes as $atr) {
         ?? strtolower(pathinfo(parse_url($url_foto, PHP_URL_PATH), PATHINFO_EXTENSION))
         ?: 'jpg';
 
-    // --- Nome do arquivo na pasta temporária ---
-    $nome_arquivo       = $parte . '_' . date('Ymd') . '_' . date('His') . '_' . rand(100, 999) . '.' . $ext;
-    $caminho_completo   = $pasta_temp . $nome_arquivo;
-    $caminho_temporario = $rel_temp_dir . $nome_arquivo;   // mesmo padrão do fluxo colar
+    // --- Salvar em disco ---
+    $nome_arquivo     = $parte . '_' . date('Ymd') . '_' . date('His') . '_' . rand(100, 999) . '.' . $ext;
+    $caminho_completo = $dir_upload . $nome_arquivo;
+    $caminho_relativo = $dir_relativo . $nome_arquivo;
 
-    // --- Salvar em disco (pasta temporária) ---
     if (file_put_contents($caminho_completo, $conteudo) === false) {
         $erros[] = "Falha ao gravar arquivo: $nome_arquivo";
         error_log("[Penomato] salvar_atribuicoes: falha ao gravar $caminho_completo");
         continue;
     }
 
-    // --- Registrar na sessão (igual ao fluxo colar) ---
-    // O finalizar_upload_temporario.php vai mover para uploads/exsicatas/ e inserir no BD
-    $_SESSION['importacao_temporaria']['imagens'][] = [
-        'nome_original'     => $nome_arquivo,
-        'caminho_temporario'=> $caminho_temporario,
-        'parte_planta'      => $parte,
-        'tamanho_bytes'     => strlen($conteudo),
-        'mime_type'         => 'image/' . $ext,
-        'fonte_nome'        => $atr['fonte_nome']      ?? null,
-        'fonte_url'         => $atr['fonte_url']       ?? null,
-        'autor_imagem'      => $atr['autor']           ?? null,
-        'licenca'           => $atr['licenca']         ?? null,
-        'descricao'         => null,
-        'principal'         => (int)($atr['principal'] ?? 0),
-        'usuario_id'        => $usuario_id,
-        'data_upload_temp'  => time(),
-        'origem'            => 'internet',
-    ];
+    // --- Inserir em especies_imagens ---
+    $stmt = $pdo->prepare("
+        INSERT INTO especies_imagens
+            (especie_id, tipo_imagem, origem, parte_planta,
+             caminho_imagem, nome_original, tamanho_bytes, mime_type,
+             fonte_nome, fonte_url, autor_imagem, licenca, principal,
+             local_coleta, data_coleta,
+             id_usuario_identificador, status_validacao)
+        VALUES
+            (?, 'provisoria', 'internet', ?,
+             ?, ?, ?, ?,
+             ?, ?, ?, ?, ?,
+             ?, ?,
+             ?, 'aprovado')
+    ");
+
+    $stmt->execute([
+        $especie_id,
+        $parte,
+        $caminho_relativo,
+        $nome_arquivo,
+        strlen($conteudo),
+        'image/' . $ext,
+        $atr['fonte_nome']      ?? null,
+        $atr['fonte_url']       ?? null,
+        $atr['autor']           ?? null,
+        $atr['licenca']         ?? null,
+        (int)($atr['principal'] ?? 0),
+        $atr['local_coleta']    ?? null,
+        $atr['data_observacao'] ?? null,
+        $usuario_id,
+    ]);
 
     $salvas++;
 }
