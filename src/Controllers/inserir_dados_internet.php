@@ -1673,7 +1673,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             <div class="prompt-box">
                 <div class="prompt-box-header">
                     <div class="prompt-box-title">📝 Prompt de Pesquisa — <em><?php echo htmlspecialchars($nome_cientifico); ?></em></div>
-                    <button type="button" class="btn btn-copy" id="btn_copiar_prompt" onclick="copiarPrompt()">📋 Copiar Prompt</button>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <?php if (defined('AI_API_KEY') && AI_API_KEY !== ''): ?>
+                        <button type="button" class="btn btn-primary" id="btn_buscar_ia" onclick="buscarComIA()">
+                            🤖 Buscar com IA
+                        </button>
+                        <?php else: ?>
+                        <span style="font-size:0.8rem;color:#888;font-style:italic;">API não configurada</span>
+                        <?php endif; ?>
+                        <button type="button" class="btn btn-copy" id="btn_copiar_prompt" onclick="copiarPrompt()">📋 Copiar Prompt</button>
+                    </div>
                 </div>
                 <div class="prompt-content" id="prompt-display"><?php
 echo htmlspecialchars(
@@ -1996,6 +2005,56 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
     // ================================================
     // COPIAR PROMPT
     // ================================================
+    // ================================================
+    // BUSCAR COM IA — chama o controller e preenche o form
+    // ================================================
+    function buscarComIA() {
+        const btn = document.getElementById('btn_buscar_ia');
+        if (!btn) return;
+
+        btn.disabled    = true;
+        btn.textContent = '⏳ Buscando...';
+
+        const fd = new FormData();
+        fd.append('nome_cientifico', <?php echo json_encode($nome_cientifico); ?>);
+
+        fetch('../Controllers/buscar_caracteristicas_ia.php', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled    = false;
+                btn.textContent = '🤖 Buscar com IA';
+
+                const msgDiv = document.getElementById('mensagem_json');
+
+                if (!data.sucesso) {
+                    msgDiv.style.display = 'block';
+                    msgDiv.className     = 'alert alert-danger';
+                    msgDiv.innerHTML     = '❌ Erro: ' + (data.erro || 'Falha desconhecida.');
+                    return;
+                }
+
+                // Preenche o textarea de JSON (para o usuário poder revisar)
+                document.getElementById('json_input').value =
+                    JSON.stringify(data.json_dados, null, 2);
+
+                // Dispara o preenchimento do formulário
+                document.getElementById('btn_carregar_json').click();
+
+                // Substitui a mensagem de sucesso para indicar a origem
+                msgDiv.innerHTML = '✅ Preenchido pela IA (' + (data.provider || '') +
+                    (data.modelo ? ' / ' + data.modelo : '') +
+                    '). Revise cada campo antes de finalizar.';
+            })
+            .catch(err => {
+                btn.disabled    = false;
+                btn.textContent = '🤖 Buscar com IA';
+                const msgDiv = document.getElementById('mensagem_json');
+                msgDiv.style.display = 'block';
+                msgDiv.className     = 'alert alert-danger';
+                msgDiv.innerHTML     = '❌ Erro de conexão: ' + err.message;
+            });
+    }
+
     function copiarPrompt() {
         const texto = document.getElementById('prompt-display').textContent;
         const btn   = document.getElementById('btn_copiar_prompt');

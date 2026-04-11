@@ -49,4 +49,11 @@ if ($is_prod) {
     ini_set('display_errors', '1');
     ini_set('display_startup_errors', '1');
     error_reporting(E_ALL);
+
+    // ── IA (dev) ─────────────────────────────────────────────
+    // Troque AI_PROVIDER por 'claude', 'openai' ou 'gemini'
+    // e coloque sua chave abaixo para testar localmente.
+    define('AI_PROVIDER', '');   // ex: 'claude'
+    define('AI_API_KEY',  '');   // ex: 'sk-ant-...'
+    define('AI_MODEL',    '');   // deixe '' para usar o padrão de cada provider
 }
