@@ -613,6 +613,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             background-color: #e2e8f0;
             color: #2d3748;
         }
+
+        /* ── MODAL: conteúdo dos itens não encaixados ── */
+        .modal-campo-nome {
+            font-weight: 600;
+            color: var(--cinza-700, #374151);
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            text-transform: capitalize;
+        }
+        .modal-sugestao-ia {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .modal-sugestao-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 4px;
+            padding: 1px 7px;
+            font-size: 0.75rem;
+            margin-left: 6px;
+        }
+        .modal-opcoes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .modal-opcao {
+            background: #f3f4f6;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .modal-opcao:hover {
+            border-color: var(--cor-primaria, #0b5e42);
+            background: #ecfdf5;
+        }
+        .modal-opcao.selecionado {
+            border-color: var(--cor-primaria, #0b5e42);
+            background: var(--cor-primaria, #0b5e42);
+            color: #fff;
+            font-weight: 600;
+        }
+        .modal-opcao-skip {
+            border-style: dashed;
+            color: #9ca3af;
+        }
+        .modal-opcao-skip.selecionado {
+            background: #6b7280;
+            border-color: #6b7280;
+            color: #fff;
+        }
         
         .technical-paper {
             margin-top: 30px;
@@ -1901,24 +1957,126 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
     });
 
     // ================================================
+    // FILA DE CAMPOS QUE NÃO ENCAIXARAM (para o modal)
+    // ================================================
+    let _naoEncaixados = []; // { id, label, sugestao, opcoes }
+
+    // ================================================
     // PREENCHER campo visível (select ou input/textarea)
+    // Retorna true se preencheu, false se não encaixou.
     // ================================================
     function preencherCampo(id, valor) {
         const el = document.getElementById(id);
-        if (!el || valor === null || valor === undefined || valor === '') return;
+        if (!el || valor === null || valor === undefined || valor === '') return true;
         const v = String(valor).trim();
-        if (!v) return;
+        if (!v) return true;
+
         if (el.tagName === 'SELECT') {
-            const opts = Array.from(el.options);
+            const opts = Array.from(el.options).filter(o => !o.disabled && o.value !== '');
             let match = opts.find(o => o.value === v);
             if (!match) match = opts.find(o => o.text.trim() === v);
-            if (!match) match = opts.find(o => o.value.startsWith(v) || v.startsWith(o.value));
-            if (!match) match = opts.find(o => o.text.trim().startsWith(v) || v.startsWith(o.text.trim()));
-            if (match) { el.value = match.value; el.classList.add('auto-filled'); }
+            if (!match) match = opts.find(o => o.value.toLowerCase() === v.toLowerCase());
+            if (!match) match = opts.find(o => o.text.trim().toLowerCase() === v.toLowerCase());
+
+            if (match) {
+                el.value = match.value;
+                el.classList.add('auto-filled');
+                return true;
+            } else {
+                // Não encaixou — guarda para o modal
+                const label = el.closest('.field-row, .form-group, label, div')
+                    ?.querySelector('label, .field-label')?.textContent?.trim()
+                    || id.replace(/_/g, ' ');
+                _naoEncaixados.push({ id, label, sugestao: v, opcoes: opts.map(o => ({ value: o.value, text: o.text.trim() })) });
+                return false;
+            }
         } else {
             el.value = v;
             el.classList.add('auto-filled');
+            return true;
         }
+    }
+
+    // ================================================
+    // MODAL — abrir com os campos que não encaixaram
+    // ================================================
+    let _escolhasModal = {}; // { id: value }
+
+    function abrirModalValidacao() {
+        if (_naoEncaixados.length === 0) return;
+
+        _escolhasModal = {};
+        let atual = 0;
+        const total = _naoEncaixados.length;
+
+        document.getElementById('modal-contador').textContent = '0/' + total;
+        document.getElementById('btnConfirmarValidacao').disabled = true;
+
+        const corpo = document.getElementById('modal-body');
+        corpo.innerHTML = _naoEncaixados.map(function(item, idx) {
+            return `
+            <div class="modal-item" id="modal-item-${idx}">
+                <div class="modal-campo-nome">${item.label}</div>
+                <div class="modal-sugestao-ia">
+                    IA sugeriu: <strong>"${item.sugestao}"</strong>
+                    <span class="modal-sugestao-badge">não reconhecido</span>
+                </div>
+                <div class="modal-opcoes">
+                    <button class="modal-opcao modal-opcao-skip"
+                            onclick="escolherOpcao(${idx}, '', this)">
+                        — Deixar em branco
+                    </button>
+                    ${item.opcoes.map(function(op) {
+                        return `<button class="modal-opcao"
+                                        onclick="escolherOpcao(${idx}, '${op.value.replace(/'/g,"\\'")}', this)">
+                                    ${op.text}
+                                </button>`;
+                    }).join('')}
+                </div>
+            </div>`;
+        }).join('<hr style="margin:16px 0;border-color:var(--cinza-200)">');
+
+        document.getElementById('modalValidacao').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function escolherOpcao(idx, value, btn) {
+        // Desmarca botões do mesmo item
+        const item = document.getElementById('modal-item-' + idx);
+        item.querySelectorAll('.modal-opcao').forEach(b => b.classList.remove('selecionado'));
+        btn.classList.add('selecionado');
+
+        _escolhasModal[idx] = { id: _naoEncaixados[idx].id, value: value };
+
+        // Conta quantos foram resolvidos
+        const resolvidos = Object.keys(_escolhasModal).length;
+        document.getElementById('modal-contador').textContent = resolvidos + '/' + _naoEncaixados.length;
+        document.getElementById('btnConfirmarValidacao').disabled = (resolvidos < _naoEncaixados.length);
+    }
+
+    function confirmarValidacao() {
+        Object.values(_escolhasModal).forEach(function(escolha) {
+            if (escolha.value === '') return; // deixar em branco
+            const el = document.getElementById(escolha.id);
+            if (el) { el.value = escolha.value; el.classList.add('auto-filled'); }
+        });
+        fecharModal();
+
+        // Mostra mensagem de sucesso atualizada
+        const msgDiv = document.getElementById('mensagem_json');
+        if (msgDiv) {
+            const resolvidos = Object.values(_escolhasModal).filter(e => e.value !== '').length;
+            const brancos    = Object.values(_escolhasModal).filter(e => e.value === '').length;
+            let extra = '';
+            if (resolvidos > 0) extra += ` ${resolvidos} campo(s) ajustado(s) manualmente.`;
+            if (brancos   > 0) extra += ` ${brancos} campo(s) deixado(s) em branco.`;
+            msgDiv.innerHTML = msgDiv.innerHTML.replace(/\. Revise.*$/, '') + '.' + extra + ' Revise a planilha antes de finalizar.';
+        }
+    }
+
+    function fecharModal() {
+        document.getElementById('modalValidacao').style.display = 'none';
+        document.body.style.overflow = 'auto';
     }
 
     // ================================================
@@ -1970,11 +2128,13 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
                 'possui_seiva_ref','possui_resina_ref'
             ];
 
+            // Zera a fila de não-encaixados antes de cada carga
+            _naoEncaixados = [];
+
             let preenchidos = 0;
             todosCampos.forEach(function(campo) {
                 if (dados[campo] !== undefined && dados[campo] !== '') {
-                    preencherCampo(campo, dados[campo]);
-                    preenchidos++;
+                    if (preencherCampo(campo, dados[campo])) preenchidos++;
                 }
             });
 
@@ -1983,8 +2143,16 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
 
             mensagemDiv.style.display = 'block';
             mensagemDiv.className = 'alert alert-success';
-            mensagemDiv.innerHTML = '✅ ' + preenchidos + ' campos preenchidos! Revise a planilha acima e clique em Finalizar Importação.';
-            document.getElementById('btn_finalizar_wrapper').style.display = 'block';
+
+            if (_naoEncaixados.length > 0) {
+                mensagemDiv.innerHTML = '✅ ' + preenchidos + ' campo(s) preenchido(s). '
+                    + '<strong>' + _naoEncaixados.length + ' campo(s) precisam de atenção</strong> — abrindo janela de ajuste...';
+                document.getElementById('btn_finalizar_wrapper').style.display = 'block';
+                setTimeout(abrirModalValidacao, 600);
+            } else {
+                mensagemDiv.innerHTML = '✅ ' + preenchidos + ' campos preenchidos! Revise a planilha acima e clique em Finalizar Importação.';
+                document.getElementById('btn_finalizar_wrapper').style.display = 'block';
+            }
 
         } catch (erro) {
             mensagemDiv.style.display = 'block';
@@ -2072,13 +2240,10 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
         });
     }
 
-    window.onclick = function(event) {
-        const modal = document.getElementById('modalValidacao');
-        if (modal && event.target === modal) {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-    };
+    // Fechar modal clicando fora
+    document.getElementById('modalValidacao').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal();
+    });
     </script>
 </body>
 </html>
