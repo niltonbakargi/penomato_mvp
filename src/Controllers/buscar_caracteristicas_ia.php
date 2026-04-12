@@ -2,7 +2,7 @@
 // ============================================================
 // BUSCAR CARACTERÍSTICAS VIA IA
 // Chamado via AJAX POST por inserir_dados_internet.php.
-// Chama a API configurada (Claude, OpenAI ou Gemini),
+// Chama a API configurada (Claude, OpenAI, Gemini ou DeepSeek),
 // retorna o JSON com as características morfológicas.
 // ============================================================
 
@@ -37,7 +37,7 @@ if (!defined('AI_PROVIDER') || !defined('AI_API_KEY') || AI_API_KEY === '') {
     exit;
 }
 
-$provider = strtolower(AI_PROVIDER); // 'claude', 'openai' ou 'gemini'
+$provider = strtolower(AI_PROVIDER); // 'claude', 'openai', 'gemini' ou 'deepseek'
 $api_key  = AI_API_KEY;
 $model    = defined('AI_MODEL') ? AI_MODEL : null;
 
@@ -323,8 +323,48 @@ if ($provider === 'claude') {
         if (!$resposta_texto) $erro_api = 'Resposta inesperada da Gemini API.';
     }
 
+} elseif ($provider === 'deepseek') {
+
+    // --- DeepSeek (compatível com formato OpenAI) ---
+    $modelo = $model ?? 'deepseek-chat';
+    $payload = json_encode([
+        'model'    => $modelo,
+        'messages' => [
+            ['role' => 'system', 'content' => 'Você é um especialista em botânica sistemática. Responda sempre em JSON válido, sem markdown.'],
+            ['role' => 'user',   'content' => $prompt],
+        ],
+        'max_tokens'  => 4096,
+        'temperature' => 0.2,
+    ]);
+
+    $ch = curl_init('https://api.deepseek.com/chat/completions');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_TIMEOUT        => 55,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $api_key,
+        ],
+    ]);
+    $resp      = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_err  = curl_error($ch);
+    curl_close($ch);
+
+    if ($curl_err) {
+        $erro_api = 'Erro de conexão: ' . $curl_err;
+    } elseif ($http_code !== 200) {
+        $erro_api = 'DeepSeek retornou HTTP ' . $http_code . ': ' . $resp;
+    } else {
+        $data = json_decode($resp, true);
+        $resposta_texto = $data['choices'][0]['message']['content'] ?? null;
+        if (!$resposta_texto) $erro_api = 'Resposta inesperada da DeepSeek API.';
+    }
+
 } else {
-    $erro_api = 'Provider não suportado: "' . $provider . '". Use claude, openai ou gemini.';
+    $erro_api = 'Provider não suportado: "' . $provider . '". Use claude, openai, gemini ou deepseek.';
 }
 
 if ($erro_api) {
