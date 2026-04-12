@@ -18,3 +18,10 @@ define('DB_NAME',    'SEU_BANCO_AQUI');           // ex: u123456789_penomato
 define('DB_USER',    'SEU_USUARIO_AQUI');         // ex: u123456789_admin
 define('DB_PASS',    'SUA_SENHA_AQUI');
 define('DB_CHARSET', 'utf8mb4');
+
+// ── IA ───────────────────────────────────────────────────────
+// Escolha o provedor: 'claude', 'openai' ou 'gemini'
+// Deixe AI_PROVIDER vazio ('') para desativar o botão de IA.
+define('AI_PROVIDER', 'claude');          // 'claude' | 'openai' | 'gemini' | ''
+define('AI_API_KEY',  'sk-ant-api03-SUACHAVEAQUI');
+define('AI_MODEL',    '');                // deixe '' para usar o padrão de cada provider

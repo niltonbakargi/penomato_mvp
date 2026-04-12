@@ -3,8 +3,7 @@
 // BUSCAR IMAGENS AUTOMÁTICO
 // Chamado via AJAX (fetch POST) pela página upload_imagens_internet.php
 // Busca candidatas no iNaturalist e Wikimedia Commons,
-// pontua, e salva as top 5 em temp_imagens_candidatas.
-// Retorna JSON.
+// pontua e retorna as top 5 como JSON.
 // ============================================================
 
 session_start();
