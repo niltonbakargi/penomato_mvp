@@ -858,6 +858,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             <div class="subtitle">PASSO 3: Preencha as características morfológicas manualmente ou use a pesquisa por IA abaixo</div>
         </div>
 
+        <div class="alert alert-info" style="margin-bottom:10px;">
+            🔧 Teste de deploy — se você está vendo esta mensagem, o servidor está sincronizado com o repositório.
+        </div>
+
         <?php if (isset($erro)): ?>
             <div class="alert alert-danger">❌ <?php echo $erro; ?></div>
         <?php endif; ?>
