@@ -911,7 +911,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
 
         <div class="paper-header">
             <h1><span>📄</span> PENOMATO • IMPORTAR DADOS</h1>
-            <div class="subtitle">PASSO 3: Preencha as características morfológicas manualmente ou use a pesquisa por IA abaixo</div>
+            <div class="subtitle">PASSO 3: Características morfológicas</div>
         </div>
 
         <?php if (isset($erro)): ?>
@@ -923,6 +923,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             <i class="fas fa-tree"></i>
             <h2><?php echo htmlspecialchars($nome_cientifico); ?></h2>
             <span>ID: <?php echo $especie_id; ?></span>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             ESCOLHA DE MODO
+        ══════════════════════════════════════════ -->
+        <div class="paper-card" style="text-align:center; padding:28px 40px;">
+            <p style="color:#555; margin-bottom:22px; font-size:1rem;">
+                Como deseja preencher as características de <em><?php echo htmlspecialchars($nome_cientifico); ?></em>?
+            </p>
+            <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:16px;">
+                <?php if (defined('AI_API_KEY') && AI_API_KEY !== ''): ?>
+                <button type="button" class="btn btn-primary" id="btn_modo_ia" onclick="modoIA()" style="font-size:1.05rem; padding:14px 32px;">
+                    🤖 Preencher com IA
+                </button>
+                <?php endif; ?>
+                <button type="button" class="btn btn-secondary" id="btn_modo_manual" onclick="modoManual()" style="font-size:1.05rem; padding:14px 32px; border:2px solid #ccc;">
+                    📋 Preencher Manual (JSON)
+                </button>
+            </div>
+            <div id="mensagem_json" style="display:none;" class="alert"></div>
+        </div>
+
+        <!-- PAINEL MANUAL (JSON paste) -->
+        <div class="paper-card" id="painel_manual" style="display:none; padding:24px 40px;">
+            <div class="ai-section-header">📋 Inserir via JSON</div>
+            <p class="ai-section-sub">Cole o JSON retornado por um agente de IA para preencher a planilha automaticamente.</p>
+            <textarea id="json_input" rows="8" placeholder='{ "forma_folha": "Lanceolada", "familia": "Fabaceae", ... }'></textarea>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" id="btn_carregar_json">🔄 PREENCHER PLANILHA</button>
+                <button type="button" class="btn btn-secondary" id="btn_limpar">🗑️ LIMPAR</button>
+            </div>
         </div>
 
         <!-- ══════════════════════════════════════════
@@ -1715,23 +1746,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             </form>
         </div>
 
-        <!-- ══════════════════════════════════════════
-             SEÇÃO DE PESQUISA POR IA
-        ══════════════════════════════════════════ -->
-        <div class="paper-card">
-            <div class="ai-section-header">🤖 Pesquisa Automatizada com Agentes de IA</div>
-            <p class="ai-section-sub">
-                Copie o prompt abaixo e cole em um agente de IA (Claude, ChatGPT, Gemini…).
-                O agente retornará um JSON — cole-o abaixo para preencher a planilha automaticamente.
+        <!-- btn finalizar flutuante — aparece após JSON carregado -->
+        <div id="btn_finalizar_wrapper" style="display:none; margin:1rem 0; text-align:center;">
+            <button type="button" class="btn-save" onclick="document.getElementById('btn_finalizar').click()">
+                ✅ FINALIZAR IMPORTAÇÃO
+            </button>
+            <p style="margin-top:8px; color:#666; font-size:0.85rem;">
+                ⚠️ Após finalizar, todas as imagens e dados serão salvos permanentemente.
             </p>
+        </div>
 
-            <!-- Prompt -->
+        <!-- SEÇÃO LEGADA REMOVIDA (hidden para não duplicar IDs) -->
+        <div style="display:none;" aria-hidden="true">
             <div class="prompt-box">
                 <div class="prompt-box-header">
                     <div class="prompt-box-title">📝 Prompt de Pesquisa — <em><?php echo htmlspecialchars($nome_cientifico); ?></em></div>
                     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                         <?php if (defined('AI_API_KEY') && AI_API_KEY !== ''): ?>
-                        <button type="button" class="btn btn-primary" id="btn_buscar_ia" onclick="buscarComIA()">
+                        <button type="button" class="btn btn-primary" onclick="buscarComIA()">
                             🤖 Buscar com IA
                         </button>
                         <?php else: ?>
@@ -1900,32 +1932,6 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
                 ?></div>
             </div>
 
-            <!-- Cole o JSON -->
-            <div class="json-import-area">
-                <h3><span>📋</span> Cole aqui o JSON da espécie</h3>
-                <p>Após obter o JSON do agente de IA, cole-o abaixo e clique em "Preencher Planilha". Revise cada campo antes de finalizar.</p>
-                <textarea id="json_input" rows="8" placeholder='{
-    "nome_cientifico_completo": "Mauritia flexuosa L.f.",
-    "familia": "Arecaceae",
-    "forma_folha": "Palmada",
-    "cor_flores": "Amarelas",
-    "referencias": "1. Flora Brasiliensis\n2. Lorenzi, 2002"
-}'></textarea>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-primary" id="btn_carregar_json">🔄 PREENCHER PLANILHA</button>
-                    <button type="button" class="btn btn-secondary" id="btn_limpar">🗑️ LIMPAR</button>
-                </div>
-                <div id="mensagem_json" style="display:none;" class="alert"></div>
-
-                <div id="btn_finalizar_wrapper" style="display:none; margin-top:1.5rem; text-align:center;">
-                    <button type="button" class="btn-save" onclick="document.getElementById('btn_finalizar').click()">
-                        ✅ FINALIZAR IMPORTAÇÃO
-                    </button>
-                    <p style="margin-top:8px; color:#666; font-size:0.85rem;">
-                        ⚠️ Após finalizar, todas as imagens e dados serão salvos permanentemente.
-                    </p>
-                </div>
-            </div>
         </div>
 
         <div class="footer">Penomato • Importação de dados - PASSO 3 DE 3</div>
@@ -2176,8 +2182,18 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
     // ================================================
     // BUSCAR COM IA — chama o controller e preenche o form
     // ================================================
+    function modoIA() {
+        document.getElementById('painel_manual').style.display = 'none';
+        buscarComIA();
+    }
+
+    function modoManual() {
+        const p = document.getElementById('painel_manual');
+        p.style.display = (p.style.display === 'none') ? 'block' : 'none';
+    }
+
     function buscarComIA() {
-        const btn = document.getElementById('btn_buscar_ia');
+        const btn = document.getElementById('btn_modo_ia');
         if (!btn) return;
 
         btn.disabled    = true;
@@ -2190,7 +2206,7 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
             .then(r => r.json())
             .then(data => {
                 btn.disabled    = false;
-                btn.textContent = '🤖 Buscar com IA';
+                btn.textContent = '🤖 Preencher com IA';
 
                 const msgDiv = document.getElementById('mensagem_json');
 
@@ -2215,29 +2231,12 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
             })
             .catch(err => {
                 btn.disabled    = false;
-                btn.textContent = '🤖 Buscar com IA';
+                btn.textContent = '🤖 Preencher com IA';
                 const msgDiv = document.getElementById('mensagem_json');
                 msgDiv.style.display = 'block';
                 msgDiv.className     = 'alert alert-danger';
                 msgDiv.innerHTML     = '❌ Erro de conexão: ' + err.message;
             });
-    }
-
-    function copiarPrompt() {
-        const texto = document.getElementById('prompt-display').textContent;
-        const btn   = document.getElementById('btn_copiar_prompt');
-        navigator.clipboard.writeText(texto).then(function() {
-            btn.textContent = '✅ Copiado!';
-            btn.classList.add('copied');
-            setTimeout(function() { btn.textContent = '📋 Copiar Prompt'; btn.classList.remove('copied'); }, 2500);
-        }).catch(function() {
-            const ta = document.createElement('textarea');
-            ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
-            document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-            document.body.removeChild(ta);
-            btn.textContent = '✅ Copiado!'; btn.classList.add('copied');
-            setTimeout(function() { btn.textContent = '📋 Copiar Prompt'; btn.classList.remove('copied'); }, 2500);
-        });
     }
 
     // Fechar modal clicando fora
