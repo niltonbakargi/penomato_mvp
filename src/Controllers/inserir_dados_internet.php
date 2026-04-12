@@ -858,7 +858,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             <div class="subtitle">PASSO 3: Preencha as características morfológicas manualmente ou use a pesquisa por IA abaixo</div>
         </div>
 
-
         <?php if (isset($erro)): ?>
             <div class="alert alert-danger">❌ <?php echo $erro; ?></div>
         <?php endif; ?>
@@ -879,13 +878,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                 <i class="fas fa-info-circle"></i>
                 <strong>Imagens já adicionadas:</strong>
                 <?php
-                $stmt_ti = $conexao->prepare("SELECT COUNT(*) FROM especies_imagens WHERE especie_id = ? AND status_validacao = 'aprovado'");
-                $stmt_ti->bind_param("i", $especie_id);
-                $stmt_ti->execute();
-                $stmt_ti->bind_result($total_imagens);
-                $stmt_ti->fetch();
-                $stmt_ti->close();
-                echo $total_imagens > 0 ? "{$total_imagens} imagem(ns) salva(s)" : "Nenhuma imagem ainda (volte para adicionar)";
+                $total_imagens = count($_SESSION['importacao_temporaria']['imagens'] ?? []);
+                echo $total_imagens > 0 ? "{$total_imagens} imagem(ns) na sessão" : "Nenhuma imagem ainda (volte para adicionar)";
                 ?>
             </div>
 
