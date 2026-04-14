@@ -924,10 +924,13 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 foreach ($partes as $key => $parte):
                     $contagem = $contagem_por_parte[$key] ?? 0;
                     $classe = 'parte-card';
+                    if ($key === $parte_selecionada) $classe .= ' selecionado';
                     if ($contagem > 0 && in_array($key, $partes_obrigatorias)) $classe .= ' completa';
                 ?>
-                <div class="<?php echo $classe; ?>"
-                     data-parte="<?php echo $key; ?>">
+                <a href="?temp_id=<?php echo urlencode($temp_id); ?>&parte=<?php echo $key; ?>"
+                   class="<?php echo $classe; ?>"
+                   data-parte="<?php echo $key; ?>"
+                   style="text-decoration:none;color:inherit;">
                     <div class="parte-icone"><?php echo $parte['icone']; ?></div>
                     <div class="parte-nome"><?php echo $parte['nome']; ?></div>
                     <div class="parte-contagem">
@@ -936,7 +939,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                     <?php if ($parte['obrigatoria'] && $contagem == 0): ?>
                         <div style="font-size:0.8rem;color:var(--perigo-cor);margin-top:5px;">⛔ Obrigatória</div>
                     <?php endif; ?>
-                </div>
+                </a>
                 <?php endforeach; ?>
             </div><!-- /partes-grid -->
 
