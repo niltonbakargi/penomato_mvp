@@ -66,42 +66,42 @@ if (!$conexao->connect_error) {
 // LISTA DE VALORES PADRONIZADOS PARA VALIDAÇÃO
 // ================================================
 $opcoes_validas = [
-    'forma_folha' => ['Lanceolada', 'Linear', 'Elíptica', 'Ovada', 'Orbicular', 'Cordiforme', 'Espatulada', 'Sagitada', 'Reniforme', 'Obovada', 'Trilobada', 'Palmada', 'Lobada'],
-    'filotaxia_folha' => ['Alterna', 'Oposta Simples', 'Oposta Decussada', 'Verticilada', 'Dística', 'Espiralada'],
-    'tipo_folha' => ['Simples', 'Composta pinnada', 'Composta bipinada', 'Composta tripinada', 'Composta tetrapinada'],
-    'tamanho_folha' => ['Microfilas (< 2 cm)', 'Nanofilas (2–7 cm)', 'Mesofilas (7–20 cm)', 'Macrófilas (20–50 cm)', 'Megafilas (> 50 cm)'],
-    'textura_folha' => ['Coriácea', 'Cartácea', 'Membranácea', 'Suculenta', 'Pilosa', 'Glabra', 'Rugosa', 'Cerosa'],
-    'margem_folha' => ['Inteira', 'Serrada', 'Dentada', 'Crenada', 'Ondulada', 'Lobada', 'Partida', 'Revoluta', 'Involuta'],
-    'venacao_folha' => ['Reticulada Pinnada', 'Reticulada Palmada', 'Paralela', 'Peninérvea', 'Dicotômica', 'Curvinérvea'],
-    'cor_flores' => ['Brancas', 'Amarelas', 'Vermelhas', 'Rosadas', 'Roxas', 'Azuis', 'Laranjas', 'Verdes'],
-    'simetria_floral' => ['Actinomorfa', 'Zigomorfa', 'Assimétrica'],
-    'numero_petalas' => ['3 pétalas', '4 pétalas', '5 pétalas', 'Muitas pétalas'],
-    'disposicao_flores' => ['Isoladas', 'Inflorescência'],
-    'aroma' => ['Sem cheiro', 'Aroma suave', 'Aroma forte', 'Aroma desagradável'],
-    'tamanho_flor' => ['Pequena', 'Média'],
-    'tipo_fruto' => ['Baga', 'Drupa', 'Cápsula', 'Folículo', 'Legume', 'Síliqua', 'Aquênio', 'Sâmara', 'Cariopse', 'Pixídio', 'Hespéridio', 'Pepo'],
-    'tamanho_fruto' => ['Pequeno', 'Médio', 'Grande'],
-    'cor_fruto' => ['Verde', 'Amarelo', 'Vermelho', 'Roxo', 'Laranja', 'Marrom', 'Preto', 'Branco'],
-    'textura_fruto' => ['Lisa', 'Rugosa', 'Coriácea', 'Peluda', 'Espinhosa', 'Cerosa'],
-    'dispersao_fruto' => ['Zoocórica', 'Anemocórica', 'Hidrocórica', 'Autocórica'],
-    'aroma_fruto' => ['Sem cheiro', 'Aroma suave', 'Aroma forte', 'Aroma desagradável'],
-    'tipo_semente' => ['Alada', 'Carnosa', 'Dura', 'Oleosa', 'Peluda'],
-    'tamanho_semente' => ['Pequena', 'Média', 'Grande'],
-    'cor_semente' => ['Preta', 'Marrom', 'Branca', 'Amarela', 'Verde'],
-    'textura_semente' => ['Lisa', 'Rugosa', 'Estriada', 'Cerosa'],
-    'quantidade_sementes' => ['Uma', 'Poucas', 'Muitas'],
-    'tipo_caule' => ['Ereto', 'Prostrado', 'Rastejante', 'Trepador', 'Subterrâneo'],
-    'estrutura_caule' => ['Lenhoso', 'Herbáceo', 'Suculento'],
-    'textura_caule' => ['Lisa', 'Rugosa', 'Sulcada', 'Fissurada', 'Cerosa', 'Espinhosa', 'Suberosa'],
-    'cor_caule' => ['Marrom', 'Verde', 'Cinza', 'Avermelhado', 'Alaranjado'],
-    'forma_caule' => ['Cilíndrico', 'Quadrangular', 'Achatado', 'Irregular'],
-    'modificacao_caule' => ['Estolão', 'Cladódio', 'Rizoma', 'Tubérculo', 'Espinhos'],
-    'diametro_caule' => ['Fino', 'Médio', 'Grosso'],
-    'ramificacao_caule' => ['Dicotômica', 'Monopodial', 'Simpodial'],
-    'possui_espinhos' => ['Sim', 'Não'],
-    'possui_latex' => ['Sim', 'Não'],
-    'possui_seiva' => ['Sim', 'Não'],
-    'possui_resina' => ['Sim', 'Não']
+    'forma_folha'       => ['Acicular','Cordiforme','Elíptica','Lanceolada','Linear','Lobada','Obovada','Orbicular','Ovada','Palmada','Reniforme','Sagitada','Trifoliada'],
+    'filotaxia_folha'   => ['Alterna','Alterna dística','Alterna espiralada','Oposta','Oposta decussada','Verticilada'],
+    'tipo_folha'        => ['Simples','Composta bipinada','Composta digitada','Composta imparipinada','Composta paripinada','Composta pinnada','Composta trifoliada','Composta tripinada'],
+    'tamanho_folha'     => ['Microfila','Nanofila','Mesofila','Macrofila','Megafila'],
+    'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],
+    'margem_folha'      => ['Crenada','Dentada','Inteira','Lobada','Ondulada','Serreada','Serrilhada','Partida'],
+    'venacao_folha'     => ['Curvinérvea','Dicotômica','Paralela','Peninérvea','Reticulada palmada','Reticulada pinada'],
+    'cor_flores'        => ['Alaranjada','Amarela','Avermelhada','Azul','Branca','Esverdeada','Lilás','Púrpura','Rósea','Roxa','Vermelha','Vinácea'],
+    'simetria_floral'   => ['Actinomorfa','Zigomorfa','Assimétrica'],
+    'numero_petalas'    => ['3 pétalas','4 pétalas','5 pétalas','6 pétalas','Muitas pétalas','Ausentes'],
+    'disposicao_flores' => ['Solitária','Capítulo','Cacho','Corimbo','Espádice','Espiga','Panícula','Umbela'],
+    'aroma'             => ['Ausente','Suave','Forte','Desagradável','Adocicada','Cítrica'],
+    'tamanho_flor'      => ['Muito pequena','Pequena','Média','Grande','Muito grande'],
+    'tipo_fruto'        => ['Aquênio','Baga','Cápsula','Drupa','Folículo','Legume','Pixídio','Sâmara','Síliqua','Cariopse','Hespéridio','Pepo'],
+    'tamanho_fruto'     => ['Minúsculo','Pequeno','Médio','Grande','Muito grande'],
+    'cor_fruto'         => ['Alaranjado','Amarelo','Avermelhado','Branco','Esverdeado','Marrom','Preto','Roxo','Verde','Vináceo'],
+    'textura_fruto'     => ['Lisa','Rugosa','Coriácea','Pubescente','Pilosa','Espinhosa','Cerosa','Tuberculada'],
+    'dispersao_fruto'   => ['Anemocórica','Autocórica','Hidrocórica','Zoocórica','Mirmecocórica','Ornitocórica'],
+    'aroma_fruto'       => ['Ausente','Suave','Forte','Adocicado','Cítrico','Desagradável'],
+    'tipo_semente'      => ['Alada','Carnosa','Dura','Oleaginosa','Plumosa','Ruminada','Arilada'],
+    'tamanho_semente'   => ['Minúscula','Muito pequena','Pequena','Média','Grande','Muito grande'],
+    'cor_semente'       => ['Amarela','Branca','Castanha','Cinza','Marrom','Preta','Vermelha','Alaranjada'],
+    'textura_semente'   => ['Lisa','Rugosa','Estriada','Pontuada','Foveolada','Reticulada','Tuberculada'],
+    'quantidade_sementes' => ['1','2–3','4–10','11–50','> 50'],
+    'tipo_caule'        => ['Ereto','Prostrado','Escandente','Trepador','Rastejante','Subterrâneo'],
+    'estrutura_caule'   => ['Herbáceo','Lenhoso','Suculento','Sublenhoso'],
+    'textura_caule'     => ['Lisa','Rugosa','Fissurada','Sulcada','Estriada','Escamosa','Suberosa','Aculeada'],
+    'cor_caule'         => ['Acinzentado','Alaranjado','Avermelhado','Esbranquiçado','Esverdeado','Marrom','Pardacento'],
+    'forma_caule'       => ['Cilíndrico','Quadrangular','Triangular','Achatado','Alado','Irregular'],
+    'modificacao_caule' => ['Cladódio','Espinho','Estolão','Gavinha','Rizoma','Tubérculo','Bulbo'],
+    'diametro_caule'    => ['Capilar','Delgado','Fino','Médio','Grosso','Muito grosso'],
+    'ramificacao_caule' => ['Monopodial','Simpodial','Dicotômica','Pseudodicotômica'],
+    'possui_espinhos'   => ['Sim','Não','Não informado'],
+    'possui_latex'      => ['Sim','Não','Não informado'],
+    'possui_seiva'      => ['Sim','Não','Não informado'],
+    'possui_resina'     => ['Sim','Não','Não informado'],
 ];
 
 // ================================================
@@ -218,32 +218,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         }
         .confirm-btn:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
         .confirm-btn.confirmed { background: var(--cor-primaria); border-color: var(--cor-primaria); color: #fff; }
-        /* ── Prompt box ── */
-        .prompt-box {
-            background: #f8fafc; border: 1px solid #e2e8f0;
-            border-radius: 10px; padding: 18px 20px; margin-bottom: 24px;
+        /* ── Botão IA ── */
+        .ia-toolbar {
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: 10px; margin-bottom: 16px;
         }
-        .prompt-box-header {
-            display: flex; align-items: center;
-            justify-content: space-between; margin-bottom: 12px;
-        }
-        .prompt-box-title { font-weight: 600; color: #2d3d2d; font-size: 0.95rem; }
-        .prompt-content {
-            background: white; border: 1px solid #e2e8f0; border-radius: 6px;
-            padding: 14px; font-family: 'Courier New', monospace; font-size: 0.75rem;
-            color: #374151; max-height: 200px; overflow-y: auto;
-            white-space: pre-wrap; word-break: break-word; line-height: 1.5;
-            margin-bottom: 12px;
-        }
-        .prompt-placeholder { color: #aaa; font-style: italic; font-family: inherit; font-size: 0.88rem; }
-        .btn-copy { background: #17a2b8; color: white; }
-        .btn-copy:hover { background: #138496; transform: translateY(-1px); }
-        .btn-copy.copied { background: var(--cor-primaria); }
-        .ai-section-header {
-            font-size: 1.1rem; font-weight: 700; color: var(--cor-primaria);
-            margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
-        }
-        .ai-section-sub { color: #666; font-size: 0.88rem; margin-bottom: 20px; }
+        #ia_status { margin-top: 8px; }
         * {
             margin: 0;
             padding: 0;
@@ -364,22 +344,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             padding: 30px 40px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             margin-bottom: 20px;
-        }
-        
-        .json-import-area {
-            background-color: #f8fafc;
-            border: 2px dashed var(--cor-primaria);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-        
-        .json-import-area h3 {
-            color: var(--cor-primaria);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         
         textarea {
@@ -874,6 +838,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         ══════════════════════════════════════════ -->
         <div class="paper-card">
 
+            <?php if (defined('AI_PROVIDER') && AI_PROVIDER !== ''): ?>
+            <div class="ia-toolbar">
+                <button type="button" id="btn_pesquisar_ia" class="btn btn-primary">
+                    🤖 Pesquisar com IA
+                </button>
+            </div>
+            <div id="ia_status" style="display:none;" class="alert"></div>
+            <?php endif; ?>
+
             <div class="alert alert-info" style="margin-bottom:20px;">
                 <i class="fas fa-info-circle"></i>
                 <strong>Imagens já adicionadas:</strong>
@@ -954,10 +927,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="forma_folha">Forma</label>
                         <select id="forma_folha" name="forma_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Lanceolada</option><option>Linear</option><option>Elíptica</option>
-                            <option>Ovada</option><option>Orbicular</option><option>Cordiforme</option>
-                            <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
-                            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Lobada</option>
+                            <option>Acicular</option><option>Cordiforme</option><option>Elíptica</option>
+                            <option>Lanceolada</option><option>Linear</option><option>Lobada</option>
+                            <option>Obovada</option><option>Orbicular</option><option>Ovada</option>
+                            <option>Palmada</option><option>Reniforme</option><option>Sagitada</option><option>Trifoliada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -974,8 +947,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="filotaxia_folha">Filotaxia</label>
                         <select id="filotaxia_folha" name="filotaxia_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Alterna</option><option>Oposta Simples</option><option>Oposta Decussada</option>
-                            <option>Verticilada</option><option>Dística</option><option>Espiralada</option>
+                            <option>Alterna</option><option>Alterna dística</option><option>Alterna espiralada</option>
+                            <option>Oposta</option><option>Oposta decussada</option><option>Verticilada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -992,8 +965,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tipo_folha">Tipo</label>
                         <select id="tipo_folha" name="tipo_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Simples</option><option>Composta pinnada</option><option>Composta bipinada</option>
-                            <option>Composta tripinada</option><option>Composta tetrapinada</option>
+                            <option>Simples</option><option>Composta bipinada</option><option>Composta digitada</option>
+                            <option>Composta imparipinada</option><option>Composta paripinada</option>
+                            <option>Composta pinnada</option><option>Composta trifoliada</option><option>Composta tripinada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1010,11 +984,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_folha">Tamanho</label>
                         <select id="tamanho_folha" name="tamanho_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="Microfilas (< 2 cm)">Microfilas (&lt; 2 cm)</option>
-                            <option value="Nanofilas (2–7 cm)">Nanofilas (2–7 cm)</option>
-                            <option value="Mesofilas (7–20 cm)">Mesofilas (7–20 cm)</option>
-                            <option value="Macrófilas (20–50 cm)">Macrófilas (20–50 cm)</option>
-                            <option value="Megafilas (> 50 cm)">Megafilas (&gt; 50 cm)</option>
+                            <option>Microfila</option><option>Nanofila</option><option>Mesofila</option>
+                            <option>Macrofila</option><option>Megafila</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1031,9 +1002,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_folha">Textura</label>
                         <select id="textura_folha" name="textura_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Coriácea</option><option>Cartácea</option><option>Membranácea</option>
-                            <option>Suculenta</option><option>Pilosa</option><option>Glabra</option>
-                            <option>Rugosa</option><option>Cerosa</option>
+                            <option>Cartácea</option><option>Coriácea</option><option>Glabra</option>
+                            <option>Membranácea</option><option>Pilosa</option><option>Pubescente</option>
+                            <option>Rugosa</option><option>Suculenta</option><option>Tomentosa</option><option>Cerosa</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1050,9 +1021,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="margem_folha">Margem</label>
                         <select id="margem_folha" name="margem_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Inteira</option><option>Serrada</option><option>Dentada</option>
-                            <option>Crenada</option><option>Ondulada</option><option>Lobada</option>
-                            <option>Partida</option><option>Revoluta</option><option>Involuta</option>
+                            <option>Crenada</option><option>Dentada</option><option>Inteira</option>
+                            <option>Lobada</option><option>Ondulada</option><option>Serreada</option>
+                            <option>Serrilhada</option><option>Partida</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1069,9 +1040,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="venacao_folha">Venação</label>
                         <select id="venacao_folha" name="venacao_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Reticulada Pinnada</option><option>Reticulada Palmada</option>
-                            <option>Paralela</option><option>Peninérvea</option>
-                            <option>Dicotômica</option><option>Curvinérvea</option>
+                            <option>Curvinérvea</option><option>Dicotômica</option><option>Paralela</option>
+                            <option>Peninérvea</option><option>Reticulada palmada</option><option>Reticulada pinada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1091,9 +1061,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_flores">Cor das Flores</label>
                         <select id="cor_flores" name="cor_flores">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Brancas</option><option>Amarelas</option><option>Vermelhas</option>
-                            <option>Rosadas</option><option>Roxas</option><option>Azuis</option>
-                            <option>Laranjas</option><option>Verdes</option>
+                            <option>Alaranjada</option><option>Amarela</option><option>Avermelhada</option>
+                            <option>Azul</option><option>Branca</option><option>Esverdeada</option>
+                            <option>Lilás</option><option>Púrpura</option><option>Rósea</option>
+                            <option>Roxa</option><option>Vermelha</option><option>Vinácea</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1129,10 +1100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="numero_petalas">Número de Pétalas</label>
                         <select id="numero_petalas" name="numero_petalas">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="3 pétalas">3 pétalas</option>
-                            <option value="4 pétalas">4 pétalas</option>
-                            <option value="5 pétalas">5 pétalas</option>
-                            <option value="Muitas pétalas">Muitas pétalas</option>
+                            <option>3 pétalas</option><option>4 pétalas</option><option>5 pétalas</option>
+                            <option>6 pétalas</option><option>Muitas pétalas</option><option>Ausentes</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1149,8 +1118,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="disposicao_flores">Disposição das Flores</label>
                         <select id="disposicao_flores" name="disposicao_flores">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Isoladas</option>
-                            <option value="Inflorescência">Inflorescência (cacho, espiga, capítulo, umbela)</option>
+                            <option>Solitária</option><option>Capítulo</option><option>Cacho</option>
+                            <option>Corimbo</option><option>Espádice</option><option>Espiga</option>
+                            <option>Panícula</option><option>Umbela</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1167,10 +1137,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="aroma">Aroma das Flores</label>
                         <select id="aroma" name="aroma">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="Sem cheiro">Sem cheiro</option>
-                            <option value="Aroma suave">Aroma suave</option>
-                            <option value="Aroma forte">Aroma forte</option>
-                            <option value="Aroma desagradável">Aroma desagradável</option>
+                            <option>Ausente</option><option>Suave</option><option>Forte</option>
+                            <option>Desagradável</option><option>Adocicada</option><option>Cítrica</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1187,7 +1155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_flor">Tamanho da Flor</label>
                         <select id="tamanho_flor" name="tamanho_flor">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Pequena</option><option>Média</option>
+                            <option>Muito pequena</option><option>Pequena</option><option>Média</option>
+                            <option>Grande</option><option>Muito grande</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1227,9 +1196,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_fruto">Tamanho do Fruto</label>
                         <select id="tamanho_fruto" name="tamanho_fruto">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="Pequeno">Pequeno (&lt; 2 cm)</option>
-                            <option value="Médio">Médio (2–5 cm)</option>
-                            <option value="Grande">Grande (&gt; 5 cm)</option>
+                            <option>Minúsculo</option><option>Pequeno</option><option>Médio</option>
+                            <option>Grande</option><option>Muito grande</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1246,9 +1214,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_fruto">Cor do Fruto</label>
                         <select id="cor_fruto" name="cor_fruto">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Verde</option><option>Amarelo</option><option>Vermelho</option>
-                            <option>Roxo</option><option>Laranja</option><option>Marrom</option>
-                            <option>Preto</option><option>Branco</option>
+                            <option>Alaranjado</option><option>Amarelo</option><option>Avermelhado</option>
+                            <option>Branco</option><option>Esverdeado</option><option>Marrom</option>
+                            <option>Preto</option><option>Roxo</option><option>Verde</option><option>Vináceo</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1266,7 +1234,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <select id="textura_fruto" name="textura_fruto">
                             <option value="" disabled selected>Selecione…</option>
                             <option>Lisa</option><option>Rugosa</option><option>Coriácea</option>
-                            <option>Peluda</option><option>Espinhosa</option><option>Cerosa</option>
+                            <option>Pubescente</option><option>Pilosa</option><option>Espinhosa</option>
+                            <option>Cerosa</option><option>Tuberculada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1283,10 +1252,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="dispersao_fruto">Tipo de Dispersão</label>
                         <select id="dispersao_fruto" name="dispersao_fruto">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="Zoocórica">Zoocórica (por animais)</option>
-                            <option value="Anemocórica">Anemocórica (pelo vento)</option>
-                            <option value="Hidrocórica">Hidrocórica (pela água)</option>
-                            <option value="Autocórica">Autocórica (pelo próprio fruto)</option>
+                            <option>Anemocórica</option><option>Autocórica</option><option>Hidrocórica</option>
+                            <option>Zoocórica</option><option>Mirmecocórica</option><option>Ornitocórica</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1303,10 +1270,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="aroma_fruto">Aroma do Fruto</label>
                         <select id="aroma_fruto" name="aroma_fruto">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="Sem cheiro">Sem cheiro</option>
-                            <option value="Aroma suave">Aroma suave</option>
-                            <option value="Aroma forte">Aroma forte</option>
-                            <option value="Aroma desagradável">Aroma desagradável</option>
+                            <option>Ausente</option><option>Suave</option><option>Forte</option>
+                            <option>Adocicado</option><option>Cítrico</option><option>Desagradável</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1327,7 +1292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <select id="tipo_semente" name="tipo_semente">
                             <option value="" disabled selected>Selecione…</option>
                             <option>Alada</option><option>Carnosa</option><option>Dura</option>
-                            <option>Oleosa</option><option>Peluda</option>
+                            <option>Oleaginosa</option><option>Plumosa</option><option>Ruminada</option><option>Arilada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1344,9 +1309,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_semente">Tamanho da Semente</label>
                         <select id="tamanho_semente" name="tamanho_semente">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="Pequena">Pequena (&lt; 5 mm)</option>
-                            <option value="Média">Média (5–10 mm)</option>
-                            <option value="Grande">Grande (&gt; 10 mm)</option>
+                            <option>Minúscula</option><option>Muito pequena</option><option>Pequena</option>
+                            <option>Média</option><option>Grande</option><option>Muito grande</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1363,8 +1327,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_semente">Cor da Semente</label>
                         <select id="cor_semente" name="cor_semente">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Preta</option><option>Marrom</option><option>Branca</option>
-                            <option>Amarela</option><option>Verde</option>
+                            <option>Amarela</option><option>Branca</option><option>Castanha</option>
+                            <option>Cinza</option><option>Marrom</option><option>Preta</option>
+                            <option>Vermelha</option><option>Alaranjada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1381,7 +1346,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_semente">Textura da Semente</label>
                         <select id="textura_semente" name="textura_semente">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Lisa</option><option>Rugosa</option><option>Estriada</option><option>Cerosa</option>
+                            <option>Lisa</option><option>Rugosa</option><option>Estriada</option>
+                            <option>Pontuada</option><option>Foveolada</option><option>Reticulada</option><option>Tuberculada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1398,9 +1364,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="quantidade_sementes">Quantidade de Sementes por Fruto</label>
                         <select id="quantidade_sementes" name="quantidade_sementes">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Uma</option>
-                            <option value="Poucas">Poucas (2–5)</option>
-                            <option value="Muitas">Muitas (&gt; 5)</option>
+                            <option>1</option><option>2–3</option><option>4–10</option>
+                            <option>11–50</option><option>&gt; 50</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1420,8 +1385,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tipo_caule">Tipo de Caule</label>
                         <select id="tipo_caule" name="tipo_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Ereto</option><option>Prostrado</option><option>Rastejante</option>
-                            <option>Trepador</option><option>Subterrâneo</option>
+                            <option>Ereto</option><option>Prostrado</option><option>Escandente</option>
+                            <option>Trepador</option><option>Rastejante</option><option>Subterrâneo</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1438,7 +1403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="estrutura_caule">Estrutura do Caule</label>
                         <select id="estrutura_caule" name="estrutura_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Lenhoso</option><option>Herbáceo</option><option>Suculento</option>
+                            <option>Herbáceo</option><option>Lenhoso</option><option>Suculento</option><option>Sublenhoso</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1455,8 +1420,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_caule">Textura do Caule</label>
                         <select id="textura_caule" name="textura_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Lisa</option><option>Rugosa</option><option>Sulcada</option>
-                            <option>Fissurada</option><option>Cerosa</option><option>Espinhosa</option><option>Suberosa</option>
+                            <option>Lisa</option><option>Rugosa</option><option>Fissurada</option>
+                            <option>Sulcada</option><option>Estriada</option><option>Escamosa</option>
+                            <option>Suberosa</option><option>Aculeada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1473,8 +1439,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_caule">Cor do Caule</label>
                         <select id="cor_caule" name="cor_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Marrom</option><option>Verde</option><option>Cinza</option>
-                            <option>Avermelhado</option><option>Alaranjado</option>
+                            <option>Acinzentado</option><option>Alaranjado</option><option>Avermelhado</option>
+                            <option>Esbranquiçado</option><option>Esverdeado</option><option>Marrom</option><option>Pardacento</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1491,8 +1457,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="forma_caule">Forma do Caule</label>
                         <select id="forma_caule" name="forma_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Cilíndrico</option><option>Quadrangular</option>
-                            <option>Achatado</option><option>Irregular</option>
+                            <option>Cilíndrico</option><option>Quadrangular</option><option>Triangular</option>
+                            <option>Achatado</option><option>Alado</option><option>Irregular</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1509,8 +1475,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="modificacao_caule">Modificações do Caule</label>
                         <select id="modificacao_caule" name="modificacao_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Estolão</option><option>Cladódio</option><option>Rizoma</option>
-                            <option>Tubérculo</option><option>Espinhos</option>
+                            <option>Cladódio</option><option>Espinho</option><option>Estolão</option>
+                            <option>Gavinha</option><option>Rizoma</option><option>Tubérculo</option><option>Bulbo</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1527,9 +1493,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="diametro_caule">Diâmetro do Caule</label>
                         <select id="diametro_caule" name="diametro_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option value="Fino">Fino (&lt; 1 cm)</option>
-                            <option value="Médio">Médio (1–5 cm)</option>
-                            <option value="Grosso">Grosso (&gt; 5 cm)</option>
+                            <option>Capilar</option><option>Delgado</option><option>Fino</option>
+                            <option>Médio</option><option>Grosso</option><option>Muito grosso</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1546,7 +1511,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="ramificacao_caule">Ramificação do Caule</label>
                         <select id="ramificacao_caule" name="ramificacao_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Dicotômica</option><option>Monopodial</option><option>Simpodial</option>
+                            <option>Monopodial</option><option>Simpodial</option>
+                            <option>Dicotômica</option><option>Pseudodicotômica</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1565,8 +1531,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     <div class="main-input">
                         <label for="possui_espinhos">Possui Espinhos?</label>
                         <select id="possui_espinhos" name="possui_espinhos">
-                            <option value="">Selecione…</option>
-                            <option>Sim</option><option>Não</option>
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Sim</option><option>Não</option><option>Não informado</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1582,8 +1548,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     <div class="main-input">
                         <label for="possui_latex">Possui Látex?</label>
                         <select id="possui_latex" name="possui_latex">
-                            <option value="">Selecione…</option>
-                            <option>Sim</option><option>Não</option>
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Sim</option><option>Não</option><option>Não informado</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1599,8 +1565,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     <div class="main-input">
                         <label for="possui_seiva">Possui Seiva?</label>
                         <select id="possui_seiva" name="possui_seiva">
-                            <option value="">Selecione…</option>
-                            <option>Sim</option><option>Não</option>
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Sim</option><option>Não</option><option>Não informado</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1616,8 +1582,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     <div class="main-input">
                         <label for="possui_resina">Possui Resina?</label>
                         <select id="possui_resina" name="possui_resina">
-                            <option value="">Selecione…</option>
-                            <option>Sim</option><option>Não</option>
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Sim</option><option>Não</option><option>Não informado</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1654,209 +1620,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             </form>
         </div>
 
-        <!-- ══════════════════════════════════════════
-             SEÇÃO DE PESQUISA POR IA
-        ══════════════════════════════════════════ -->
-        <div class="paper-card">
-            <div class="ai-section-header">🤖 Pesquisa Automatizada com Agentes de IA</div>
-            <p class="ai-section-sub">
-                Copie o prompt abaixo e cole em um agente de IA (Claude, ChatGPT, Gemini…).
-                O agente retornará um JSON — cole-o abaixo para preencher a planilha automaticamente.
-            </p>
-
-            <!-- Prompt -->
-            <div class="prompt-box">
-                <div class="prompt-box-header">
-                    <div class="prompt-box-title">📝 Prompt de Pesquisa — <em><?php echo htmlspecialchars($nome_cientifico); ?></em></div>
-                    <button type="button" class="btn btn-copy" id="btn_copiar_prompt" onclick="copiarPrompt()">📋 Copiar Prompt</button>
-                </div>
-                <div class="prompt-content" id="prompt-display"><?php
-echo htmlspecialchars(
-'Você é um especialista em botânica sistemática. Preencha o JSON abaixo com as características botânicas da espécie indicada.
-
-ESPÉCIE-ALVO: ' . $nome_cientifico . '
-
-REGRAS OBRIGATÓRIAS — leia antes de responder:
-
-1. FORMATO DE SAÍDA: Responda APENAS com o JSON preenchido, sem nenhum texto antes ou depois, sem blocos de código markdown (sem ```json), sem comentários.
-
-2. ESTRUTURA: O JSON de saída deve ser PLANO (flat), com todos os campos no mesmo nível — sem seções aninhadas como "folha", "flor", "fruto" etc. Siga exatamente a estrutura do EXEMPLO DE SAÍDA abaixo.
-
-3. CAMPOS DE SELEÇÃO: Para cada campo de seleção, escreva APENAS a string exata da opção escolhida, sem nenhum wrapper. Escolha somente entre as opções listadas. NUNCA use valor fora da lista.
-
-4. CAMPOS MÚLTIPLOS (sinonimos, nome_popular): Use uma única string com os valores separados por vírgula e espaço. Ex: "Valor A, Valor B, Valor C"
-
-5. CAMPO referencias: Use uma única string com cada referência separada por \n, no formato:
-   N. SOBRENOME, Nome. Título. Local: Editora, Ano.
-
-6. CAMPOS _ref: String com números separados por vírgula. Ex: "1,3". Se sem referência, use string vazia "".
-
-7. CAMPOS OPCIONAIS INAPLICÁVEIS: Use string vazia "" (ex: modificacao_caule quando a espécie não possui modificação caulinar).
-
-8. DADOS AUSENTES: Se a informação não puder ser confirmada com segurança por uma fonte bibliográfica, use "Não informado" para campos de seleção e "" para campos livres. NUNCA invente ou suponha dados.
-
-9. especie_id deve conter EXATAMENTE o nome científico da espécie: ' . $nome_cientifico . '
-
----
-
-CAMPOS DE SELEÇÃO E SUAS OPÇÕES VÁLIDAS:
-
-forma_folha: Acicular | Cordiforme | Elíptica | Lanceolada | Linear | Lobada | Obovada | Orbicular | Ovada | Palmada | Reniforme | Sagitada | Trifoliada
-filotaxia_folha: Alterna | Alterna dística | Alterna espiralada | Oposta | Oposta decussada | Verticilada
-tipo_folha: Simples | Composta bipinada | Composta digitada | Composta imparipinada | Composta paripinada | Composta pinnada | Composta trifoliada | Composta tripinada
-tamanho_folha: Microfila | Nanofila | Mesofila | Macrofila | Megafila
-textura_folha: Cartácea | Coriácea | Glabra | Membranácea | Pilosa | Pubescente | Rugosa | Suculenta | Tomentosa | Cerosa
-margem_folha: Crenada | Dentada | Inteira | Lobada | Ondulada | Serreada | Serrilhada | Partida
-venacao_folha: Curvinérvea | Dicotômica | Paralela | Peninérvea | Reticulada palmada | Reticulada pinada
-cor_flores: Alaranjada | Amarela | Avermelhada | Azul | Branca | Esverdeada | Lilás | Púrpura | Rósea | Roxa | Vermelha | Vinácea
-simetria_floral: Actinomorfa | Zigomorfa | Assimétrica
-numero_petalas: 3 pétalas | 4 pétalas | 5 pétalas | 6 pétalas | Muitas pétalas | Ausentes
-disposicao_flores: Solitária | Capítulo | Cacho | Corimbo | Espádice | Espiga | Panícula | Umbela
-aroma: Ausente | Suave | Forte | Desagradável | Adocicada | Cítrica
-tamanho_flor: Muito pequena | Pequena | Média | Grande | Muito grande
-tipo_fruto: Aquênio | Baga | Cápsula | Drupa | Folículo | Legume | Pixídio | Sâmara | Síliqua | Cariopse | Hespéridio | Pepo
-tamanho_fruto: Minúsculo | Pequeno | Médio | Grande | Muito grande
-cor_fruto: Alaranjado | Amarelo | Avermelhado | Branco | Esverdeado | Marrom | Preto | Roxo | Verde | Vináceo
-textura_fruto: Lisa | Rugosa | Coriácea | Pubescente | Pilosa | Espinhosa | Cerosa | Tuberculada
-dispersao_fruto: Anemocórica | Autocórica | Hidrocórica | Zoocórica | Mirmecocórica | Ornitocórica
-aroma_fruto: Ausente | Suave | Forte | Adocicado | Cítrico | Desagradável
-tipo_semente: Alada | Carnosa | Dura | Oleaginosa | Plumosa | Ruminada | Arilada
-tamanho_semente: Minúscula | Muito pequena | Pequena | Média | Grande | Muito grande
-cor_semente: Amarela | Branca | Castanha | Cinza | Marrom | Preta | Vermelha | Alaranjada
-textura_semente: Lisa | Rugosa | Estriada | Pontuada | Foveolada | Reticulada | Tuberculada
-quantidade_sementes: 1 | 2–3 | 4–10 | 11–50 | > 50
-tipo_caule: Ereto | Prostrado | Escandente | Trepador | Rastejante | Subterrâneo
-estrutura_caule: Herbáceo | Lenhoso | Suculento | Sublenhoso
-textura_caule: Lisa | Rugosa | Fissurada | Sulcada | Estriada | Escamosa | Suberosa | Aculeada
-cor_caule: Acinzentado | Alaranjado | Avermelhado | Esbranquiçado | Esverdeado | Marrom | Pardacento
-forma_caule: Cilíndrico | Quadrangular | Triangular | Achatado | Alado | Irregular
-modificacao_caule: Cladódio | Espinho | Estolão | Gavinha | Rizoma | Tubérculo | Bulbo
-diametro_caule: Capilar | Delgado | Fino | Médio | Grosso | Muito grosso
-ramificacao_caule: Monopodial | Simpodial | Dicotômica | Pseudodicotômica
-possui_espinhos: Sim | Não | Não informado
-possui_latex: Sim | Não | Não informado
-possui_seiva: Sim | Não | Não informado
-possui_resina: Sim | Não | Não informado
-
----
-
-ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
-
-{
-  "especie_id": "' . $nome_cientifico . '",
-  "nome_cientifico_completo": "",
-  "nome_cientifico_completo_ref": "",
-  "sinonimos": "",
-  "sinonimos_ref": "",
-  "nome_popular": "",
-  "nome_popular_ref": "",
-  "familia": "",
-  "familia_ref": "",
-  "forma_folha": "",
-  "forma_folha_ref": "",
-  "filotaxia_folha": "",
-  "filotaxia_folha_ref": "",
-  "tipo_folha": "",
-  "tipo_folha_ref": "",
-  "tamanho_folha": "",
-  "tamanho_folha_ref": "",
-  "textura_folha": "",
-  "textura_folha_ref": "",
-  "margem_folha": "",
-  "margem_folha_ref": "",
-  "venacao_folha": "",
-  "venacao_folha_ref": "",
-  "cor_flores": "",
-  "cor_flores_ref": "",
-  "simetria_floral": "",
-  "simetria_floral_ref": "",
-  "numero_petalas": "",
-  "numero_petalas_ref": "",
-  "disposicao_flores": "",
-  "disposicao_flores_ref": "",
-  "aroma": "",
-  "aroma_ref": "",
-  "tamanho_flor": "",
-  "tamanho_flor_ref": "",
-  "tipo_fruto": "",
-  "tipo_fruto_ref": "",
-  "tamanho_fruto": "",
-  "tamanho_fruto_ref": "",
-  "cor_fruto": "",
-  "cor_fruto_ref": "",
-  "textura_fruto": "",
-  "textura_fruto_ref": "",
-  "dispersao_fruto": "",
-  "dispersao_fruto_ref": "",
-  "aroma_fruto": "",
-  "aroma_fruto_ref": "",
-  "tipo_semente": "",
-  "tipo_semente_ref": "",
-  "tamanho_semente": "",
-  "tamanho_semente_ref": "",
-  "cor_semente": "",
-  "cor_semente_ref": "",
-  "textura_semente": "",
-  "textura_semente_ref": "",
-  "quantidade_sementes": "",
-  "quantidade_sementes_ref": "",
-  "tipo_caule": "",
-  "tipo_caule_ref": "",
-  "estrutura_caule": "",
-  "estrutura_caule_ref": "",
-  "textura_caule": "",
-  "textura_caule_ref": "",
-  "cor_caule": "",
-  "cor_caule_ref": "",
-  "forma_caule": "",
-  "forma_caule_ref": "",
-  "modificacao_caule": "",
-  "modificacao_caule_ref": "",
-  "diametro_caule": "",
-  "diametro_caule_ref": "",
-  "ramificacao_caule": "",
-  "ramificacao_caule_ref": "",
-  "possui_espinhos": "",
-  "possui_espinhos_ref": "",
-  "possui_latex": "",
-  "possui_latex_ref": "",
-  "possui_seiva": "",
-  "possui_seiva_ref": "",
-  "possui_resina": "",
-  "possui_resina_ref": "",
-  "referencias": ""
-}'
-);
-                ?></div>
-            </div>
-
-            <!-- Cole o JSON -->
-            <div class="json-import-area">
-                <h3><span>📋</span> Cole aqui o JSON da espécie</h3>
-                <p>Após obter o JSON do agente de IA, cole-o abaixo e clique em "Preencher Planilha". Revise cada campo antes de finalizar.</p>
-                <textarea id="json_input" rows="8" placeholder='{
-    "nome_cientifico_completo": "Mauritia flexuosa L.f.",
-    "familia": "Arecaceae",
-    "forma_folha": "Palmada",
-    "cor_flores": "Amarelas",
-    "referencias": "1. Flora Brasiliensis\n2. Lorenzi, 2002"
-}'></textarea>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-primary" id="btn_carregar_json">🔄 PREENCHER PLANILHA</button>
-                    <button type="button" class="btn btn-secondary" id="btn_limpar">🗑️ LIMPAR</button>
-                </div>
-                <div id="mensagem_json" style="display:none;" class="alert"></div>
-
-                <div id="btn_finalizar_wrapper" style="display:none; margin-top:1.5rem; text-align:center;">
-                    <button type="button" class="btn-save" onclick="document.getElementById('btn_finalizar').click()">
-                        ✅ FINALIZAR IMPORTAÇÃO
-                    </button>
-                    <p style="margin-top:8px; color:#666; font-size:0.85rem;">
-                        ⚠️ Após finalizar, todas as imagens e dados serão salvos permanentemente.
-                    </p>
-                </div>
-            </div>
-        </div>
 
         <div class="footer">Penomato • Importação de dados - PASSO 3 DE 3</div>
     </div>
@@ -1922,91 +1685,137 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
     }
 
     // ================================================
-    // CARREGAR JSON → preenche planilha visível
+    // PESQUISAR COM IA — fetch para buscar_dados_especie_ai.php
     // ================================================
-    document.getElementById('btn_carregar_json').addEventListener('click', function() {
-        const mensagemDiv = document.getElementById('mensagem_json');
-        mensagemDiv.style.display = 'none';
+    (function() {
+        const btnIA = document.getElementById('btn_pesquisar_ia');
+        if (!btnIA) return;
 
-        try {
-            const jsonTexto = document.getElementById('json_input').value.trim();
-            if (!jsonTexto) throw new Error('Nenhum JSON foi colado!');
-            const dados = JSON.parse(jsonTexto);
+        btnIA.addEventListener('click', function() {
+            const statusDiv = document.getElementById('ia_status');
+            btnIA.disabled = true;
+            btnIA.textContent = '⏳ Pesquisando...';
+            statusDiv.style.display = 'none';
 
-            const todosCampos = [
-                'nome_cientifico_completo','sinonimos','nome_popular','familia',
-                'forma_folha','filotaxia_folha','tipo_folha','tamanho_folha',
-                'textura_folha','margem_folha','venacao_folha',
-                'cor_flores','simetria_floral','numero_petalas','disposicao_flores','aroma','tamanho_flor',
-                'tipo_fruto','tamanho_fruto','cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto',
-                'tipo_semente','tamanho_semente','cor_semente','textura_semente','quantidade_sementes',
-                'tipo_caule','estrutura_caule','textura_caule','cor_caule','forma_caule',
-                'modificacao_caule','diametro_caule','ramificacao_caule',
-                'possui_espinhos','possui_latex','possui_seiva','possui_resina','referencias',
-                'nome_cientifico_completo_ref','sinonimos_ref','nome_popular_ref','familia_ref',
-                'forma_folha_ref','filotaxia_folha_ref','tipo_folha_ref','tamanho_folha_ref',
-                'textura_folha_ref','margem_folha_ref','venacao_folha_ref',
-                'cor_flores_ref','simetria_floral_ref','numero_petalas_ref','disposicao_flores_ref',
-                'aroma_ref','tamanho_flor_ref','tipo_fruto_ref','tamanho_fruto_ref','cor_fruto_ref',
-                'textura_fruto_ref','dispersao_fruto_ref','aroma_fruto_ref',
-                'tipo_semente_ref','tamanho_semente_ref','cor_semente_ref','textura_semente_ref',
-                'quantidade_sementes_ref','tipo_caule_ref','estrutura_caule_ref','textura_caule_ref',
-                'cor_caule_ref','forma_caule_ref','modificacao_caule_ref','diametro_caule_ref',
-                'ramificacao_caule_ref','possui_espinhos_ref','possui_latex_ref',
-                'possui_seiva_ref','possui_resina_ref'
-            ];
+            const fd = new FormData();
+            fd.append('temp_id', '<?php echo addslashes($temp_id); ?>');
 
-            let preenchidos = 0;
-            todosCampos.forEach(function(campo) {
-                if (dados[campo] !== undefined && dados[campo] !== '') {
-                    preencherCampo(campo, dados[campo]);
-                    preenchidos++;
+            fetch('buscar_dados_especie_ai.php', { method: 'POST', body: fd })
+            .then(function(r) { return r.json(); })
+            .then(function(resp) {
+                btnIA.disabled = false;
+                btnIA.textContent = '🤖 Pesquisar com IA';
+
+                if (!resp.sucesso) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.className = 'alert alert-danger';
+                    statusDiv.textContent = '❌ ' + resp.erro;
+                    return;
                 }
+
+                const validos = resp.campos_validos || {};
+                let preenchidos = 0;
+                Object.keys(validos).forEach(function(campo) {
+                    preencherCampo(campo, validos[campo]);
+                    preenchidos++;
+                });
+
+                if (resp.campos_divergentes && resp.campos_divergentes.length > 0) {
+                    abrirModalDivergentes(resp.campos_divergentes);
+                } else {
+                    statusDiv.style.display = 'block';
+                    statusDiv.className = 'alert alert-success';
+                    statusDiv.textContent = '✅ ' + preenchidos + ' campos preenchidos! Revise e finalize.';
+                    document.getElementById('form_principal').scrollIntoView({ behavior: 'smooth' });
+                }
+            })
+            .catch(function(err) {
+                btnIA.disabled = false;
+                btnIA.textContent = '🤖 Pesquisar com IA';
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'alert alert-danger';
+                statusDiv.textContent = '❌ Erro de rede: ' + err.message;
+            });
+        });
+    })();
+
+    // ================================================
+    // MODAL DE DIVERGÊNCIAS
+    // ================================================
+    var _divergentes = [];
+    var _escolhas    = {};
+
+    function abrirModalDivergentes(divergentes) {
+        _divergentes = divergentes;
+        _escolhas    = {};
+
+        const body     = document.getElementById('modal-body');
+        const contador = document.getElementById('modal-contador');
+        body.innerHTML = '';
+
+        divergentes.forEach(function(item, idx) {
+            const nome = item.campo.replace(/_/g, ' ')
+                             .replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+
+            var opcoesHtml = '<div class="opcoes-grid">';
+            item.opcoes.forEach(function(opcao) {
+                var sugerida = (opcao === item.sugestao) ? ' style="font-weight:700;"' : '';
+                opcoesHtml += '<label class="opcao-item"' + sugerida + '>'
+                    + '<input type="radio" name="modal_campo_' + idx + '" value="' + opcao + '"'
+                    + (opcao === item.sugestao ? ' checked' : '') + '> ' + opcao
+                    + '</label>';
+            });
+            opcoesHtml += '</div>';
+
+            _escolhas[item.campo] = item.sugestao;
+
+            const bloco = document.createElement('div');
+            bloco.className = 'campo-validacao';
+            bloco.innerHTML = '<div class="campo-titulo">⚠️ ' + nome + '</div>'
+                + '<div class="campo-json">IA retornou: <strong>' + item.valor_ia + '</strong>'
+                + ' — sugestão: <strong>' + item.sugestao + '</strong></div>'
+                + opcoesHtml;
+
+            bloco.querySelectorAll('input[type=radio]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    _escolhas[item.campo] = this.value;
+                    atualizarContadorModal();
+                });
             });
 
-            // Scroll até a planilha
-            document.getElementById('form_principal').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            mensagemDiv.style.display = 'block';
-            mensagemDiv.className = 'alert alert-success';
-            mensagemDiv.innerHTML = '✅ ' + preenchidos + ' campos preenchidos! Revise a planilha acima e clique em Finalizar Importação.';
-            document.getElementById('btn_finalizar_wrapper').style.display = 'block';
-
-        } catch (erro) {
-            mensagemDiv.style.display = 'block';
-            mensagemDiv.className = 'alert alert-danger';
-            mensagemDiv.innerHTML = '❌ Erro: ' + erro.message;
-        }
-    });
-
-    document.getElementById('btn_limpar').addEventListener('click', function() {
-        if (confirm('Limpar o JSON e todos os campos da planilha?')) {
-            document.getElementById('json_input').value = '';
-            document.getElementById('mensagem_json').style.display = 'none';
-            document.getElementById('btn_finalizar_wrapper').style.display = 'none';
-            limparPlanilha();
-        }
-    });
-
-    // ================================================
-    // COPIAR PROMPT
-    // ================================================
-    function copiarPrompt() {
-        const texto = document.getElementById('prompt-display').textContent;
-        const btn   = document.getElementById('btn_copiar_prompt');
-        navigator.clipboard.writeText(texto).then(function() {
-            btn.textContent = '✅ Copiado!';
-            btn.classList.add('copied');
-            setTimeout(function() { btn.textContent = '📋 Copiar Prompt'; btn.classList.remove('copied'); }, 2500);
-        }).catch(function() {
-            const ta = document.createElement('textarea');
-            ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
-            document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-            document.body.removeChild(ta);
-            btn.textContent = '✅ Copiado!'; btn.classList.add('copied');
-            setTimeout(function() { btn.textContent = '📋 Copiar Prompt'; btn.classList.remove('copied'); }, 2500);
+            body.appendChild(bloco);
         });
+
+        atualizarContadorModal();
+        const modal = document.getElementById('modalValidacao');
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
+
+    function atualizarContadorModal() {
+        const total   = _divergentes.length;
+        const prontos = Object.keys(_escolhas).length;
+        document.getElementById('modal-contador').textContent = prontos + '/' + total;
+        document.getElementById('btnConfirmarValidacao').disabled = (prontos < total);
+    }
+
+    function fecharModal() {
+        document.getElementById('modalValidacao').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function confirmarValidacao() {
+        Object.keys(_escolhas).forEach(function(campo) {
+            preencherCampo(campo, _escolhas[campo]);
+        });
+        fecharModal();
+        const statusDiv = document.getElementById('ia_status');
+        statusDiv.style.display = 'block';
+        statusDiv.className = 'alert alert-success';
+        statusDiv.textContent = '✅ Campos preenchidos e divergências resolvidas! Revise e finalize.';
+        document.getElementById('form_principal').scrollIntoView({ behavior: 'smooth' });
+    }
+
 
     window.onclick = function(event) {
         const modal = document.getElementById('modalValidacao');
