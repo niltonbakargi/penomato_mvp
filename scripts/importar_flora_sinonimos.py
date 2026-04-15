@@ -23,20 +23,37 @@ ARQUIVOS  = [
 SAIDA_SQL = os.path.join(BASE_DIR, 'database', 'flora_sinonimos_import.sql')
 LOTE      = 500
 
+# ── Índices das colunas ────────────────────────────────────────
+COL_RANK        = 1
+COL_GRUPO       = 2
+COL_FAMILIA     = 6
+COL_GENERO      = 9
+COL_EPITETO     = 10
+COL_AUTOR       = 14
+COL_STATUS      = 16
+COL_DOM         = 28
+COL_SINONIMO_DE = 31
+
+# ── Passo 1: coleta nomes aceitos do Cerrado ──────────────────
+# (os mesmos critérios do importar_flora_brasil.py)
+nomes_aceitos_cerrado = set()
+for caminho in ARQUIVOS:
+    wb = openpyxl.load_workbook(caminho, read_only=True)
+    ws = wb['Relatório']
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        rank   = str(row[COL_RANK]   or '').strip()
+        status = str(row[COL_STATUS] or '').strip()
+        dom    = str(row[COL_DOM]    or '')
+        if rank == 'Espécie' and status == 'Nome aceito' and 'Cerrado' in dom:
+            genero  = str(row[COL_GENERO]  or '').strip()
+            epiteto = str(row[COL_EPITETO] or '').strip()
+            nomes_aceitos_cerrado.add(f'{genero} {epiteto}'.strip())
+
+print(f'Nomes aceitos do Cerrado carregados: {len(nomes_aceitos_cerrado)}')
+
 # Prefixos de tipo de sinonímia a remover
 PREFIXOS = ['heterotípico', 'homotípico', 'basônimo', 'basiônimo',
             'heterotipico', 'homotipico', 'basinimo']
-
-# Índices das colunas
-COL_RANK    = 1
-COL_GRUPO   = 2
-COL_FAMILIA = 6
-COL_GENERO  = 9
-COL_EPITETO = 10
-COL_AUTOR   = 14
-COL_STATUS  = 16
-COL_DOM     = 28
-COL_SINONIMO_DE = 31  # 'É Sinônimo de'
 
 # ── Helpers ───────────────────────────────────────────────────
 def esc(v):
@@ -78,7 +95,7 @@ for caminho in ARQUIVOS:
         dom        = str(row[COL_DOM]    or '')
         sinonimo_de = row[COL_SINONIMO_DE]
 
-        if rank != 'Espécie' or status != 'Sinônimo' or 'Cerrado' not in dom:
+        if rank != 'Espécie' or status != 'Sinônimo':
             ignorados += 1
             continue
         if not sinonimo_de:
@@ -96,7 +113,8 @@ for caminho in ARQUIVOS:
 
         for parte in partes:
             tipo, nome_aceito = extrair_tipo_e_nome(parte)
-            if nome_aceito:
+            # Só importa se o nome aceito existe na nossa base do Cerrado
+            if nome_aceito and nome_aceito in nomes_aceitos_cerrado:
                 registros.append({
                     'sinonimo':    sinonimo_nome,
                     'autor':       autor,
