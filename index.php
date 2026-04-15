@@ -152,6 +152,29 @@ $url_painel = ($tipo === 'gestor')
             box-shadow: 0 10px 20px rgba(11,94,66,0.3);
         }
 
+        .reflora-card {
+            background: #f0faf5;
+            border-color: #a7d7bf;
+            margin-top: -16px;
+        }
+
+        .reflora-card:hover {
+            border-color: #2d8f63;
+        }
+
+        .reflora-card .search-icon {
+            color: #2d8f63;
+        }
+
+        .btn-reflora {
+            background: #2d8f63;
+        }
+
+        .reflora-card:hover .btn-reflora {
+            background: #22704d;
+            box-shadow: 0 10px 20px rgba(45,143,99,0.3);
+        }
+
         /* Separador */
         .divider {
             display: flex;
@@ -332,6 +355,20 @@ $url_painel = ($tipo === 'gestor')
                         </div>
                         <span class="btn-search">
                             <i class="fas fa-search me-2"></i>Acessar Busca
+                        </span>
+                    </a>
+
+                    <!-- Card REFLORA -->
+                    <a href="/penomato_mvp/src/Views/publico/flora_cerrado.php" class="search-card reflora-card">
+                        <div class="search-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="search-title">FLORA DO CERRADO</div>
+                        <div class="search-desc">
+                            Explore +14.000 espécies nativas com dados taxonômicos oficiais da base REFLORA — Jardim Botânico do Rio de Janeiro
+                        </div>
+                        <span class="btn-search btn-reflora">
+                            <i class="fas fa-leaf me-2"></i>Explorar Flora
                         </span>
                     </a>
 
