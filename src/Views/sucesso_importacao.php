@@ -9,11 +9,7 @@ error_reporting(E_ALL);
 
 session_start();
 
-require_once __DIR__ . '/../../config/app.php';
-$servidor   = DB_HOST;
-$usuario_db = DB_USER;
-$senha_db   = DB_PASS;
-$banco      = DB_NAME;
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ================================================
 // VERIFICAR SE USUÁRIO ESTÁ LOGADO
@@ -42,38 +38,20 @@ if ($especie_id <= 0) {
 // ================================================
 // BUSCAR DADOS DA ESPÉCIE
 // ================================================
-$conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
-
-if ($conexao->connect_error) {
-    die("Erro de conexão: " . $conexao->connect_error);
-}
-
-$conexao->set_charset("utf8mb4");
-
-$sql = "SELECT id, nome_cientifico, status,
-               data_dados_internet, data_registrada,
-               autor_dados_internet_id
-        FROM especies_administrativo 
-        WHERE id = ?";
-
-$stmt = $conexao->prepare($sql);
-$stmt->bind_param("i", $especie_id);
-$stmt->execute();
-$resultado = $stmt->get_result();
-
-if ($resultado->num_rows === 0) {
-    $especie = [
-        'nome_cientifico' => 'Espécie não encontrada',
-        'status' => 'desconhecido',
-        'data_dados_internet' => null,
-        'data_registrada' => null
-    ];
-} else {
-    $especie = $resultado->fetch_assoc();
-}
-
-$stmt->close();
-$conexao->close();
+$stmt = $pdo->prepare(
+    "SELECT id, nome_cientifico, status,
+            data_dados_internet, data_registrada,
+            autor_dados_internet_id
+     FROM especies_administrativo
+     WHERE id = ?"
+);
+$stmt->execute([$especie_id]);
+$especie = $stmt->fetch() ?: [
+    'nome_cientifico' => 'Espécie não encontrada',
+    'status'          => 'desconhecido',
+    'data_dados_internet' => null,
+    'data_registrada'     => null,
+];
 
 // Mapear status para mensagem amigável
 $status_mensagem = [

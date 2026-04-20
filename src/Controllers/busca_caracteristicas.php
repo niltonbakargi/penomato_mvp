@@ -6,11 +6,7 @@
 session_start();
 ob_start();
 
-require_once __DIR__ . '/../../config/app.php';
-$servidor = DB_HOST;
-$usuario  = DB_USER;
-$senha    = DB_PASS;
-$banco    = DB_NAME;
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ================================================
 // FUNÇÕES AUXILIARES
@@ -20,10 +16,9 @@ $banco    = DB_NAME;
  * Monta a query WHERE dinamicamente baseada nos filtros preenchidos
  */
 function montarWhere($dados_busca) {
-    $condicoes = [];
+    $condicoes  = [];
     $parametros = [];
-    $tipos = "";
-    
+
     // MAPEAMENTO CORRETO - Baseado no seu formulário de cadastro
     $campos_busca = [
         // Identificação
@@ -84,13 +79,11 @@ function montarWhere($dados_busca) {
         if (isset($dados_busca[$campo]) && trim($dados_busca[$campo]) !== '' && $dados_busca[$campo] !== 'todos') {
             
             if ($operador === 'LIKE') {
-                $condicoes[] = "$campo LIKE ?";
+                $condicoes[]  = "$campo LIKE ?";
                 $parametros[] = '%' . $dados_busca[$campo] . '%';
-                $tipos .= "s";
             } else {
-                $condicoes[] = "$campo = ?";
+                $condicoes[]  = "$campo = ?";
                 $parametros[] = $dados_busca[$campo];
-                $tipos .= "s";
             }
         }
     }
@@ -101,73 +94,37 @@ function montarWhere($dados_busca) {
     }
     
     return [
-        'where' => $sql_where,
+        'where'      => $sql_where,
         'parametros' => $parametros,
-        'tipos' => $tipos
     ];
 }
 
 /**
  * Conta total de espécies que atendem aos filtros
  */
-function contarEspecies($conexao, $where_info) {
-    // Usando a tabela especies_caracteristicas diretamente
-    $sql = "SELECT COUNT(*) as total 
-            FROM especies_caracteristicas 
-            " . $where_info['where'];
-    
-    $stmt = mysqli_prepare($conexao, $sql);
-    if (!$stmt) {
-        die("Erro na preparação da consulta: " . mysqli_error($conexao));
-    }
-    
-    if (!empty($where_info['parametros'])) {
-        mysqli_stmt_bind_param($stmt, $where_info['tipos'], ...$where_info['parametros']);
-    }
-    
-    mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
-    $linha = mysqli_fetch_assoc($resultado);
-    mysqli_stmt_close($stmt);
-    
-    return $linha['total'];
+function contarEspecies($where_info) {
+    global $pdo;
+    $sql  = "SELECT COUNT(*) FROM especies_caracteristicas " . $where_info['where'];
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($where_info['parametros']);
+    return (int) $stmt->fetchColumn();
 }
 
 /**
  * Busca espécies paginadas
  */
-function buscarEspecies($conexao, $where_info, $pagina, $limite = 100) {
-    $offset = ($pagina - 1) * $limite;
-    
-    // Busca os dados para exibir na lista
-    $sql = "SELECT id, nome_cientifico_completo as nome_cientifico, nome_popular, familia 
-            FROM especies_caracteristicas 
-            " . $where_info['where'] . "
-            ORDER BY nome_cientifico_completo 
-            LIMIT ? OFFSET ?";
-    
-    $stmt = mysqli_prepare($conexao, $sql);
-    if (!$stmt) {
-        die("Erro na preparação da consulta: " . mysqli_error($conexao));
-    }
-    
-    $tipos = $where_info['tipos'] . "ii";
+function buscarEspecies($where_info, $pagina, $limite = 100) {
+    global $pdo;
+    $offset     = ($pagina - 1) * $limite;
     $parametros = array_merge($where_info['parametros'], [$limite, $offset]);
-    
-    if (!empty($parametros)) {
-        mysqli_stmt_bind_param($stmt, $tipos, ...$parametros);
-    }
-    
-    mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
-    
-    $especies = [];
-    while ($linha = mysqli_fetch_assoc($resultado)) {
-        $especies[] = $linha;
-    }
-    
-    mysqli_stmt_close($stmt);
-    return $especies;
+    $sql = "SELECT id, nome_cientifico_completo as nome_cientifico, nome_popular, familia
+            FROM especies_caracteristicas
+            " . $where_info['where'] . "
+            ORDER BY nome_cientifico_completo
+            LIMIT ? OFFSET ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($parametros);
+    return $stmt->fetchAll();
 }
 
 // ================================================
@@ -189,21 +146,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
         return $valor !== '' && $valor !== 'todos';
     });
     
-    $conexao = mysqli_connect($servidor, $usuario, $senha, $banco);
-    
-    if (!$conexao) {
-        $mensagem_busca = 'Erro ao conectar ao banco de dados';
-    } else {
-        mysqli_set_charset($conexao, "utf8mb4");
-        
-        $where_info = montarWhere($dados_busca);
-        $total_encontrado = contarEspecies($conexao, $where_info);
-        
-        if ($total_encontrado > 0) {
-            $especies_encontradas = buscarEspecies($conexao, $where_info, $pagina_atual, 100);
-        }
-        
-        mysqli_close($conexao);
+    $where_info       = montarWhere($dados_busca);
+    $total_encontrado = contarEspecies($where_info);
+    if ($total_encontrado > 0) {
+        $especies_encontradas = buscarEspecies($where_info, $pagina_atual, 100);
     }
 }
 

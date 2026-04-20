@@ -151,11 +151,7 @@ function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs): string {
     return ob_get_clean();
 }
 
-require_once __DIR__ . '/../../config/app.php';
-$servidor   = DB_HOST;
-$usuario_db = DB_USER;
-$senha_db   = DB_PASS;
-$banco      = DB_NAME;
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ================================================
 // VERIFICAR SE USUÁRIO ESTÁ LOGADO
@@ -215,22 +211,10 @@ if (empty($dados_caracteristicas)) {
 // A verificação de partes ocorre após conectar ao banco (abaixo).
 
 // ================================================
-// CONECTAR AO BANCO
-// ================================================
-$conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
-
-if ($conexao->connect_error) {
-    error_log("ERRO: Falha na conexão com banco");
-    die("Erro de conexão: " . $conexao->connect_error);
-}
-
-$conexao->set_charset("utf8mb4");
-error_log("Conectado ao banco com sucesso");
-
-// ================================================
 // INICIAR TRANSAÇÃO
 // ================================================
-$conexao->begin_transaction();
+error_log("Conectado ao banco com sucesso");
+$pdo->beginTransaction();
 error_log("Transação iniciada");
 
 try {
@@ -239,101 +223,58 @@ try {
     // 1. SALVAR DADOS DAS CARACTERÍSTICAS
     // ================================================
     error_log("--- Salvando características ---");
-    
-    // Verificar se já existem características para esta espécie
-    $sql_check = "SELECT id FROM especies_caracteristicas WHERE especie_id = ?";
-    $stmt_check = $conexao->prepare($sql_check);
-    $stmt_check->bind_param("i", $especie_id);
-    $stmt_check->execute();
-    $stmt_check->store_result();
-    $ja_existe = $stmt_check->num_rows > 0;
-    $stmt_check->close();
-    
+
+    $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM especies_caracteristicas WHERE especie_id = ?");
+    $stmt_check->execute([$especie_id]);
+    $ja_existe = (int) $stmt_check->fetchColumn() > 0;
+
     error_log("Características já existem? " . ($ja_existe ? "SIM" : "NÃO"));
-    
+
     if ($ja_existe) {
-        // UPDATE - características já existem
-        $sql = "UPDATE especies_caracteristicas SET ";
-        $sets = [];
-        $tipos = "";
+        $sets    = [];
         $valores = [];
-        
         foreach ($dados_caracteristicas as $campo => $valor) {
-            if ($campo != 'especie_id') {
-                $sets[] = "$campo = ?";
+            if ($campo !== 'especie_id') {
+                $sets[]    = "$campo = ?";
                 $valores[] = $valor;
-                $tipos .= "s";
             }
         }
-        
-        $sql .= implode(", ", $sets);
-        $sql .= " WHERE especie_id = ?";
         $valores[] = $especie_id;
-        $tipos .= "i";
-        
+        $sql = "UPDATE especies_caracteristicas SET " . implode(', ', $sets) . " WHERE especie_id = ?";
         error_log("SQL UPDATE: " . $sql);
-        
-        $stmt = $conexao->prepare($sql);
-        $stmt->bind_param($tipos, ...$valores);
-        $stmt->execute();
-        $stmt->close();
-        
+        $pdo->prepare($sql)->execute($valores);
         error_log("UPDATE realizado com sucesso");
-        
     } else {
-        // INSERT - novas características
-        $colunas = implode(", ", array_keys($dados_caracteristicas));
-        $placeholders = implode(", ", array_fill(0, count($dados_caracteristicas), "?"));
+        $colunas      = implode(', ', array_keys($dados_caracteristicas));
+        $placeholders = implode(', ', array_fill(0, count($dados_caracteristicas), '?'));
         $sql = "INSERT INTO especies_caracteristicas ($colunas) VALUES ($placeholders)";
-        
-        $tipos = str_repeat("s", count($dados_caracteristicas));
-        $valores = array_values($dados_caracteristicas);
-        
         error_log("SQL INSERT: " . $sql);
-        
-        $stmt = $conexao->prepare($sql);
-        $stmt->bind_param($tipos, ...$valores);
-        $stmt->execute();
-        $stmt->close();
-        
+        $pdo->prepare($sql)->execute(array_values($dados_caracteristicas));
         error_log("INSERT realizado com sucesso");
     }
-    
+
     // ================================================
     // 2. ATUALIZAR STATUS DA ESPÉCIE (dados_internet)
     // ================================================
     error_log("--- Atualizando status da espécie ---");
-    
-    $sql_status = "UPDATE especies_administrativo 
-                   SET status = 'dados_internet',
-                       autor_dados_internet_id = ?,
-                       data_dados_internet = NOW()
-                   WHERE id = ?";
-    $stmt_status = $conexao->prepare($sql_status);
-    $stmt_status->bind_param("ii", $id_usuario, $especie_id);
-    $stmt_status->execute();
-    $stmt_status->close();
-    
+    $pdo->prepare(
+        "UPDATE especies_administrativo
+         SET status = 'dados_internet', autor_dados_internet_id = ?, data_dados_internet = NOW()
+         WHERE id = ?"
+    )->execute([$id_usuario, $especie_id]);
     error_log("Status atualizado para 'dados_internet'");
-    
+
     // ================================================
     // 3. (IMAGENS JÁ SALVAS) — verificar partes obrigatórias no BD
     // ================================================
     $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
 
-    $stmt_partes = $conexao->prepare(
-        "SELECT DISTINCT parte_planta
-           FROM especies_imagens
-          WHERE especie_id = ? AND status_validacao = 'aprovado'"
+    $stmt_partes = $pdo->prepare(
+        "SELECT DISTINCT parte_planta FROM especies_imagens
+         WHERE especie_id = ? AND status_validacao = 'aprovado'"
     );
-    $stmt_partes->bind_param("i", $especie_id);
-    $stmt_partes->execute();
-    $res_partes = $stmt_partes->get_result();
-    $partes_com_imagem = [];
-    while ($row = $res_partes->fetch_assoc()) {
-        $partes_com_imagem[$row['parte_planta']] = true;
-    }
-    $stmt_partes->close();
+    $stmt_partes->execute([$especie_id]);
+    $partes_com_imagem = array_column($stmt_partes->fetchAll(), null, 'parte_planta');
 
     $partes_faltando = [];
     foreach ($partes_obrigatorias as $parte) {
@@ -345,7 +286,7 @@ try {
     if (!empty($partes_faltando)) {
         $msg = 'Imagens obrigatórias ausentes: ' . implode(', ', $partes_faltando) . '. Adicione ao menos uma imagem para cada parte obrigatória.';
         error_log("ERRO: Partes sem imagem: " . implode(', ', $partes_faltando));
-        $conexao->rollback();
+        $pdo->rollBack();
         header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode($msg));
         exit;
     }
@@ -355,7 +296,7 @@ try {
     // ================================================
     // COMMIT - TUDO OK
     // ================================================
-    $conexao->commit();
+    $pdo->commit();
     error_log("COMMIT realizado com sucesso");
 
     // ================================================
@@ -363,42 +304,31 @@ try {
     // ================================================
     error_log("--- Gerando artigo rascunho ---");
     try {
-        $stmt_c = $conexao->prepare("SELECT * FROM especies_caracteristicas WHERE especie_id = ? LIMIT 1");
-        $stmt_c->bind_param("i", $especie_id);
-        $stmt_c->execute();
-        $c_art = $stmt_c->get_result()->fetch_assoc();
-        $stmt_c->close();
+        $stmt_c = $pdo->prepare("SELECT * FROM especies_caracteristicas WHERE especie_id = ? LIMIT 1");
+        $stmt_c->execute([$especie_id]);
+        $c_art = $stmt_c->fetch();
 
-        $stmt_a = $conexao->prepare("SELECT * FROM especies_administrativo WHERE id = ? LIMIT 1");
-        $stmt_a->bind_param("i", $especie_id);
-        $stmt_a->execute();
-        $adm_art = $stmt_a->get_result()->fetch_assoc();
-        $stmt_a->close();
+        $stmt_a = $pdo->prepare("SELECT * FROM especies_administrativo WHERE id = ? LIMIT 1");
+        $stmt_a->execute([$especie_id]);
+        $adm_art = $stmt_a->fetch();
 
-        $stmt_i = $conexao->prepare("
+        $stmt_i = $pdo->prepare("
             SELECT parte_planta, caminho_imagem, autor_imagem, licenca, fonte_nome, fonte_url
             FROM especies_imagens
             WHERE especie_id = ?
             ORDER BY FIELD(parte_planta,'habito','folha','flor','fruto','caule','semente')
         ");
-        $stmt_i->bind_param("i", $especie_id);
-        $stmt_i->execute();
-        $res_i  = $stmt_i->get_result();
-        $imgs_art = [];
-        while ($img = $res_i->fetch_assoc()) $imgs_art[] = $img;
-        $stmt_i->close();
+        $stmt_i->execute([$especie_id]);
+        $imgs_art = $stmt_i->fetchAll();
 
         if ($c_art && $adm_art) {
             $html_art = gerarHtmlArtigoRascunho($adm_art, $c_art, $imgs_art);
 
-            $stmt_art = $conexao->prepare("
+            $pdo->prepare("
                 INSERT INTO artigos (especie_id, texto_html, status, gerado_em)
                 VALUES (?, ?, 'rascunho', NOW())
                 ON DUPLICATE KEY UPDATE texto_html = VALUES(texto_html), atualizado_em = NOW(), status = 'rascunho'
-            ");
-            $stmt_art->bind_param("is", $especie_id, $html_art);
-            $stmt_art->execute();
-            $stmt_art->close();
+            ")->execute([$especie_id, $html_art]);
             error_log("Artigo rascunho gerado: " . strlen($html_art) . " bytes");
         } else {
             error_log("Artigo não gerado: características ou dados administrativos ausentes");
@@ -418,11 +348,9 @@ try {
         $orientador_id = (int)($dados_temporarios['orientador_id'] ?? 0);
 
         // Buscar nome da espécie
-        $stmt_nome = $conexao->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ? LIMIT 1");
-        $stmt_nome->bind_param("i", $especie_id);
-        $stmt_nome->execute();
-        $nome_especie = $stmt_nome->get_result()->fetch_row()[0] ?? "ID $especie_id";
-        $stmt_nome->close();
+        $stmt_nome = $pdo->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ? LIMIT 1");
+        $stmt_nome->execute([$especie_id]);
+        $nome_especie = $stmt_nome->fetchColumn() ?: "ID $especie_id";
 
         $link = APP_URL . '/src/Controllers/artigos_fila.php';
 
@@ -443,11 +371,9 @@ try {
 
         if ($orientador_id > 0) {
             // Notificar orientador específico
-            $stmt_or = $conexao->prepare("SELECT nome, email FROM usuarios WHERE id = ? AND ativo = 1 LIMIT 1");
-            $stmt_or->bind_param("i", $orientador_id);
-            $stmt_or->execute();
-            $or = $stmt_or->get_result()->fetch_assoc();
-            $stmt_or->close();
+            $stmt_or = $pdo->prepare("SELECT nome, email FROM usuarios WHERE id = ? AND ativo = 1 LIMIT 1");
+            $stmt_or->execute([$orientador_id]);
+            $or = $stmt_or->fetch();
 
             if ($or) {
                 $corpo = templateEmail("Nova espécie aguarda revisão", "
@@ -460,13 +386,13 @@ try {
             }
         } else {
             // Sem orientação: notificar todos os especialistas
-            $res_todos = $conexao->query(
+            $res_todos = $pdo->query(
                 "SELECT nome, email FROM usuarios
                  WHERE categoria IN ('revisor') AND ativo = 1
                    AND status_verificacao = 'verificado'"
-            );
+            )->fetchAll();
             $enviados = 0;
-            while ($esp = $res_todos->fetch_assoc()) {
+            foreach ($res_todos as $esp) {
                 $corpo = templateEmail("Nova espécie disponível para orientação", "
                     <p>Olá, <strong>" . htmlspecialchars($esp['nome']) . "</strong>!</p>
                     <p>Uma nova espécie foi importada <strong>sem orientador definido</strong>.
@@ -486,14 +412,11 @@ try {
     // ================================================
     // 7. CONTAR IMAGENS SALVAS E LIMPAR SESSÃO
     // ================================================
-    $stmt_count = $conexao->prepare(
+    $stmt_count = $pdo->prepare(
         "SELECT COUNT(*) FROM especies_imagens WHERE especie_id = ? AND status_validacao = 'aprovado'"
     );
-    $stmt_count->bind_param("i", $especie_id);
-    $stmt_count->execute();
-    $stmt_count->bind_result($imagens_salvas);
-    $stmt_count->fetch();
-    $stmt_count->close();
+    $stmt_count->execute([$especie_id]);
+    $imagens_salvas = (int) $stmt_count->fetchColumn();
 
     unset($_SESSION['importacao_temporaria']);
     error_log("Sessão temporária limpa");
@@ -509,7 +432,7 @@ try {
     // ================================================
     // ROLLBACK EM CASO DE ERRO
     // ================================================
-    $conexao->rollback();
+    $pdo->rollBack();
     
     $erro = "Erro ao salvar dados: " . $e->getMessage();
     error_log("ERRO NA TRANSAÇÃO: " . $erro);
@@ -519,7 +442,6 @@ try {
     exit;
 }
 
-$conexao->close();
 ob_end_flush();
 exit;
 ?>

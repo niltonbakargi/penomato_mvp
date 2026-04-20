@@ -14,11 +14,7 @@ error_reporting(E_ALL);
 session_start();
 ob_start();
 
-require_once __DIR__ . '/../../config/app.php';
-$servidor   = DB_HOST;
-$usuario_db = DB_USER;
-$senha_db   = DB_PASS;
-$banco      = DB_NAME;
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ================================================
 // CONFIGURAÇÕES DE UPLOAD
@@ -161,39 +157,26 @@ function redimensionarImagem($caminho_origem, $caminho_destino, $largura_max = 1
 /**
  * Atualiza o status_imagens da espécie com base nas imagens cadastradas
  */
-function atualizarStatusImagens($conexao, $especie_id) {
+function atualizarStatusImagens($especie_id) {
+    global $pdo;
     $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
-    $partes_completas = 0;
-    
+    $partes_completas    = 0;
+
+    $stmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM especies_imagens WHERE especie_id = ? AND parte_planta = ?"
+    );
     foreach ($partes_obrigatorias as $parte) {
-        $sql = "SELECT COUNT(*) as total FROM especies_imagens 
-                WHERE especie_id = ? AND parte_planta = ?";
-        $stmt = $conexao->prepare($sql);
-        $stmt->bind_param("is", $especie_id, $parte);
-        $stmt->execute();
-        $resultado = $stmt->get_result();
-        $row = $resultado->fetch_assoc();
-        
-        if ($row['total'] > 0) {
-            $partes_completas++;
-        }
-        $stmt->close();
+        $stmt->execute([$especie_id, $parte]);
+        if ((int) $stmt->fetchColumn() > 0) $partes_completas++;
     }
-    
-    if ($partes_completas == count($partes_obrigatorias)) {
-        $novo_status = 'registrada';
-    } else if ($partes_completas > 0) {
-        $novo_status = 'internet';
-    } else {
-        $novo_status = 'sem_imagens';
-    }
-    
-    $sql_update = "UPDATE especies_administrativo SET status_imagens = ? WHERE id = ?";
-    $stmt_update = $conexao->prepare($sql_update);
-    $stmt_update->bind_param("si", $novo_status, $especie_id);
-    $stmt_update->execute();
-    $stmt_update->close();
-    
+
+    $novo_status = $partes_completas === count($partes_obrigatorias)
+        ? 'registrada'
+        : ($partes_completas > 0 ? 'internet' : 'sem_imagens');
+
+    $pdo->prepare("UPDATE especies_administrativo SET status_imagens = ? WHERE id = ?")
+        ->execute([$novo_status, $especie_id]);
+
     return $novo_status;
 }
 
@@ -234,18 +217,6 @@ $licenca = $_POST['licenca'] ?? null;
 $descricao = $_POST['descricao'] ?? null;
 
 // ================================================
-// CONECTAR AO BANCO
-// ================================================
-$conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
-
-if ($conexao->connect_error) {
-    header("Location: ../Views/enviar_imagem.php?especie_id=" . $especie_id . "&parte=" . urlencode($parte_planta) . "&erro=" . urlencode("Erro de conexão com banco."));
-    exit;
-}
-
-$conexao->set_charset("utf8mb4");
-
-// ================================================
 // CRIAR PASTA DE UPLOAD
 // ================================================
 $pasta_raiz = dirname(dirname(__DIR__)) . '/uploads/especies/';
@@ -284,39 +255,24 @@ for ($i = 0; $i < $total_arquivos; $i++) {
     if (redimensionarImagem($arquivo['tmp_name'], $caminho_completo)) {
         
         // Inserir no banco
-        $sql_insert = "INSERT INTO especies_imagens (
-            especie_id, parte_planta, caminho_imagem, nome_original,
-            tamanho_bytes, mime_type, fonte_nome, fonte_url,
-            autor_imagem, licenca, descricao, id_usuario_identificador,
-            status_validacao, data_upload
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprovado', NOW())";
-        
-        $stmt = $conexao->prepare($sql_insert);
-        $stmt->bind_param(
-            "isssissssssi",
-            $especie_id,
-            $parte_planta,
-            $caminho_relativo,
-            $arquivo['name'],
-            $arquivo['size'],
-            $arquivo['type'],
-            $fonte_nome,
-            $fonte_url,
-            $autor_imagem,
-            $licenca,
-            $descricao,
-            $id_usuario
+        $stmt = $pdo->prepare(
+            "INSERT INTO especies_imagens (
+                especie_id, parte_planta, caminho_imagem, nome_original,
+                tamanho_bytes, mime_type, fonte_nome, fonte_url,
+                autor_imagem, licenca, descricao, id_usuario_identificador,
+                status_validacao, data_upload
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprovado', NOW())"
         );
-        
-        if ($stmt->execute()) {
+        if ($stmt->execute([
+            $especie_id, $parte_planta, $caminho_relativo, $arquivo['name'],
+            $arquivo['size'], $arquivo['type'],
+            $fonte_nome, $fonte_url, $autor_imagem, $licenca, $descricao, $id_usuario,
+        ])) {
             $sucessos++;
         } else {
             $erros[] = "Arquivo {$arquivo['name']}: Erro ao salvar no banco.";
-            if (file_exists($caminho_completo)) {
-                unlink($caminho_completo);
-            }
+            if (file_exists($caminho_completo)) unlink($caminho_completo);
         }
-        $stmt->close();
         
     } else {
         $erros[] = "Arquivo {$arquivo['name']}: Erro ao processar imagem.";
@@ -327,10 +283,8 @@ for ($i = 0; $i < $total_arquivos; $i++) {
 // ATUALIZAR STATUS DA ESPÉCIE
 // ================================================
 if ($sucessos > 0) {
-    atualizarStatusImagens($conexao, $especie_id);
+    atualizarStatusImagens($especie_id);
 }
-
-$conexao->close();
 
 // ================================================
 // REDIRECIONAMENTO

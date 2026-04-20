@@ -11,11 +11,7 @@ error_reporting(E_ALL);
 session_start();
 ob_start();
 
-require_once __DIR__ . '/../../config/app.php';
-$servidor   = DB_HOST;
-$usuario_db = DB_USER;
-$senha_db   = DB_PASS;
-$banco      = DB_NAME;
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ================================================
 // VERIFICAR SE USUÁRIO ESTÁ LOGADO
@@ -30,54 +26,26 @@ $id_usuario = $_SESSION['usuario_id'];
 $nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
 
 // ================================================
-// CONECTAR AO BANCO E BUSCAR ESPÉCIES COM STATUS 'sem_dados'
-// ================================================
-$conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
-
-if ($conexao->connect_error) {
-    die("Erro de conexão: " . $conexao->connect_error);
-}
-
-$conexao->set_charset("utf8mb4");
-
-// ================================================
 // BUSCAR ESPECIALISTAS (revisores ativos)
 // ================================================
-$sql_esp = "SELECT id, nome, subtipo_colaborador
-            FROM usuarios
-            WHERE categoria IN ('revisor')
-              AND ativo = 1
-              AND status_verificacao = 'verificado'
-            ORDER BY nome";
-$res_esp = $conexao->query($sql_esp);
-$especialistas = [];
-if ($res_esp) {
-    while ($e = $res_esp->fetch_assoc()) $especialistas[] = $e;
-}
+$especialistas = $pdo->query(
+    "SELECT id, nome, subtipo_colaborador
+     FROM usuarios
+     WHERE categoria IN ('revisor') AND ativo = 1 AND status_verificacao = 'verificado'
+     ORDER BY nome"
+)->fetchAll();
 
 // ================================================
 // BUSCAR ESPÉCIES COM STATUS 'sem_dados'
 // ================================================
-$sql = "SELECT id, nome_cientifico
-        FROM especies_administrativo
-        WHERE status = 'sem_dados'
-        ORDER BY nome_cientifico";
+$especies = $pdo->query(
+    "SELECT id, nome_cientifico
+     FROM especies_administrativo
+     WHERE status = 'sem_dados'
+     ORDER BY nome_cientifico"
+)->fetchAll();
 
-$resultado = $conexao->query($sql);
-$especies = [];
-$total_especies = 0;
-
-if ($resultado && $resultado->num_rows > 0) {
-    $total_especies = $resultado->num_rows;
-    while ($linha = $resultado->fetch_assoc()) {
-        $especies[] = [
-            'id' => $linha['id'],
-            'nome_cientifico' => $linha['nome_cientifico']
-        ];
-    }
-}
-
-$conexao->close();
+$total_especies = count($especies);
 
 // ================================================
 // PROCESSAR SELEÇÃO DA ESPÉCIE

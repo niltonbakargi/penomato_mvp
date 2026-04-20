@@ -12,7 +12,7 @@
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/../../config/app.php';
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ============================================================
 // AUTENTICAÇÃO
@@ -42,19 +42,9 @@ $especie_id = $_SESSION['importacao_temporaria']['especie_id'];
 // ============================================================
 // BUSCAR NOME CIENTÍFICO NO BANCO
 // ============================================================
-$conexao = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-if ($conexao->connect_error) {
-    echo json_encode(['sucesso' => false, 'erro' => 'Erro ao conectar ao banco de dados.']);
-    exit;
-}
-$conexao->set_charset('utf8mb4');
-
-$stmt = $conexao->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ?");
-$stmt->bind_param("i", $especie_id);
-$stmt->execute();
-$row = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-$conexao->close();
+$stmt = $pdo->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ?");
+$stmt->execute([$especie_id]);
+$row = $stmt->fetch();
 
 $nome_cientifico = $row['nome_cientifico'] ?? '';
 if (empty($nome_cientifico)) {

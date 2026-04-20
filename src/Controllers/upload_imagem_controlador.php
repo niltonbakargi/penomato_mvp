@@ -24,11 +24,7 @@
 session_start();
 ob_start();
 
-require_once __DIR__ . '/../../config/app.php';
-$servidor = DB_HOST;
-$usuario  = DB_USER;
-$senha    = DB_PASS;
-$banco    = DB_NAME;
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // Configurações de upload
 $pasta_upload = dirname(dirname(__DIR__)) . '/uploads/exsicatas/';
@@ -169,61 +165,27 @@ function redimensionarImagem($caminho_origem, $caminho_destino, $largura_max = 1
 /**
  * ATUALIZADO: Verifica se espécie pode avançar para 'registrada'
  */
-function verificarEAvancarStatus($conexao, $especie_id) {
-    // 1. Verificar status atual da espécie
-    $sql = "SELECT status FROM especies_administrativo WHERE id = ?";
-    $stmt = mysqli_prepare($conexao, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $especie_id);
-    mysqli_stmt_execute($stmt);
-    $resultado = mysqli_stmt_get_result($stmt);
-    $dados = mysqli_fetch_assoc($resultado);
-    mysqli_stmt_close($stmt);
-    
-    $status_atual = $dados['status'] ?? '';
-    
-    // 2. Se não está em status que pode avançar, mantém
+function verificarEAvancarStatus($especie_id) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT status FROM especies_administrativo WHERE id = ?");
+    $stmt->execute([$especie_id]);
+    $status_atual = $stmt->fetchColumn() ?: '';
+
     if (!in_array($status_atual, ['dados_internet', 'descrita'])) {
         return $status_atual;
     }
-    
-    // 3. Verificar se tem imagens de todas as partes obrigatórias
+
     $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
-    $todas_as_partes = true;
-    
+    $stmt_c = $pdo->prepare("SELECT COUNT(*) FROM imagens_especies WHERE especie_id = ? AND parte = ?");
     foreach ($partes_obrigatorias as $parte) {
-        $sql = "SELECT COUNT(*) as total FROM imagens_especies 
-                WHERE especie_id = ? AND parte = ?";
-        $stmt = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($stmt, "is", $especie_id, $parte);
-        mysqli_stmt_execute($stmt);
-        $resultado = mysqli_stmt_get_result($stmt);
-        $dados = mysqli_fetch_assoc($resultado);
-        mysqli_stmt_close($stmt);
-        
-        if ($dados['total'] == 0) {
-            $todas_as_partes = false;
-            break;
-        }
+        $stmt_c->execute([$especie_id, $parte]);
+        if ((int) $stmt_c->fetchColumn() === 0) return $status_atual;
     }
-    
-    // 4. Se tem todas as partes, avança para 'registrada'
-    if ($todas_as_partes) {
-        $novo_status = 'registrada';
-        
-        $sql_update = "UPDATE especies_administrativo 
-                       SET status = ?,
-                           data_registrada = NOW()
-                       WHERE id = ?";
-        
-        $stmt = mysqli_prepare($conexao, $sql_update);
-        mysqli_stmt_bind_param($stmt, "si", $novo_status, $especie_id);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-        
-        return $novo_status;
-    }
-    
-    return $status_atual;
+
+    $pdo->prepare(
+        "UPDATE especies_administrativo SET status = 'registrada', data_registrada = NOW() WHERE id = ?"
+    )->execute([$especie_id]);
+    return 'registrada';
 }
 
 // ================================================
@@ -274,108 +236,60 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['imagem'])) {
         
         error_log("Processando: especie_id={$especie_id}, parte={$parte}, usuario={$id_usuario}");
         
-        // Conecta ao banco
-        $conexao = mysqli_connect($servidor, $usuario, $senha, $banco);
-        
-        if (!$conexao) {
-            $erro = 'Erro ao conectar ao banco de dados.';
-            error_log("ERRO: Falha na conexão com BD");
+        // Valida se a espécie existe
+        $stmt_chk = $pdo->prepare("SELECT id, nome_cientifico, status FROM especies_administrativo WHERE id = ?");
+        $stmt_chk->execute([$especie_id]);
+        $especie = $stmt_chk->fetch();
+
+        if (!$especie) {
+            $erro = 'Espécie não encontrada.';
+            error_log("ERRO: Espécie ID {$especie_id} não encontrada");
         } else {
-            mysqli_set_charset($conexao, "utf8mb4");
-            
-            // Valida se a espécie existe
-            $sql_check = "SELECT id, nome_cientifico, status FROM especies_administrativo WHERE id = ?";
-            $stmt = mysqli_prepare($conexao, $sql_check);
-            mysqli_stmt_bind_param($stmt, "i", $especie_id);
-            mysqli_stmt_execute($stmt);
-            $resultado = mysqli_stmt_get_result($stmt);
-            $especie = mysqli_fetch_assoc($resultado);
-            mysqli_stmt_close($stmt);
-            
-            if (!$especie) {
-                $erro = 'Espécie não encontrada.';
-                error_log("ERRO: Espécie ID {$especie_id} não encontrada");
-            } else {
-                
-                // Valida a imagem
-                $arquivo = $_FILES['imagem'];
-                
-                if (validarImagem($arquivo, $erro)) {
-                    
-                    // Cria pasta de upload
-                    $pasta_raiz = dirname(dirname(__DIR__)) . '/uploads/exsicatas/';
-                    $pasta_especie = $pasta_raiz . $especie_id . '/';
-                    
-                    error_log("Criando pasta: " . $pasta_especie);
-                    criarPastasUpload($pasta_especie);
-                    
-                    // Gera nome do arquivo
-                    $extensao = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
-                    $nome_arquivo = gerarNomeArquivo($especie_id, $parte, $extensao);
-                    $caminho_completo = $pasta_especie . $nome_arquivo;
-                    $caminho_relativo = 'uploads/exsicatas/' . $especie_id . '/' . $nome_arquivo;
-                    
-                    error_log("Salvando imagem em: " . $caminho_completo);
-                    
-                    // Redimensiona e salva a imagem
-                    if (redimensionarImagem($arquivo['tmp_name'], $caminho_completo)) {
-                        
-                        // Insere no banco (assumindo que todos os campos existem)
-                        $sql_insert = "INSERT INTO imagens_especies (
-                            especie_id,
-                            parte,
-                            caminho_imagem,
-                            id_usuario_identificador,
-                            data_upload,
-                            descricao,
-                            localizacao,
-                            data_coleta,
-                            observacoes
-                        ) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)";
-                        
-                        $stmt = mysqli_prepare($conexao, $sql_insert);
-                        mysqli_stmt_bind_param($stmt, 
-                            "ississss", 
-                            $especie_id,
-                            $parte,
-                            $caminho_relativo,
-                            $id_usuario,
-                            $descricao,
-                            $localizacao,
-                            $data_coleta,
-                            $observacoes
+            $arquivo = $_FILES['imagem'];
+
+            if (validarImagem($arquivo, $erro)) {
+                $pasta_raiz    = dirname(dirname(__DIR__)) . '/uploads/exsicatas/';
+                $pasta_especie = $pasta_raiz . $especie_id . '/';
+                error_log("Criando pasta: " . $pasta_especie);
+                criarPastasUpload($pasta_especie);
+
+                $extensao       = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
+                $nome_arquivo   = gerarNomeArquivo($especie_id, $parte, $extensao);
+                $caminho_completo = $pasta_especie . $nome_arquivo;
+                $caminho_relativo = 'uploads/exsicatas/' . $especie_id . '/' . $nome_arquivo;
+                error_log("Salvando imagem em: " . $caminho_completo);
+
+                if (redimensionarImagem($arquivo['tmp_name'], $caminho_completo)) {
+                    try {
+                        $stmt_ins = $pdo->prepare(
+                            "INSERT INTO imagens_especies
+                             (especie_id, parte, caminho_imagem, id_usuario_identificador,
+                              data_upload, descricao, localizacao, data_coleta, observacoes)
+                             VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)"
                         );
-                        
-                        if (mysqli_stmt_execute($stmt)) {
-                            $imagem_id = mysqli_insert_id($conexao);
-                            
-                            // Verifica se pode avançar para 'registrada'
-                            $novo_status = verificarEAvancarStatus($conexao, $especie_id);
-                            
-                            $sucesso = "Imagem enviada com sucesso! ID: {$imagem_id}";
-                            error_log("SUCESSO: Imagem {$imagem_id} salva. Status da espécie: {$novo_status}");
-                            
-                        } else {
-                            $erro = "Erro ao salvar dados no banco: " . mysqli_error($conexao);
-                            error_log("ERRO BD: " . mysqli_error($conexao));
-                            
-                            // Remove arquivo se falhou no banco
-                            if (file_exists($caminho_completo)) {
-                                unlink($caminho_completo);
-                                error_log("Arquivo removido: " . $caminho_completo);
-                            }
+                        $stmt_ins->execute([
+                            $especie_id, $parte, $caminho_relativo, $id_usuario,
+                            $descricao, $localizacao, $data_coleta, $observacoes,
+                        ]);
+                        $imagem_id  = $pdo->lastInsertId();
+                        $novo_status = verificarEAvancarStatus($especie_id);
+                        $sucesso = "Imagem enviada com sucesso! ID: {$imagem_id}";
+                        error_log("SUCESSO: Imagem {$imagem_id} salva. Status da espécie: {$novo_status}");
+                    } catch (PDOException $ex) {
+                        $erro = "Erro ao salvar dados no banco: " . $ex->getMessage();
+                        error_log("ERRO BD: " . $ex->getMessage());
+                        if (file_exists($caminho_completo)) {
+                            unlink($caminho_completo);
+                            error_log("Arquivo removido: " . $caminho_completo);
                         }
-                        mysqli_stmt_close($stmt);
-                        
-                    } else {
-                        $erro = "Erro ao processar a imagem.";
-                        error_log("ERRO: Falha ao redimensionar/salvar imagem");
                     }
                 } else {
-                    error_log("ERRO validação: " . $erro);
+                    $erro = "Erro ao processar a imagem.";
+                    error_log("ERRO: Falha ao redimensionar/salvar imagem");
                 }
+            } else {
+                error_log("ERRO validação: " . $erro);
             }
-            mysqli_close($conexao);
         }
     }
 } else {
