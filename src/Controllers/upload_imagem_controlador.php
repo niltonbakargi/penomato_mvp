@@ -24,11 +24,11 @@
 session_start();
 ob_start();
 
-// Configurações do banco
-$servidor = "127.0.0.1";
-$usuario = "root";
-$senha = "";
-$banco = "penomato";
+require_once __DIR__ . '/../../config/app.php';
+$servidor = DB_HOST;
+$usuario  = DB_USER;
+$senha    = DB_PASS;
+$banco    = DB_NAME;
 
 // Configurações de upload
 $pasta_upload = dirname(dirname(__DIR__)) . '/uploads/exsicatas/';

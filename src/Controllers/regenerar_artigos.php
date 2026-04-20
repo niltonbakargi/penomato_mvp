@@ -5,8 +5,15 @@
  * existentes no banco usando o gerador de texto atual.
  * Delete este arquivo após o uso.
  */
+session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 require_once __DIR__ . '/../Config/gerador_texto_botanico.php';
+
+// Apenas gestores podem acessar esta ferramenta
+if (empty($_SESSION['usuario_id']) || ($_SESSION['usuario_tipo'] ?? '') !== 'gestor') {
+    http_response_code(403);
+    die('Acesso negado. Apenas gestores podem usar esta ferramenta.');
+}
 
 // ── helpers (mesmos do gerar_artigo.php) ────────────────────────────────
 function ref2(string $refs): string {

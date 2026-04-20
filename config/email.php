@@ -35,11 +35,15 @@ define('APP_NOME',             'Penomato');
 //   User: seu@gmail.com  | Pass: senha de app (não a senha normal)
 // ============================================================
 
-define('SMTP_HOST',       'mail.penomato.app.br');
-define('SMTP_PORT',       465);
-define('SMTP_USER',       'noreply@penomato.app.br');
-define('SMTP_PASS',       'd^^HT[zIdy41');
-define('SMTP_ENCRYPTION', PHPMailer::ENCRYPTION_SMTPS);
+// Credenciais SMTP ficam em config/dev_local.php (dev) ou config/producao.php (prod).
+// Nunca coloque senhas reais aqui — este arquivo vai para o git.
+if (!defined('SMTP_HOST')) {
+    define('SMTP_HOST',       'localhost');
+    define('SMTP_PORT',       1025);
+    define('SMTP_USER',       '');
+    define('SMTP_PASS',       '');
+    define('SMTP_ENCRYPTION', '');
+}
 
 // ============================================================
 // FUNÇÃO PRINCIPAL

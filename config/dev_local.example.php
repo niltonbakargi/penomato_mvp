@@ -10,3 +10,10 @@
 define('AI_PROVIDER', 'deepseek');
 define('AI_API_KEY',  'sk-COLE_SUA_CHAVE_AQUI');
 define('AI_MODEL',    '');   // '' usa o padrão de cada provider
+
+// ── SMTP (dev — use Mailtrap: mailtrap.io) ────────────────────
+define('SMTP_HOST',       'sandbox.smtp.mailtrap.io');
+define('SMTP_PORT',       587);
+define('SMTP_USER',       'COLE_SEU_USER_MAILTRAP');
+define('SMTP_PASS',       'COLE_SUA_SENHA_MAILTRAP');
+define('SMTP_ENCRYPTION', 'tls');

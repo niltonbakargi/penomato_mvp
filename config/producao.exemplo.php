@@ -20,9 +20,13 @@ define('DB_PASS',    'SUA_SENHA_AQUI');
 define('DB_CHARSET', 'utf8mb4');
 
 // ── IA ───────────────────────────────────────────────────────
-// Escolha o provedor: 'claude', 'openai', 'gemini' ou 'deepseek'
-// Deixe AI_PROVIDER vazio ('') para desativar o botão de IA.
 define('AI_PROVIDER', 'claude');          // 'claude' | 'openai' | 'gemini' | 'deepseek' | ''
 define('AI_API_KEY',  'sk-ant-api03-SUACHAVEAQUI');
-define('AI_MODEL',    '');                // deixe '' para usar o padrão de cada provider
-                                          // deepseek: 'deepseek-chat' | 'deepseek-reasoner'
+define('AI_MODEL',    '');
+
+// ── SMTP (produção — servidor de email da Hostinger) ──────────
+define('SMTP_HOST',       'mail.penomato.app.br');
+define('SMTP_PORT',       465);
+define('SMTP_USER',       'noreply@penomato.app.br');
+define('SMTP_PASS',       'SUA_SENHA_EMAIL_AQUI');
+define('SMTP_ENCRYPTION', 'ssl');
