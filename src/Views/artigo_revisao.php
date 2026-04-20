@@ -950,11 +950,17 @@ $nomes_partes = [
             </div>
         </div>
 
+        <?php if (!empty($_GET['erro'])): ?>
+        <div style="background:#f8d7da;border:1px solid #f5c6cb;color:#721c24;padding:12px 18px;border-radius:8px;margin-bottom:16px;">
+            ⚠️ <?php echo htmlspecialchars($_GET['erro']); ?>
+        </div>
+        <?php endif; ?>
+
         <!-- DECISÃO DA REVISÃO -->
         <div class="decision-box">
             <div class="decision-title">⚖️ DECISÃO DA REVISÃO</div>
             
-            <form id="formDecisao" method="POST" action="/penomato_mvp/src/Controllers/controlador_painel_revisor.php">
+            <form id="formDecisao" method="POST" action="<?php echo APP_BASE; ?>/src/Controllers/controlador_painel_revisor.php">
                 <input type="hidden" name="especie_id" value="<?php echo $especie_id; ?>">
                 
                 <div class="radio-group">

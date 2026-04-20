@@ -197,6 +197,16 @@
             <div class="user-badge"><?php echo htmlspecialchars($usuario_nome); ?> · <?php echo htmlspecialchars($usuario_instituicao ?: 'Penomato'); ?></div>
         </div>
 
+        <?php if (!empty($_GET['sucesso'])): ?>
+        <div class="alert" style="background:#d4edda;border:1px solid #c3e6cb;color:#155724;padding:12px 18px;border-radius:8px;margin-bottom:16px;">
+            ✅ <?php echo htmlspecialchars($_GET['sucesso']); ?>
+        </div>
+        <?php elseif (!empty($_GET['erro'])): ?>
+        <div class="alert" style="background:#f8d7da;border:1px solid #f5c6cb;color:#721c24;padding:12px 18px;border-radius:8px;margin-bottom:16px;">
+            ⚠️ <?php echo htmlspecialchars($_GET['erro']); ?>
+        </div>
+        <?php endif; ?>
+
         <!-- BARRA DE AÇÕES -->
         <div class="actions-bar">
             <button class="btn" onclick="abrirModalNovaRevisao()">➕ NOVA REVISÃO</button>
