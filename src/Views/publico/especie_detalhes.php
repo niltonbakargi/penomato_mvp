@@ -164,7 +164,10 @@ if (!empty($ids)) {
         WHERE especie_id IN ($placeholders)
         ORDER BY especie_id, data_upload DESC");
     $stmt_img->execute($ids);
+    $raiz_fisica = __DIR__ . '/../../../';
     foreach ($stmt_img->fetchAll(PDO::FETCH_ASSOC) as $img) {
+        // Só exibe imagens cujo arquivo existe em disco
+        if (!file_exists($raiz_fisica . $img['caminho_imagem'])) continue;
         $imagens[$img['especie_id']][$img['parte_planta']][] = [
             'url'       => '/penomato_mvp/' . $img['caminho_imagem'],
             'fonte'     => $img['fonte_nome']    ?? '',

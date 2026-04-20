@@ -45,9 +45,17 @@ $model    = defined('AI_MODEL') ? AI_MODEL : null;
 // PROMPT (mesmo usado na seção manual da página)
 // ============================================================
 $prompt = <<<PROMPT
-Você é um especialista em botânica sistemática. Preencha o JSON abaixo com as características botânicas da espécie indicada.
+Você é um especialista em botânica sistemática com foco na flora brasileira, especialmente do Cerrado. Preencha o JSON abaixo com as características botânicas da espécie indicada.
 
 ESPÉCIE-ALVO: {$nome_cientifico}
+
+FONTES PREFERENCIAIS (use estas quando disponíveis, nesta ordem de prioridade):
+- Flora e Funga do Brasil / REFLORA (reflora.jbrj.gov.br) — nomenclatura e distribuição
+- LORENZI, H. Árvores Brasileiras (vol. 1, 2, 3) — morfologia e ecologia
+- MENDONÇA, R.C. et al. Flora Vascular do Cerrado — espécies do Cerrado
+- BARROSO, G.M. et al. Frutos e Sementes — frutos e sementes
+- RIZZINI, C.T. Árvores e Madeiras Úteis do Brasil — caule e madeira
+- Periódicos indexados (Rodriguésia, Acta Botanica Brasilica, Hoehnea) — dados específicos
 
 REGRAS OBRIGATÓRIAS — leia antes de responder:
 
@@ -209,10 +217,12 @@ $erro_api       = null;
 if ($provider === 'claude') {
 
     // --- Anthropic Claude ---
-    $modelo = $model ?? 'claude-opus-4-6';
+    $modelo = $model ?? 'claude-sonnet-4-6';
     $payload = json_encode([
         'model'      => $modelo,
-        'max_tokens' => 4096,
+        'max_tokens' => 8192,
+        'temperature' => 0.2,
+        'system'     => 'Você é um especialista em botânica sistemática com foco na flora brasileira. Responda sempre em JSON válido, sem markdown, sem texto fora do JSON.',
         'messages'   => [
             ['role' => 'user', 'content' => $prompt]
         ],
@@ -252,10 +262,10 @@ if ($provider === 'claude') {
     $payload = json_encode([
         'model'    => $modelo,
         'messages' => [
-            ['role' => 'system', 'content' => 'Você é um especialista em botânica sistemática. Responda sempre em JSON válido, sem markdown.'],
+            ['role' => 'system', 'content' => 'Você é um especialista em botânica sistemática com foco na flora brasileira. Responda sempre em JSON válido, sem markdown.'],
             ['role' => 'user',   'content' => $prompt],
         ],
-        'max_tokens'  => 4096,
+        'max_tokens'  => 8192,
         'temperature' => 0.2,
     ]);
 
@@ -296,7 +306,7 @@ if ($provider === 'claude') {
         ],
         'generationConfig' => [
             'temperature'     => 0.2,
-            'maxOutputTokens' => 4096,
+            'maxOutputTokens' => 8192,
         ],
     ]);
 
@@ -330,10 +340,10 @@ if ($provider === 'claude') {
     $payload = json_encode([
         'model'    => $modelo,
         'messages' => [
-            ['role' => 'system', 'content' => 'Você é um especialista em botânica sistemática. Responda sempre em JSON válido, sem markdown.'],
+            ['role' => 'system', 'content' => 'Você é um especialista em botânica sistemática com foco na flora brasileira. Responda sempre em JSON válido, sem markdown.'],
             ['role' => 'user',   'content' => $prompt],
         ],
-        'max_tokens'  => 4096,
+        'max_tokens'  => 8192,
         'temperature' => 0.2,
     ]);
 

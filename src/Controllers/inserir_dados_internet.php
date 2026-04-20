@@ -162,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penomato - Importar Dados da Espécie</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../assets/css/estilo.css">
     <style>
         /* ── Planilha de campos ── */
         .section-title {
@@ -838,14 +839,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         ══════════════════════════════════════════ -->
         <div class="paper-card">
 
-            <?php if (defined('AI_PROVIDER') && AI_PROVIDER !== ''): ?>
             <div class="ia-toolbar">
                 <button type="button" id="btn_pesquisar_ia" class="btn btn-primary">
                     🤖 Pesquisar com IA
                 </button>
             </div>
             <div id="ia_status" style="display:none;" class="alert"></div>
-            <?php endif; ?>
+
+            <div id="form_wrapper" style="display:none;">
 
             <div class="alert alert-info" style="margin-bottom:20px;">
                 <i class="fas fa-info-circle"></i>
@@ -1618,6 +1619,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     ⚠️ Após finalizar, todas as imagens e dados serão salvos permanentemente.
                 </p>
             </form>
+            </div><!-- /#form_wrapper -->
         </div>
 
 
@@ -1720,13 +1722,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     preenchidos++;
                 });
 
+                // Revelar formulário
+                document.getElementById('form_wrapper').style.display = 'block';
+
                 if (resp.campos_divergentes && resp.campos_divergentes.length > 0) {
                     abrirModalDivergentes(resp.campos_divergentes);
                 } else {
                     statusDiv.style.display = 'block';
                     statusDiv.className = 'alert alert-success';
                     statusDiv.textContent = '✅ ' + preenchidos + ' campos preenchidos! Revise e finalize.';
-                    document.getElementById('form_principal').scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('form_wrapper').scrollIntoView({ behavior: 'smooth' });
                 }
             })
             .catch(function(err) {
@@ -1813,7 +1818,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         statusDiv.style.display = 'block';
         statusDiv.className = 'alert alert-success';
         statusDiv.textContent = '✅ Campos preenchidos e divergências resolvidas! Revise e finalize.';
-        document.getElementById('form_principal').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('form_wrapper').scrollIntoView({ behavior: 'smooth' });
     }
 
 

@@ -635,12 +635,23 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
 
         .btn-secondary {
-            background-color: var(--cinza-500);
+            background-color: #6c757d;
             color: white;
         }
 
         .btn-secondary:hover {
             background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-limpar {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107 !important;
+        }
+
+        .btn-limpar:hover {
+            background-color: #ffe69c;
             transform: translateY(-2px);
         }
 
@@ -1038,12 +1049,14 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             <!-- BOTÕES DE AÇÃO GLOBAL - MODIFICADO -->
             <!-- ================================================ -->
             <div class="action-buttons">
-                <!-- NOVO BOTÃO: AVANÇAR PARA DADOS (sempre visível) -->
                 <a href="../Controllers/inserir_dados_internet.php?temp_id=<?php echo urlencode($temp_id); ?>" class="btn btn-avancar">
                     ➡️ AVANÇAR PARA DADOS (PASSO 3)
                 </a>
-                
-                <!-- Botão cancelar (mantido) -->
+
+                <button type="button" id="btn_limpar_sessao" class="btn btn-limpar">
+                    🗑️ LIMPAR E RECOMEÇAR
+                </button>
+
                 <a href="escolher_especie.php" class="btn btn-secondary" onclick="return confirm('Tem certeza? Todo o progresso atual será perdido.')">
                     ⏪ CANCELAR IMPORTAÇÃO
                 </a>
@@ -1517,6 +1530,37 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             alert('Por favor, cole uma imagem primeiro!');
             return;
         }
+    });
+
+    // ================================================
+    // LIMPAR IMAGENS E RECOMEÇAR
+    // ================================================
+    document.getElementById('btn_limpar_sessao').addEventListener('click', function() {
+        if (!confirm('Isso vai apagar TODAS as imagens salvas desta espécie (banco + disco) e reiniciar o processo. Confirma?')) return;
+
+        const btn = this;
+        btn.disabled = true;
+        btn.textContent = '⏳ Limpando...';
+
+        const fd = new FormData();
+        fd.append('temp_id', '<?php echo addslashes($temp_id); ?>');
+
+        fetch('../Controllers/limpar_importacao_especie.php', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(resp => {
+            if (resp.sucesso) {
+                window.location.reload();
+            } else {
+                alert('Erro: ' + resp.erro);
+                btn.disabled = false;
+                btn.textContent = '🗑️ LIMPAR IMAGENS E RECOMEÇAR';
+            }
+        })
+        .catch(err => {
+            alert('Erro de rede: ' + err.message);
+            btn.disabled = false;
+            btn.textContent = '🗑️ LIMPAR IMAGENS E RECOMEÇAR';
+        });
     });
     </script>
 </body>

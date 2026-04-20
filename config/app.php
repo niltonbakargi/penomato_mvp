@@ -51,9 +51,14 @@ if ($is_prod) {
     error_reporting(E_ALL);
 
     // ── IA (dev) ─────────────────────────────────────────────
-    // Troque AI_PROVIDER por 'claude', 'openai' ou 'gemini'
-    // e coloque sua chave abaixo para testar localmente.
-    define('AI_PROVIDER', '');   // ex: 'claude'
-    define('AI_API_KEY',  '');   // ex: 'sk-ant-...'
-    define('AI_MODEL',    '');   // deixe '' para usar o padrão de cada provider
+    // Chaves ficam em config/dev_local.php (gitignored).
+    // Copie config/dev_local.example.php para começar.
+    $dev_local = __DIR__ . '/dev_local.php';
+    if (file_exists($dev_local)) {
+        require_once $dev_local;
+    } else {
+        define('AI_PROVIDER', '');
+        define('AI_API_KEY',  '');
+        define('AI_MODEL',    '');
+    }
 }

@@ -363,7 +363,7 @@ if ($provider === 'claude') {
 
 } elseif ($provider === 'deepseek') {
 
-    $modelo_usado = $model ?? 'deepseek-chat';
+    $modelo_usado = $model ?: 'deepseek-chat';
     $payload = json_encode([
         'model'       => $modelo_usado,
         'messages'    => [
@@ -372,32 +372,38 @@ if ($provider === 'claude') {
         ],
         'max_tokens'  => 4096,
         'temperature' => 0.2,
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
 
-    $ch = curl_init('https://api.deepseek.com/chat/completions');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => $payload,
-        CURLOPT_TIMEOUT        => 55,
-        CURLOPT_HTTPHEADER     => [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $api_key,
-        ],
-    ]);
-    $resp      = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_err  = curl_error($ch);
-    curl_close($ch);
-
-    if ($curl_err) {
-        $erro_api = 'Erro de conexão: ' . $curl_err;
-    } elseif ($http_code !== 200) {
-        $erro_api = 'DeepSeek retornou HTTP ' . $http_code . '.';
+    if ($payload === false) {
+        $erro_api = 'Erro ao serializar payload: ' . json_last_error_msg();
     } else {
-        $data = json_decode($resp, true);
-        $resposta_texto = $data['choices'][0]['message']['content'] ?? null;
-        if (!$resposta_texto) $erro_api = 'Resposta inesperada da DeepSeek API.';
+        $ch = curl_init('https://api.deepseek.com/chat/completions');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_TIMEOUT        => 55,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $api_key,
+            ],
+        ]);
+        $resp      = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_err  = curl_error($ch);
+        curl_close($ch);
+
+        if ($curl_err) {
+            $erro_api = 'Erro de conexão: ' . $curl_err;
+        } elseif ($http_code !== 200) {
+            $body = json_decode($resp, true);
+            $detalhe = $body['error']['message'] ?? $resp;
+            $erro_api = 'DeepSeek HTTP ' . $http_code . ': ' . $detalhe;
+        } else {
+            $data = json_decode($resp, true);
+            $resposta_texto = $data['choices'][0]['message']['content'] ?? null;
+            if (!$resposta_texto) $erro_api = 'Resposta inesperada da DeepSeek API.';
+        }
     }
 
 } else {
@@ -414,15 +420,33 @@ if ($erro_api) {
 // LIMPAR E PARSEAR O JSON RETORNADO
 // ============================================================
 $json_limpo = trim($resposta_texto);
+// Remove blocos markdown
 $json_limpo = preg_replace('/^```(?:json)?\s*/i', '', $json_limpo);
 $json_limpo = preg_replace('/\s*```$/', '', $json_limpo);
 $json_limpo = trim($json_limpo);
+// Substitui quebras de linha e tabs literais dentro de valores de string JSON
+// (controle inválido em JSON — DeepSeek às vezes retorna isso no campo referencias)
+$json_limpo = preg_replace_callback(
+    '/"(?:[^"\\\\]|\\\\.)*"/s',
+    function ($m) {
+        $s = $m[0];
+        $s = str_replace("\r\n", '\n', $s);
+        $s = str_replace("\r",   '\n', $s);
+        $s = str_replace("\n",   '\n', $s);
+        $s = str_replace("\t",   '\t', $s);
+        return $s;
+    },
+    $json_limpo
+);
 
 $dados = json_decode($json_limpo, true);
 
 if (json_last_error() !== JSON_ERROR_NONE) {
-    error_log('[Penomato] buscar_dados_especie_ai JSON inválido: ' . $json_limpo);
-    echo json_encode(['sucesso' => false, 'erro' => 'A IA retornou um JSON inválido. Tente novamente.']);
+    echo json_encode([
+        'sucesso' => false,
+        'erro'    => 'JSON inválido: ' . json_last_error_msg(),
+        'raw'     => mb_substr($json_limpo, 0, 500),
+    ]);
     exit;
 }
 
