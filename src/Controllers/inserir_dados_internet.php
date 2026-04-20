@@ -23,11 +23,7 @@ if (!isset($_SESSION['usuario_id'])) {
 $id_usuario = $_SESSION['usuario_id'];
 $nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
 
-require_once __DIR__ . '/../../config/app.php';
-$servidor   = DB_HOST;
-$usuario_db = DB_USER;
-$senha_db   = DB_PASS;
-$banco      = DB_NAME;
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ================================================
 // VERIFICAR SESSÃO TEMPORÁRIA
@@ -48,19 +44,9 @@ $dados_temporarios = $_SESSION['importacao_temporaria'];
 $especie_id = $dados_temporarios['especie_id'];
 
 // Buscar nome da espécie para exibir
-$conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
-if (!$conexao->connect_error) {
-    $conexao->set_charset("utf8mb4");
-    $sql_especie = "SELECT nome_cientifico FROM especies_administrativo WHERE id = ?";
-    $stmt = $conexao->prepare($sql_especie);
-    $stmt->bind_param("i", $especie_id);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    $especie = $resultado->fetch_assoc();
-    $nome_cientifico = $especie['nome_cientifico'] ?? 'Espécie desconhecida';
-    $stmt->close();
-    $conexao->close();
-}
+$stmt_nome = $pdo->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ?");
+$stmt_nome->execute([$especie_id]);
+$nome_cientifico = $stmt_nome->fetchColumn() ?: 'Espécie desconhecida';
 
 // ================================================
 // LISTA DE VALORES PADRONIZADOS PARA VALIDAÇÃO
@@ -842,6 +828,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             <div class="ia-toolbar">
                 <button type="button" id="btn_pesquisar_ia" class="btn btn-primary">
                     🤖 Pesquisar com IA
+                </button>
+                <button type="button" id="btn_manual" class="btn btn-outline-secondary"
+                        onclick="document.getElementById('form_wrapper').style.display='block';this.style.display='none';document.getElementById('form_wrapper').scrollIntoView({behavior:'smooth'});">
+                    ✏️ Preencher manualmente
                 </button>
             </div>
             <div id="ia_status" style="display:none;" class="alert"></div>
@@ -1710,8 +1700,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
 
                 if (!resp.sucesso) {
                     statusDiv.style.display = 'block';
-                    statusDiv.className = 'alert alert-danger';
-                    statusDiv.textContent = '❌ ' + resp.erro;
+                    statusDiv.className = 'alert alert-warning';
+                    statusDiv.textContent = '⚠️ ' + resp.erro + ' — preencha o formulário manualmente abaixo.';
+                    document.getElementById('form_wrapper').style.display = 'block';
+                    document.getElementById('btn_manual').style.display = 'none';
+                    document.getElementById('form_wrapper').scrollIntoView({ behavior: 'smooth' });
                     return;
                 }
 
@@ -1724,6 +1717,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
 
                 // Revelar formulário
                 document.getElementById('form_wrapper').style.display = 'block';
+                document.getElementById('btn_manual').style.display = 'none';
 
                 if (resp.campos_divergentes && resp.campos_divergentes.length > 0) {
                     abrirModalDivergentes(resp.campos_divergentes);
@@ -1738,8 +1732,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                 btnIA.disabled = false;
                 btnIA.textContent = '🤖 Pesquisar com IA';
                 statusDiv.style.display = 'block';
-                statusDiv.className = 'alert alert-danger';
-                statusDiv.textContent = '❌ Erro de rede: ' + err.message;
+                statusDiv.className = 'alert alert-warning';
+                statusDiv.textContent = '⚠️ Erro de rede: ' + err.message + ' — preencha o formulário manualmente abaixo.';
+                document.getElementById('form_wrapper').style.display = 'block';
+                document.getElementById('btn_manual').style.display = 'none';
+                document.getElementById('form_wrapper').scrollIntoView({ behavior: 'smooth' });
             });
         });
     })();
