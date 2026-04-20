@@ -1,0 +1,1100 @@
+PENOMATO: INFRAESTRUTURA COLABORATIVA DE DADOS PARA IDENTIFICACAO DE
+ESPECIES VEGETAIS NATIVAS DO CERRADO — DA DOCUMENTACAO CIENTIFICA
+A EDUCACAO AMBIENTAL
+
+Autor: [nome do autor]
+Orientador: [nome do orientador]
+Instituicao: Universidade Federal de Mato Grosso do Sul (UFMS)
+Curso: [nome do curso]
+Data: 2026
+
+
+================================================================================
+RESUMO
+================================================================================
+
+A identificacao de especies vegetais em florestas nativas e um dos problemas
+mais dificeis enfrentados por profissionais de Engenharia Florestal em campo.
+O conhecimento empirico que permitia aos antigos mateiros nomear cada individuo
+pelo formato da folha, pela textura do caule ou pelo cheiro da casca esta se
+perdendo com o desaparecimento dessa geracao. Projetos de inventario florestal
+e de recuperacao de areas degradadas dependem diretamente dessa capacidade,
+tornando sua erosao um problema pratico com impacto direto na conservacao.
+
+Este trabalho nasce desse problema concreto e descreve a concepcao, o
+desenvolvimento e a avaliacao do Penomato — sistema web colaborativo que e,
+antes de tudo, uma infraestrutura de coleta de dados para viabilizar, no futuro,
+uma ferramenta digital de identificacao de especies vegetais nativas do Cerrado.
+A ideia original era um aplicativo que identificasse especies por caracteristicas
+morfologicas observaveis a olho nu: tipo de folha, textura do caule, cor da flor.
+Evoluiu para identificacao por imagem, onde o usuario fotografaria partes da
+planta e receberia uma lista das especies mais provaveis. O bloqueio foi imediato:
+nao existiam dados de qualidade suficiente para alimentar esse sistema.
+
+A solucao veio de uma descoberta obtida na pesquisa com profissionais de
+Engenharia Florestal: a colaboracao seria motivada por producao cientifica.
+Isso levou ao acoplamento de uma publicacao cientifica por especie como incentivo
+a coleta de dados, e ao padrao de exsicata digital com fotografias sistematicas
+de todas as partes do individuo fisico como criterio de qualidade.
+
+O Penomato MVP e o primeiro elo dessa cadeia. Cada especie documentada alimenta
+um acervo que viabilizara, em versoes futuras, um modelo de inteligencia
+artificial especializado por bioma para identificacao por imagem. Sobre essa
+base de dados, a visao de produto projeta uma camada de gamificacao no estilo
+do Pokemon Go, onde usuarios comuns identificam especies nativas em campo, e
+um jogo de recuperacao ambiental onde as especies capturadas sao usadas para
+reflorear areas virtuais. O destino final e uma plataforma de educacao ambiental
+acessivel a qualquer pessoa com acesso a internet.
+
+O trabalho adota o paradigma da Design Science Research (DSR) como metodologia.
+A avaliacao de usabilidade e conduzida com usuarios reais da UEMS, utilizando
+protocolo think-aloud e o questionario System Usability Scale (SUS). O sistema
+e implementado com tecnologias abertas e de baixo custo operacional.
+
+Palavras-chave: identificacao de especies vegetais; inventario florestal;
+exsicata digital; sistema colaborativo; Cerrado; Design Science Research;
+educacao ambiental; inteligencia artificial aplicada a botanica.
+
+
+================================================================================
+ABSTRACT
+================================================================================
+
+This paper describes the development and evaluation of Penomato, a collaborative
+web system designed to structure the complete digital documentation cycle for
+herbarium specimens and phytomorphological descriptions of native plant species
+of the Brazilian Cerrado. The system integrates, in a single traceable workflow,
+the steps of institutional demand registration, insertion of morphological
+reference data, field photographic recording linked to individualized and
+georeferenced physical specimens, attribute confirmation by specialists,
+automated generation of structured scientific articles, and publication of
+species records accessible as environmental education resources. The work adopts
+the Design Science Research paradigm as its research methodology, with the
+software artifact as the central object of investigation. Usability evaluation is
+conducted with real users from the partner research group, using a think-aloud
+protocol and the System Usability Scale (SUS) questionnaire. Penomato is
+implemented with open-source, low-cost technologies, making it deployable in
+public teaching and research institutions without specialized infrastructure.
+Expected results include a functional MVP with all cycle modules implemented,
+an original data model for photographic documentation linked to physical
+specimens, and empirical usability validation with the defined target audience.
+
+Keywords: botanical documentation; digital herbarium specimen; collaborative
+system; Cerrado; Design Science Research; automated scientific article generation.
+
+
+================================================================================
+1. INTRODUCAO
+================================================================================
+
+Entrar em uma floresta nativa e identificar os individuos presentes e, para
+qualquer profissional de Engenharia Florestal, um dos desafios mais dificeis
+do trabalho de campo. Nao se trata apenas de um problema academico ou de
+nomenclatura: a identificacao correta das especies e pre-requisito para
+inventarios florestais, laudos de recuperacao de areas degradadas, estudos de
+composicao floristica e projetos de restauracao ecologica. Sem ela, o trabalho
+tecnico nao pode ser concluido com rigor cientifico.
+
+Durante decadas, esse desafio foi enfrentado com o auxilio dos chamados
+mateiros: profissionais com conhecimento empirico profundo da flora local,
+capazes de identificar centenas de especies pelo formato da folha, pela textura
+do caule, pelo aspecto da casca ou pelo cheiro da seiva. Esse conhecimento,
+construido ao longo de geracoes por observacao direta e transmissao oral, esta
+se perdendo. Os mateiros que conheciam o mato estao envelhecendo sem sucessores
+sistematicos, e sua ausencia ja e sentida nos projetos de campo em diversas
+regioes do Cerrado e de outros biomas brasileiros.
+
+O problema motivador deste trabalho e, portanto, esse: como substituir ou
+ampliar digitalmente um conhecimento que foi construido de forma empirica,
+pessoal e nao codificada? Como criar uma ferramenta que permita a qualquer
+profissional de campo, com um celular na mao, identificar uma especie vegetal
+nativa por caracteristicas que ele pode observar diretamente?
+
+A resposta nao surgiu pronta. Ela evoluiu ao longo de varios anos, passando
+por diferentes formas e suportes. O ponto de partida foi uma planilha de Excel
+com abas organizadas por especie e por caracteristicas morfologicas, usada como
+auxiliar de pesquisa pessoal. A partir dela surgiu a ideia de um aplicativo
+que funcionasse como uma chave dicotomica digital: o usuario selecionaria
+caracteristicas visiveis da planta — folha composta ou simples, caule liso ou
+rugoso, flores de cor amarela, fruto capsular ou drupaceo — e o sistema
+retornaria as especies cujos atributos correspondessem ao conjunto informado.
+A logica era simples e elegante: substituir o mateiro por um sistema de filtros
+sobre uma base de dados de caracteristicas morfologicas.
+
+A evolucao seguinte foi o reconhecimento de que filtros textuais, embora uteis,
+tem limites praticos em campo: o usuario nem sempre sabe o nome tecnico da
+caracteristica que esta observando, e a selecao sequential de filtros e lenta
+para quem esta parado no meio do mato. A ideia evoluiu para identificacao por
+imagem: o usuario fotografaria partes da planta e o sistema analisaria a imagem
+contra o banco de dados, retornando uma lista das especies mais provaveis
+ordenadas por grau de correspondencia. Essa abordagem, hoje viabilizada por
+modelos modernos de visao computacional e grandes modelos de linguagem (LLMs)
+especializados em imagem, resolveria o problema da interface e tornaria a
+ferramenta acessivel a qualquer pessoa, nao apenas a especialistas.
+
+O bloqueio critico foi imediato: para que um sistema de identificacao por imagem
+funcione com precisao para especies vegetais especificas de um bioma, ele
+precisa ser treinado com imagens de alta qualidade, sistematicamente coletadas,
+validadas por especialistas e vinculadas a exemplares fisicos identificados com
+certeza. Esse tipo de dado simplesmente nao existia em volume e qualidade
+suficientes para o Cerrado brasileiro.
+
+A solucao para o problema dos dados veio de uma descoberta obtida na pesquisa
+com profissionais de Engenharia Florestal e botanica: a colaboracao sistematica
+desses profissionais na coleta de dados seria motivada, de forma decisiva, pelo
+reconhecimento via producao cientifica. Profissionais da area academica
+contribuem de forma sustentada quando ha credito formal: publicacoes com autoria
+registrada, citaveis em curriculo, reconhecidas pelos pares. Isso levou a um
+reposicionamento fundamental do projeto: em vez de coletar dados de forma
+utilitaria para alimentar um algoritmo, o sistema precisava oferecer, como
+contrapartida ao esforco dos colaboradores, a geracao de publicacoes cientificas
+com atribuicao completa de autoria.
+
+Ao acoplamento da publicacao cientifica como incentivo, somou-se o padrao de
+exsicata digital como criterio de qualidade: cada especie documentada precisaria
+ter fotografias sistematicas de todas as suas partes morfologicas — folha, flor,
+fruto, caule, semente e habito — vinculadas a um individuo fisico especifico
+identificado em campo. Esse padrao, adaptado da tradicao secular das exsicatas
+em papel dos herbarios botanicos, garante que as imagens coletadas tenham valor
+cientifico real, nao sejam apenas fotografias avulsas sem rastreabilidade.
+
+O resultado desse processo de evolucao e o Penomato: sistema web colaborativo
+que e, antes de qualquer outra coisa, uma infraestrutura de coleta e validacao
+de dados botanicos de qualidade cientifica, capaz de crescer de forma
+sustentada porque oferece publicacao como contrapartida ao esforco dos
+colaboradores. Cada especie documentada pelo sistema aumenta o acervo de dados
+que viabilizara, progressivamente, as camadas seguintes da visao: o modelo de
+inteligencia artificial especializado por bioma para identificacao por imagem;
+a camada de gamificacao onde usuarios comuns identificam especies nativas no
+estilo do Pokemon Go e reconstroem areas degradadas em um jogo de recuperacao
+ambiental; e, como destino final de todo esse ecossistema, uma plataforma de
+educacao ambiental acessivel a qualquer pessoa com acesso a internet.
+
+O sistema foi desenvolvido em parceria com o Departamento de Botanica do curso
+de Engenharia Florestal da Universidade Estadual de Mato Grosso do Sul (UEMS),
+instituicao com atuacao reconhecida na pesquisa e conservacao da flora do
+Cerrado sul-mato-grossense. Essa parceria fundamenta tanto a definicao dos
+requisitos quanto o contexto de avaliacao da usabilidade do sistema.
+
+
+1.1 Problema de Pesquisa
+
+O presente trabalho e orientado pelo seguinte problema: como um sistema web
+colaborativo pode estruturar e automatizar o fluxo de documentacao digital de
+especies vegetais, desde o cadastro de exemplares de campo ate a publicacao de
+artigos cientificos, de modo a reduzir a fragmentacao do processo, garantir a
+rastreabilidade e a integridade dos dados produzidos por equipes distribuidas
+e ampliar o acesso ao conhecimento botanico como recurso de educacao ambiental?
+
+
+1.2 Objetivos
+
+O objetivo geral deste trabalho e desenvolver um sistema web colaborativo,
+denominado Penomato, para documentacao digital de exsicatas e descricoes
+fitomorfologicas de especies vegetais nativas do Cerrado, integrando o fluxo
+de producao cientifica desde o cadastro de exemplares de campo ate a publicacao
+de fichas de especies acessiveis como recurso de educacao ambiental.
+
+Para a realizacao desse objetivo, sao estabelecidos os seguintes objetivos
+especificos:
+
+a) Modelar e implementar uma base de dados relacional que vincule registros
+fotograficos de partes vegetais a exemplares fisicos individualizados e
+georeferenciados, garantindo a rastreabilidade e a integridade cientifica de
+cada colecao;
+
+b) Desenvolver fluxos de trabalho colaborativos com controle de estados e
+permissoes diferenciadas por papel de usuario, organizando as etapas de
+insercao, validacao e publicacao dos dados de cada especie;
+
+c) Implementar o modulo de cadastro, aprovacao e visualizacao geografica de
+exemplares, permitindo que especialistas revisem e aprovem registros de campo
+antes que fotos das partes vegetais sejam vinculadas ao sistema;
+
+d) Construir o modulo de confirmacao de atributos fitomorfologicos,
+possibilitando que colaboradores verifiquem e corrijam, atributo a atributo,
+as caracteristicas morfologicas inseridas a partir de fontes de referencia;
+
+e) Desenvolver o mecanismo de geracao automatizada de artigos cientificos
+estruturados a partir dos dados validados, compondo descricoes fitomorfologicas
+com metadados de coleta, galeria de exsicatas e lista de contribuidores;
+
+f) Implementar o fluxo de revisao especializada e publicacao das fichas de
+especies, com historico de alteracoes, rastreabilidade de decisoes e
+contestacao pos-publicacao;
+
+g) Projetar a camada publica do sistema como recurso de educacao ambiental,
+tornando as fichas de especies do Cerrado acessiveis a consulta livre, com
+linguagem e apresentacao adequadas ao publico nao especializado.
+
+
+1.3 Justificativa
+
+A justificativa deste trabalho opera em quatro dimensoes complementares: a
+urgencia ambiental do Cerrado, a demanda pratica dos profissionais de campo,
+a inacessibilidade do conhecimento botanico existente e a ausencia de solucoes
+tecnicas adequadas.
+
+O Cerrado e o segundo maior bioma brasileiro, ocupando aproximadamente dois
+milhoes de quilometros quadrados e abrangendo grande parte do estado de Mato
+Grosso do Sul. E reconhecido internacionalmente como um dos 36 hotspots mundiais
+de biodiversidade, concentrando cerca de 12.356 especies vegetais nativas, das
+quais aproximadamente 4.400 sao endemicas (MYERS et al., 2000; FLORA E FUNGA
+DO BRASIL, 2023). Apesar dessa riqueza, estima-se que apenas 19,8% de sua
+vegetacao nativa permaneca integra (MAPBIOMAS, 2023). Numerosas especies correm
+o risco real de desaparecer antes de serem adequadamente descritas. A velocidade
+de perda de habitat supera o ritmo da documentacao cientifica. Cada especie que
+desaparece sem registro e conhecimento perdido para sempre.
+
+O segundo eixo e a demanda pratica dos profissionais de campo. Projetos de
+inventario florestal, restauracao ecologica, licenciamento ambiental e manejo
+florestal dependem da identificacao correta das especies presentes em uma area.
+Essa identificacao, historicamente realizada com o auxilio de mateiros e de
+chaves dicotomicas impressas, carece de uma alternativa digital pratica,
+acessivel e precisa. A ferramenta que este trabalho busca viabilizar — a longo
+prazo — e precisamente essa: um sistema de identificacao por imagem, treinado
+com dados reais e validados por especialistas, especifico para cada bioma
+brasileiro.
+
+O terceiro eixo e a inacessibilidade do conhecimento botanico existente. As
+descricoes fitomorfologicas produzidas pela ciencia estao publicadas em
+periodicos de acesso restrito, escritas em linguagem tecnica inacessivel ao
+publico geral. O resultado e um paradoxo: o Brasil possui a flora mais diversa
+do mundo, mas a maioria de sua populacao nao consegue nomear ou identificar as
+especies que crescem em seu entorno. A educacao ambiental efetiva exige conteudo
+acessivel, visual e contextualizado — e esse conteudo falta sistematicamente
+para a flora do Cerrado. A plataforma publica do Penomato, com fichas de especies
+em linguagem acessivel, fotografias organizadas parte a parte e mapas de
+ocorrencia, e uma resposta direta a essa demanda.
+
+O quarto eixo e tecnico: nao existe solucao especificamente projetada para o
+fluxo de trabalho de equipes de botanica de campo em formacao academica. As
+principais plataformas digitais voltadas a flora brasileira — SpeciesLink, GBIF,
+SiBBr — foram concebidas para a interoperabilidade de dados ja existentes, nao
+para mediar o processo de producao desses dados. Ferramentas de gestao de
+herbarios como o BRAHMS e o Specify sao sistemas complexos, instalados
+localmente, voltados a herbarios institucionais consolidados, sem suporte a
+colaboracao distribuida ou a fluxo de publicacao. O iNaturalist permite registros
+pontuais por cidadaos cientistas, mas nao o registro sistematico de todas as
+partes de um especime vinculado a um individuo fisico, com validacao por
+especialista e geracao de artigo cientifico. O Penomato ocupa esse espaco
+especifico, nao atendido pelas solucoes existentes.
+
+A justificativa final e temporal: o acervo de dados necessario para viabilizar
+um sistema de identificacao por imagem robusto nao se constroi rapidamente.
+Quanto mais cedo a infraestrutura de coleta estiver em operacao, mais cedo
+esses dados estarao disponiveis. O MVP desenvolvido neste trabalho e o inicio
+desse processo.
+
+
+1.4 Estrutura do Trabalho
+
+O presente trabalho esta organizado em seis capitulos. O Capitulo 1 apresenta
+o contexto, o problema, os objetivos e a justificativa da pesquisa. O Capitulo
+2 desenvolve o referencial teorico, situando o trabalho no conjunto de
+conhecimentos consolidados sobre exsicatas digitais, sistemas colaborativos,
+modelagem de fluxos de trabalho, georeferenciamento e geracao automatizada de
+documentos. O Capitulo 3 descreve a metodologia adotada, fundamentada no
+paradigma da Design Science Research. O Capitulo 4 apresenta o sistema Penomato
+em detalhe: sua arquitetura, seus atores, seu modelo de dados, seus modulos
+funcionais e as regras de negocio que governam o ciclo de documentacao. O
+Capitulo 5 apresenta os resultados da avaliacao de usabilidade realizada com
+os usuarios reais do grupo parceiro. O Capitulo 6 conclui o trabalho,
+sintetizando as contribuicoes, as limitacoes do MVP e o horizonte de evolucao
+do sistema.
+
+
+================================================================================
+2. REFERENCIAL TEORICO
+================================================================================
+
+2.1 Exsicatas e Herarios Digitais
+
+A exsicata e o registro fisico fundamental da botanica sistematica. Consiste em
+um especime vegetal coletado, prensado, seco e montado em cartao, acompanhado
+de etiqueta com dados de coleta precisos: nome do coletor, data, localidade,
+coordenadas geograficas e numero de colecao. Herbarios fisicos funcionam como
+repositorios permanentes desses registros, servindo de base para estudos
+taxonomicos, filogeneticos e de distribuicao geografica. O herbario do Real
+Jardim Botanico de Kew, em Londres, por exemplo, abriga mais de oito milhoes
+de especimes coletados ao longo de séculos, constituindo uma memoria insubstituivel
+da diversidade vegetal do planeta.
+
+A digitalizacao de herbarios avancou consideravelmente nas ultimas decadas.
+Iniciativas como o GBIF (Global Biodiversity Information Facility) e o
+SpeciesLink (CRIA, Brasil) consolidaram padroes de dados abertos para registros
+de ocorrencia, baseados no formato Darwin Core, que define campos padronizados
+para metadados de coleta como taxa, localidade, data e numero do especime.
+No Brasil, a Rede SpeciesLink conecta mais de 80 colecoes biologicas,
+disponibilizando publicamente cerca de 10 milhoes de registros.
+
+Entretanto, o foco dessas plataformas e a interoperabilidade de dados ja
+existentes, nao a construcao do fluxo de producao desses dados. A exsicata
+digital proposta neste trabalho preserva os metadados essenciais da exsicata
+tradicional e acrescenta o registro fotografico sistematico de cada parte da
+planta: folha, flor, fruto, caule, semente e habito. Esse registro e vinculado
+ao individuo fisico especifico por meio de um codigo unico gerado pelo sistema,
+garantindo que as imagens de diferentes partes de uma mesma colecao sejam
+sempre do mesmo especime, preservando a integridade cientifica do material.
+
+A ideia de combinar fotografia e metadados de coleta em registros digitais nao
+e nova. Sistemas como o iNaturalist permitem o registro fotografico
+georeferenciado de organismos por cidadaos cientistas. No entanto, o iNaturalist
+e orientado a observacoes pontuais e identificacoes por consenso comunitario,
+nao ao registro sistematico de todas as partes de um especime vinculado a um
+individuo fisico especifico, com validacao por especialista e geracao de artigo
+cientifico estruturado. O Penomato ocupa esse espaco especifico, complementar
+e distinto.
+
+
+2.2 Sistemas Colaborativos de Informacao Cientifica
+
+Sistemas colaborativos de informacao, campo estudado sob o acronimo CSCW
+(Computer-Supported Cooperative Work), sao projetados para mediar o trabalho
+de grupos distribuidos que compartilham um objetivo comum. Introduzido por
+Irene Greif e Paul Cashman em 1984 e desenvolvido como campo de pesquisa por
+Grudin (1994) e Olson e Olson (2000), o CSCW abrange tanto os aspectos
+tecnologicos quanto os sociais e organizacionais da colaboracao mediada por
+computador.
+
+Em contextos cientificos, sistemas colaborativos precisam equilibrar dois
+valores frequentemente em tensao: a abertura a contribuicao, que permite
+que mais pessoas produzam mais dados, e o rigor na validacao, que garante
+que os dados produzidos tenham valor cientifico. Plataformas como o Wikipedia
+resolveram essa tensao priorizando a abertura e delegando a validacao a
+comunidade; plataformas como o arXiv priorizam a velocidade de disseminacao
+mantendo a revisao em instancias separadas; plataformas como o PubPeer
+incorporam a revisao pos-publicacao. Cada modelo reflete escolhas diferentes
+sobre onde o controle de qualidade ocorre no fluxo.
+
+O Penomato adota um modelo de colaboracao assíncrona e assimétrica:
+contribuidores produzem dados em ritmos e momentos distintos; especialistas
+revisam em janelas de tempo proprias; o gestor coordena a demanda. O controle
+de qualidade esta embutido no proprio fluxo em dois pontos criticos: na
+revisao do exemplar fisico antes de qualquer registro fotografico e na revisao
+do artigo gerado antes de qualquer publicacao. Entre esses dois pontos de
+controle, a colaboracao e aberta e incremental.
+
+A rastreabilidade de quem produziu o que e quando e um requisito central em
+sistemas colaborativos de producao cientifica, especialmente quando os dados
+produzidos fundamentarao publicacoes com atribuicao de autoria formal. O modulo
+de historico de alteracoes do Penomato registra cada operacao realizada no
+sistema com identificacao do usuario, data e tipo de acao, atendendo a esse
+requisito sem impor burocracia adicional ao colaborador.
+
+
+2.3 Modelagem de Fluxos de Trabalho e Controle de Estados
+
+A modelagem de fluxos de trabalho (workflow management) e um campo estabelecido
+da engenharia de software e dos sistemas de informacao. Van der Aalst (2011)
+define um workflow como "a automacao de um processo de negocio, no todo ou em
+parte, durante o qual documentos, informacoes ou tarefas sao passados de um
+participante a outro para acao, de acordo com um conjunto de regras
+procedurais". O modelo de estados finitos, proveniente da teoria da computacao,
+e amplamente utilizado para representar formalmente o ciclo de vida de
+documentos e entidades em sistemas colaborativos.
+
+No Penomato, tanto a especie quanto o exemplar fisico possuem maquinas de
+estado explicitas que governam quais operacoes estao disponiveis em cada
+momento e quais transicoes sao possiveis. Para a especie, os estados sao:
+SEM_DADOS, DADOS_INTERNET, IDENTIFICADA, REGISTRADA, AGUARDANDO_REVISAO,
+REVISADA e PUBLICADA. Para o exemplar, os estados sao: AGUARDANDO_REVISAO,
+APROVADO e REJEITADO. Cada transicao e condicionada ao cumprimento de
+pre-requisitos especificos, e o sistema recusa operacoes que violem a logica
+do fluxo. Esse design previne inconsistencias nos dados, orienta os usuarios
+sobre qual passo executar a seguir e torna o estado atual do processo visivel
+a todos os participantes em tempo real.
+
+A decisao de modelar o ciclo de documentacao como uma maquina de estados, em
+vez de um conjunto de formularios independentes, reflete uma escolha
+arquitetural deliberada: o sistema nao e apenas um repositorio de dados, mas
+um mediador ativo do processo cientifico, responsavel por garantir que as
+condicoes de integridade sejam cumpridas antes de cada avanco.
+
+
+2.4 Georeferenciamento e Visualizacao Cartografica Web
+
+O uso de coordenadas geograficas como metadado de coleta e pratica consolidada
+em botanica de campo. A localizacao exata do especime e informacao cientifica
+de primeira ordem, utilizada em estudos de distribuicao geografica, analise de
+endemismo, modelagem de nicho ecologico e planejamento de areas de conservacao.
+No padrao Darwin Core, os campos de latitude, longitude, altitude e precisao
+geografica sao campos de primeira classe no registro de ocorrencia.
+
+A integracao de mapas interativos em sistemas web foi revolucionada pela
+disponibilizacao de bases cartograficas abertas. O OpenStreetMap, iniciado em
+2004 por Steve Coast como o "Wikipedia dos mapas", e hoje a maior base
+cartografica colaborativa do mundo, cobrindo praticamente todo o territorio
+brasileiro em escala de detalhe. A biblioteca Leaflet.js, lancada em 2011 por
+Vladimir Agafonkin, tornou trivial a integracao de mapas interativos em
+aplicacoes web, sem dependencia de APIs comerciais com cotas de uso e custos
+associados (LEAFLET, 2023).
+
+No Penomato, o georeferenciamento dos exemplares cumpre dupla funcao. Do ponto
+de vista cientifico, registra o local exato de coleta com a precisao do GPS
+do dispositivo movel do colaborador, capturado pelo navegador via API de
+Geolocalizacao do HTML5. Do ponto de vista operacional, permite que o
+especialista visualize no mapa, no momento da revisao, o ponto onde o exemplar
+foi coletado, contextualizando a avaliacao com informacoes sobre o ambiente.
+Um painel dedicado exibe todos os exemplares do especialista em um mapa com
+marcadores coloridos por status, permitindo acompanhar a distribuicao espacial
+das colecoes em andamento.
+
+
+2.5 Geracao Automatizada de Documentos Cientificos
+
+A geracao de texto cientifico a partir de dados estruturados e uma area em
+expansao, especialmente em bioinformatica e taxonomia computacional. O sistema
+DELTA (DEscription Language for TAxonomy), desenvolvido na decada de 1970 por
+Mike Dallwitz, foi um dos primeiros a formalizar a representacao de
+caracteristicas morfologicas de organismos em formato matricial, possibilitando
+a geracao automatica de descricoes textuais e chaves dicotomicas. Sistemas mais
+recentes como o Scratchpads, desenvolvido pelo Natural History Museum de
+Londres, e o Species File Software permitem a construcao colaborativa de
+monografias taxonomicas a partir de dados estruturados.
+
+No campo mais amplo da geracao automatizada de linguagem natural (NLG), a
+producao de texto a partir de dados estruturados e estudada pelo menos desde
+os anos 1980, com sistemas como o MUMBLE (McDONALD, 1983) e o FUF (ELHADAD,
+1991). A aplicacao mais comum em sistemas modernos e a geracao de relatorios
+financeiros, relatorios meteorologicos e sumarios de eventos esportivos a
+partir de dados tabelados.
+
+O Penomato adota uma abordagem intermediaria: nao gera texto completamente livre,
+mas compoe o artigo a partir de um template estruturado preenchido com os
+atributos morfologicos validados pelo especialista. Para cada parte da planta,
+o sistema combina os valores confirmados nos campos correspondentes, formando
+paragrafos descritivos coerentes segundo o padrao da botanica sistematica. O
+especialista pode revisar e ajustar o texto gerado antes da publicacao, mantendo
+o controle humano sobre o produto final sem abrir mao da automacao que elimina
+o retrabalho.
+
+
+2.6 Sistemas Existentes e Lacuna Identificada
+
+Uma avaliacao das solucoes existentes para documentacao botanica digital revela
+um espaco nao atendido que o Penomato se propoe a ocupar.
+
+O SpeciesLink e o GBIF sao plataformas de agregacao e consulta de dados de
+ocorrencia ja existentes em herbarios. Recebem registros de colecoes
+institucionais processadas e os tornam consultaveis de forma integrada. Nao se
+propõem a mediar o processo de producao dos dados, apenas sua disseminacao.
+
+O BRAHMS (Botanical Research and Herbarium Management System), desenvolvido
+pela Universidade de Oxford, e o Specify, mantido pelo iDigBio, sao sistemas
+completos de gestao de herbarios. Ambos sao instalados localmente, tem curva
+de aprendizado consideravel e sao projetados para herbarios institucionais
+consolidados com curadoria permanente. Nao sao ferramentas de campo nem de
+colaboracao distribuida.
+
+O iNaturalist permite o registro fotografico georeferenciado de organismos por
+cidadaos cientistas, com identificacao por consenso comunitario. E uma
+plataforma de ciencia cidada de grande alcance, mas nao e projetada para o
+registro sistematico de todas as partes de um especime vinculado a um individuo
+fisico especifico, nem para a geracao de artigos cientificos estruturados com
+revisao por especialista.
+
+O Penomato ocupa o espaco entre essas categorias: e mais rigoroso que o
+iNaturalist em termos de integridade do registro, mais accessivel e colaborativo
+que o BRAHMS e o Specify, e orientado a producao dos dados, nao apenas a sua
+disseminacao como o SpeciesLink e o GBIF. Sua proposta e ser a ferramenta que
+acompanha o grupo de pesquisa desde a demanda de documentacao ate a publicacao
+do conhecimento produzido.
+
+
+================================================================================
+3. METODOLOGIA
+================================================================================
+
+3.1 Natureza e Paradigma da Pesquisa
+
+Esta pesquisa e de natureza aplicada, com abordagem quali-quantitativa. O
+paradigma metodologico adotado e a Design Science Research (DSR), proposta por
+Hevner et al. (2004) como framework adequado para pesquisas em Sistemas de
+Informacao que produzem artefatos tecnologicos como contribuicao cientifica.
+
+A DSR distingue-se das pesquisas comportamentais classicas, cujo objetivo e
+descrever, explicar ou predizer fenomenos existentes. Na DSR, o objetivo e
+criar um artefato que resolva um problema relevante e avaliar se esse artefato
+efetivamente o resolve. Hevner et al. (2004) estabelecem sete diretrizes para
+uma pesquisa em DSR ser considerada rigorosa: o artefato deve ser um projeto
+viavel; deve tratar um problema relevante; deve ser avaliado empiricamente;
+deve representar uma contribuicao ao estado do conhecimento; deve aplicar
+metodos de pesquisa rigorosos; deve ser pertinente ao contexto de aplicacao;
+e os resultados devem ser comunicados de forma apropriada tanto a audiencias
+tecnicas quanto de gestao.
+
+No presente trabalho, o artefato e o sistema Penomato, e o problema relevante
+e a fragmentacao do fluxo de documentacao botanica em grupos de pesquisa
+universitarios. O sistema nao e apenas o produto do trabalho, mas o objeto
+central de investigacao: sua construcao, sua avalicao de usabilidade e seus
+resultados constituem a contribuicao cientifica do trabalho.
+
+A DSR organiza a pesquisa em torno de tres ciclos interdependentes (HEVNER,
+2007). O ciclo de relevância extrai o problema do contexto real de uso. Neste
+trabalho, o contexto e a rotina de um grupo de pesquisa botanica em parceria
+com a UEMS, e os requisitos do sistema foram definidos a partir de necessidades
+concretas identificadas nessa rotina. O ciclo de rigor apoia o desenvolvimento
+em conhecimentos estabelecidos: engenharia de software, modelagem de dados,
+sistemas colaborativos e interacao humano-computador fundamentam as decisoes
+de projeto. O ciclo de design constroi e avalia o artefato iterativamente:
+o sistema e construido, testado com usuarios reais e refinado com base nos
+resultados.
+
+
+3.2 Levantamento de Requisitos
+
+O levantamento de requisitos foi conduzido em colaboracao com docentes e
+discentes do curso de Engenharia Florestal da UEMS, por meio de reunioes de
+elicitacao e observacao da rotina de trabalho do grupo de pesquisa. Essa etapa
+identificou os tres atores principais do sistema (gestor, colaborador e
+especialista), os fluxos de trabalho existentes e suas limitacoes, e os
+requisitos funcionais e nao funcionais que orientaram o projeto do sistema.
+
+Entre as limitacoes identificadas no processo atual, destacam-se: a perda de
+rastreabilidade das fotografias em relacao ao individuo fisico especifico; a
+fragmentacao das contribuicoes de multiplos colaboradores sem repositorio unico
+e centralizado; a ausencia de fluxo formal de validacao entre a coleta e a
+producao do texto cientifico; e o retrabalho na producao textual de cada artigo,
+sem aproveitamento sistematico dos dados ja organizados durante o processo de
+confirmacao.
+
+Os requisitos foram organizados em historias de usuario e validados com os
+stakeholders antes do inicio do desenvolvimento. Alem dos requisitos funcionais
+que descrevem os modulos do sistema, foram identificados requisitos nao
+funcionais determinantes para a adocao da ferramenta: acessibilidade via
+navegador sem instalacao, responsividade para uso em dispositivos moveis em
+campo, operacao com tecnologias abertas e de baixo custo, e rastreabilidade
+completa de todas as operacoes realizadas.
+
+
+3.3 Projeto e Desenvolvimento do Sistema
+
+O desenvolvimento do sistema segue o modelo iterativo e incremental, com
+entregas organizadas em modulos funcionais sequencialmente dependentes. A
+arquitetura adotada e o padrao MVC (Model-View-Controller), que separa a logica
+de negocio da apresentacao e do acesso a dados, favorecendo a manutenibilidade
+e a evolucao independente de cada camada.
+
+A escolha por tecnologias consolidadas, abertas e de baixo custo operacional
+reflete o objetivo de que o sistema seja implantavel em instituicoes publicas
+de ensino e pesquisa sem necessidade de infraestrutura especializada ou licencas
+comerciais. O backend e implementado em PHP 8.2 com acesso a dados via PDO;
+o banco de dados e MySQL/MariaDB; a interface utiliza HTML5, CSS3, Bootstrap 5.3
+e JavaScript ES6; os mapas sao renderizados com Leaflet.js sobre base
+cartografica OpenStreetMap; o controle de versao e realizado com Git.
+
+O desenvolvimento foi organizado em oito modulos sequencialmente dependentes.
+O Modulo 1, de autenticacao e papeis de usuario, implementa o controle de
+sessao, login, cadastro com confirmacao de e-mail e separacao de permissoes
+por categoria, constituindo a base sobre a qual todos os demais modulos operam.
+O Modulo 2, de gestao de especies, implementa o cadastro de especies de
+interesse pelo gestor e o controle de status ao longo de todo o ciclo de
+documentacao. O Modulo 3, de insercao de dados morfologicos, implementa o
+formulario colaborativo para preenchimento de atributos fitomorfologicos a
+partir de fontes de referencia. O Modulo 4, de confirmacao de atributos,
+implementa a interface de revisao individual de cada caracteristica morfologica,
+com transicao automatica para o estado "identificada" quando todos os atributos
+forem confirmados ou corrigidos. O Modulo 5, de cadastro e revisao de
+exemplares, implementa o registro de individuos fisicos com localizacao
+georeferenciada e a interface de revisao e aprovacao pelo especialista. O
+Modulo 6, de registro fotografico, implementa o upload incremental de fotos
+das seis partes vegetais, obrigatoriamente vinculadas a um exemplar aprovado.
+O Modulo 7, de geracao e revisao do artigo cientifico, implementa a composicao
+automatizada do artigo e o fluxo de revisao especializada. O Modulo 8, de
+publicacao publica e contestacao, implementa a ficha publica acessivel sem
+autenticacao e o mecanismo de contestacao pos-publicacao com possibilidade de
+redicao.
+
+
+3.4 Avaliacao de Usabilidade
+
+Apos a conclusao do MVP, o sistema sera avaliado com usuarios reais pertencentes
+ao publico-alvo definido: colaboradores, recrutados entre alunos de graduacao
+e pos-graduacao em Engenharia Florestal da UEMS, e especialistas, recrutados
+entre os docentes com atuacao em botanica do Cerrado da mesma instituicao.
+
+A avaliacao combina dois instrumentos complementares. O primeiro e o teste de
+usabilidade com protocolo think-aloud, no qual os participantes realizam tarefas
+representativas dos fluxos principais do sistema: cadastrar um exemplar, enviar
+fotos de partes, revisar um exemplar e consultar a ficha publica de uma especie.
+Durante a realizacao das tarefas, os participantes verbalizam seus pensamentos
+em voz alta. As sessoes sao registradas e analisadas para identificacao de
+problemas de usabilidade, pontos de confusao e sugestoes emergentes.
+
+O segundo instrumento e o questionario SUS (System Usability Scale), proposto
+por Brooke (1996), composto por dez afirmacoes em escala Likert de cinco pontos.
+O SUS e um instrumento validado e amplamente utilizado na literatura de IHC,
+que produz um escore entre 0 e 100, interpretavel em faixas qualitativas:
+inaceitavel, marginal, bom e excelente. Escores acima de 68 sao considerados
+acima da media para sistemas em geral (BANGOR et al., 2008). O numero minimo
+de participantes por perfil sera de cinco, conforme referencial de Nielsen
+(1993), que demonstra que esse numero e suficiente para identificar
+aproximadamente 85% dos problemas de usabilidade em testes com protocolo
+think-aloud.
+
+Os dados quantitativos do SUS serao analisados com estatistica descritiva.
+Os dados qualitativos das sessoes think-aloud serao submetidos a analise de
+conteudo tematica, organizando os achados em categorias de problemas por
+modulo e por perfil de usuario. Os resultados orientarao uma iteracao de
+refinamento do sistema antes da versao final entregue como produto do trabalho.
+
+
+================================================================================
+4. O SISTEMA PENOMATO
+================================================================================
+
+4.1 Visao Geral
+
+O Penomato e um sistema web colaborativo para documentacao digital de exsicatas
+e descricoes fitomorfologicas de especies vegetais. Seu objetivo operacional e
+conduzir equipes distribuidas de pesquisa botanica por um ciclo completo e
+rastreavel de producao de conhecimento, desde o cadastro da demanda institucional
+ate a publicacao de fichas de especies acessiveis ao publico como recurso de
+educacao ambiental.
+
+O sistema e acessado por navegador web sem instalacao de software adicional,
+e foi projetado para operar tanto em desktops quanto em dispositivos moveis,
+considerando que parte das operacoes, especialmente o cadastro de exemplares e
+o envio de fotografias, e realizada em campo. O endereço de producao do sistema
+e penomato.app.br, hospedado em servidor compartilhado com acesso HTTPS.
+
+O nome Penomato deriva de "Planta Nativa de Mato Grosso do Sul", refletindo
+o foco inicial do sistema no estado sul-mato-grossense e no bioma Cerrado.
+A arquitetura, entretanto, e independente de bioma, e o sistema foi concebido
+para suportar expansao para outros biomas brasileiros em versoes futuras.
+
+
+4.2 Atores do Sistema
+
+O Penomato e estruturado em torno de quatro atores, com permissoes e
+responsabilidades distintas definidas no momento do cadastro e validadas a cada
+operacao.
+
+O Gestor e o administrador institucional do sistema. Sua funcao e definir quais
+especies serao documentadas, aprovando cada entrada na fila de trabalho da
+equipe. Tambem e responsavel por autorizar dispensas de partes vegetais quando
+um individuo fisico especifico nao apresenta determinada parte disponivel no
+momento da coleta, e por monitorar o progresso geral de todas as especies em
+documentacao. O gestor tem visao global de todo o sistema.
+
+O Colaborador e o ator responsavel pela producao direta dos dados cientificos.
+Pode ser aluno de graduacao ou pos-graduacao, pesquisador de campo ou qualquer
+membro autorizado do grupo. O colaborador insere os dados morfologicos de
+referencia, cadastra os exemplares fisicos com suas localizacoes georeferenciadas,
+fotografa as partes da planta no campo e solicita a geracao do artigo quando as
+condicoes necessarias forem cumpridas. Multiplos colaboradores podem contribuir
+para a documentacao de uma mesma especie em momentos distintos.
+
+O Especialista, denominado revisor no sistema, e o professor ou pesquisador
+senior em botanica responsavel pela validacao cientifica. Tem duas funcoes
+criticas no fluxo: a revisao e aprovacao dos exemplares fisicos, que habilita
+o inicio do registro fotografico, e a revisao e aprovacao do artigo gerado,
+que habilita a publicacao da ficha publica. O especialista tem acesso a
+ferramentas de visualizacao de imagens com filtros de brilho, contraste, zoom
+e saturacao para analise das fotografias, sem que esses ajustes alterem os
+arquivos originais armazenados.
+
+O Publico e qualquer pessoa com acesso a internet. Nao requer cadastro. Acessa
+as fichas de especies publicadas, consulta descricoes fitomorfologicas, visualiza
+a galeria de exsicatas organizada por parte da planta, explora o mapa de
+ocorrencia georeferenciado e navega pelo sistema de busca por caracteristicas
+morfologicas. E o ator final para quem a plataforma de educacao ambiental e
+direcionada.
+
+
+4.3 Arquitetura e Stack Tecnologico
+
+O sistema adota a arquitetura MVC (Model-View-Controller) em PHP puro, sem
+framework, por razoes deliberadas de simplicidade operacional, portabilidade
+e baixo custo de hospedagem. A decisao de nao utilizar frameworks como Laravel
+ou Symfony reflete a premissa de que o sistema deve ser implantavel em qualquer
+servidor compartilhado com suporte a PHP e MySQL, sem dependencias de
+ferramentas de linha de comando, gerenciadores de dependencias ou configuracoes
+de servidor especializadas.
+
+A camada de Model e implementada por um conjunto de funcoes utilitarias de
+acesso a dados centralizadas em um arquivo de configuracao do banco de dados,
+que gerencia a conexao PDO, executa queries parametrizadas e expoe funcoes de
+alto nivel como buscarUm, buscarTodos, inserir e atualizar, utilizadas
+consistentemente em todos os controllers.
+
+A camada de View e implementada em arquivos PHP que produzem HTML, carregando
+um cabecalho padronizado com as dependencias CSS e JavaScript compartilhadas:
+Bootstrap 5.3 para o sistema de grid e componentes de interface, FontAwesome
+para icones e uma folha de estilos propria do sistema que implementa o design
+de marca via tokens CSS customizados.
+
+A camada de Controller e implementada em arquivos PHP que recebem requisicoes,
+verificam permissoes de acesso, processam dados, interagem com o banco e
+redirecionam o usuario com mensagens de feedback. O controle de acesso e
+centralizado em um modulo de verificacao que mapeia cada categoria de usuario
+para as operacoes autorizadas.
+
+O envio de emails transacionais e realizado via PHPMailer com autenticacao SMTP
+no servidor de hospedagem de producao, cobrindo fluxos de confirmacao de
+cadastro, recuperacao de senha, alteracao de email, notificacao de aprovacao
+de membro, notificacao de novo exemplar aguardando revisao e notificacao de
+artigo aguardando revisao.
+
+
+4.4 Modelo de Dados
+
+O banco de dados relacional do Penomato e composto por tabelas que refletem
+diretamente as entidades do dominio botanico e os requisitos de rastreabilidade
+do sistema.
+
+A tabela central e a de especies_administrativo, que armazena cada especie em
+documentacao com seu status atual, nome cientifico, nome popular e atributos
+fitomorfologicos distribuidos por partes da planta: folha, flor, fruto, caule,
+semente e habito. A progressao do status da especie ao longo do ciclo de
+documentacao e controlada por uma coluna de status com valores pre-definidos.
+
+A tabela de exemplares registra os individuos fisicos de campo, com codigo unico
+gerado automaticamente, coordenadas geograficas, municipio, estado, bioma,
+descricao livre do local, fotografia de identificacao geral, numero da etiqueta
+fisica, especialista orientador responsavel, colaborador que realizou o cadastro
+e status de revisao. O relacionamento entre exemplares e especies e de muitos
+para um: um exemplar pertence a uma especie, mas uma especie pode ter multiplos
+exemplares em versoes futuras do sistema.
+
+A tabela de especies_imagens armazena as fotografias das partes vegetais, cada
+uma obrigatoriamente vinculada a um exemplar aprovado via chave estrangeira.
+Cada registro inclui a parte da planta fotografada, o colaborador responsavel
+pelo envio, a data de coleta, o arquivo de imagem e observacoes livres do
+fotografo.
+
+Tabelas auxiliares gerenciam os tokens de autenticacao (verificacao de email,
+recuperacao de senha e alteracao de email), o historico de alteracoes (registro
+auditavel de todas as operacoes realizadas no sistema), a fila de aprovacao de
+especies e os dados de feedback publico. A separacao entre tokens com prazo
+de expiracao e o estado permanente das entidades garante que operacoes
+sensiveis como recuperacao de senha tenham validade temporal controlada.
+
+
+4.5 Ciclo Completo de Documentacao
+
+O ciclo de documentacao de uma especie no Penomato percorre um pipeline
+estruturado de seis etapas, com transicoes de estado controladas pelo sistema.
+
+Na Etapa 1, o gestor registra uma especie de interesse no sistema, fornecendo
+nome cientifico e nome popular. O sistema cria o registro com um identificador
+interno unico e atribui o status SEM_DADOS. A especie aparece na lista de
+demandas abertas do gestor.
+
+Na Etapa 2, o colaborador pesquisa a especie em fontes bibliograficas e preenche
+os atributos fitomorfologicos por parte da planta, incluindo sinonimias
+taxonomicas, distribuicao geografica e referencias bibliograficas utilizadas.
+Imagens de referencia com indicacao de fonte podem ser incluidas. Os dados
+inseridos nesta etapa tem aprovacao automatica, funcionando como ponto de
+partida para a etapa de confirmacao. O status da especie passa para DADOS_INTERNET.
+
+A partir deste ponto, dois caminhos de documentacao correm em paralelo e de
+forma independente. O Caminho A e a confirmacao fitomorfologica: o colaborador
+acessa a interface de confirmacao e revisa cada atributo individualmente,
+podendo confirmar que o dado de referencia esta correto ou corrigir substituindo
+pelo valor verificado. A regra e absoluta: todos os atributos devem ser
+confirmados ou corrigidos para que a especie avance. Qualquer atributo ainda
+pendente bloqueia a transicao. Quando o ultimo atributo for confirmado, o sistema
+transiciona automaticamente o status para IDENTIFICADA.
+
+O Caminho B e o registro fotografico de campo. Antes de qualquer fotografia de
+parte vegetal, o colaborador cadastra o exemplar: o registro do individuo fisico
+encontrado no campo. O formulario de cadastro de exemplar coleta as coordenadas
+geograficas do local de coleta, capturadas automaticamente pelo GPS do
+dispositivo ou inseridas manualmente; o municipio, estado e bioma; uma descricao
+livre do local; a fotografia de identificacao geral do individuo, tirada no
+momento do encontro; o especialista orientador responsavel; e o numero da
+etiqueta de aluminio fixada fisicamente na planta. Ao salvar, o sistema gera
+automaticamente um codigo unico para o exemplar no formato alfanumerico XX000.
+O status do exemplar e definido como AGUARDANDO_REVISAO, e o upload de fotos
+das partes fica bloqueado.
+
+Na sequencia do Caminho B, o especialista recebe notificacao por email, acessa
+a interface de revisao do exemplar, analisa a fotografia de identificacao, os
+dados de localizacao e o mapa com o ponto de coleta, e decide aprovar ou
+rejeitar. Se aprovado, o status do exemplar muda para APROVADO e os colaboradores
+ficam habilitados a enviar fotos das partes. Se rejeitado, o motivo e registrado
+e exibido ao colaborador, que pode corrigir e resubmeter o exemplar.
+
+Com o exemplar aprovado, colaboradores enviam as fotografias das seis partes
+vegetais: folha, flor, fruto, caule, semente e habito. Cada foto e
+obrigatoriamente vinculada ao exemplar aprovado, garantindo que todas as imagens
+de uma colecao sejam do mesmo individuo fisico. Multiplos colaboradores podem
+contribuir com partes distintas em momentos distintos. Uma parte pode ser
+formalmente dispensada pelo gestor quando nao esta disponivel no individuo.
+Quando todas as partes estiverem fotografadas ou dispensadas, o sistema
+transiciona automaticamente o status da especie para REGISTRADA.
+
+Na Etapa 3, o artigo cientifico pode ser gerado quando a especie esta
+simultaneamente IDENTIFICADA e REGISTRADA. Ambas as condicoes sao obrigatorias.
+A geracao e disparada explicitamente pelo colaborador ou gestor apos confirmacao.
+O sistema compoe automaticamente um documento estruturado contendo nome
+cientifico, familia, sinonimias taxonomicas, descricao fitomorfologica por
+parte com os atributos confirmados, referencias bibliograficas, galeria de
+exsicatas organizada por parte com metadados completos de cada fotografia, e
+lista de todos os contribuidores com suas respectivas contribuicoes. O status
+passa para AGUARDANDO_REVISAO e o artigo entra na fila do especialista.
+
+Na Etapa 4, o especialista acessa o artigo completo com todas as fotografias.
+Pode aprovar com parecer, caso em que o parecer e registrado no historico e o
+status avanca para REVISADA, ou rejeitar com motivo, caso em que o motivo e
+visivel ao colaborador e a especie retorna ao status correspondente ao problema
+identificado.
+
+Na Etapa 5, apos aprovacao, o sistema publica automaticamente a ficha publica
+da especie, acessivel sem autenticacao. A ficha contem a descricao fitomorfologica
+validada, a galeria de exsicatas por parte da planta, o mapa de ocorrencia com
+o ponto de coleta georeferenciado, os creditos individuais de todos os
+contribuidores, a data de publicacao e o numero da edicao. O status final e
+PUBLICADA.
+
+A Etapa 6 e a contestacao pos-publicacao. Qualquer colaborador ou especialista
+pode abrir uma contestacao registrando o motivo. Se aceita pelo gestor ou
+especialista, a identificacao morfologica e corrigida enquanto as fotografias
+permanecem vinculadas ao exemplar fisico, pois representam o registro do
+individuo, nao de sua identificacao. O artigo e regenerado, passa por nova
+revisao e e republicado como nova edicao numerada.
+
+
+4.6 Regras de Negocio Fundamentais
+
+O Penomato implementa um conjunto de regras de negocio que garantem a
+integridade cientifica dos dados produzidos.
+
+Os dados de referencia inseridos na Etapa 2 recebem aprovacao automatica. Essa
+decisao de design e intencional: esses dados sao o ponto de partida para a
+confirmacao, nao o produto final. A qualidade cientifica e garantida na Etapa
+de confirmacao, onde cada atributo e validado individualmente por alguem com
+acesso direto ao especime fisico ou a literatura especializada.
+
+Nenhuma fotografia de parte vegetal pode ser enviada sem que exista um exemplar
+previamente cadastrado e aprovado pelo especialista. Essa regra impede que
+colecoes fotograficas sejam criadas sem vinculo a um individuo fisico validado,
+preservando a integridade fundamental da exsicata digital.
+
+Todas as partes de uma colecao devem ser do mesmo individuo fisico. Isso e
+garantido pelo vinculo obrigatorio de cada fotografia ao codigo do exemplar e
+pela etiqueta fisica de aluminio numerada pregada na planta no campo. A
+correspondencia entre o codigo digital e a etiqueta fisica e o mecanismo central
+de rastreabilidade do sistema.
+
+A transicao para o status IDENTIFICADA exige exatamente 100% dos atributos
+confirmados ou corrigidos. Nao existe meio-termo: qualquer atributo pendente
+bloqueia o avanco. Essa regra garante que artigos gerados nunca contenham
+campos em branco ou dados de referencia nao verificados.
+
+A transicao para REGISTRADA e automatica: o sistema verifica continuamente a
+completude das partes e realiza a transicao sem necessidade de acao humana.
+Isso reduz a carga cognitiva dos colaboradores e elimina o risco de que uma
+especie fique presa em um estado intermediario por esquecimento.
+
+A geracao do artigo exige obrigatoriamente que a especie esteja simultaneamente
+nos estados IDENTIFICADA e REGISTRADA. Esses dois estados sao independentes e
+podem ser atingidos em qualquer ordem, mas ambos sao necessarios.
+
+Contestacoes nao descartam fotografias. As imagens sao registros do individuo
+fisico, independentes de sua identificacao taxonomica. Se a identificacao de
+uma especie for contestada e corrigida, as fotografias do exemplar permanecem
+no sistema vinculadas ao mesmo individuo, agora reclassificado.
+
+
+================================================================================
+5. TRABALHOS FUTUROS E VISAO DE PRODUTO
+================================================================================
+
+O MVP desenvolvido neste trabalho e o primeiro elo de uma cadeia de produtos
+cuja logica interna e coerente: cada camada depende da anterior e viabiliza
+a proxima. Esta secao descreve essa cadeia completa, situando o MVP no seu
+papel de infraestrutura e apresentando o horizonte de produto para o qual todas
+as decisoes arquiteturais do sistema foram orientadas.
+
+
+5.1 Identificacao por Filtros Morfologicos — A Chave Dicotomica Digital
+
+O primeiro incremento imediato sobre o MVP e a evolucao da busca por
+caracteristicas morfologicas ja existente no sistema para uma interface de
+identificacao em campo. O principio e o da chave dicotomica digital: o usuario
+seleciona caracteristicas visiveis a olho nu — folha composta ou simples,
+margem inteira ou serrilhada, caule liso ou com aculeios, flores amarelas ou
+brancas, fruto carnoso ou seco — e o sistema retorna as especies do banco de
+dados cujos atributos confirmados correspondem ao conjunto informado, ordenadas
+por grau de correspondencia.
+
+Esse mecanismo resolve, de forma imediata e sem dependencia de inteligencia
+artificial, o problema original: o profissional de campo pode estreitar
+rapidamente o conjunto de candidatos a partir do que observa no individuo a
+sua frente. Quanto maior o acervo de especies documentadas, mais precisa e
+util se torna a ferramenta. O crescimento do acervo e a utilidade da busca se
+retroalimentam diretamente, criando um incentivo adicional para a contribuicao.
+
+
+5.2 Identificacao por Imagem com LLM Especializado por Bioma
+
+A identificacao por imagem e a visao de longo prazo que motivou toda a
+arquitetura do sistema. O modelo de funcionamento e o seguinte: o usuario
+fotografa uma ou mais partes de uma planta desconhecida — a folha, o fruto,
+o caule — e o sistema analisa as imagens contra o acervo de exsicatas validadas,
+retornando uma lista das especies mais provaveis com grau de confianca.
+
+Para que esse sistema funcione com precisao aceitavel para especies especificas
+de um bioma, ele precisa ser treinado com imagens de alta qualidade, coletadas
+de forma sistematica, validadas por especialistas e vinculadas a individuos
+fisicos identificados com certeza. Esse e exatamente o tipo de dado que o
+Penomato produz. Cada exsicata digital aprovada por um especialista — com
+fotografias das seis partes da planta, metadados de coleta e identificacao
+taxonomica confirmada — e um exemplo de treinamento de alta qualidade para
+um modelo de visao computacional.
+
+A arquitetura prevista e um modelo especializado por bioma, treinado
+exclusivamente com especies e imagens do Cerrado, da Amazonia, da Mata
+Atlantica e dos demais biomas brasileiros, em vez de um modelo generalista.
+Modelos especializados em dominios especificos tendem a superar modelos
+generalistas quando o acervo de treinamento e suficientemente rico e de
+qualidade controlada (BOMMASANI et al., 2021). O Penomato e a fabrica desse
+acervo.
+
+
+5.3 Game de Identificacao Florestal — O Pokemon Go das Especies Nativas
+
+A camada de gamificacao e o mecanismo de escala para o publico geral. A
+inspiracao e o Pokemon Go (Niantic, 2016): um jogo de realidade aumentada em
+que os jogadores capturaram criaturas virtuais no mundo real usando a camera
+do celular. A proposta e transpor essa mecanica para a biodiversidade real.
+
+No game florestal do Penomato, o jogador usa o celular para identificar especies
+vegetais nativas no ambiente onde se encontra — em uma praca, em uma unidade
+de conservacao, no quintal, em uma trilha. A identificacao e feita pelo modelo
+de LLM especializado do sistema, que analisa a fotografia e aponta a especie.
+Cada especie identificada com sucesso e "capturada": entra para o portfolio
+virtual do jogador, que acumula pontos proporcionais a raridade da especie
+para aquele bioma. Uma especie endemica do Cerrado ameacada de extincao vale
+muito mais do que uma especie cosmopolita amplamente distribuida.
+
+O portfolio do jogador e publico e consultavel, funcionando como um herbario
+digital pessoal. Jogadores podem comparar portfolios, organizar expedicoes
+coletivas para identificar especies raras e contribuir com registros de
+ocorrencia que alimentam tanto o banco de dados cientifico do Penomato quanto
+plataformas abertas como o iNaturalist e o GBIF.
+
+O game opera sobre a mesma infraestrutura de dados do Penomato. Nao e um
+produto separado: e uma interface diferente de acesso ao mesmo acervo, voltada
+ao usuario comum em vez do pesquisador.
+
+
+5.4 FarmGame de Recuperacao Ambiental
+
+Sobre a mecanica de captura do game florestal, um segundo nivel de jogo
+funciona como simulador de recuperacao de areas degradadas. O jogador usa as
+especies que capturou para "plantar" em uma area virtual que precisa ser
+restaurada. Cada especie tem um papel ecologico: especies pioneiras preparam
+o solo para as secundarias; especies produtoras de frutos atraem fauna que
+dispersa sementes; especies de dossel fecham o dossel e controlam a temperatura.
+
+A mecanica e similar a jogos de gestao de fazenda como FarmVille ou Hay Day,
+mas o conteudo e ecologicamente fundamentado: as regras de sucessao ecologica
+e as interacoes entre especies sao baseadas nas descricoes cientificas presentes
+no banco de dados do Penomato. O jogador aprende, enquanto joga, quais especies
+sao pioneiras no Cerrado, quais atraem aves, quais fixam nitrogenio no solo.
+
+O resultado final da partida e uma area recuperada com uma composicao floristica
+ecologicamente viavel, que o sistema avalia por metricas de diversidade,
+estrutura e funcionalidade ecossistêmica. Jogadores que atingem metas de
+recuperacao recebem certificados digitais que podem ser compartilhados como
+indicadores de engajamento ambiental.
+
+
+5.5 Plataforma de Educacao Ambiental
+
+Todas as camadas anteriores convergem em uma plataforma de educacao ambiental.
+Para o professor, o Penomato oferece fichas de especies validadas por
+especialistas, com fotografias sistematicas, descricoes morfologicas e mapas
+de ocorrencia, organizaveis por bioma, familia e caracteristicas. O professor
+pode montar roteiros de aula interativos diretamente a partir do acervo. Para
+o aluno, a navegacao pelas fichas, o game de identificacao e o simulador de
+recuperacao criam uma experiencia de aprendizado visual, contextualizada e
+gamificada, sem dependencia de herbario fisico ou saida de campo obrigatoria.
+
+Para o cidadao comum, a plataforma e simplesmente um lugar onde se pode
+aprender a identificar as arvores do proprio quintal, do parque da cidade ou
+da Unidade de Conservacao mais proxima. O conhecimento que estava restrito aos
+mateiros e aos herbarios de papel torna-se acessivel a todos.
+
+O Penomato MVP, ao construir a infraestrutura de coleta de dados com qualidade
+cientifica e motivacao por publicacao, e o alicerce de toda essa cadeia. Sem
+dados, nao ha LLM. Sem LLM, nao ha game. Sem game, nao ha alcance em escala.
+Sem alcance em escala, nao ha educacao ambiental de impacto. O MVP nao e um
+produto final: e o ponto zero de uma plataforma com potencial de impacto social,
+cientifico e educacional de longo prazo.
+
+
+================================================================================
+REFERENCIAS
+================================================================================
+
+BANGOR, A.; KORTUM, P. T.; MILLER, J. T. An empirical evaluation of the system
+usability scale. International Journal of Human-Computer Interaction, v. 24,
+n. 6, p. 574-594, 2008.
+
+BROOKE, J. SUS: A quick and dirty usability scale. In: JORDAN, P. W.; THOMAS,
+B.; WEERDMEESTER, B. A.; McCLELLAND, I. L. (Eds.). Usability evaluation in
+industry. London: Taylor & Francis, 1996. p. 189-194.
+
+DALLWITZ, M. J. A general system for coding taxonomic descriptions. Taxon,
+v. 29, n. 1, p. 41-46, 1980.
+
+FLORA E FUNGA DO BRASIL. Jardim Botanico do Rio de Janeiro. Disponivel em:
+http://floradobrasil.jbrj.gov.br. Acesso em: mar. 2026.
+
+GBIF — GLOBAL BIODIVERSITY INFORMATION FACILITY. What is GBIF? Disponivel em:
+https://www.gbif.org/what-is-gbif. Acesso em: mar. 2026.
+
+GRUDIN, J. Computer-supported cooperative work: History and focus.
+Computer, v. 27, n. 5, p. 19-26, 1994.
+
+HEVNER, A. R. A three cycle view of design science research. Scandinavian
+Journal of Information Systems, v. 19, n. 2, p. 87-92, 2007.
+
+HEVNER, A. R.; MARCH, S. T.; PARK, J.; RAM, S. Design science in information
+systems research. MIS Quarterly, v. 28, n. 1, p. 75-105, 2004.
+
+LEAFLET. Leaflet: an open-source JavaScript library for mobile-friendly
+interactive maps. Disponivel em: https://leafletjs.com. Acesso em: mar. 2026.
+
+MAPBIOMAS. Colecao 8 da serie anual de mapas de cobertura e uso da terra do
+Brasil. Disponivel em: https://mapbiomas.org. Acesso em: mar. 2026.
+
+MYERS, N.; MITTERMEIER, R. A.; MITTERMEIER, C. G.; DA FONSECA, G. A. B.; KENT,
+J. Biodiversity hotspots for conservation priorities. Nature, v. 403,
+p. 853-858, 2000.
+
+NIELSEN, J. Usability engineering. San Francisco: Morgan Kaufmann, 1993.
+
+OLSON, G. M.; OLSON, J. S. Distance matters. Human-Computer Interaction,
+v. 15, n. 2-3, p. 139-178, 2000.
+
+OPENSTREETMAP FOUNDATION. OpenStreetMap. Disponivel em:
+https://www.openstreetmap.org. Acesso em: mar. 2026.
+
+SPECIESLINK. Sistema de Informacao Distribuido para Colecoes Biologicas. Centro
+de Referencia em Informacao Ambiental (CRIA). Disponivel em:
+http://www.splink.org.br. Acesso em: mar. 2026.
+
+VAN DER AALST, W. M. P. Process mining: Discovery, conformance and enhancement
+of business processes. Berlin: Springer, 2011.
+
+
+================================================================================
+FIM DO RASCUNHO
+================================================================================
+
+Notas de revisao pendentes:
+- Preencher: nome do autor, orientador, curso, campus
+- Secao 5 (Resultados da avaliacao) sera escrita apos a realizacao dos testes
+- Secao de Conclusao sera escrita apos a secao de Resultados
+- Verificar e completar referencias bibliograficas com dados completos
+- Adicionar citacoes em linha nos paragrafos que ainda estao sem (ex: sec 2.5)
+- Inserir figuras: diagrama ER, diagrama de fluxo, capturas de tela dos modulos
+- Revisar terminologia: exsicata x especime x exemplar (padronizar conforme
+  decisao do orientador)
+- Verificar formatacao ABNT no Word apos conversao deste rascunho

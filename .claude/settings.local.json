@@ -1,7 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(git checkout:*)",
+      "Bash(\"C:/xampp/mysql/bin/mysql\" -u root -e \"SELECT id, especie_id, status, LEFT\\(texto_html, 100\\) as inicio FROM penomato.artigos WHERE especie_id = 32;\")",
+      "Bash(\"C:/xampp/mysql/bin/mysql\" -u root -e \"SELECT id, especie_id, status FROM penomato.artigos WHERE especie_id = 32;\")",
+      "Bash(\"C:/xampp/mysql/bin/mysql\" -u root -e \"SELECT id, especie_id, status, LENGTH\\(texto_html\\) as tamanho FROM penomato.artigos;\")",
+      "Bash(\"C:/xampp/mysql/bin/mysql\" -u root penomato -e \"SELECT id, especie_id, status FROM artigos LIMIT 10;\")",
+      "Bash(\"C:/xampp/mysql/bin/mysql\" -u root penomato -e \"SELECT COUNT\\(*\\) FROM especies_imagens WHERE especie_id=32;\")"
     ]
   }
 }
