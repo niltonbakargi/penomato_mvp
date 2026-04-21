@@ -373,7 +373,7 @@ if ($provider === 'claude') {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_TIMEOUT        => 28,
+            CURLOPT_TIMEOUT        => 110,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
