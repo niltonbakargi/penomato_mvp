@@ -56,24 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
     $orientador_id = (int)($_POST['orientador_id'] ?? 0); // 0 = sem orientação
 
     // Validar se a espécie realmente existe e tem status 'sem_dados'
-    $conexao2 = new mysqli($servidor, $usuario_db, $senha_db, $banco);
-    $conexao2->set_charset("utf8mb4");
-    $stmt = $conexao2->prepare("SELECT id, nome_cientifico FROM especies_administrativo WHERE id = ? AND status = 'sem_dados'");
-    $stmt->bind_param("i", $especie_id);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
+    $stmt = $pdo->prepare("SELECT id, nome_cientifico FROM especies_administrativo WHERE id = ? AND status = 'sem_dados'");
+    $stmt->execute([$especie_id]);
+    $especie = $stmt->fetch();
 
-    if ($resultado->num_rows > 0) {
-        $especie = $resultado->fetch_assoc();
-        $stmt->close();
+    if ($especie) {
 
         // Registrar orientador em atribuido_a (NULL se sem orientação)
         $attr_val = $orientador_id > 0 ? $orientador_id : null;
-        $stmt2 = $conexao2->prepare("UPDATE especies_administrativo SET atribuido_a = ? WHERE id = ?");
-        $stmt2->bind_param("ii", $attr_val, $especie_id);
-        $stmt2->execute();
-        $stmt2->close();
-        $conexao2->close();
+        $pdo->prepare("UPDATE especies_administrativo SET atribuido_a = ? WHERE id = ?")->execute([$attr_val, $especie_id]);
 
         // Gerar ID único para a sessão temporária
         $temp_id = uniqid('temp_', true);
@@ -94,8 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
         exit;
 
     } else {
-        $stmt->close();
-        $conexao2->close();
         $erro = "Espécie inválida ou não está disponível para importação.";
     }
 }

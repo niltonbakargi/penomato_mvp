@@ -9,11 +9,7 @@ error_reporting(E_ALL);
 
 session_start();
 
-require_once __DIR__ . '/../../config/app.php';
-$servidor   = DB_HOST;
-$usuario_db = DB_USER;
-$senha_db   = DB_PASS;
-$banco      = DB_NAME;
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ================================================
 // VERIFICAR SE USUÁRIO ESTÁ LOGADO
@@ -48,26 +44,13 @@ if ($_SESSION['importacao_temporaria']['usuario_id'] != $id_usuario) {
 // ================================================
 // BUSCAR DADOS DA ESPÉCIE NO BANCO (APENAS PARA EXIBIÇÃO)
 // ================================================
-$conexao = new mysqli($servidor, $usuario_db, $senha_db, $banco);
+$stmt = $pdo->prepare("SELECT id, nome_cientifico FROM especies_administrativo WHERE id = ?");
+$stmt->execute([$especie_id]);
+$especie = $stmt->fetch();
 
-if ($conexao->connect_error) {
-    die("Erro de conexão: " . $conexao->connect_error);
-}
-
-$conexao->set_charset("utf8mb4");
-
-$sql_especie = "SELECT id, nome_cientifico FROM especies_administrativo WHERE id = ?";
-$stmt = $conexao->prepare($sql_especie);
-$stmt->bind_param("i", $especie_id);
-$stmt->execute();
-$resultado = $stmt->get_result();
-
-if ($resultado->num_rows === 0) {
+if (!$especie) {
     die("Espécie não encontrada.");
 }
-
-$especie = $resultado->fetch_assoc();
-$stmt->close();
 
 // ================================================
 // CONTAGEM POR PARTE — VEM DO BANCO DE DADOS
@@ -77,22 +60,18 @@ $contagem_por_parte = [
     'semente' => 0, 'habito' => 0, 'exsicata_completa' => 0, 'detalhe' => 0
 ];
 
-$stmt_prog = $conexao->prepare(
+$stmt_prog = $pdo->prepare(
     "SELECT parte_planta, COUNT(*) AS total
        FROM especies_imagens
       WHERE especie_id = ? AND status_validacao = 'aprovado'
       GROUP BY parte_planta"
 );
-$stmt_prog->bind_param("i", $especie_id);
-$stmt_prog->execute();
-$res_prog = $stmt_prog->get_result();
-while ($row = $res_prog->fetch_assoc()) {
+$stmt_prog->execute([$especie_id]);
+while ($row = $stmt_prog->fetch()) {
     if (isset($contagem_por_parte[$row['parte_planta']])) {
         $contagem_por_parte[$row['parte_planta']] = (int)$row['total'];
     }
 }
-$stmt_prog->close();
-$conexao->close();
 
 // ================================================
 // DEFINIR STATUS DAS IMAGENS
@@ -1053,10 +1032,6 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                     ➡️ AVANÇAR PARA DADOS (PASSO 3)
                 </a>
 
-                <button type="button" id="btn_limpar_sessao" class="btn btn-limpar">
-                    🗑️ LIMPAR E RECOMEÇAR
-                </button>
-
                 <a href="escolher_especie.php" class="btn btn-secondary" onclick="return confirm('Tem certeza? Todo o progresso atual será perdido.')">
                     ⏪ CANCELAR IMPORTAÇÃO
                 </a>
@@ -1532,36 +1507,6 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
     });
 
-    // ================================================
-    // LIMPAR IMAGENS E RECOMEÇAR
-    // ================================================
-    document.getElementById('btn_limpar_sessao').addEventListener('click', function() {
-        if (!confirm('Isso vai apagar TODAS as imagens salvas desta espécie (banco + disco) e reiniciar o processo. Confirma?')) return;
-
-        const btn = this;
-        btn.disabled = true;
-        btn.textContent = '⏳ Limpando...';
-
-        const fd = new FormData();
-        fd.append('temp_id', '<?php echo addslashes($temp_id); ?>');
-
-        fetch('../Controllers/limpar_importacao_especie.php', { method: 'POST', body: fd })
-        .then(r => r.json())
-        .then(resp => {
-            if (resp.sucesso) {
-                window.location.reload();
-            } else {
-                alert('Erro: ' + resp.erro);
-                btn.disabled = false;
-                btn.textContent = '🗑️ LIMPAR IMAGENS E RECOMEÇAR';
-            }
-        })
-        .catch(err => {
-            alert('Erro de rede: ' + err.message);
-            btn.disabled = false;
-            btn.textContent = '🗑️ LIMPAR IMAGENS E RECOMEÇAR';
-        });
-    });
     </script>
 </body>
 </html>

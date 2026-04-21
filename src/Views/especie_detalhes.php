@@ -6,11 +6,7 @@
 session_start();
 ob_start();
 
-// Configurações do banco
-$servidor = "127.0.0.1";
-$usuario = "root";
-$senha = "";
-$banco = "penomato";
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 
 // ================================================
 // BUSCAR DADOS DA ESPÉCIE
@@ -23,27 +19,11 @@ $id_especie = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id_especie <= 0) {
     $erro = 'ID de espécie inválido';
 } else {
-    $conexao = mysqli_connect($servidor, $usuario, $senha, $banco);
-    
-    if (!$conexao) {
-        $erro = 'Erro ao conectar ao banco de dados';
-    } else {
-        mysqli_set_charset($conexao, "utf8mb4");
-        
-        $sql = "SELECT * FROM especies_caracteristicas WHERE id = ?";
-        $stmt = mysqli_prepare($conexao, $sql);
-        mysqli_stmt_bind_param($stmt, "i", $id_especie);
-        mysqli_stmt_execute($stmt);
-        $resultado = mysqli_stmt_get_result($stmt);
-        
-        if (mysqli_num_rows($resultado) > 0) {
-            $especie = mysqli_fetch_assoc($resultado);
-        } else {
-            $erro = 'Espécie não encontrada';
-        }
-        
-        mysqli_stmt_close($stmt);
-        mysqli_close($conexao);
+    $stmt = $pdo->prepare("SELECT * FROM especies_caracteristicas WHERE id = ?");
+    $stmt->execute([$id_especie]);
+    $especie = $stmt->fetch();
+    if (!$especie) {
+        $erro = 'Espécie não encontrada';
     }
 }
 
