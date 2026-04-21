@@ -9,6 +9,7 @@
 //   campos_divergentes → precisam de revisão no modal
 // ============================================================
 
+@set_time_limit(60);
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
@@ -372,7 +373,10 @@ if ($provider === 'claude') {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_TIMEOUT        => 55,
+            CURLOPT_TIMEOUT        => 28,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $api_key,
