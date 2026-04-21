@@ -19,8 +19,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 define('EMAIL_REMETENTE',      'noreply@penomato.app.br');
 define('EMAIL_NOME_REMETENTE', 'Penomato');
-define('APP_URL',              'https://penomato.app.br');
-define('APP_NOME',             'Penomato');
+if (!defined('APP_URL')) define('APP_URL', 'https://penomato.app.br');
+if (!defined('APP_NOME')) define('APP_NOME', 'Penomato');
 
 // ============================================================
 // CONFIGURAÇÕES SMTP

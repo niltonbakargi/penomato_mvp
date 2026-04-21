@@ -1032,9 +1032,11 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                     ➡️ AVANÇAR PARA DADOS (PASSO 3)
                 </a>
 
-                <a href="escolher_especie.php" class="btn btn-secondary" onclick="return confirm('Tem certeza? Todo o progresso atual será perdido.')">
-                    ⏪ CANCELAR IMPORTAÇÃO
-                </a>
+                <form method="POST" action="../Controllers/limpar_importacao_especie.php"
+                      onsubmit="return confirm('Cancelar importação? Todas as imagens já enviadas para esta espécie serão apagadas.')">
+                    <input type="hidden" name="especie_id" value="<?php echo (int)$especie_id; ?>">
+                    <button type="submit" class="btn btn-secondary">⏪ CANCELAR IMPORTAÇÃO</button>
+                </form>
             </div>
             
             <!-- Informação adicional -->
@@ -1061,7 +1063,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             <div class="busca-header">
                 <h2>🔍 Busca Automática</h2>
                 <span id="buscaNomeEspecie" class="busca-especie-nome"></span>
-                <button id="btnFecharBusca" class="btn-fechar-busca" onclick="fecharBusca()" title="Fechar">✕</button>
+                <button id="btnFecharBusca" class="btn-fechar-busca" onclick="cancelarBusca()" title="Cancelar e fechar sem salvar">✕</button>
             </div>
 
             <div class="busca-corpo">
@@ -1075,13 +1077,13 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 <!-- Sem resultados -->
                 <div id="buscaVazio" style="display:none;" class="busca-vazio">
                     <p>😕 Nenhuma imagem encontrada nas fontes automáticas.</p>
-                    <button onclick="document.getElementById('buscaModal').classList.remove('aberto')" class="btn btn-secondary" style="margin:0 auto;">Fechar</button>
+                    <button onclick="cancelarBusca()" class="btn btn-secondary" style="margin:0 auto;">Fechar</button>
                 </div>
 
                 <!-- Sem mais imagens -->
                 <div id="buscaSemMais" style="display:none;" class="busca-sem-mais">
                     <p>📭 Sem mais imagens disponíveis.</p>
-                    <button onclick="fecharBusca()" class="btn btn-primary" style="margin:0 auto;">✓ Fechar e salvar</button>
+                    <button onclick="confirmarEFechar()" class="btn btn-primary" style="margin:0 auto;">✓ Confirmar e salvar</button>
                 </div>
 
                 <!-- Imagem + ações -->
@@ -1112,6 +1114,16 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
                 </div><!-- /buscaConteudo -->
             </div><!-- /busca-corpo -->
+
+            <!-- Rodapé com botão de confirmação explícito -->
+            <div id="buscaRodape" style="display:none; padding:16px 24px; border-top:1px solid var(--cinza-200); display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                <span id="buscaRodapeInfo" style="font-size:0.9rem; color:var(--cinza-600);"></span>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="cancelarBusca()" class="btn btn-secondary" style="padding:8px 20px;">Cancelar</button>
+                    <button id="btnConfirmarBusca" onclick="confirmarEFechar()" class="btn btn-primary" style="padding:8px 20px;" disabled>✓ Confirmar seleção</button>
+                </div>
+            </div>
+
         </div><!-- /busca-container -->
     </div><!-- /buscaModal -->
 
@@ -1286,28 +1298,55 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
     }
 
     // ------------------------------------------------
-    // Verificar auto-fechamento (todas obrigatórias preenchidas)
+    // Atualizar rodapé e verificar se todas obrigatórias estão preenchidas
     // ------------------------------------------------
     function verificarAutoFechamento() {
+        const total = Object.values(busca.atribuicoes).reduce((s, a) => s + a.length, 0);
+
         const todasCompletas = Object.entries(PARTES_INFO)
             .filter(([, info]) => info.obrigatoria)
             .every(([key]) => busca.atribuicoes[key] && busca.atribuicoes[key].length > 0);
 
-        if (todasCompletas) {
-            setTimeout(() => fecharBusca(), 400);
+        const rodape    = document.getElementById('buscaRodape');
+        const info      = document.getElementById('buscaRodapeInfo');
+        const btnConf   = document.getElementById('btnConfirmarBusca');
+
+        if (total > 0) {
+            rodape.style.display = 'flex';
+            info.textContent = total + ' imagem(ns) selecionada(s)' + (todasCompletas ? ' ✅ Partes obrigatórias completas' : '');
+            btnConf.disabled = false;
+        } else {
+            rodape.style.display = 'none';
+            btnConf.disabled = true;
         }
+        // SEM auto-fechamento — o usuário confirma explicitamente
     }
 
     // ------------------------------------------------
-    // Fechar modal e salvar atribuições
+    // Fechar sem salvar (descartar seleção)
     // ------------------------------------------------
-    function fecharBusca() {
+    function cancelarBusca() {
+        const total = Object.values(busca.atribuicoes).reduce((s, a) => s + a.length, 0);
+        if (total > 0 && !confirm(total + ' imagem(ns) selecionada(s) serão descartadas. Confirmar?')) return;
+        document.getElementById('buscaModal').classList.remove('aberto');
+        document.getElementById('buscaRodape').style.display = 'none';
+    }
+
+    // ------------------------------------------------
+    // Confirmar seleção e salvar
+    // ------------------------------------------------
+    function confirmarEFechar() {
         const total = Object.values(busca.atribuicoes).reduce((s, a) => s + a.length, 0);
         if (total === 0) {
-            document.getElementById('buscaModal').classList.remove('aberto');
+            cancelarBusca();
             return;
         }
         salvarAtribuicoes();
+    }
+
+    // Mantido para compatibilidade (usado em buscaSemMais, etc.)
+    function fecharBusca() {
+        confirmarEFechar();
     }
 
     // ------------------------------------------------
@@ -1361,9 +1400,9 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             });
     }
 
-    // Fechar clicando fora do container
+    // Fechar clicando fora do container — descarta sem salvar
     document.getElementById('buscaModal').addEventListener('click', function(e) {
-        if (e.target === this) fecharBusca();
+        if (e.target === this) cancelarBusca();
     });
 
     // ------------------------------------------------
