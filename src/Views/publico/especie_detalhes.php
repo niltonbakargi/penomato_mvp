@@ -635,6 +635,127 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             font-style: italic;
         }
 
+        /* ── ABAS ARTIGO / ATRIBUTOS ── */
+        .artigo-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--cinza-200);
+        }
+        .artigo-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 20px;
+            font-size: .88rem;
+            font-weight: 700;
+            border: none;
+            background: none;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: color .15s, border-color .15s;
+        }
+        .artigo-tab:hover { color: var(--cor-primaria); }
+        .artigo-tab.ativo {
+            color: var(--cor-primaria);
+            border-bottom-color: var(--cor-primaria);
+        }
+
+        /* ── PIPELINE DE STATUS ── */
+        .artigo-pipeline {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid var(--cinza-200);
+            border-radius: 10px;
+            font-size: .78rem;
+        }
+        .pipeline-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            min-width: 70px;
+            position: relative;
+        }
+        .pipeline-step::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: calc(50% + 14px);
+            right: calc(-50% + 14px);
+            height: 2px;
+            background: var(--cinza-200);
+        }
+        .pipeline-step:last-child::after { display: none; }
+        .pipeline-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--cinza-200);
+            border: 2px solid var(--cinza-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .65rem;
+            color: #94a3b8;
+            font-weight: 700;
+            z-index: 1;
+            transition: all .2s;
+        }
+        .pipeline-step.feito .pipeline-dot {
+            background: var(--cor-primaria);
+            border-color: var(--cor-primaria);
+            color: white;
+        }
+        .pipeline-step.atual .pipeline-dot {
+            background: white;
+            border-color: var(--cor-primaria);
+            color: var(--cor-primaria);
+            box-shadow: 0 0 0 3px rgba(11,94,66,.15);
+        }
+        .pipeline-step::after {
+            background: var(--cinza-200);
+        }
+        .pipeline-step.feito::after {
+            background: var(--cor-primaria);
+        }
+        .pipeline-label {
+            font-size: .7rem;
+            color: #94a3b8;
+            text-align: center;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .pipeline-step.feito .pipeline-label,
+        .pipeline-step.atual .pipeline-label {
+            color: var(--cor-primaria);
+        }
+
+        /* ── CARD DO ARTIGO ── */
+        .artigo-preview-card {
+            background: white;
+            border: 1px solid var(--cinza-200);
+            border-radius: 12px;
+            padding: 32px 36px;
+            font-family: Georgia, 'Times New Roman', serif;
+            line-height: 1.7;
+        }
+        .artigo-sem-dados {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+            font-family: var(--fonte-principal);
+        }
+        .artigo-sem-dados i { font-size: 2rem; margin-bottom: 12px; display: block; }
+
         /* ── CARACTERÍSTICAS ── */
         .caract-container {
             display: flex;
@@ -1096,10 +1217,27 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             <i class="fas fa-map-marked-alt"></i> Ver no mapa
         </button>
 
-        <!-- AVISO dados não publicados -->
+        <!-- ABAS -->
+        <div class="artigo-tabs">
+            <button class="artigo-tab ativo" id="tab-artigo" onclick="trocarTab('artigo')">
+                <i class="fas fa-book-open"></i> Artigo Científico
+            </button>
+            <button class="artigo-tab" id="tab-atributos" onclick="trocarTab('atributos')">
+                <i class="fas fa-list"></i> Atributos
+            </button>
+        </div>
+
+        <!-- PIPELINE DE STATUS -->
+        <div id="artigo-pipeline"></div>
+
+        <!-- AVISO contextual -->
         <div id="caract-aviso"></div>
-        <!-- CARACTERÍSTICAS -->
-        <div class="caract-container" id="caract-container"></div>
+
+        <!-- ARTIGO PREVIEW (aba artigo) -->
+        <div class="artigo-preview-card" id="artigo-preview"></div>
+
+        <!-- CARACTERÍSTICAS (aba atributos) -->
+        <div class="caract-container" id="caract-container" style="display:none;"></div>
     </div>
 </div>
 
@@ -1206,6 +1344,9 @@ function renderArtigo(esp) {
 
     renderCarrossel();
 
+    // Pipeline de status
+    renderPipeline(esp.status, esp.artigo_status);
+
     // Aviso contextual por status
     var AVISO_STATUS = {
         'dados_internet': 'Dados preliminares de fontes externas — aguardando verificação científica.',
@@ -1224,10 +1365,10 @@ function renderArtigo(esp) {
     }
     document.getElementById('caract-aviso').innerHTML = aviso;
 
-    // Mostrar artigo armazenado ou características brutas como fallback
-    var container = document.getElementById('caract-container');
+    // ── Renderizar artigo no preview card ──
+    var preview = document.getElementById('artigo-preview');
     if (esp.artigo_html) {
-        container.innerHTML = esp.artigo_html;
+        preview.innerHTML = esp.artigo_html;
 
         // Injetar bloco de autores após art-nomes (ou art-titulo como fallback)
         if (esp.autores && esp.autores.length > 0) {
@@ -1241,18 +1382,67 @@ function renderArtigo(esp) {
             });
             autoresHtml += partes.join(' &nbsp;·&nbsp; ');
             autoresHtml += '</div>';
-
-            // Inserir após .art-nomes se existir, senão após .art-titulo
-            var alvo = container.querySelector('.art-nomes') || container.querySelector('.art-titulo');
+            var alvo = preview.querySelector('.art-nomes') || preview.querySelector('.art-titulo');
             if (alvo && alvo.parentNode) {
-                var div = document.createElement('div');
-                div.innerHTML = autoresHtml;
-                alvo.parentNode.insertBefore(div.firstChild, alvo.nextSibling);
+                var divA = document.createElement('div');
+                divA.innerHTML = autoresHtml;
+                alvo.parentNode.insertBefore(divA.firstChild, alvo.nextSibling);
             }
         }
     } else {
-        renderCaracteristicas(esp);
+        preview.innerHTML = '<div class="artigo-sem-dados">'
+            + '<i class="fas fa-hourglass-half"></i>'
+            + '<p>O artigo será gerado automaticamente após o upload de dados e imagens.</p>'
+            + '</div>';
     }
+
+    // ── Renderizar características na aba atributos ──
+    renderCaracteristicas(esp);
+
+    // Garantir que a aba ativa está correta
+    trocarTab(tabAtiva);
+}
+
+// ── PIPELINE DE STATUS ─────────────────────────────
+function renderPipeline(statusEspecie, statusArtigo) {
+    var passos = [
+        { key: 'dados_internet', label: 'Dados',     icon: '1' },
+        { key: 'registrada',     label: 'Exemplar',  icon: '2' },
+        { key: 'em_revisao',     label: 'Revisão',   icon: '3' },
+        { key: 'publicado',      label: 'Publicado', icon: '✓' },
+    ];
+    var ordem = ['sem_dados','dados_internet','descrita','registrada','em_revisao','revisada','contestado','publicado'];
+    var idxAtual = ordem.indexOf(statusEspecie);
+
+    var html = '<div class="artigo-pipeline">';
+    passos.forEach(function(p, i) {
+        var idxPasso = ordem.indexOf(p.key);
+        var cls = '';
+        if (idxAtual > idxPasso) cls = 'feito';
+        else if (statusEspecie === p.key || (p.key === 'em_revisao' && statusEspecie === 'revisada') || (p.key === 'publicado' && statusEspecie === 'publicado')) cls = 'feito';
+        else if (
+            (p.key === 'dados_internet' && statusEspecie === 'dados_internet') ||
+            (p.key === 'registrada'     && (statusEspecie === 'registrada' || statusEspecie === 'descrita')) ||
+            (p.key === 'em_revisao'     && (statusEspecie === 'em_revisao' || statusEspecie === 'contestado')) ||
+            (p.key === 'publicado'      && statusEspecie === 'publicado')
+        ) cls = 'atual';
+        html += '<div class="pipeline-step ' + cls + '">';
+        html += '<div class="pipeline-dot">' + (cls === 'feito' ? '✓' : p.icon) + '</div>';
+        html += '<div class="pipeline-label">' + p.label + '</div>';
+        html += '</div>';
+    });
+    html += '</div>';
+    document.getElementById('artigo-pipeline').innerHTML = html;
+}
+
+// ── TROCAR ABA ─────────────────────────────────────
+var tabAtiva = 'artigo';
+function trocarTab(qual) {
+    tabAtiva = qual;
+    document.getElementById('artigo-preview').style.display  = qual === 'artigo'    ? '' : 'none';
+    document.getElementById('caract-container').style.display = qual === 'atributos' ? '' : 'none';
+    document.getElementById('tab-artigo').classList.toggle('ativo',    qual === 'artigo');
+    document.getElementById('tab-atributos').classList.toggle('ativo', qual === 'atributos');
 }
 
 // ── CARROSSEL ─────────────────────────────────────
