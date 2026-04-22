@@ -687,7 +687,7 @@ header {
     <div class="logo-mark">🌿</div>
     <div>
       <div class="logo-title">Penomato</div>
-      <div class="logo-sub">MVP KANBAN</div>
+      <div class="logo-sub">MVP KANBAN · Atualizado 22/04/2026</div>
     </div>
   </div>
 
@@ -862,7 +862,7 @@ header {
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = 'penomato_kanban_v5';
+const STORAGE_KEY = 'penomato_kanban_v6';
 
 const DEFAULT_TASKS = [
   // ── CONCLUÍDO (histórico git) ──────────────────────────────────────────
@@ -912,24 +912,74 @@ const DEFAULT_TASKS = [
   { id:44, col:'done', title:"Fix: inserir_dados_internet.php sincronizado com vocabulário botânico", prio:"p1", tag:"Dados Internet", notes:"21/03/2026 — forma_folha: adicionadas Composta pinnada e Composta bipinada que estavam no $opcoes_validas mas faltavam no <select>. tamanho_flor: removida opção 'Grande' inválida (vocabulário só tem Pequena/Média).", due:"2026-03-21", created:"2026-03-21" },
   { id:45, col:'done', title:"Módulo de sugestões do colaborador", prio:"p2", tag:"Painel Colaborador", notes:"21/03/2026 — sugestoes.php criada do zero. Formulário com categoria, assunto e descrição. Histórico de sugestões enviadas com badge de status (recebida/em_analise/aprovada/rejeitada) e exibição de resposta do gestor. Usa tabela sugestoes_usuario já existente no banco. Botão 💡 Sugestões adicionado ao painel do colaborador para todos os subtipos.", due:"2026-03-21", created:"2026-03-21" },
 
-  // ── EM ANDAMENTO ───────────────────────────────────────────────────────
-  { id:50, col:'doing', title:"Integrar fila_aprovacao nos controladores existentes (dados_internet, confirmacao, imagem)", prio:"p1", tag:"Módulo Aprovação", notes:"Parcialmente feito: contestar_informacao e gerar_artigo já usam. Faltam: inserir_dados_internet, confirmar_caracteristicas, processar_upload_imagem", due:"", created:"2026-03-17" },
+  // ── CONCLUÍDO — Fase 5: Deploy e Produção ──────────────────────────────
+  { id:46, col:'done', title:"Workflow CI/CD via GitHub Actions + FTP HostGator", prio:"p1", tag:"Deploy", notes:"975831c — deploy automático em penomato.app.br a cada push na main. Múltiplos ajustes de protocolo FTP, server-dir e secrets.", due:"2026-03-22", created:"2026-03-22" },
+  { id:47, col:'done', title:"Configuração de ambiente prod/dev separados (config/producao.php + dev_local.php)", prio:"p1", tag:"Deploy", notes:"625f26a — credenciais separadas por ambiente. dev_local.php no .gitignore. producao.exemplo.php como template.", due:"2026-03-22", created:"2026-03-22" },
+  { id:48, col:'done', title:"Sistema funcionando em penomato.app.br — URLs, RewriteBase e APP_BASE corrigidos", prio:"p1", tag:"Deploy", notes:"baab88b + 0b5e901 + d06a652 — prefixo /penomato_mvp/ corrigido para produção, RewriteBase e redirect no .htaccess, app.php carregado em todas as entradas.", due:"2026-03-23", created:"2026-03-23" },
+  { id:91, col:'done', title:"Módulo de exemplares reimplementado e funcionando em produção (23/03)", prio:"p1", tag:"Módulo Exemplares", notes:"47a892b — reimplementação completa com deploy: cadastrar_exemplar.php, revisar_exemplar.php, mapa_exemplares.php. Fix de erros de sintaxe $var$var em todos os controllers (1f20943).", due:"2026-03-23", created:"2026-03-23" },
+  { id:92, col:'done', title:"Opção Desenvolvedor no cadastro + crédito institucional UEMS no rodapé", prio:"p3", tag:"Autenticação", notes:"01b1344 + aed225b — cadastro agora oferece 4 perfis incluindo Desenvolvedor. Rodapé do index exibe crédito institucional UEMS.", due:"2026-03-24", created:"2026-03-24" },
 
-  // ── A FAZER — CRÍTICO ──────────────────────────────────────────────────
-  { id:51, col:'todo', title:"Testar fluxo completo ponta a ponta com espécie real", prio:"p1", tag:"Testes", notes:"Cadastrar dados internet → confirmar → revisão → publicar. Verificar se status avança corretamente em cada etapa.", due:"", created:"2026-03-19" },
-  { id:52, col:'todo', title:"Criar 1 espécie com fluxo completo validado e aprovado pelo gestor", prio:"p1", tag:"Dados", notes:"Meta de demonstração do MVP para a banca.", due:"", created:"2026-03-19" },
-  { id:53, col:'todo', title:"Validação JS no botão 'Avançar para Dados' em upload_imagens_internet.php", prio:"p1", tag:"Upload Imagens", notes:"Botão avança sem verificar se folha/flor/fruto/caule/habito têm imagem. Precisa de guarda JS antes de permitir avançar.", due:"", created:"2026-03-19" },
-  { id:54, col:'todo', title:"Verificar requisitos formais da UEMS para o projeto integrador", prio:"p1", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
+  // ── CONCLUÍDO — Fase 6: E-mail e Autenticação ──────────────────────────
+  { id:49, col:'done', title:"SMTP configurado (noreply@penomato.app.br via HostGator)", prio:"p1", tag:"E-mail", notes:"c9aca30 — PHPMailer com SMTP HostGator. Usado em todos os fluxos transacionais.", due:"2026-03-28", created:"2026-03-28" },
+  { id:50, col:'done', title:"E-mail transacional em todos os fluxos (cadastro, aprovação, rejeição, recuperação)", prio:"p1", tag:"E-mail", notes:"bd12aaa — e-mails enviados em: cadastro de membro, aprovação/rejeição pelo gestor, recuperação de senha.", due:"2026-03-28", created:"2026-03-28" },
+  { id:67, col:'done', title:"Confirmação de e-mail obrigatória no cadastro + bloqueio de aprovação sem confirmação", prio:"p1", tag:"E-mail", notes:"6b3e322 + ca992a2 — token de confirmação enviado no cadastro. Gestor não consegue aprovar membro com e-mail não confirmado. Identificador tem acesso imediato.", due:"2026-03-30", created:"2026-03-30" },
+  { id:68, col:'done', title:"Pré-preenchimento de e-mail na recuperação de senha vindo do login", prio:"p3", tag:"E-mail", notes:"e532856 — UX: ao clicar 'Esqueci a senha' no login, e-mail já aparece preenchido.", due:"2026-03-28", created:"2026-03-28" },
+
+  // ── CONCLUÍDO — 28/03: GPS do Exemplar + Remoção do Validador ──────────
+  { id:93, col:'done', title:"Remoção do perfil validador/autenticador do sistema", prio:"p2", tag:"Autenticação", notes:"761833f — perfil validador removido definitivamente. Fluxo simplificado: Gestor aprova sem etapa extra de validação.", due:"2026-03-28", created:"2026-03-28" },
+  { id:94, col:'done', title:"Extração de GPS do exemplar via EXIF da foto e geolocalização do dispositivo", prio:"p2", tag:"Módulo Exemplares", notes:"761833f + 3aff777 + 2d9ff65 + 1c2b5dd — ~15 commits: dois botões de foto (câmera direta p/ EXIF, galeria p/ geolocalização), parser EXIF binário próprio (exif_gps.js), fallback automático para geoloc do dispositivo, leitura de GPS via servidor. Revertido ao estado pré-mobile (a9e6dd8) por instabilidade nos browsers — GPS via formulário manual mantido.", due:"2026-03-28", created:"2026-03-28" },
+
+  // ── CONCLUÍDO — 02/04 ───────────────────────────────────────────────────
+  { id:95, col:'done', title:"Terminologia botânica corrigida nos atributos de folha", prio:"p2", tag:"Módulo Fichas", notes:"09961ac — nomenclatura dos atributos de folha padronizada com o vocabulário botânico oficial.", due:"2026-04-02", created:"2026-04-02" },
+
+  // ── CONCLUÍDO — 08/04: Pipeline de Imagens + UX ─────────────────────────
+  { id:96, col:'done', title:"Opção 'Gestor' no cadastro aparece apenas até o primeiro gestor ser criado", prio:"p2", tag:"Autenticação", notes:"db44d42 — UX: evita múltiplos gestores por acidente. Depois do primeiro gestor cadastrado, a opção some do formulário.", due:"2026-04-08", created:"2026-04-08" },
+  { id:97, col:'done', title:"Pipeline de imagens refatorado: pasta temp eliminada — imagens salvas direto no banco", prio:"p1", tag:"Upload Imagens", notes:"a6e0715 + cdbce13 — elimina pasta temporária de upload. Imagens vão direto para a tabela do banco. Limpeza final do módulo: controllers de temp removidos.", due:"2026-04-12", created:"2026-04-12" },
+  { id:98, col:'done', title:"Script SQL de limpeza de dados de testes (reset completo para reimportação)", prio:"p3", tag:"Banco de Dados", notes:"d3a6271 + 3ebea1a — script 004 para zerar dados de teste antes de importação real. Snapshot do banco de produção em 08/04 (f83246c).", due:"2026-04-08", created:"2026-04-08" },
+
+  // ── CONCLUÍDO — 21/04: Fixes finais ─────────────────────────────────────
+  { id:99, col:'done', title:"Fix: modal de busca de imagens, botão cancelar importação e config de e-mail", prio:"p1", tag:"UX", notes:"69bdb28 — modal de busca de imagens por parte corrigido, botão de cancelar importação funcionando, config de e-mail ajustada.", due:"2026-04-21", created:"2026-04-21" },
+
+  // ── CONCLUÍDO — Fase 7: Flora do Cerrado + Curadoria de Imagens ─────────
+  { id:70, col:'done', title:"Módulo público Flora do Cerrado (consulta REFLORA/JBRJ)", prio:"p2", tag:"Flora Cerrado", notes:"ac7628e — página pública de consulta de nomes aceitos no Cerrado via JBRJ. Redesenhada como ferramenta de referência botânica (5f17554).", due:"2026-04-05", created:"2026-04-05" },
+  { id:71, col:'done', title:"Carrossel de curadoria de imagens automáticas (iNaturalist + Wikimedia)", prio:"p2", tag:"Curadoria Imagens", notes:"b411ad0 + 8ac6529 — controller busca imagens por nome científico nas duas APIs. Modal de seleção por parte da planta (bd6a913). Cards viram links clicáveis (35ea7e4).", due:"2026-04-07", created:"2026-04-07" },
+
+  // ── CONCLUÍDO — Fase 8: Integração IA ──────────────────────────────────
+  { id:72, col:'done', title:"Integração IA (DeepSeek/Claude/OpenAI/Gemini) para preenchimento morfológico", prio:"p1", tag:"IA", notes:"ba3e8a1 + 58ecc09 — botão 'Preencher com IA' em inserir_dados_internet. Prompt com fontes preferenciais (REFLORA, Lorenzi). max_tokens 8192, temperature 0.2. Formulário oculto até retorno da IA.", due:"2026-04-10", created:"2026-04-10" },
+  { id:73, col:'done', title:"Modal de validação para valores não reconhecidos vindos da IA ou JSON manual", prio:"p2", tag:"IA", notes:"a08c96c — quando a IA retorna valor fora do vocabulário botânico, modal apresenta opções válidas para o usuário escolher antes de salvar.", due:"2026-04-10", created:"2026-04-10" },
+  { id:74, col:'done', title:"Botão 'Preencher manualmente' como fallback quando IA falha", prio:"p2", tag:"IA", notes:"411e181 — se provider offline ou chave inválida, formulário abre normalmente sem travar o fluxo.", due:"2026-04-10", created:"2026-04-10" },
+  { id:75, col:'done', title:"Fix: timeout de IA ajustado para 110s + max_execution_time=120 no .htaccess", prio:"p1", tag:"IA", notes:"8759d4b + 8558249 — DeepSeek com SSL verify desativado no Hostgator. Timeout HTTP 110s para não ultrapassar limit PHP.", due:"2026-04-20", created:"2026-04-20" },
+
+  // ── CONCLUÍDO — Fase 9: Migração e Segurança ───────────────────────────
+  { id:76, col:'done', title:"Migração MySQLi → PDO 100% concluída (9 arquivos)", prio:"p1", tag:"Banco de Dados", notes:"5048bdc + 33b23e5 — todos os arquivos usam $pdo global de banco_de_dados.php. Prepared statements com execute([]) em todos — sem SQL Injection.", due:"2026-04-20", created:"2026-04-20" },
+  { id:77, col:'done', title:"Remoção de credenciais hardcoded de 7 arquivos (segurança)", prio:"p1", tag:"Segurança", notes:"d94a74e + 734586f — senhas SMTP e credenciais MySQL movidas para config/dev_local.php (gitignored). Correções de XSS e outras vulnerabilidades.", due:"2026-04-20", created:"2026-04-20" },
+  { id:78, col:'done', title:"Limpeza de arquivos mortos: controllers órfãos, dumps SQL antigos, uploads legados", prio:"p2", tag:"Infraestrutura", notes:"99dbc73 + 984e2ff — removidos: busca_caracteristicas_controlador.php, cadastrar_caracteristicas_controlador.php, config/database.php, src/index.php, 6 dumps SQL. Link de upload vazio corrigido.", due:"2026-04-20", created:"2026-04-20" },
+
+  // ── CONCLUÍDO — Fase 10: Fluxo do Revisor ──────────────────────────────
+  { id:79, col:'done', title:"Fluxo completo do revisor: aprovar e contestar com e-mail de feedback", prio:"p1", tag:"Módulo Revisão", notes:"2868cf7 — handler POST em controlador_painel_revisor.php. Aprovar: status → revisada, notifica colaborador. Contestar: status → contestado, motivo obrigatório, notifica com feedback. Validação de erro se motivo ausente.", due:"2026-04-20", created:"2026-04-20" },
+
+  // ── A FAZER — CRÍTICO: TVV ─────────────────────────────────────────────
+  { id:80, col:'todo', title:"TVV — Fluxo colaborador ponta a ponta em produção", prio:"p1", tag:"TVV", notes:"Criar conta → login → upload imagens → IA preenche → confirmar/editar → artigo aparece no painel do revisor com status pendente. Testar em penomato.app.br.", due:"", created:"2026-04-22" },
+  { id:81, col:'todo', title:"TVV — Fluxo revisor: aprovar e contestar em produção", prio:"p1", tag:"TVV", notes:"Login como revisor → ver artigo pendente → Aprovar (verificar status revisada + e-mail) → Contestar (verificar status contestado + e-mail com motivo). Testar erro se contestar sem motivo.", due:"", created:"2026-04-22" },
+  { id:82, col:'todo', title:"TVV — Fallback da IA: simular falha e verificar botão manual", prio:"p2", tag:"TVV", notes:"Desabilitar chave da IA temporariamente → verificar se botão 'Preencher manualmente' aparece e o formulário abre sem travar.", due:"", created:"2026-04-22" },
+  { id:83, col:'todo', title:"TVV — Segurança: dev_local.php fora do repositório + páginas protegidas sem sessão", prio:"p2", tag:"TVV", notes:"git status: garantir que dev_local.php não está rastreado. Testar acesso direto a páginas internas sem login → deve redirecionar.", due:"", created:"2026-04-22" },
+  { id:84, col:'todo', title:"TVV — Links quebrados no menu do colaborador", prio:"p2", tag:"TVV", notes:"Navegar por todas as opções do menu buscando páginas em branco ou 404. Verificar colaborador/upload_imagem.php → deve redirecionar para enviar_imagem.php.", due:"", created:"2026-04-22" },
+
+  // ── A FAZER — CRÍTICO: Exemplares ─────────────────────────────────────
+  { id:85, col:'todo', title:"Vincular foto de identificação ao exemplar (exemplar_id em especies_imagens)", prio:"p1", tag:"Módulo Exemplares", notes:"exemplar_id já existe na tabela especies_imagens mas o fluxo de upload não pergunta qual exemplar. Mudança cirúrgica no controller de upload e na view.", due:"", created:"2026-04-22" },
 
   // ── A FAZER — ALTA ─────────────────────────────────────────────────────
+  { id:51, col:'todo', title:"Criar 1 espécie com fluxo completo validado e aprovado pelo gestor", prio:"p1", tag:"Dados", notes:"Meta de demonstração do MVP para a banca. Usar IA para preencher + curadoria de imagens.", due:"", created:"2026-03-19" },
+  { id:52, col:'todo', title:"Verificar requisitos formais da UEMS para o projeto integrador", prio:"p1", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
   { id:55, col:'todo', title:"Implementar destino do botão 'Abrir Artigo' para espécies publicadas", prio:"p2", tag:"Módulo Fichas", notes:"O botão existe e está habilitado para status=publicado, mas ainda não leva a nenhuma página. Falta criar a view de artigo publicado.", due:"", created:"2026-03-19" },
-  { id:56, col:'todo', title:"Painel do validador (aprovação final pós-revisão pelo especialista)", prio:"p2", tag:"Módulo Validação", notes:"painel_validador.php e validar_especie.php existem mas precisam ser integrados ao fluxo.", due:"", created:"2026-03-17" },
   { id:57, col:'todo', title:"Implementar contato.php e sobre.php (páginas públicas vazias)", prio:"p2", tag:"Público", notes:"Ambos são stubs vazios. sobre.php: apresentação do projeto/parceria UEMS. contato.php: form simples.", due:"", created:"2026-03-19" },
-  { id:58, col:'todo', title:"Adicionar imagens reais a pelo menos 3 espécies do Cerrado", prio:"p2", tag:"Dados", notes:"Necessário para demonstração da busca pública e especie_detalhes.php funcionar com dados reais.", due:"", created:"2026-03-17" },
+  { id:58, col:'todo', title:"Adicionar imagens reais a pelo menos 3 espécies do Cerrado", prio:"p2", tag:"Dados", notes:"Necessário para demonstração da busca pública e especie_detalhes.php funcionar com dados reais. Usar curadoria iNaturalist/Wikimedia já implementada.", due:"", created:"2026-03-17" },
   { id:59, col:'todo', title:"Escrever introdução e justificativa do TCC (ângulo educação ambiental fitomorfológica)", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
   { id:60, col:'todo', title:"Documentar arquitetura, banco de dados e fluxo científico no relatório", prio:"p2", tag:"TCC", notes:"", due:"", created:"2026-03-17" },
 
   // ── A FAZER — MÉDIA ────────────────────────────────────────────────────
+  { id:86, col:'todo', title:"Atualizar README com perfis corretos e fluxo com exemplares", prio:"p3", tag:"Documentação", notes:"Perfil validador foi removido (761833f). Fluxo com exemplares e IA ainda não está documentado no README.", due:"", created:"2026-04-22" },
+  { id:87, col:'todo', title:"Limpeza da pasta penomato/ duplicada no repositório", prio:"p3", tag:"Infraestrutura", notes:"Sobrou da reestruturação revertida (8b16a74 → eed76aa). Contém composer.lock, config/ e vendor/ duplicados que não deveriam estar no repositório.", due:"", created:"2026-04-22" },
   { id:61, col:'todo', title:"Lightbox para ampliar imagens com créditos e licença", prio:"p3", tag:"Módulo Fichas", notes:"", due:"", created:"2026-03-17" },
   { id:62, col:'todo', title:"Exportação da ficha da espécie em PDF", prio:"p3", tag:"Fichas", notes:"", due:"", created:"2026-03-17" },
   { id:63, col:'todo', title:"Responsividade mobile nos formulários longos", prio:"p3", tag:"UX", notes:"", due:"", created:"2026-03-17" },
@@ -938,8 +988,7 @@ const DEFAULT_TASKS = [
 
   // ── A FAZER — BAIXA ────────────────────────────────────────────────────
   { id:66, col:'todo', title:"API REST pública para consulta de espécies", prio:"p4", tag:"API", notes:"", due:"", created:"2026-03-17" },
-  { id:67, col:'todo', title:"Notificações por email (aprovação, rejeição, atribuição)", prio:"p4", tag:"Sistema", notes:"Infraestrutura de tokens já existe no banco.", due:"", created:"2026-03-17" },
-  { id:68, col:'todo', title:"Configurações do sistema: subtipos de colaborador e partes obrigatórias", prio:"p4", tag:"Painel Gestor", notes:"configuracoes_sistema.php — adiado para pós-MVP", due:"", created:"2026-03-17" },
+  { id:88, col:'todo', title:"Configurações do sistema: subtipos de colaborador e partes obrigatórias", prio:"p4", tag:"Painel Gestor", notes:"configuracoes_sistema.php — adiado para pós-MVP", due:"", created:"2026-03-17" },
 ];
 
 // ── STATE ──

@@ -1,7 +1,7 @@
 # Kanban — Penomato MVP
-**Atualizado em:** 28/03/2026
+**Atualizado em:** 22/04/2026
 **Branch ativo:** `main`
-**Último commit:** `e532856` feat: pré-preenche e-mail na recuperação de senha vindo do login
+**Último commit:** `8759d4b` fix: aumenta timeout da IA para 110s e define max_execution_time=120 no htaccess
 
 ---
 
@@ -35,26 +35,96 @@
 - [x] Upload de partes vinculado ao exemplar aprovado
 - [x] Design tokens CSS globais (sistema de variáveis)
 
-### Fase 5 — Deploy em Produção
-- [x] Workflow CI/CD via GitHub Actions + FTP HostGator
-- [x] Configuração de ambiente prod/dev separados
-- [x] Sistema funcionando em `penomato.app.br`
+### Fase 5 — Deploy em Produção (22-23/03)
+- [x] Workflow CI/CD via GitHub Actions + FTP HostGator (`975831c`)
+- [x] Configuração de ambiente prod/dev separados (config/producao.php + dev_local.php) (`625f26a`)
+- [x] Sistema funcionando em `penomato.app.br` — URLs, RewriteBase e APP_BASE corrigidos (`baab88b`, `0b5e901`, `d06a652`)
+- [x] Módulo de exemplares reimplementado e funcionando em produção (`47a892b`)
+- [x] Fix erros de sintaxe $var$var em todos os controllers (`1f20943`)
+- [x] Opção Desenvolvedor no cadastro + crédito institucional UEMS no rodapé (`01b1344`, `aed225b`)
 
-### Fase 6 — E-mail e Segurança
-- [x] SMTP configurado (noreply@penomato.app.br via HostGator)
-- [x] E-mail transacional em todos os fluxos (cadastro, aprovação, rejeição, recuperação)
-- [x] Confirmação de e-mail obrigatória no cadastro
-- [x] Identificador com acesso imediato; demais perfis aguardam aprovação do gestor
-- [x] Bloqueio de aprovação de membros sem e-mail confirmado
-- [x] Pré-preenchimento de e-mail na tela de recuperação de senha
+### Fase 6 — E-mail e Autenticação Avançada (24-25/03)
+- [x] SMTP configurado (noreply@penomato.app.br via HostGator) (`c9aca30`)
+- [x] E-mail transacional em todos os fluxos (cadastro, aprovação, rejeição, recuperação) (`bd12aaa`)
+- [x] Confirmação de e-mail obrigatória no cadastro (`6b3e322`)
+- [x] Identificador com acesso imediato; demais perfis aguardam aprovação do gestor (`c3a51fd`)
+- [x] Bloqueio de aprovação de membros sem e-mail confirmado (`ca992a2`)
+- [x] Pré-preenchimento de e-mail na tela de recuperação de senha (`e532856`)
+
+### Fase 6b — GPS do Exemplar + Remoção do Validador (28/03)
+- [x] Remoção do perfil validador/autenticador do sistema (`761833f`)
+- [x] Extração de GPS da foto do exemplar via EXIF + fallback para geolocalização do dispositivo (`3aff777`, `2d9ff65`, `1c2b5dd`, `3739322`) — ~15 commits; revertido ao formulário manual por instabilidade nos browsers (`a9e6dd8`)
+
+### Fase 6c — Terminologia e Banco (02-08/04)
+- [x] Terminologia botânica corrigida nos atributos de folha (`09961ac`)
+- [x] Opção gestor no cadastro restrita ao primeiro gestor (`db44d42`)
+- [x] Script SQL de limpeza de dados de testes / reset para reimportação (`d3a6271`, `3ebea1a`)
+- [x] Snapshot do banco de produção em 08/04 (`f83246c`)
+
+### Fase 7 — Pipeline de Imagens + Flora do Cerrado (08-15/04)
+- [x] Pipeline de imagens refatorado: pasta temp eliminada — imagens salvas direto no banco (`a6e0715`, `cdbce13`)
+- [x] Módulo público Flora do Cerrado (consulta REFLORA/JBRJ por nome aceito) (`ac7628e`, `5f17554`, `fb48fef`)
+- [x] Carrossel de curadoria de imagens automáticas (iNaturalist + Wikimedia) (`b411ad0`, `8ac6529`)
+- [x] Modal de seleção de imagem por parte da planta (`bd6a913`)
+- [x] Cards de resultado viram links clicáveis para navegação por parte (`35ea7e4`)
+
+### Fase 8 — Integração IA (11-21/04)
+- [x] Integração IA (DeepSeek/Claude/OpenAI/Gemini) para preenchimento morfológico automático (`ba3e8a1`, `58ecc09`, `a08c96c`)
+- [x] Modal de validação para valores não reconhecidos vindos da IA ou JSON manual (`6c5222f`)
+- [x] Botão "Preencher manualmente" como fallback quando IA falha ou está offline (`411e181`)
+- [x] Fix timeout IA: 110s HTTP + max_execution_time=120 no .htaccess (Hostgator) (`8759d4b`, `8558249`)
+- [x] Fix: modal de busca de imagens, botão cancelar importação e config de e-mail (`69bdb28`)
+
+### Fase 9 — Migração e Segurança
+- [x] Migração MySQLi → PDO 100% concluída (9 arquivos, prepared statements em todos)
+- [x] Remoção de credenciais hardcoded de 7 arquivos (SMTP, MySQL movidos para config/)
+- [x] Correções de vulnerabilidades de segurança (XSS, SQL Injection prevention)
+- [x] Limpeza de arquivos mortos: controllers órfãos, dumps SQL antigos, uploads legados
+
+### Fase 10 — Fluxo do Revisor (fechado)
+- [x] Fluxo completo aprovação/contestação do revisor com e-mail de feedback
+- [x] Aprovar: status → `revisada`, notifica colaborador por e-mail
+- [x] Contestar: status → `contestado`, motivo obrigatório, notifica com feedback
+- [x] Validação de erro se contestar sem motivo
 
 ---
 
-## EM ANDAMENTO — Pós-MVP / Estabilização
+## TVV PENDENTE — Teste, Validação e Verificação
 
-- [ ] **Limpeza da pasta `penomato/`** — sobrou da reestruturação revertida (`8b16a74` → `eed76aa`); contém composer.lock, config/ e vendor/ duplicados que não deveriam estar no repositório
-- [ ] **Testes integrados em produção** — validar fluxo completo: cadastro exemplar → revisão → upload de partes → geração de artigo → revisão do especialista
-- [ ] **Atualizar README** — incluir perfis corretos e fluxo com exemplares
+- [ ] **Fluxo colaborador ponta a ponta em produção** — upload → IA → confirmar → artigo no revisor
+- [ ] **Fluxo revisor: aprovar e contestar** — verificar status + e-mails chegando
+- [ ] **Fallback da IA** — simular falha, verificar botão "Preencher manualmente"
+- [ ] **Segurança** — dev_local.php fora do repo, páginas protegidas redirecionam sem sessão
+- [ ] **Links quebrados** — navegar menu do colaborador buscando 404 ou páginas em branco
+
+---
+
+## A FAZER — Pós-TVV
+
+### Crítico
+- [ ] **Vincular foto de identificação ao exemplar** — `exemplar_id` existe em `especies_imagens` mas o upload não pergunta; mudança cirúrgica no controller
+- [ ] **Criar 1 espécie com fluxo completo validado** — meta de demonstração para a banca
+- [ ] **Verificar requisitos formais UEMS** — projeto integrador
+
+### Alta
+- [ ] Implementar destino do botão "Abrir Artigo" para espécies publicadas (view de artigo publicado)
+- [ ] Implementar contato.php e sobre.php (stubs vazios)
+- [ ] Adicionar imagens reais a pelo menos 3 espécies do Cerrado
+- [ ] Escrever introdução e justificativa do TCC
+- [ ] Documentar arquitetura e fluxo científico no relatório
+
+### Média
+- [ ] Atualizar README com perfis corretos e fluxo com exemplares
+- [ ] Limpeza da pasta `penomato/` duplicada no repositório
+- [ ] Lightbox para ampliar imagens com créditos e licença
+- [ ] Exportação da ficha da espécie em PDF
+- [ ] Responsividade mobile nos formulários longos
+- [ ] Preparar apresentação para a banca (slides)
+- [ ] Preparar demonstração ao vivo do sistema
+
+### Baixa
+- [ ] API REST pública para consulta de espécies
+- [ ] Configurações do sistema: subtipos de colaborador e partes obrigatórias
 
 ---
 
@@ -108,11 +178,12 @@
 
 | Métrica | Valor |
 |---|---|
-| Total de commits | 94 |
-| Período de desenvolvimento | 08/02 – 25/03/2026 (46 dias) |
-| Fases concluídas | 6 / 6 |
+| Total de commits | ~210 |
+| Período de desenvolvimento | 08/02 – 22/04/2026 (74 dias) |
+| Fases concluídas | 10 / 10 |
 | Controllers PHP | ~30 |
 | Views PHP | ~40 |
 | Perfis de usuário | 4 (Gestor, Colaborador, Revisor/Especialista, Desenvolvedor) |
 | Status de espécie | 7 (Sem dados → Publicada) |
+| Providers de IA | 4 (DeepSeek, Claude, OpenAI, Gemini) |
 | Deploy | penomato.app.br (HostGator) |
