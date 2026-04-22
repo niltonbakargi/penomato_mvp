@@ -1182,8 +1182,11 @@ function renderArtigo(esp) {
     if (esp.artigo_html) {
         var icon  = ARTIGO_ICONS[esp.artigo_status]  || 'fa-file-alt';
         var label = ARTIGO_LABELS[esp.artigo_status] || 'Artigo';
-        var cls   = esp.artigo_status === 'publicado' ? 'ativo' : 'ativo';
-        btnWrapper.innerHTML = '<span class="btn-artigo ' + cls + '"><i class="fas ' + icon + '"></i> Artigo: ' + label + '</span>';
+        if (esp.artigo_status === 'publicado') {
+            btnWrapper.innerHTML = '<a href="<?= APP_BASE ?>/src/Views/publico/artigo.php?id=' + esp.id + '" class="btn-artigo ativo"><i class="fas ' + icon + '"></i> Abrir Artigo</a>';
+        } else {
+            btnWrapper.innerHTML = '<span class="btn-artigo ativo" title="Aguardando publicação"><i class="fas ' + icon + '"></i> Artigo: ' + label + '</span>';
+        }
     } else {
         btnWrapper.innerHTML = '<span class="btn-artigo desativado"><i class="fas fa-lock"></i> Sem artigo</span>';
     }

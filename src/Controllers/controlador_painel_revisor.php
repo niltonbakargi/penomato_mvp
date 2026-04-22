@@ -67,26 +67,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['acao'] ?? '', ['ap
 
             $pdo->prepare("
                 UPDATE especies_administrativo
-                SET status = 'revisada', data_revisada = NOW(),
-                    autor_revisada_id = ?, observacoes_revisao = ?,
+                SET status = 'publicado',
+                    data_revisada = NOW(),
+                    autor_revisada_id = ?,
+                    observacoes_revisao = ?,
+                    data_publicado = NOW(),
+                    autor_publicado_id = ?,
                     data_ultima_atualizacao = NOW()
                 WHERE id = ?
-            ")->execute([$usuario_id, $motivo ?: null, $especie_id]);
+            ")->execute([$usuario_id, $motivo ?: null, $usuario_id, $especie_id]);
+
+            $pdo->prepare("
+                UPDATE artigos
+                SET status = 'publicado', atualizado_em = NOW()
+                WHERE especie_id = ?
+            ")->execute([$especie_id]);
 
             if (!empty($especie['colaborador_email'])) {
                 $corpo = "<p>Olá, <strong>" . htmlspecialchars($especie['colaborador_nome']) . "</strong>!</p>
                     <p>A espécie <em>" . htmlspecialchars($especie['nome_cientifico']) . "</em>
-                    foi <strong style='color:#0b5e42;'>APROVADA</strong> pelo revisor.</p>"
+                    foi <strong style='color:#0b5e42;'>APROVADA e PUBLICADA</strong> pelo especialista.</p>"
                     . ($motivo ? "<p><strong>Observações:</strong> " . htmlspecialchars($motivo) . "</p>" : "")
-                    . "<p>Os dados serão publicados em breve.</p>";
+                    . "<p>Os dados já estão disponíveis publicamente no Penomato.</p>";
                 enviarEmail(
                     $especie['colaborador_email'],
-                    'Espécie aprovada — Penomato',
-                    templateEmail('Revisão concluída com aprovação', $corpo)
+                    'Espécie publicada — Penomato',
+                    templateEmail('Espécie publicada com sucesso', $corpo)
                 );
             }
 
-            header('Location: ' . $url_painel . '?sucesso=' . urlencode('"' . $especie['nome_cientifico'] . '" aprovada com sucesso!'));
+            header('Location: ' . $url_painel . '?sucesso=' . urlencode('"' . $especie['nome_cientifico'] . '" publicada com sucesso!'));
 
         } else {
 
