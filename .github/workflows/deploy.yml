@@ -70,7 +70,6 @@ jobs:
             *.ps1
             mapear_estrutura.php
             gerar_hash.php
-            penomato_kanban.html
             mapeamento_estrutura.*
             arquivos_para_ajustar.txt
             config/database.php
