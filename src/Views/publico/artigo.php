@@ -238,11 +238,215 @@ $data_pub = $artigo['data_publicado']
             margin-top: 8px;
         }
 
+        /* ── BLOCO ABNT (só visível na impressão) ── */
+        .print-cabecalho {
+            display: none;
+        }
+
+        /* ════════════════════════════════════════
+           ABNT NBR 6022:2018 — @media print
+           A4 · Times New Roman 12pt · 1,5 esp.
+           Margens: 3cm sup/esq · 2cm inf/dir
+        ════════════════════════════════════════ */
         @media print {
-            .header, .acoes, .pub-meta, .card-creditos { display: none; }
-            .card-artigo { box-shadow: none; padding: 0; }
-            .page-wrap { padding: 0; }
-            body { background: white; }
+
+            /* Página A4 com margens ABNT */
+            @page {
+                size: A4 portrait;
+                margin: 3cm 2cm 2cm 3cm;
+            }
+
+            /* Reset geral */
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+            body {
+                background: white !important;
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                font-size: 12pt !important;
+                line-height: 1.5 !important;
+                margin: 0 !important;
+            }
+
+            /* Ocultar elementos de navegação/web */
+            .header,
+            .hero,
+            .acoes,
+            .pub-meta,
+            .card-creditos { display: none !important; }
+
+            /* Remover card visual */
+            .page-wrap {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .card-artigo {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* Exibir bloco de título ABNT */
+            .print-cabecalho {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 24pt;
+            }
+
+            .print-titulo {
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 14pt;
+                font-weight: bold;
+                font-style: italic;
+                text-align: center;
+                text-transform: uppercase;
+                margin-bottom: 18pt;
+                line-height: 1.3;
+            }
+
+            .print-autores {
+                font-size: 11pt;
+                text-align: center;
+                margin-bottom: 4pt;
+                line-height: 1.4;
+            }
+
+            .print-inst {
+                font-size: 10pt;
+                text-align: center;
+                color: #333;
+                margin-bottom: 16pt;
+                font-style: italic;
+            }
+
+            .print-linha {
+                border: none;
+                border-top: 1px solid #000;
+                margin: 16pt 0;
+            }
+
+            .print-data {
+                font-size: 10pt;
+                text-align: right;
+                color: #444;
+                margin-bottom: 24pt;
+                font-style: italic;
+            }
+
+            /* ── Artigo: tipografia ABNT ── */
+            .artigo {
+                font-family: 'Times New Roman', Times, serif !important;
+                font-size: 12pt !important;
+                line-height: 1.5 !important;
+                color: #000 !important;
+            }
+
+            /* Título da espécie (h2) */
+            .art-titulo {
+                font-size: 14pt !important;
+                font-weight: bold !important;
+                font-style: italic !important;
+                text-align: center !important;
+                color: #000 !important;
+                margin-bottom: 6pt !important;
+                text-transform: none !important;
+            }
+
+            /* Família, sinônimos, nomes populares */
+            .art-familia,
+            .art-sinonimos,
+            .art-nomes {
+                font-size: 11pt !important;
+                text-align: center !important;
+                color: #000 !important;
+                margin-bottom: 4pt !important;
+            }
+
+            /* Seções (h3): numeradas, negrito, maiúsculas */
+            .art-secao {
+                font-family: 'Times New Roman', Times, serif !important;
+                font-size: 12pt !important;
+                font-weight: bold !important;
+                text-transform: uppercase !important;
+                color: #000 !important;
+                border-bottom: none !important;
+                margin: 18pt 0 6pt !important;
+                page-break-after: avoid !important;
+            }
+
+            /* Parágrafos: recuo ABNT, justificado */
+            .art-paragrafo {
+                font-size: 12pt !important;
+                line-height: 1.5 !important;
+                text-align: justify !important;
+                text-indent: 1.25cm !important;
+                margin-bottom: 0 !important;
+                color: #000 !important;
+            }
+
+            /* Referências sobrescritas */
+            .art-paragrafo sup {
+                font-size: 8pt !important;
+                color: #000 !important;
+            }
+
+            /* ── Prancha fotográfica ── */
+            .art-galeria {
+                display: block !important;
+                columns: 3 !important;
+                column-gap: 12pt !important;
+                margin: 12pt 0 !important;
+            }
+
+            .art-figura {
+                display: inline-block !important;
+                width: 100% !important;
+                text-align: center !important;
+                margin-bottom: 12pt !important;
+                page-break-inside: avoid !important;
+            }
+
+            .art-figura img {
+                width: 100% !important;
+                max-width: 140pt !important;
+                height: auto !important;
+                border: 1px solid #ccc !important;
+                display: block !important;
+                margin: 0 auto !important;
+            }
+
+            /* Legenda: ABNT — abaixo da figura, 10pt */
+            .art-figura figcaption {
+                font-size: 10pt !important;
+                color: #000 !important;
+                text-align: center !important;
+                max-width: 100% !important;
+                margin-top: 4pt !important;
+                font-style: italic !important;
+            }
+
+            /* ── Referências: espaço simples, 6pt entre itens ── */
+            .art-refs {
+                font-size: 11pt !important;
+                line-height: 1.2 !important;
+                color: #000 !important;
+                padding-left: 0 !important;
+                list-style-position: inside !important;
+            }
+
+            .art-refs li {
+                margin-bottom: 6pt !important;
+                text-align: justify !important;
+            }
+
+            /* Controle de quebra de página */
+            .art-galeria { page-break-inside: avoid; }
+            .art-refs    { page-break-before: auto; }
+            h2, h3       { page-break-after: avoid; }
+            p            { orphans: 3; widows: 3; }
         }
 
         @media (max-width: 640px) {
@@ -290,6 +494,34 @@ $data_pub = $artigo['data_publicado']
 
     <!-- Artigo -->
     <div class="card-artigo">
+
+        <!-- Bloco de título ABNT — oculto na web, visível na impressão -->
+        <div class="print-cabecalho">
+            <div class="print-titulo"><?= htmlspecialchars($artigo['nome_cientifico']) ?></div>
+
+            <?php
+            $autores_print = [];
+            if (!empty($artigo['nome_colaborador'])) $autores_print[] = $artigo['nome_colaborador'];
+            if (!empty($artigo['nome_publicador']))  $autores_print[] = $artigo['nome_publicador'];
+            ?>
+            <?php if ($autores_print): ?>
+            <div class="print-autores"><?= htmlspecialchars(implode(' · ', $autores_print)) ?></div>
+            <?php endif; ?>
+
+            <?php
+            $insts_print = array_filter(array_unique([
+                $artigo['inst_colaborador'] ?? '',
+                $artigo['inst_publicador']  ?? '',
+            ]));
+            ?>
+            <?php if ($insts_print): ?>
+            <div class="print-inst"><?= htmlspecialchars(implode(' / ', $insts_print)) ?></div>
+            <?php endif; ?>
+
+            <hr class="print-linha">
+            <div class="print-data">Publicado em: <?= $data_pub ?> · Penomato — UFMS / UEMS</div>
+        </div>
+
         <?= $artigo['texto_html'] ?>
     </div>
 
