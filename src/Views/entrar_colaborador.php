@@ -16,7 +16,7 @@ $usuario_id    = $_SESSION['usuario_id'];
 // ================================================
 // ESTATÍSTICAS PESSOAIS
 // ================================================
-$qtd_internet  = $pdo->prepare("SELECT COUNT(*) FROM especies_administrativo WHERE autor_dados_internet_id = ?");
+$qtd_internet  = $pdo->prepare("SELECT COUNT(*) FROM especies_administrativo WHERE autor_dados_internet_id = ? AND status != 'sem_dados'");
 $qtd_internet->execute([$usuario_id]);
 $total_internet = $qtd_internet->fetchColumn();
 
