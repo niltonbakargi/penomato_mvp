@@ -578,62 +578,131 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             background: #1d4ed8;
         }
 
-        /* ── PRANCHA FOTOGRÁFICA (override do HTML salvo no banco) ── */
-        .art-galeria {
+        /* ══════════════════════════════════════════
+           CARD DO ARTIGO — tipografia e layout
+        ══════════════════════════════════════════ */
+
+        /* Título da espécie: centralizado, escuro, científico */
+        .artigo-preview-card .art-titulo {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            font-style: italic;
+            color: #1a2634;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        /* Família, sinônimos, nomes populares: centralizados */
+        .artigo-preview-card .art-familia,
+        .artigo-preview-card .art-sinonimos,
+        .artigo-preview-card .art-nomes {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 0.9rem;
+            color: #475569;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        /* Seções: Georgia, verde, linha separadora */
+        .artigo-preview-card .art-secao {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--cor-primaria);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin: 28px 0 10px;
+            border-bottom: 1px solid var(--cinza-200);
+            padding-bottom: 5px;
+        }
+
+        /* Parágrafos: recuo, justificado, serif */
+        .artigo-preview-card .art-paragrafo {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 0.95rem;
+            line-height: 1.85;
+            text-align: justify;
+            text-indent: 1.5em;
+            color: #1e293b;
+            margin-bottom: 0;
+        }
+        .artigo-preview-card .art-paragrafo sup {
+            font-size: 0.7rem;
+            color: var(--cor-primaria);
+            font-family: var(--fonte-principal);
+        }
+
+        /* Prancha fotográfica: grid 2 colunas */
+        .artigo-preview-card .art-galeria {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            gap: 20px !important;
-            flex-wrap: unset !important;
+            gap: 16px !important;
             margin: 16px 0 !important;
         }
-        .art-figura {
-            border: 1px solid #ddd !important;
+        .artigo-preview-card .art-figura {
+            border: 1px solid var(--cinza-200) !important;
             border-radius: 8px !important;
             overflow: hidden !important;
             background: #fafafa !important;
             text-align: left !important;
-            flex: unset !important;
         }
-        .art-figura img {
+        .artigo-preview-card .art-figura-titulo {
+            font-family: var(--fonte-principal);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            padding: 8px 10px 4px;
+        }
+        .artigo-preview-card .art-figura img {
             width: 100% !important;
             height: auto !important;
             object-fit: contain !important;
             border-radius: 0 !important;
             display: block !important;
         }
-        .art-figura figcaption {
-            padding: 6px 10px 8px !important;
-            font-size: 0.78em !important;
-            color: #555 !important;
+        .artigo-preview-card .art-figura figcaption {
+            font-family: var(--fonte-principal) !important;
+            font-size: 0.75rem !important;
+            font-style: italic;
+            color: #64748b !important;
+            padding: 6px 10px 10px !important;
             line-height: 1.5 !important;
-            max-width: unset !important;
         }
         @media (max-width: 600px) {
-            .art-galeria { grid-template-columns: 1fr !important; }
+            .artigo-preview-card .art-galeria { grid-template-columns: 1fr !important; }
         }
 
-        /* ── AUTORES DO ARTIGO ── */
+        /* Referências */
+        .artigo-preview-card .art-refs {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-size: 0.83rem !important;
+            color: #475569 !important;
+            line-height: 1.7 !important;
+            padding-left: 20px !important;
+        }
+        .artigo-preview-card .art-refs li {
+            margin-bottom: 5px !important;
+        }
+
+        /* Autores: bloco discreto abaixo do cabeçalho */
         .art-autores {
-            font-size: 0.82em;
-            color: #555;
-            margin: 4px 0 14px;
-            padding: 6px 10px;
-            background: #f4f8f4;
-            border-left: 3px solid var(--cor-primaria);
-            border-radius: 4px;
+            font-family: var(--fonte-principal);
+            font-size: 0.8rem;
+            color: #64748b;
+            margin: 10px 0 20px;
+            padding: 8px 14px;
+            background: #f8fafc;
+            border: 1px solid var(--cinza-200);
+            border-radius: 6px;
             line-height: 1.6;
+            text-align: center;
         }
-        .art-autores-label {
-            font-weight: 600;
-            color: var(--cor-primaria);
-        }
-        .art-autores-inst {
-            color: #777;
-        }
-        .art-autores-papel {
-            color: #888;
-            font-style: italic;
-        }
+        .art-autores-label { font-weight: 700; color: #475569; }
+        .art-autores-inst  { color: #94a3b8; }
+        .art-autores-papel { font-style: italic; color: #94a3b8; }
 
         /* ── ABAS ARTIGO / ATRIBUTOS ── */
         .artigo-tabs {
@@ -744,13 +813,16 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             background: white;
             border: 1px solid var(--cinza-200);
             border-radius: 12px;
-            padding: 32px 36px;
+            padding: 40px 48px;
             font-family: Georgia, 'Times New Roman', serif;
-            line-height: 1.7;
+            line-height: 1.85;
+        }
+        @media (max-width: 640px) {
+            .artigo-preview-card { padding: 24px 20px; }
         }
         .artigo-sem-dados {
             text-align: center;
-            padding: 40px 20px;
+            padding: 48px 20px;
             color: #94a3b8;
             font-family: var(--fonte-principal);
         }
