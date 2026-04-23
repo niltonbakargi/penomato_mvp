@@ -83,7 +83,7 @@ $todos_botoes = [
     'minhas_acoes' => [
         'icon'  => '↩',
         'label' => 'Minhas Ações',
-        'desc'  => 'Veja e desfaça suas ações recentes (até 24 horas após realizadas).',
+        'desc'  => 'Desfaça ações em até 24h. Após o prazo, solicite ao gestor com justificativa.',
         'link'  => '/penomato_mvp/src/Controllers/minhas_acoes.php',
     ],
 ];
