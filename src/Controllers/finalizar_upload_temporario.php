@@ -299,6 +299,13 @@ try {
     $pdo->commit();
     error_log("COMMIT realizado com sucesso");
 
+    // Registrar no histórico para permitir desfazer
+    $pdo->prepare("
+        INSERT INTO historico_alteracoes
+            (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
+        VALUES (?, ?, 'especies_caracteristicas', 'status', 'sem_dados', 'dados_internet', 'insercao')
+    ")->execute([$especie_id, $id_usuario]);
+
     // ================================================
     // 4. GERAR ARTIGO RASCUNHO AUTOMATICAMENTE
     // ================================================

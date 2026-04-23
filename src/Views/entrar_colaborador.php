@@ -80,14 +80,20 @@ $todos_botoes = [
         'desc'  => 'Envie ideias e feedbacks para a equipe gestora e de desenvolvimento.',
         'link'  => '/penomato_mvp/src/Views/sugestoes.php',
     ],
+    'minhas_acoes' => [
+        'icon'  => '↩',
+        'label' => 'Minhas Ações',
+        'desc'  => 'Veja e desfaça suas ações recentes (até 24 horas após realizadas).',
+        'link'  => '/penomato_mvp/src/Controllers/minhas_acoes.php',
+    ],
 ];
 
 // Permissões por subtipo
 $permissoes = [
-    'identificador' => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'sugestoes'],
-    'dev'           => ['dados_internet', 'dev_tools', 'sugestoes'],
-    'especialista'  => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes'],
-    'gestor'        => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes'],
+    'identificador' => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'sugestoes', 'minhas_acoes'],
+    'dev'           => ['dados_internet', 'dev_tools', 'sugestoes', 'minhas_acoes'],
+    'especialista'  => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes', 'minhas_acoes'],
+    'gestor'        => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes', 'minhas_acoes'],
 ];
 
 // Gestor (por categoria ou subtipo) acessa tudo

@@ -83,6 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['acao'] ?? '', ['ap
                 WHERE especie_id = ?
             ")->execute([$especie_id]);
 
+            // Histórico para permitir desfazer
+            $pdo->prepare("
+                INSERT INTO historico_alteracoes
+                    (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
+                VALUES (?, ?, 'especies_administrativo', 'status', 'em_revisao', 'publicado', 'revisao')
+            ")->execute([$especie_id, $usuario_id]);
+
             if (!empty($especie['colaborador_email'])) {
                 $corpo = "<p>Olá, <strong>" . htmlspecialchars($especie['colaborador_nome']) . "</strong>!</p>
                     <p>A espécie <em>" . htmlspecialchars($especie['nome_cientifico']) . "</em>
@@ -107,6 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['acao'] ?? '', ['ap
                     data_ultima_atualizacao = NOW()
                 WHERE id = ?
             ")->execute([$usuario_id, $motivo, $especie_id]);
+
+            // Histórico para permitir desfazer
+            $pdo->prepare("
+                INSERT INTO historico_alteracoes
+                    (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
+                VALUES (?, ?, 'especies_administrativo', 'status', 'em_revisao', 'contestado', 'contestacao')
+            ")->execute([$especie_id, $usuario_id]);
 
             if (!empty($especie['colaborador_email'])) {
                 $corpo = "<p>Olá, <strong>" . htmlspecialchars($especie['colaborador_nome']) . "</strong>!</p>

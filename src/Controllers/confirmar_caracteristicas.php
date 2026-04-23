@@ -120,6 +120,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             [':id' => $especie_id]
         );
 
+        // Registrar no histórico para permitir desfazer
+        $pdo->prepare("
+            INSERT INTO historico_alteracoes
+                (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
+            VALUES (?, ?, 'especies_administrativo', 'status', 'dados_internet', 'descrita', 'edicao')
+        ")->execute([$especie_id, $autor_id]);
+
         confirmarTransacao();
 
         $_SESSION['msg_sucesso'] = 'Identificação confirmada e dados salvos com sucesso!';

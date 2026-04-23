@@ -137,13 +137,15 @@ try {
         $observacoes ?: null
     ]);
 
-    // Registrar no histórico
-    $stmt_hist = $pdo->prepare("
+    // Registrar no histórico (com dados_extras para permitir desfazer)
+    $imagem_id = $pdo->lastInsertId();
+    $pdo->prepare("
         INSERT INTO historico_alteracoes
-            (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_novo, tipo_acao)
-        VALUES (?, ?, 'especies_imagens', 'parte_planta', ?, 'insercao')
-    ");
-    $stmt_hist->execute([$especie_id, $usuario_id, $parte_planta]);
+            (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_novo, tipo_acao, dados_extras)
+        VALUES (?, ?, 'especies_imagens', 'parte_planta', ?, 'insercao', ?)
+    ")->execute([$especie_id, $usuario_id, $parte_planta,
+        json_encode(['imagem_id' => (int)$imagem_id, 'caminho' => $caminho_rel])
+    ]);
 
     // ── Verificar se todas as partes estão completas → REGISTRADA ────────────
     $partes_todas = ['folha', 'flor', 'fruto', 'caule', 'semente', 'habito'];
