@@ -242,6 +242,7 @@ $colaboradores = $pdo->query("
                     <th style="width:140px">Prioridade</th>
                     <th style="width:190px">Atribuído a</th>
                     <th>Última atualização</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -291,6 +292,13 @@ $colaboradores = $pdo->query("
 
                     <td style="color:#999;font-size:0.82em;white-space:nowrap;">
                         <?php echo $e['data_ultima_atualizacao'] ? date('d/m/Y H:i', strtotime($e['data_ultima_atualizacao'])) : '—'; ?>
+                    </td>
+                    <td>
+                        <a href="gerenciar_especie.php?id=<?php echo $e['id']; ?>"
+                           style="display:inline-flex;align-items:center;gap:5px;padding:5px 13px;background:#e8f5e9;color:var(--cor-primaria);border-radius:20px;font-size:.8em;font-weight:600;text-decoration:none;white-space:nowrap;border:1px solid #c8e6c9;transition:background .15s;"
+                           onmouseover="this.style.background='#c8e6c9'" onmouseout="this.style.background='#e8f5e9'">
+                            ⚙ Gerenciar
+                        </a>
                     </td>
                 </tr>
             <?php endforeach; ?>
