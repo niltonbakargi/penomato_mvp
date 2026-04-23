@@ -47,7 +47,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     VALUES (?, ?, 'especies_administrativo', 'status', ?, ?, 'edicao')
                 ")->execute([$especie_id, $usuario_id, $status_anterior, $novo_status]);
 
-                $msg = ['tipo' => 'ok', 'texto' => "Status alterado para «$novo_status»."];
+                // Voltando para sem_dados: apaga tudo que não devia existir
+                if ($novo_status === 'sem_dados') {
+                    $pdo->prepare("DELETE FROM especies_caracteristicas WHERE especie_id = ?")->execute([$especie_id]);
+                    $pdo->prepare("DELETE FROM artigos WHERE especie_id = ?")->execute([$especie_id]);
+                    $stmt_imgs = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE especie_id = ?");
+                    $stmt_imgs->execute([$especie_id]);
+                    foreach ($stmt_imgs->fetchAll(PDO::FETCH_COLUMN) as $caminho) {
+                        $arquivo = __DIR__ . '/../../../' . $caminho;
+                        if (file_exists($arquivo)) unlink($arquivo);
+                    }
+                    $pdo->prepare("DELETE FROM especies_imagens WHERE especie_id = ?")->execute([$especie_id]);
+                    $msg = ['tipo' => 'ok', 'texto' => 'Status revertido para sem_dados. Todos os dados, imagens e artigo foram removidos.'];
+                } else {
+                    $msg = ['tipo' => 'ok', 'texto' => "Status alterado para «$novo_status»."];
+                }
             }
         }
     }
@@ -375,22 +389,24 @@ $campos_display = [
             position: absolute;
             top: 6px;
             right: 6px;
-            background: rgba(220,38,38,.85);
-            color: white;
+            background: #b91c1c;
+            color: #fff;
             border: none;
             border-radius: 50%;
-            width: 26px;
-            height: 26px;
-            font-size: .8rem;
+            width: 28px;
+            height: 28px;
+            font-size: .85rem;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background .15s;
+            box-shadow: 0 1px 4px rgba(0,0,0,.3);
         }
-        .btn-excluir-img:hover { background: #b91c1c; }
+        .btn-excluir-img:hover { background: #7f1d1d; }
 
-        /* Botões de ação */
+        /* Botões de ação — alto contraste (acessível para daltonismo) */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -398,20 +414,21 @@ $campos_display = [
             padding: 9px 20px;
             border-radius: 8px;
             font-size: .88rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             border: none;
             text-decoration: none;
             transition: .15s;
+            letter-spacing: .01em;
         }
-        .btn-primario   { background: var(--cor-primaria); color: white; }
+        .btn-primario   { background: var(--cor-primaria); color: #fff; }
         .btn-primario:hover { background: var(--cor-primaria-hover); }
-        .btn-secundario { background: #f1f5f9; color: #475569; }
-        .btn-secundario:hover { background: #e2e8f0; }
-        .btn-aviso      { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-        .btn-aviso:hover { background: #fde68a; }
-        .btn-perigo     { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-        .btn-perigo:hover { background: #fca5a5; }
+        .btn-secundario { background: #334155; color: #fff; }
+        .btn-secundario:hover { background: #1e293b; }
+        .btn-aviso      { background: #b45309; color: #fff; }
+        .btn-aviso:hover { background: #92400e; }
+        .btn-perigo     { background: #b91c1c; color: #fff; }
+        .btn-perigo:hover { background: #991b1b; }
 
         /* Zona de perigo */
         .zona-perigo { border: 1px solid #fca5a5; border-radius: 10px; overflow: hidden; }
