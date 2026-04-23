@@ -72,7 +72,7 @@ $model    = defined('AI_MODEL') ? AI_MODEL : null;
 // ============================================================
 $opcoes_validas = [
     'forma_folha'       => ['Acicular','Cordiforme','Elíptica','Lanceolada','Linear','Lobada','Obovada','Orbicular','Ovada','Palmada','Reniforme','Sagitada','Trifoliada'],
-    'filotaxia_folha'   => ['Alterna','Alterna dística','Alterna espiralada','Oposta','Oposta decussada','Verticilada'],
+    'filotaxia_folha'   => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
     'tipo_folha'        => ['Simples','Composta bipinada','Composta digitada','Composta imparipinada','Composta paripinada','Composta pinnada','Composta trifoliada','Composta tripinada'],
     'tamanho_folha'     => ['Microfila','Nanofila','Mesofila','Macrofila','Megafila'],
     'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],

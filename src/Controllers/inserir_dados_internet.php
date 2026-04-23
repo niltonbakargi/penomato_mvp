@@ -53,7 +53,7 @@ $nome_cientifico = $stmt_nome->fetchColumn() ?: 'Espécie desconhecida';
 // ================================================
 $opcoes_validas = [
     'forma_folha'       => ['Acicular','Cordiforme','Elíptica','Lanceolada','Linear','Lobada','Obovada','Orbicular','Ovada','Palmada','Reniforme','Sagitada','Trifoliada'],
-    'filotaxia_folha'   => ['Alterna','Alterna dística','Alterna espiralada','Oposta','Oposta decussada','Verticilada'],
+    'filotaxia_folha'   => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
     'tipo_folha'        => ['Simples','Composta bipinada','Composta digitada','Composta imparipinada','Composta paripinada','Composta pinnada','Composta trifoliada','Composta tripinada'],
     'tamanho_folha'     => ['Microfila','Nanofila','Mesofila','Macrofila','Megafila'],
     'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],
@@ -938,8 +938,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="filotaxia_folha">Filotaxia</label>
                         <select id="filotaxia_folha" name="filotaxia_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Alterna</option><option>Alterna dística</option><option>Alterna espiralada</option>
-                            <option>Oposta</option><option>Oposta decussada</option><option>Verticilada</option>
+                            <option>Alterna</option><option>Oposta Simples</option><option>Oposta Decussada</option>
+                            <option>Verticilada</option><option>Dística</option><option>Espiralada</option>
                         </select>
                     </div>
                     <div class="ref-col">
