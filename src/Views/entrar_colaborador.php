@@ -253,6 +253,13 @@ $label_subtipo = $labels_subtipo[$subtipo] ?? ucfirst($subtipo ?: 'Colaborador')
 </head>
 <body>
 
+    <?php if ($tipo_usuario === 'gestor' || $subtipo === 'gestor'): ?>
+        <a href="/penomato_mvp/src/Controllers/controlador_gestor.php"
+           style="display:inline-block;margin-bottom:12px;font-size:.85rem;color:var(--cor-primaria);text-decoration:none;font-weight:600;">
+            ← Voltar ao painel do gestor
+        </a>
+    <?php endif; ?>
+
     <div class="header">
         <h1>🌿 Painel do Colaborador</h1>
         <p><?php echo htmlspecialchars($nome_usuario); ?></p>
