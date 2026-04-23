@@ -71,10 +71,10 @@ $model    = defined('AI_MODEL') ? AI_MODEL : null;
 // O prompt abaixo é gerado a partir desta mesma lista.
 // ============================================================
 $opcoes_validas = [
-    'forma_folha'       => ['Acicular','Cordiforme','Elíptica','Lanceolada','Linear','Lobada','Obovada','Orbicular','Ovada','Palmada','Reniforme','Sagitada','Trifoliada'],
+    'forma_folha'       => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Lobada'],
     'filotaxia_folha'   => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
     'tipo_folha'        => ['Simples','Composta bipinada','Composta digitada','Composta imparipinada','Composta paripinada','Composta pinnada','Composta trifoliada','Composta tripinada'],
-    'tamanho_folha'     => ['Microfila','Nanofila','Mesofila','Macrofila','Megafila'],
+    'tamanho_folha'     => ['Microfilas (< 2 cm)','Nanofilas (2–7 cm)','Mesofilas (7–20 cm)','Macrófilas (20–50 cm)','Megafilas (> 50 cm)'],
     'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],
     'margem_folha'      => ['Crenada','Dentada','Inteira','Lobada','Ondulada','Serreada','Serrilhada','Partida'],
     'venacao_folha'     => ['Curvinérvea','Dicotômica','Paralela','Peninérvea','Reticulada palmada','Reticulada pinada'],
@@ -103,10 +103,10 @@ $opcoes_validas = [
     'modificacao_caule' => ['Cladódio','Espinho','Estolão','Gavinha','Rizoma','Tubérculo','Bulbo'],
     'diametro_caule'    => ['Capilar','Delgado','Fino','Médio','Grosso','Muito grosso'],
     'ramificacao_caule' => ['Monopodial','Simpodial','Dicotômica','Pseudodicotômica'],
-    'possui_espinhos'   => ['Sim','Não','Não informado'],
-    'possui_latex'      => ['Sim','Não','Não informado'],
-    'possui_seiva'      => ['Sim','Não','Não informado'],
-    'possui_resina'     => ['Sim','Não','Não informado'],
+    'possui_espinhos'   => ['Sim','Não'],
+    'possui_latex'      => ['Sim','Não'],
+    'possui_seiva'      => ['Sim','Não'],
+    'possui_resina'     => ['Sim','Não'],
 ];
 
 // Gera a string de opções para o prompt a partir do array acima
@@ -459,9 +459,9 @@ foreach ($dados as $campo => $valor) {
         continue;
     }
 
-    // Valor vazio ou "Não informado" — aceita direto
+    // Valor vazio ou "Não informado" em campo ENUM → salva como vazio (NULL no banco)
     if ($valor_str === '' || $valor_str === 'Não informado') {
-        $campos_validos[$campo] = $valor_str;
+        $campos_validos[$campo] = '';
         continue;
     }
 

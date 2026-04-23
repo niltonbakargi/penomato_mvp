@@ -52,10 +52,10 @@ $nome_cientifico = $stmt_nome->fetchColumn() ?: 'Espécie desconhecida';
 // LISTA DE VALORES PADRONIZADOS PARA VALIDAÇÃO
 // ================================================
 $opcoes_validas = [
-    'forma_folha'       => ['Acicular','Cordiforme','Elíptica','Lanceolada','Linear','Lobada','Obovada','Orbicular','Ovada','Palmada','Reniforme','Sagitada','Trifoliada'],
+    'forma_folha'       => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Lobada'],
     'filotaxia_folha'   => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
     'tipo_folha'        => ['Simples','Composta bipinada','Composta digitada','Composta imparipinada','Composta paripinada','Composta pinnada','Composta trifoliada','Composta tripinada'],
-    'tamanho_folha'     => ['Microfila','Nanofila','Mesofila','Macrofila','Megafila'],
+    'tamanho_folha'     => ['Microfilas (< 2 cm)','Nanofilas (2–7 cm)','Mesofilas (7–20 cm)','Macrófilas (20–50 cm)','Megafilas (> 50 cm)'],
     'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],
     'margem_folha'      => ['Crenada','Dentada','Inteira','Lobada','Ondulada','Serreada','Serrilhada','Partida'],
     'venacao_folha'     => ['Curvinérvea','Dicotômica','Paralela','Peninérvea','Reticulada palmada','Reticulada pinada'],
@@ -84,10 +84,10 @@ $opcoes_validas = [
     'modificacao_caule' => ['Cladódio','Espinho','Estolão','Gavinha','Rizoma','Tubérculo','Bulbo'],
     'diametro_caule'    => ['Capilar','Delgado','Fino','Médio','Grosso','Muito grosso'],
     'ramificacao_caule' => ['Monopodial','Simpodial','Dicotômica','Pseudodicotômica'],
-    'possui_espinhos'   => ['Sim','Não','Não informado'],
-    'possui_latex'      => ['Sim','Não','Não informado'],
-    'possui_seiva'      => ['Sim','Não','Não informado'],
-    'possui_resina'     => ['Sim','Não','Não informado'],
+    'possui_espinhos'   => ['Sim','Não'],
+    'possui_latex'      => ['Sim','Não'],
+    'possui_seiva'      => ['Sim','Não'],
+    'possui_resina'     => ['Sim','Não'],
 ];
 
 // ================================================
@@ -918,10 +918,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="forma_folha">Forma</label>
                         <select id="forma_folha" name="forma_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Acicular</option><option>Cordiforme</option><option>Elíptica</option>
-                            <option>Lanceolada</option><option>Linear</option><option>Lobada</option>
-                            <option>Obovada</option><option>Orbicular</option><option>Ovada</option>
-                            <option>Palmada</option><option>Reniforme</option><option>Sagitada</option><option>Trifoliada</option>
+                            <option>Lanceolada</option><option>Linear</option><option>Elíptica</option>
+                            <option>Ovada</option><option>Orbicular</option><option>Cordiforme</option>
+                            <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
+                            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Lobada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -975,8 +975,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_folha">Tamanho</label>
                         <select id="tamanho_folha" name="tamanho_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Microfila</option><option>Nanofila</option><option>Mesofila</option>
-                            <option>Macrofila</option><option>Megafila</option>
+                            <option>Microfilas (&lt; 2 cm)</option><option>Nanofilas (2–7 cm)</option>
+                            <option>Mesofilas (7–20 cm)</option><option>Macrófilas (20–50 cm)</option><option>Megafilas (&gt; 50 cm)</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1523,7 +1523,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="possui_espinhos">Possui Espinhos?</label>
                         <select id="possui_espinhos" name="possui_espinhos">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Sim</option><option>Não</option><option>Não informado</option>
+                            <option>Sim</option><option>Não</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1540,7 +1540,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="possui_latex">Possui Látex?</label>
                         <select id="possui_latex" name="possui_latex">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Sim</option><option>Não</option><option>Não informado</option>
+                            <option>Sim</option><option>Não</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1557,7 +1557,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="possui_seiva">Possui Seiva?</label>
                         <select id="possui_seiva" name="possui_seiva">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Sim</option><option>Não</option><option>Não informado</option>
+                            <option>Sim</option><option>Não</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1574,7 +1574,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="possui_resina">Possui Resina?</label>
                         <select id="possui_resina" name="possui_resina">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Sim</option><option>Não</option><option>Não informado</option>
+                            <option>Sim</option><option>Não</option>
                         </select>
                     </div>
                     <div class="ref-col">
