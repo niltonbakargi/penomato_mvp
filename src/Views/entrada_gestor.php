@@ -61,7 +61,26 @@
         }
         .action-btn .icon { font-size: 1.8em; margin-bottom: 10px; display: block; }
 
+        .action-btn { position: relative; }
         .action-btn.danger { border-color: var(--perigo-cor); color: #b02020; }
+
+        .notif-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc2626;
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 2px 6px rgba(220,38,38,.4);
+        }
         .action-btn.danger:hover { background: var(--perigo-cor); color: var(--branco); }
 
         .btn-sair {
@@ -188,6 +207,9 @@
 
     <div class="btn-grid">
         <div class="action-btn" onclick="abrirModal('modal-aceitar')">
+            <?php if (count($membros_pendentes) > 0): ?>
+                <span class="notif-badge"><?= count($membros_pendentes) ?></span>
+            <?php endif; ?>
             <span class="icon">✅</span>
             Aceitar Membro
         </div>
@@ -204,6 +226,9 @@
             Gestão de Espécies
         </div>
         <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/aprovacao_acoes.php'">
+            <?php if ($acoes_pendentes > 0): ?>
+                <span class="notif-badge"><?= $acoes_pendentes ?></span>
+            <?php endif; ?>
             <span class="icon">✅</span>
             Aprovação de Ações
         </div>
