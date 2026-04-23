@@ -47,13 +47,13 @@ if ($acao === 'solicitar') {
     }
     $pdo->prepare("
         INSERT INTO fila_aprovacao
-            (tipo, especie_id, usuario_id, descricao, observacoes)
-        VALUES ('contestacao', ?, ?, ?, ?)
+            (tipo, subtipo, especie_id, usuario_id, descricao, observacoes)
+        VALUES ('contestacao', 'desfazer', ?, ?, ?, ?)
     ")->execute([
         $hist['especie_id'],
         $usuario_id,
-        'Solicitação de desfazer ação: ' . $hist['tipo_acao'] . ' em ' . $hist['campo_alterado'],
-        $justificativa
+        'Desfazer: ' . $hist['tipo_acao'] . ' → ' . ($hist['campo_alterado'] ?: $hist['tabela_afetada']),
+        json_encode(['hist_id' => $hist_id, 'justificativa' => $justificativa])
     ]);
     header("Location: $redirect?ok=" . urlencode('Solicitação enviada ao gestor.'));
     exit;
