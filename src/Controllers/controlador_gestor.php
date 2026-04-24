@@ -15,6 +15,7 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Dados do usuário logado
+$gestor_id    = (int)$_SESSION['usuario_id'];
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Gestor';
 $usuario_instituicao = $_SESSION['usuario_instituicao'] ?? 'Penomato';
 
@@ -74,7 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inserir_especies'])) 
         }
     }
 
-    if ($adicionadas > 0) $msg_especies[] = ['tipo' => 'ok',   'texto' => "$adicionadas espécie(s) inserida(s) com sucesso."];
+    if ($adicionadas > 0) {
+        error_log(sprintf(
+            '[GESTOR_AUDIT] inserir_especies | gestor_id=%d | adicionadas=%d | duplicadas=%d | ip=%s',
+            $gestor_id, $adicionadas, $duplicadas, $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+        ));
+        $msg_especies[] = ['tipo' => 'ok', 'texto' => "$adicionadas espécie(s) inserida(s) com sucesso."];
+    }
     if ($duplicadas  > 0) $msg_especies[] = ['tipo' => 'warn', 'texto' => "$duplicadas já existia(m) no banco e foram ignorada(s)."];
     if ($erros       > 0) $msg_especies[] = ['tipo' => 'err',  'texto' => "$erros erro(s) ao inserir."];
 
@@ -104,6 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aceitar_membro'])) {
         } else {
         $stmt = $pdo->prepare("UPDATE usuarios SET status_verificacao = 'verificado', ativo = 1, categoria = ? WHERE id = ?");
         $stmt->execute([$categoria, $membro_id]);
+        error_log(sprintf(
+            '[GESTOR_AUDIT] aceitar_membro | gestor_id=%d | membro_id=%d | nome=%s | categoria=%s | ip=%s',
+            $gestor_id, $membro_id, $membro['nome'] ?? 'desconhecido', $categoria, $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+        ));
         $msg_aceitar[] = ['tipo' => 'ok', 'texto' => "Membro aceito com sucesso." . ($motivacao ? " Motivo: $motivacao" : '')];
         $total_usuarios = $pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
 
@@ -144,6 +155,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_membro'])) {
 
         $stmt = $pdo->prepare("DELETE FROM usuarios WHERE id = ?");
         $stmt->execute([$membro_id]);
+        error_log(sprintf(
+            '[GESTOR_AUDIT] excluir_membro | gestor_id=%d | membro_id=%d | nome=%s | email=%s | motivo=%s | ip=%s',
+            $gestor_id, $membro_id,
+            $membro_excluir['nome']  ?? 'desconhecido',
+            $membro_excluir['email'] ?? 'desconhecido',
+            $motivacao ?: '(sem motivo)',
+            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+        ));
         $msg_excluir[] = ['tipo' => 'ok', 'texto' => "Membro removido." . ($motivacao ? " Motivo: $motivacao" : '')];
         $total_usuarios = $pdo->query("SELECT COUNT(*) FROM usuarios")->fetchColumn();
 

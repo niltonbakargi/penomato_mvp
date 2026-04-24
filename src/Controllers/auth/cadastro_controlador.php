@@ -81,8 +81,8 @@ if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $erros[] = "E-mails não conferem.";
 }
 
-if (empty($senha)) {
-    $erros[] = "Senha é obrigatória.";
+if (empty($senha) || strlen($senha) < 8) {
+    $erros[] = "A senha deve ter pelo menos 8 caracteres.";
 } elseif ($senha !== $confirmar_senha) {
     $erros[] = "Senhas não conferem.";
 }

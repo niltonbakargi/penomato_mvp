@@ -45,6 +45,46 @@ if (!$especialista_id) {
     exit;
 }
 
+// Comprimentos máximos
+if (mb_strlen($cidade) > 150) {
+    header("Location: {$redirect}&erro=" . urlencode('Nome da cidade muito longo. Máximo: 150 caracteres.'));
+    exit;
+}
+if (mb_strlen($numero_etiqueta) > 50) {
+    header("Location: {$redirect}&erro=" . urlencode('Número de etiqueta muito longo. Máximo: 50 caracteres.'));
+    exit;
+}
+if (mb_strlen($descricao_local) > 1000) {
+    header("Location: {$redirect}&erro=" . urlencode('Descrição do local muito longa. Máximo: 1000 caracteres.'));
+    exit;
+}
+
+// Estado: deve ser uma UF brasileira válida (2 letras)
+$ufs_validas = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS',
+                 'MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+$estado = strtoupper($estado);
+if (!in_array($estado, $ufs_validas)) {
+    header("Location: {$redirect}&erro=" . urlencode('Estado inválido. Use a sigla da UF (ex: MS, SP).'));
+    exit;
+}
+
+// Bioma: deve ser um valor ENUM válido
+$biomas_validos = ['Cerrado','Mata Atlântica','Pantanal','Caatinga','Amazônia','Pampa','Outro'];
+if (!in_array($bioma, $biomas_validos)) {
+    header("Location: {$redirect}&erro=" . urlencode('Bioma inválido. Selecione uma das opções disponíveis.'));
+    exit;
+}
+
+// Coordenadas: faixa geográfica válida
+if ($latitude !== null && ($latitude < -90 || $latitude > 90)) {
+    header("Location: {$redirect}&erro=" . urlencode('Latitude inválida. Deve estar entre -90 e 90.'));
+    exit;
+}
+if ($longitude !== null && ($longitude < -180 || $longitude > 180)) {
+    header("Location: {$redirect}&erro=" . urlencode('Longitude inválida. Deve estar entre -180 e 180.'));
+    exit;
+}
+
 // ── Verificar espécie ─────────────────────────────────────────────────────────
 $stmt = $pdo->prepare("SELECT id FROM especies_administrativo WHERE id = ?");
 $stmt->execute([$especie_id]);
@@ -84,7 +124,7 @@ if (!empty($_FILES['foto_identificacao']['name']) &&
     }
 
     $pasta = dirname(dirname(__DIR__)) . '/uploads/exemplares/' . $especie_id . '/';
-    if (!file_exists($pasta)) mkdir($pasta, 0777, true);
+    if (!file_exists($pasta)) mkdir($pasta, 0755, true);
 
     $ext          = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
     $nome_arquivo = 'identificacao_' . date('Ymd_His') . '_' . rand(100, 999) . '.' . $ext;
@@ -200,8 +240,10 @@ try {
 
 } catch (Exception $e) {
     $pdo->rollBack();
-    if ($caminho_foto && file_exists(dirname(dirname(__DIR__)) . '/' . $caminho_foto)) {
-        unlink(dirname(dirname(__DIR__)) . '/' . $caminho_foto);
+    if ($caminho_foto) {
+        $_raiz_uploads = realpath(__DIR__ . '/../../uploads');
+        $_arq = realpath(__DIR__ . '/../../' . $caminho_foto);
+        if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
     }
     error_log('Erro cadastro exemplar: ' . $e->getMessage());
     header("Location: {$redirect}&erro=" . urlencode('Erro interno ao salvar. Tente novamente.'));

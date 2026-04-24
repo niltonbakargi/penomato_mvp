@@ -164,7 +164,7 @@ if (!empty($mensagem_erro)) {
     <body>
         <div class="card">
             <h2 style="color: var(--cor-primaria);">❌ Erro no Cadastro</h2>
-            <div class="error"><?php echo $mensagem_erro; ?></div>
+            <div class="error"><?php echo htmlspecialchars($mensagem_erro, ENT_QUOTES, 'UTF-8'); ?></div>
             <a href="javascript:history.back()" class="btn">← Voltar e corrigir</a>
         </div>
     </body>

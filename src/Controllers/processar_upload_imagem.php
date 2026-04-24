@@ -42,7 +42,7 @@ $id_usuario = $_SESSION['usuario_id'];
  */
 function criarPastasUpload($caminho) {
     if (!file_exists($caminho)) {
-        mkdir($caminho, 0777, true);
+        mkdir($caminho, 0755, true);
         return true;
     }
     return true;

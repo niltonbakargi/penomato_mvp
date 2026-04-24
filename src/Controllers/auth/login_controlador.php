@@ -8,6 +8,19 @@
 // INICIALIZAÇÃO
 // ============================================================
 if (session_status() === PHP_SESSION_NONE) {
+    $cookie_seguro = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+
+    ini_set('session.use_strict_mode', '1');
+
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $cookie_seguro,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+
     session_start();
 }
 
@@ -122,6 +135,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "DELETE FROM tentativas_login WHERE ip = :ip",
                 [':ip' => $ip]
             );
+
+            // Regenerar ID de sessão para evitar session fixation
+            // O parâmetro true apaga o arquivo de sessão antigo no servidor
+            session_regenerate_id(true);
 
             // Atualizar último acesso
             atualizar('usuarios', ['ultimo_acesso' => date('Y-m-d H:i:s')], 'id = :id', [':id' => $usuario['id']]);

@@ -73,14 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($hist) {
                         $especie_id = (int)$hist['especie_id'];
                         $h_extras   = $hist['dados_extras'] ? json_decode($hist['dados_extras'], true) : [];
+                        $_raiz_uploads = realpath(__DIR__ . '/../../uploads');
 
                         if ($hist['tabela_afetada'] === 'especies_imagens' && isset($h_extras['imagem_id'])) {
                             $img_stmt = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE id = ? AND especie_id = ?");
                             $img_stmt->execute([$h_extras['imagem_id'], $especie_id]);
                             $img = $img_stmt->fetch();
                             if ($img) {
-                                $arq = __DIR__ . '/../../../' . $img['caminho_imagem'];
-                                if (file_exists($arq)) unlink($arq);
+                                $_arq = realpath(__DIR__ . '/../../' . $img['caminho_imagem']);
+                                if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
                                 $pdo->prepare("DELETE FROM especies_imagens WHERE id = ?")->execute([$h_extras['imagem_id']]);
                             }
                             $pdo->prepare("UPDATE especies_administrativo SET data_ultima_atualizacao = NOW() WHERE id = ?")->execute([$especie_id]);
@@ -91,8 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $si = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE especie_id = ? AND origem = 'internet'");
                             $si->execute([$especie_id]);
                             foreach ($si->fetchAll(PDO::FETCH_COLUMN) as $caminho) {
-                                $arq = __DIR__ . '/../../../' . $caminho;
-                                if (file_exists($arq)) unlink($arq);
+                                $_arq = realpath(__DIR__ . '/../../' . $caminho);
+                                if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
                             }
                             $pdo->prepare("DELETE FROM especies_imagens WHERE especie_id = ? AND origem = 'internet'")->execute([$especie_id]);
                             $pdo->prepare("UPDATE especies_administrativo SET status = 'sem_dados', data_ultima_atualizacao = NOW() WHERE id = ?")->execute([$especie_id]);

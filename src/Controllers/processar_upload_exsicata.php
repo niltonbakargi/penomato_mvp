@@ -47,6 +47,26 @@ if (!$data_coleta) {
     exit;
 }
 
+// Formato e validade da data (YYYY-MM-DD, não pode ser futura)
+$data_obj = DateTime::createFromFormat('Y-m-d', $data_coleta);
+if (!$data_obj || $data_obj->format('Y-m-d') !== $data_coleta) {
+    header("Location: {$redirect}&erro=" . urlencode('Data de coleta inválida. Use o formato AAAA-MM-DD.'));
+    exit;
+}
+if ($data_obj > new DateTime('today')) {
+    header("Location: {$redirect}&erro=" . urlencode('Data de coleta não pode ser no futuro.'));
+    exit;
+}
+
+// Comprimentos máximos
+if (mb_strlen($observacoes) > 1000) {
+    header("Location: {$redirect}&erro=" . urlencode('Observações muito longas. Máximo: 1000 caracteres.'));
+    exit;
+}
+if (mb_strlen($licenca) > 100) {
+    $licenca = 'Privado';
+}
+
 // ── Validação do arquivo ──────────────────────────────────────────────────────
 if (empty($_FILES['imagem']) || $_FILES['imagem']['error'] !== UPLOAD_ERR_OK) {
     header("Location: {$redirect}&erro=" . urlencode('Nenhum arquivo enviado ou erro no upload.'));
@@ -96,7 +116,7 @@ if (!$exemplar) {
 // ── Salvar arquivo em disco ───────────────────────────────────────────────────
 $pasta = dirname(dirname(__DIR__)) . '/uploads/exsicatas/' . $especie_id . '/';
 if (!file_exists($pasta)) {
-    mkdir($pasta, 0777, true);
+    mkdir($pasta, 0755, true);
 }
 
 $ext           = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));

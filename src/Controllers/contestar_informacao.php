@@ -29,6 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msgs[] = ['tipo' => 'err', 'texto' => 'Selecione o tipo de contestação.'];
     } elseif (!$conteudo_atual) {
         $msgs[] = ['tipo' => 'err', 'texto' => 'Descreva o problema encontrado.'];
+    } elseif (mb_strlen($conteudo_atual) > 2000) {
+        $msgs[] = ['tipo' => 'err', 'texto' => 'Descrição do problema muito longa. Máximo: 2000 caracteres.'];
+    } elseif (mb_strlen($conteudo_correto) > 2000) {
+        $msgs[] = ['tipo' => 'err', 'texto' => 'Conteúdo correto muito longo. Máximo: 2000 caracteres.'];
+    } elseif (mb_strlen($referencias) > 1000) {
+        $msgs[] = ['tipo' => 'err', 'texto' => 'Referências muito longas. Máximo: 1000 caracteres.'];
+    } elseif (mb_strlen($observacoes) > 1000) {
+        $msgs[] = ['tipo' => 'err', 'texto' => 'Observações muito longas. Máximo: 1000 caracteres.'];
     } else {
         $stmt = $pdo->prepare("
             INSERT INTO fila_aprovacao

@@ -655,7 +655,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
 <!-- SCRIPTS -->
 <!-- ============================================================ -->
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" integrity="sha384-6LwNpGeYDjlORU0Q5rfxEC8SQO6/FTh/VecUcvFvNx1gLMdX5dm8y1Y739D3lFSW" crossorigin="anonymous"></script>
 
 <script>
     // ============================================================

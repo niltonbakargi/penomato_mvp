@@ -7,36 +7,60 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+$status_validos     = ['sem_dados', 'dados_internet', 'identificado', 'registrada', 'em_revisao', 'revisada', 'contestado', 'publicado'];
+$prioridades_validas = ['baixa', 'media', 'alta', 'urgente'];
+
 // ================================================
 // PROCESSAR AÇÕES (POST)
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $acao      = $_POST['acao'] ?? '';
+    $acao       = $_POST['acao'] ?? '';
     $especie_id = (int)($_POST['especie_id'] ?? 0);
+
+    $gestor_id = (int)$_SESSION['usuario_id'];
 
     if ($especie_id) {
         if ($acao === 'prioridade') {
-            $prioridade = $_POST['prioridade'] ?? 'media';
+            $prioridade_raw = $_POST['prioridade'] ?? '';
+            $prioridade = in_array($prioridade_raw, $prioridades_validas) ? $prioridade_raw : 'media';
+            $stmt_old = $pdo->prepare("SELECT prioridade FROM especies_administrativo WHERE id = ?");
+            $stmt_old->execute([$especie_id]);
+            $prioridade_antiga = $stmt_old->fetchColumn();
             $stmt = $pdo->prepare("UPDATE especies_administrativo SET prioridade = ? WHERE id = ?");
             $stmt->execute([$prioridade, $especie_id]);
+            $pdo->prepare("
+                INSERT INTO historico_alteracoes
+                    (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
+                VALUES (?, ?, 'especies_administrativo', 'prioridade', ?, ?, 'edicao')
+            ")->execute([$especie_id, $gestor_id, $prioridade_antiga, $prioridade]);
 
         } elseif ($acao === 'atribuir') {
-            $atribuido_a = $_POST['atribuido_a'] ?: null;
+            $atribuido_a = $_POST['atribuido_a'] ? (int)$_POST['atribuido_a'] : null;
+            $stmt_old = $pdo->prepare("SELECT atribuido_a FROM especies_administrativo WHERE id = ?");
+            $stmt_old->execute([$especie_id]);
+            $atribuido_antigo = $stmt_old->fetchColumn() ?: null;
             $stmt = $pdo->prepare("UPDATE especies_administrativo SET atribuido_a = ? WHERE id = ?");
             $stmt->execute([$atribuido_a, $especie_id]);
+            $pdo->prepare("
+                INSERT INTO historico_alteracoes
+                    (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
+                VALUES (?, ?, 'especies_administrativo', 'atribuido_a', ?, ?, 'edicao')
+            ")->execute([$especie_id, $gestor_id, $atribuido_antigo, $atribuido_a]);
         }
     }
 
-    // Redireciona de volta mantendo os filtros
-    $filtro = $_POST['filtro_status'] ?? '';
-    header("Location: gestao_especies.php" . ($filtro ? "?status=$filtro" : ''));
+    // Redireciona de volta mantendo os filtros (valor validado para evitar header injection)
+    $filtro_raw = $_POST['filtro_status'] ?? '';
+    $filtro = in_array($filtro_raw, $status_validos) ? $filtro_raw : '';
+    header("Location: gestao_especies.php" . ($filtro ? "?status=" . urlencode($filtro) : ''));
     exit;
 }
 
 // ================================================
 // FILTROS
 // ================================================
-$filtro_status = $_GET['status'] ?? '';
+$filtro_status_raw = $_GET['status'] ?? '';
+$filtro_status = in_array($filtro_status_raw, $status_validos) ? $filtro_status_raw : '';
 
 $where = $filtro_status ? "WHERE e.status = ?" : "";
 $params = $filtro_status ? [$filtro_status] : [];

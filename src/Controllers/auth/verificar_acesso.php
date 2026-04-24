@@ -14,8 +14,22 @@
 // INICIALIZAÇÃO DA SESSÃO
 // ============================================================
 
-// Iniciar sessão se não estiver iniciada
+// Iniciar sessão com configuração segura de cookie
 if (session_status() === PHP_SESSION_NONE) {
+    // Cookie seguro só em HTTPS (produção); em dev (HTTP/XAMPP) usa false
+    $cookie_seguro = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+
+    ini_set('session.use_strict_mode', '1'); // Rejeita IDs de sessão não gerados pelo servidor
+
+    session_set_cookie_params([
+        'lifetime' => 0,              // Expira ao fechar o navegador
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $cookie_seguro, // HTTPS-only em produção
+        'httponly' => true,           // Inacessível via JavaScript (bloqueia roubo via XSS)
+        'samesite' => 'Lax',         // Proteção CSRF básica sem quebrar links externos
+    ]);
+
     session_start();
 }
 

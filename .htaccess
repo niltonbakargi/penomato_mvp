@@ -4,6 +4,91 @@ php_value max_input_time 120
 RewriteEngine On
 RewriteBase /
 
+# ---------------------------------------------------------------------------
+# CABEÇALHOS DE SEGURANÇA HTTP
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+
+    # Impede que a página seja exibida em iframe (proteção contra clickjacking)
+    Header always set X-Frame-Options "DENY"
+
+    # Impede que o navegador "adivinhe" o tipo MIME do arquivo (MIME sniffing)
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Controla quais informações de origem são enviadas em requisições externas
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Força HTTPS por 1 ano em produção (só ativa quando a conexão já é HTTPS)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+
+    # Desabilita funcionalidades do navegador não utilizadas pelo Penomato
+    Header always set Permissions-Policy "geolocation=(self), camera=(self), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+
+    # Content Security Policy
+    # Nota: 'unsafe-inline' é necessário porque o projeto usa <script> e <style> inline.
+    # Remover 'unsafe-inline' exige mover todos os scripts/estilos para arquivos externos (trabalho futuro).
+    Header always set Content-Security-Policy "\
+default-src 'self'; \
+script-src 'self' 'unsafe-inline' \
+    https://cdn.jsdelivr.net \
+    https://unpkg.com \
+    https://code.jquery.com \
+    https://cdnjs.cloudflare.com; \
+style-src 'self' 'unsafe-inline' \
+    https://cdn.jsdelivr.net \
+    https://cdnjs.cloudflare.com \
+    https://fonts.googleapis.com \
+    https://unpkg.com; \
+font-src 'self' \
+    https://fonts.googleapis.com \
+    https://fonts.gstatic.com \
+    https://cdnjs.cloudflare.com; \
+img-src 'self' data: \
+    https://tile.openstreetmap.org \
+    https://*.tile.openstreetmap.org; \
+connect-src 'self'; \
+frame-ancestors 'none'; \
+object-src 'none'; \
+base-uri 'self'; \
+form-action 'self';"
+
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# FORÇAR HTTPS E CANONICALIZAR DOMÍNIO (apenas produção)
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    # 1. Redirecionar www → sem www (canonicalização de domínio)
+    #    Garante um único domínio canônico e cookie de sessão consistente
+    RewriteCond %{HTTP_HOST} ^www\.penomato\.app\.br$ [NC]
+    RewriteRule ^ https://penomato.app.br%{REQUEST_URI} [R=301,L]
+
+    # 2. Forçar HTTPS em produção
+    #    %{HTTP:X-Forwarded-Proto} cobre o proxy reverso da Hostgator:
+    #    o load balancer termina o SSL e repassa ao Apache como HTTP,
+    #    então %{HTTPS} sempre fica "off" — a segunda condição evita loop infinito
+    RewriteCond %{HTTP_HOST} ^penomato\.app\.br$ [NC]
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://penomato.app.br%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# BLOQUEAR ACESSO DIRETO A ARQUIVOS SENSÍVEIS
+# ---------------------------------------------------------------------------
+<FilesMatch "\.(sql|log|env|json|md|gitignore|lock)$">
+    Require all denied
+</FilesMatch>
+
+# Bloquear acesso à pasta config/ diretamente via URL
+<IfModule mod_rewrite.c>
+    RewriteRule ^config/ - [F,L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# ROTEAMENTO
+# ---------------------------------------------------------------------------
+
 # Redireciona /penomato_mvp/X → /X (resolve links hardcoded do ambiente dev)
 RewriteCond %{REQUEST_URI} ^/penomato_mvp/(.*)$ [NC]
 RewriteRule ^penomato_mvp/(.*)$ /$1 [R=301,L]

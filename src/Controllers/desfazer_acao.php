@@ -12,11 +12,14 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 $usuario_id = (int)$_SESSION['usuario_id'];
-$acao       = $_POST['acao'] ?? '';
 $hist_id    = (int)($_POST['hist_id'] ?? 0);
 $redirect   = APP_BASE . '/src/Controllers/minhas_acoes.php';
 
-if (!$hist_id) {
+$acoes_validas = ['solicitar', 'desfazer'];
+$acao_raw = $_POST['acao'] ?? '';
+$acao = in_array($acao_raw, $acoes_validas) ? $acao_raw : '';
+
+if (!$hist_id || !$acao) {
     header("Location: $redirect?erro=" . urlencode('Ação inválida.'));
     exit;
 }
@@ -45,6 +48,10 @@ if ($acao === 'solicitar') {
         header("Location: $redirect?erro=" . urlencode('Justificativa obrigatória.'));
         exit;
     }
+    if (mb_strlen($justificativa) > 1000) {
+        header("Location: $redirect?erro=" . urlencode('Justificativa muito longa. Máximo: 1000 caracteres.'));
+        exit;
+    }
     $pdo->prepare("
         INSERT INTO fila_aprovacao
             (tipo, subtipo, especie_id, usuario_id, descricao, observacoes)
@@ -61,6 +68,7 @@ if ($acao === 'solicitar') {
 
 // ── DESFAZER (dentro do prazo) ───────────────────────────────────
 if ($acao === 'desfazer' && $dentro_prazo) {
+    $_raiz_uploads = realpath(__DIR__ . '/../../uploads');
 
     $especie_id = (int)$hist['especie_id'];
     $extras     = $hist['dados_extras'] ? json_decode($hist['dados_extras'], true) : [];
@@ -72,8 +80,8 @@ if ($acao === 'desfazer' && $dentro_prazo) {
         $stmt->execute([$imagem_id, $especie_id]);
         $img = $stmt->fetch();
         if ($img) {
-            $arquivo = __DIR__ . '/../../../' . $img['caminho_imagem'];
-            if (file_exists($arquivo)) unlink($arquivo);
+            $_arq = realpath(__DIR__ . '/../../' . $img['caminho_imagem']);
+            if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
             $pdo->prepare("DELETE FROM especies_imagens WHERE id = ?")->execute([$imagem_id]);
         }
         $pdo->prepare("UPDATE especies_administrativo SET data_ultima_atualizacao = NOW() WHERE id = ?")
@@ -88,8 +96,8 @@ if ($acao === 'desfazer' && $dentro_prazo) {
         $stmt = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE especie_id = ? AND origem = 'internet'");
         $stmt->execute([$especie_id]);
         foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $caminho) {
-            $arquivo = __DIR__ . '/../../../' . $caminho;
-            if (file_exists($arquivo)) unlink($arquivo);
+            $_arq = realpath(__DIR__ . '/../../' . $caminho);
+            if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
         }
         $pdo->prepare("DELETE FROM especies_imagens WHERE especie_id = ? AND origem = 'internet'")->execute([$especie_id]);
         $pdo->prepare("UPDATE especies_administrativo SET status = 'sem_dados', data_ultima_atualizacao = NOW() WHERE id = ?")

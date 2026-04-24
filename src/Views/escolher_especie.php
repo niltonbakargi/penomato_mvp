@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Penomato - Escolher Espécie</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
     <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
         body { background-color: var(--cinza-50); padding: var(--esp-8) var(--esp-5); }
@@ -243,7 +243,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
             
             <!-- Mensagem de erro (se houver) -->
             <?php if (isset($erro)): ?>
-                <div class="alerta--perigo">❌ <?php echo $erro; ?></div>
+                <div class="alerta--perigo">❌ <?php echo htmlspecialchars($erro, ENT_QUOTES, 'UTF-8'); ?></div>
             <?php endif; ?>
             
             <!-- Campo de busca -->

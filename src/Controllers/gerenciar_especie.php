@@ -21,6 +21,9 @@ if (!$especie_id) {
 
 $msg = null;
 
+// Diretório raiz de uploads — usado para verificação de path traversal
+$_raiz_uploads = realpath(__DIR__ . '/../../uploads');
+
 // ================================================
 // PROCESSAR AÇÕES POST
 // ================================================
@@ -54,8 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt_imgs = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE especie_id = ?");
                     $stmt_imgs->execute([$especie_id]);
                     foreach ($stmt_imgs->fetchAll(PDO::FETCH_COLUMN) as $caminho) {
-                        $arquivo = __DIR__ . '/../../../' . $caminho;
-                        if (file_exists($arquivo)) unlink($arquivo);
+                        $_arq = realpath(__DIR__ . '/../../' . $caminho);
+                        if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
                     }
                     $pdo->prepare("DELETE FROM especies_imagens WHERE especie_id = ?")->execute([$especie_id]);
                     $msg = ['tipo' => 'ok', 'texto' => 'Status revertido para sem_dados. Todos os dados, imagens e artigo foram removidos.'];
@@ -74,9 +77,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$imagem_id, $especie_id]);
             $img = $stmt->fetch();
             if ($img) {
-                $arquivo = __DIR__ . '/../../../' . $img['caminho_imagem'];
-                if (file_exists($arquivo)) unlink($arquivo);
+                $_arq = realpath(__DIR__ . '/../../' . $img['caminho_imagem']);
+                if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
                 $pdo->prepare("DELETE FROM especies_imagens WHERE id = ?")->execute([$imagem_id]);
+                $pdo->prepare("
+                    INSERT INTO historico_alteracoes
+                        (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, tipo_acao)
+                    VALUES (?, ?, 'especies_imagens', 'caminho_imagem', ?, 'edicao')
+                ")->execute([$especie_id, $usuario_id, $img['caminho_imagem']]);
                 $msg = ['tipo' => 'ok', 'texto' => 'Imagem removida.'];
             }
         }
@@ -103,31 +111,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE especie_id = ?");
         $stmt->execute([$especie_id]);
         foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $caminho) {
-            $arquivo = __DIR__ . '/../../../' . $caminho;
-            if (file_exists($arquivo)) unlink($arquivo);
+            $_arq = realpath(__DIR__ . '/../../' . $caminho);
+            if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
         }
         $pdo->prepare("DELETE FROM especies_imagens WHERE especie_id = ?")->execute([$especie_id]);
+        $pdo->prepare("
+            INSERT INTO historico_alteracoes
+                (especie_id, id_usuario, tabela_afetada, campo_alterado, tipo_acao)
+            VALUES (?, ?, 'especies_imagens', 'todas_imagens', 'edicao')
+        ")->execute([$especie_id, $usuario_id]);
         $msg = ['tipo' => 'ok', 'texto' => 'Todas as imagens foram excluídas.'];
     }
 
     // ── Reverter último status ────────────────────
     elseif ($acao === 'reverter_status') {
         $stmt = $pdo->prepare("
-            SELECT valor_anterior FROM historico_alteracoes
+            SELECT valor_anterior, valor_novo FROM historico_alteracoes
             WHERE especie_id = ? AND campo_alterado = 'status'
             ORDER BY data_alteracao DESC LIMIT 1
         ");
         $stmt->execute([$especie_id]);
-        $anterior = $stmt->fetchColumn();
-        if ($anterior) {
+        $row_hist = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row_hist && $row_hist['valor_anterior'] !== null) {
+            $anterior = $row_hist['valor_anterior'];
             $pdo->prepare("UPDATE especies_administrativo SET status = ?, data_ultima_atualizacao = NOW() WHERE id = ?")
                 ->execute([$anterior, $especie_id]);
-            // Remove o registro de histórico que foi revertido
+            // Registra o revert sem apagar a evidência anterior
             $pdo->prepare("
-                DELETE FROM historico_alteracoes
-                WHERE especie_id = ? AND campo_alterado = 'status'
-                ORDER BY data_alteracao DESC LIMIT 1
-            ")->execute([$especie_id]);
+                INSERT INTO historico_alteracoes
+                    (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao, justificativa)
+                VALUES (?, ?, 'especies_administrativo', 'status', ?, ?, 'edicao', 'revert_gestor')
+            ")->execute([$especie_id, $usuario_id, $row_hist['valor_novo'], $anterior]);
             $msg = ['tipo' => 'ok', 'texto' => "Status revertido para «$anterior»."];
         } else {
             $msg = ['tipo' => 'erro', 'texto' => 'Nenhuma alteração de status encontrada para reverter.'];
@@ -136,12 +150,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // ── Excluir espécie completa ──────────────────
     elseif ($acao === 'excluir_tudo') {
+        // Registra antes do delete (CASCADE apagaria qualquer entrada no histórico)
+        $stmt_nome = $pdo->prepare("SELECT nome_cientifico, status FROM especies_administrativo WHERE id = ?");
+        $stmt_nome->execute([$especie_id]);
+        $esp_dados = $stmt_nome->fetch(PDO::FETCH_ASSOC);
+        error_log(sprintf(
+            '[GESTOR_AUDIT] excluir_especie | gestor_id=%d | especie_id=%d | nome=%s | status=%s | ip=%s',
+            $usuario_id, $especie_id,
+            $esp_dados['nome_cientifico'] ?? 'desconhecido',
+            $esp_dados['status'] ?? 'desconhecido',
+            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+        ));
         // Arquivos físicos
         $stmt = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE especie_id = ?");
         $stmt->execute([$especie_id]);
         foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $caminho) {
-            $arquivo = __DIR__ . '/../../../' . $caminho;
-            if (file_exists($arquivo)) unlink($arquivo);
+            $_arq = realpath(__DIR__ . '/../../' . $caminho);
+            if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
         }
         // ON DELETE CASCADE cuida das tabelas filhas
         $pdo->prepare("DELETE FROM especies_administrativo WHERE id = ?")->execute([$especie_id]);

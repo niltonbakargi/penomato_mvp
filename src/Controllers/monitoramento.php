@@ -7,10 +7,10 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-// Parâmetros de filtro
-$dias_sem_dados  = (int)($_GET['dias_sem_dados']  ?? 30);
-$dias_inativo    = (int)($_GET['dias_inativo']    ?? 30);
-$limite_contrib  = (int)($_GET['limite_contrib']  ?? 30);
+// Parâmetros de filtro (clamped: dias entre 1–365, limite entre 1–100)
+$dias_sem_dados = max(1, min(365, (int)($_GET['dias_sem_dados'] ?? 30)));
+$dias_inativo   = max(1, min(365, (int)($_GET['dias_inativo']   ?? 30)));
+$limite_contrib = max(1, min(100, (int)($_GET['limite_contrib']  ?? 30)));
 
 // ================================================
 // 1. ÚLTIMAS CONTRIBUIÇÕES

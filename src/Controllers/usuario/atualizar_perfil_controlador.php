@@ -272,8 +272,10 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
         $caminho_final = UPLOAD_DIR . $foto_nova;
         
         // Remover foto antiga se existir
-        if ($usuario_atual['foto_perfil'] && file_exists(UPLOAD_DIR . $usuario_atual['foto_perfil'])) {
-            unlink(UPLOAD_DIR . $usuario_atual['foto_perfil']);
+        if ($usuario_atual['foto_perfil']) {
+            $_dir = realpath(UPLOAD_DIR);
+            $_arq = realpath(UPLOAD_DIR . $usuario_atual['foto_perfil']);
+            if ($_arq && $_dir && str_starts_with($_arq, $_dir)) unlink($_arq);
         }
         
         // Renomear arquivo temporário para o final
@@ -298,8 +300,10 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] !== UPLOAD_ERR_NO_FILE) {
 // ============================================================
 
 if ($dados['remover_foto'] && !$foto_processada) {
-    if ($usuario_atual['foto_perfil'] && file_exists(UPLOAD_DIR . $usuario_atual['foto_perfil'])) {
-        unlink(UPLOAD_DIR . $usuario_atual['foto_perfil']);
+    if ($usuario_atual['foto_perfil']) {
+        $_dir = realpath(UPLOAD_DIR);
+        $_arq = realpath(UPLOAD_DIR . $usuario_atual['foto_perfil']);
+        if ($_arq && $_dir && str_starts_with($_arq, $_dir)) unlink($_arq);
         $foto_nome = null;
     }
 }

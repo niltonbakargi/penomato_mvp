@@ -41,7 +41,7 @@ $extensoes_permitidas = ['jpg', 'jpeg', 'png'];
  */
 function criarPastasUpload($caminho) {
     if (!file_exists($caminho)) {
-        mkdir($caminho, 0777, true);
+        mkdir($caminho, 0755, true);
         error_log("Pasta criada: " . $caminho);
         return true;
     }

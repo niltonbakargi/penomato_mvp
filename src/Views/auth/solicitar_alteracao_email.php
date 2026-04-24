@@ -29,7 +29,7 @@ if (!isset($_SESSION['csrf_token_email'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alterar E-mail - Penomato</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
     <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
         body {
@@ -118,14 +118,14 @@ if (!isset($_SESSION['csrf_token_email'])) {
             <?php if (!empty($erro)): ?>
                 <div class="alerta--perigo">
                     <i class="fas fa-exclamation-circle"></i>
-                    <span><?php echo $erro; ?></span>
+                    <span><?php echo htmlspecialchars($erro, ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
             <?php endif; ?>
 
             <?php if (!empty($sucesso)): ?>
                 <div class="alerta--sucesso">
                     <i class="fas fa-check-circle"></i>
-                    <span><?php echo $sucesso; ?></span>
+                    <span><?php echo htmlspecialchars($sucesso, ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
             <?php endif; ?>
 

@@ -87,6 +87,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dados[$c] = $v !== '' ? $v : null;
     }
 
+    // ── Validação de ENUMs ────────────────────────────────────────────────────
+    $enums_validos = [
+        'forma_folha'     => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Lobada'],
+        'filotaxia_folha' => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
+        'tamanho_folha'   => ['Microfilas (< 2 cm)','Nanofilas (2–7 cm)','Mesofilas (7–20 cm)','Macrófilas (20–50 cm)','Megafilas (> 50 cm)'],
+        'possui_espinhos' => ['Sim','Não'],
+        'possui_latex'    => ['Sim','Não'],
+        'possui_seiva'    => ['Sim','Não'],
+        'possui_resina'   => ['Sim','Não'],
+    ];
+    foreach ($enums_validos as $campo => $validos) {
+        if ($dados[$campo] !== null && !in_array($dados[$campo], $validos, true)) {
+            $dados[$campo] = null;
+        }
+    }
+
+    // ── Limites de tamanho (alinhados com o schema do banco) ─────────────────
+    $limites = [
+        // text — capados para evitar abuso
+        'sinonimos'    => 5000, 'nome_popular' => 5000,
+        'nome_cientifico_completo_ref' => 5000, 'referencias' => 10000,
+        // varchar(255)
+        'nome_cientifico_completo' => 255, 'familia' => 255,
+        'sinonimos_ref' => 255, 'nome_popular_ref' => 255,
+        'tipo_folha' => 255, 'textura_folha' => 255, 'margem_folha' => 255,
+        'venacao_folha' => 255, 'cor_flores' => 255, 'simetria_floral' => 255,
+        'numero_petalas' => 255, 'disposicao_flores' => 255, 'aroma' => 255,
+        'tamanho_flor' => 255, 'tipo_fruto' => 255, 'tamanho_fruto' => 255,
+        'cor_fruto' => 255, 'textura_fruto' => 255, 'dispersao_fruto' => 255,
+        'aroma_fruto' => 255, 'tipo_semente' => 255, 'tamanho_semente' => 255,
+        'cor_semente' => 255, 'textura_semente' => 255, 'quantidade_sementes' => 255,
+        'tipo_caule' => 255, 'estrutura_caule' => 255, 'textura_caule' => 255,
+        'cor_caule' => 255, 'forma_caule' => 255, 'modificacao_caule' => 255,
+        'diametro_caule' => 255, 'ramificacao_caule' => 255,
+        // varchar(100)
+        'familia_ref' => 100, 'forma_folha_ref' => 100, 'filotaxia_folha_ref' => 100,
+        'tipo_folha_ref' => 100, 'tamanho_folha_ref' => 100, 'textura_folha_ref' => 100,
+        'margem_folha_ref' => 100, 'venacao_folha_ref' => 100, 'cor_flores_ref' => 100,
+        'simetria_floral_ref' => 100, 'numero_petalas_ref' => 100,
+        'disposicao_flores_ref' => 100, 'aroma_ref' => 100, 'tamanho_flor_ref' => 100,
+        'tipo_fruto_ref' => 100, 'tamanho_fruto_ref' => 100, 'cor_fruto_ref' => 100,
+        'textura_fruto_ref' => 100, 'dispersao_fruto_ref' => 100, 'aroma_fruto_ref' => 100,
+        'tipo_semente_ref' => 100, 'tamanho_semente_ref' => 100, 'cor_semente_ref' => 100,
+        'textura_semente_ref' => 100, 'quantidade_sementes_ref' => 100,
+        'tipo_caule_ref' => 100, 'estrutura_caule_ref' => 100, 'textura_caule_ref' => 100,
+        'cor_caule_ref' => 100, 'forma_caule_ref' => 100, 'modificacao_caule_ref' => 100,
+        'diametro_caule_ref' => 100, 'ramificacao_caule_ref' => 100,
+        // varchar(50)
+        'possui_espinhos_ref' => 50, 'possui_latex_ref' => 50,
+        'possui_seiva_ref' => 50, 'possui_resina_ref' => 50,
+    ];
+    foreach ($limites as $campo => $max) {
+        if (isset($dados[$campo]) && $dados[$campo] !== null && mb_strlen($dados[$campo]) > $max) {
+            $dados[$campo] = mb_substr($dados[$campo], 0, $max);
+        }
+    }
+
     try {
         iniciarTransacao();
 

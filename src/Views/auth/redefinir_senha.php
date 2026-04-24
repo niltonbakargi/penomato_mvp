@@ -53,7 +53,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redefinir Senha - Penomato</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
     <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
         body {
@@ -142,7 +142,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
             <?php if (!empty($erro)): ?>
                 <div class="alerta--perigo">
                     <i class="fas fa-exclamation-circle"></i>
-                    <span><?php echo $erro; ?></span>
+                    <span><?php echo htmlspecialchars($erro, ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
             <?php endif; ?>
 
