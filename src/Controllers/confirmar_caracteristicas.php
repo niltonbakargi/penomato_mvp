@@ -184,6 +184,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES (?, ?, 'especies_administrativo', 'status', 'dados_internet', 'descrita', 'edicao')
         ")->execute([$especie_id, $autor_id]);
 
+        // Avançar artigo para 'confirmado' (apenas se ainda estiver em rascunho)
+        $pdo->prepare("
+            UPDATE artigos
+            SET status = 'confirmado', data_confirmado = NOW(), atualizado_em = NOW()
+            WHERE especie_id = ? AND status = 'rascunho'
+        ")->execute([$especie_id]);
+
         confirmarTransacao();
 
         $_SESSION['msg_sucesso'] = 'Identificação confirmada e dados salvos com sucesso!';

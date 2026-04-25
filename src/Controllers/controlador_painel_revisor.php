@@ -48,90 +48,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['acao'] ?? '', ['ap
     }
 
     try {
+        // Busca a espécie e o colaborador autor — verifica que o artigo está em 'revisando'
         $stmt = $pdo->prepare("
             SELECT e.nome_cientifico, e.autor_dados_internet_id,
                    u.nome AS colaborador_nome, u.email AS colaborador_email
             FROM especies_administrativo e
-            LEFT JOIN usuarios u ON u.id = e.autor_dados_internet_id
-            WHERE e.id = ? AND e.status = 'em_revisao'
+            INNER JOIN artigos a ON a.especie_id = e.id AND a.status = 'revisando'
+            LEFT JOIN  usuarios u ON u.id = e.autor_dados_internet_id
+            WHERE e.id = ?
         ");
         $stmt->execute([$especie_id]);
         $especie = $stmt->fetch();
 
         if (!$especie) {
-            header('Location: ' . $url_painel . '?erro=' . urlencode('Espécie não encontrada ou não está em revisão.'));
+            header('Location: ' . $url_painel . '?erro=' . urlencode('Artigo não encontrado ou não está em revisão.'));
             exit;
         }
 
         if ($acao_decisao === 'aprovar') {
 
-            $pdo->prepare("
-                UPDATE especies_administrativo
-                SET status = 'publicado',
-                    data_revisada = NOW(),
-                    autor_revisada_id = ?,
-                    observacoes_revisao = ?,
-                    data_publicado = NOW(),
-                    autor_publicado_id = ?,
-                    data_ultima_atualizacao = NOW()
-                WHERE id = ?
-            ")->execute([$usuario_id, $motivo ?: null, $usuario_id, $especie_id]);
-
+            // Artigo avança para 'revisado'
             $pdo->prepare("
                 UPDATE artigos
-                SET status = 'publicado', atualizado_em = NOW()
-                WHERE especie_id = ?
-            ")->execute([$especie_id]);
+                SET status      = 'revisado',
+                    data_revisado = NOW(),
+                    revisado_por  = ?,
+                    atualizado_em = NOW()
+                WHERE especie_id = ? AND status = 'revisando'
+            ")->execute([$usuario_id, $especie_id]);
 
-            // Histórico para permitir desfazer
+            // Espécie: registra data e autor da revisão
+            $pdo->prepare("
+                UPDATE especies_administrativo
+                SET data_revisada        = NOW(),
+                    autor_revisada_id    = ?,
+                    observacoes_revisao  = ?,
+                    data_ultima_atualizacao = NOW()
+                WHERE id = ?
+            ")->execute([$usuario_id, $motivo ?: null, $especie_id]);
+
+            // Histórico
             $pdo->prepare("
                 INSERT INTO historico_alteracoes
                     (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
-                VALUES (?, ?, 'especies_administrativo', 'status', 'em_revisao', 'publicado', 'revisao')
+                VALUES (?, ?, 'artigos', 'status', 'revisando', 'revisado', 'revisao')
             ")->execute([$especie_id, $usuario_id]);
 
             if (!empty($especie['colaborador_email'])) {
                 $corpo = "<p>Olá, <strong>" . htmlspecialchars($especie['colaborador_nome']) . "</strong>!</p>
-                    <p>A espécie <em>" . htmlspecialchars($especie['nome_cientifico']) . "</em>
-                    foi <strong style='color:#0b5e42;'>APROVADA e PUBLICADA</strong> pelo especialista.</p>"
-                    . ($motivo ? "<p><strong>Observações:</strong> " . htmlspecialchars($motivo) . "</p>" : "")
-                    . "<p>Os dados já estão disponíveis publicamente no Penomato.</p>";
+                    <p>O artigo da espécie <em>" . htmlspecialchars($especie['nome_cientifico']) . "</em>
+                    foi <strong style='color:#0b5e42;'>APROVADO</strong> pelo especialista e está aguardando publicação.</p>"
+                    . ($motivo ? "<p><strong>Observações:</strong> " . htmlspecialchars($motivo) . "</p>" : "");
                 enviarEmail(
                     $especie['colaborador_email'],
-                    'Espécie publicada — Penomato',
-                    templateEmail('Espécie publicada com sucesso', $corpo)
+                    'Artigo aprovado — Penomato',
+                    templateEmail('Artigo aprovado pelo especialista', $corpo)
                 );
             }
 
-            header('Location: ' . $url_painel . '?sucesso=' . urlencode('"' . $especie['nome_cientifico'] . '" publicada com sucesso!'));
+            header('Location: ' . $url_painel . '?sucesso=' . urlencode('"' . $especie['nome_cientifico'] . '" revisada e aprovada!'));
 
         } else {
 
+            // Artigo volta para 'registrado' — colaborador precisa corrigir e reenviar
+            $pdo->prepare("
+                UPDATE artigos
+                SET status        = 'registrado',
+                    atualizado_em = NOW()
+                WHERE especie_id = ? AND status = 'revisando'
+            ")->execute([$especie_id]);
+
+            // Espécie: registra contestação
             $pdo->prepare("
                 UPDATE especies_administrativo
-                SET status = 'contestado', data_contestado = NOW(),
-                    autor_contestado_id = ?, motivo_contestado = ?,
+                SET status               = 'contestado',
+                    data_contestado      = NOW(),
+                    autor_contestado_id  = ?,
+                    motivo_contestado    = ?,
                     data_ultima_atualizacao = NOW()
                 WHERE id = ?
             ")->execute([$usuario_id, $motivo, $especie_id]);
 
-            // Histórico para permitir desfazer
+            // Histórico
             $pdo->prepare("
                 INSERT INTO historico_alteracoes
                     (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
-                VALUES (?, ?, 'especies_administrativo', 'status', 'em_revisao', 'contestado', 'contestacao')
+                VALUES (?, ?, 'artigos', 'status', 'revisando', 'registrado', 'contestacao')
             ")->execute([$especie_id, $usuario_id]);
 
             if (!empty($especie['colaborador_email'])) {
                 $corpo = "<p>Olá, <strong>" . htmlspecialchars($especie['colaborador_nome']) . "</strong>!</p>
-                    <p>A espécie <em>" . htmlspecialchars($especie['nome_cientifico']) . "</em>
-                    foi <strong style='color:#c0392b;'>CONTESTADA</strong> pelo revisor.</p>
+                    <p>O artigo da espécie <em>" . htmlspecialchars($especie['nome_cientifico']) . "</em>
+                    foi <strong style='color:#c0392b;'>CONTESTADO</strong> pelo especialista.</p>
                     <p><strong>Motivo:</strong> " . htmlspecialchars($motivo) . "</p>
-                    <p>Por favor, revise os dados e reenvie para revisão.</p>";
+                    <p>Por favor, corrija os dados ou imagens e o artigo voltará para revisão automaticamente.</p>";
                 enviarEmail(
                     $especie['colaborador_email'],
-                    'Espécie contestada — Penomato',
-                    templateEmail('Revisão requer ajustes', $corpo)
+                    'Artigo contestado — Penomato',
+                    templateEmail('Artigo requer correções', $corpo)
                 );
             }
 
@@ -140,7 +154,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['acao'] ?? '', ['ap
 
     } catch (Exception $e) {
         error_log('Erro na decisão de revisão: ' . $e->getMessage());
-        header('Location: ' . $url_revisao . '&erro=' . urlencode('Erro interno. Tente novamente.'));
+        header('Location: ' . $url_revisao . '?erro=' . urlencode('Erro interno. Tente novamente.'));
+    }
+    exit;
+}
+
+// ============================================
+// PUBLICAR ARTIGO (apenas gestor)
+// ============================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'publicar') {
+
+    if ($usuario_tipo !== 'gestor') {
+        header('Location: ' . APP_BASE . '/src/Controllers/artigos_fila.php?erro=' . urlencode('Apenas gestores podem publicar artigos.'));
+        exit;
+    }
+
+    require_once __DIR__ . '/../../config/email.php';
+
+    $especie_id = (int)($_POST['especie_id'] ?? 0);
+    $url_fila   = APP_BASE . '/src/Controllers/artigos_fila.php';
+
+    if (!$especie_id) {
+        header('Location: ' . $url_fila . '?erro=' . urlencode('ID inválido.'));
+        exit;
+    }
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT e.nome_cientifico, e.autor_dados_internet_id,
+                   u.nome AS colaborador_nome, u.email AS colaborador_email
+            FROM especies_administrativo e
+            INNER JOIN artigos a ON a.especie_id = e.id AND a.status = 'revisado'
+            LEFT JOIN  usuarios u ON u.id = e.autor_dados_internet_id
+            WHERE e.id = ?
+        ");
+        $stmt->execute([$especie_id]);
+        $especie = $stmt->fetch();
+
+        if (!$especie) {
+            header('Location: ' . $url_fila . '?erro=' . urlencode('Artigo não encontrado ou não está revisado.'));
+            exit;
+        }
+
+        $usuario_id = (int)$_SESSION['usuario_id'];
+
+        $pdo->prepare("
+            UPDATE artigos
+            SET status = 'publicado', atualizado_em = NOW()
+            WHERE especie_id = ? AND status = 'revisado'
+        ")->execute([$especie_id]);
+
+        $pdo->prepare("
+            UPDATE especies_administrativo
+            SET status              = 'publicado',
+                data_publicado      = NOW(),
+                autor_publicado_id  = ?,
+                data_ultima_atualizacao = NOW()
+            WHERE id = ?
+        ")->execute([$usuario_id, $especie_id]);
+
+        $pdo->prepare("
+            INSERT INTO historico_alteracoes
+                (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao)
+            VALUES (?, ?, 'artigos', 'status', 'revisado', 'publicado', 'publicacao')
+        ")->execute([$especie_id, $usuario_id]);
+
+        if (!empty($especie['colaborador_email'])) {
+            $corpo = "<p>Olá, <strong>" . htmlspecialchars($especie['colaborador_nome']) . "</strong>!</p>
+                <p>O artigo da espécie <em>" . htmlspecialchars($especie['nome_cientifico']) . "</em>
+                foi <strong style='color:#1e40af;'>PUBLICADO</strong> no Penomato.</p>
+                <p>Os dados já estão disponíveis publicamente na plataforma.</p>";
+            enviarEmail(
+                $especie['colaborador_email'],
+                'Artigo publicado — Penomato',
+                templateEmail('Artigo publicado com sucesso', $corpo)
+            );
+        }
+
+        header('Location: ' . $url_fila . '?sucesso=' . urlencode('"' . $especie['nome_cientifico'] . '" publicada com sucesso!'));
+
+    } catch (Exception $e) {
+        error_log('Erro ao publicar artigo: ' . $e->getMessage());
+        header('Location: ' . $url_fila . '?erro=' . urlencode('Erro interno. Tente novamente.'));
     }
     exit;
 }

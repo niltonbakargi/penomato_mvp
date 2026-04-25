@@ -8,6 +8,7 @@ session_start();
 // CARREGAR CONFIGURAÇÃO
 // ================================================
 require_once __DIR__ . '/../../config/banco_de_dados.php';
+require_once __DIR__ . '/../helpers/autores_artigo.php';
 
 // ================================================
 // VERIFICAÇÕES DE ACESSO
@@ -29,46 +30,28 @@ if ($usuario_tipo !== 'revisor' && $usuario_tipo !== 'gestor') {
 // ================================================
 // PARÂMETROS
 // ================================================
-$especie_id = $_GET['id'] ?? 0;
+$especie_id = (int)($_GET['id'] ?? 0);
+$modo       = in_array($_GET['modo'] ?? '', ['revisar', 'ver']) ? $_GET['modo'] : 'ver';
+
 if (!$especie_id) {
-    header('Location: ' . APP_BASE . '/src/Controllers/controlador_painel_revisor.php');
+    header('Location: ' . APP_BASE . '/src/Controllers/artigos_fila.php');
     exit;
 }
 
 // ================================================
-// VERIFICAR SE ESPÉCIE ESTÁ EM REVISÃO
+// MODO REVISAR: avança artigo de registrado → revisando
 // ================================================
-try {
-    // Primeiro, verificar se o usuário já está revisando esta espécie
-    // (por segurança, mas como não temos campo, apenas verificamos status)
-    $sql_check = "SELECT status FROM especies_administrativo WHERE id = ?";
-    $stmt = $pdo->prepare($sql_check);
-    $stmt->execute([$especie_id]);
-    $status_data = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$status_data) {
-        die("Espécie não encontrada");
+if ($modo === 'revisar') {
+    try {
+        $pdo->prepare("
+            UPDATE artigos
+            SET status = 'revisando', data_revisando = NOW(), atualizado_em = NOW()
+            WHERE especie_id = ? AND status = 'registrado'
+        ")->execute([$especie_id]);
+        // Se já estava em 'revisando', o UPDATE não altera nada — comportamento correto.
+    } catch (Exception $e) {
+        error_log('Erro ao avançar artigo para revisando: ' . $e->getMessage());
     }
-    
-    // Se não estiver em revisão, tentar bloquear para este revisor
-    if ($status_data['status'] !== 'em_revisao') {
-        // Tenta atualizar para 'em_revisao' se ainda estiver disponível
-        $sql_lock = "UPDATE especies_administrativo 
-                     SET status = 'em_revisao', 
-                         data_ultima_atualizacao = NOW() 
-                     WHERE id = ? AND status = 'registrada'";
-        $stmt_lock = $pdo->prepare($sql_lock);
-        $stmt_lock->execute([$especie_id]);
-        
-        if ($stmt_lock->rowCount() === 0) {
-            // Não conseguiu travar - redireciona
-            header('Location: ' . APP_BASE . '/src/Controllers/controlador_painel_revisor.php?erro=indisponivel');
-            exit;
-        }
-    }
-    
-} catch (Exception $e) {
-    die("Erro ao verificar espécie: " . $e->getMessage());
 }
 
 // ================================================
@@ -150,6 +133,9 @@ function exibirCaracteristica($valor, $ref) {
     }
     return $html;
 }
+
+// Autores/contribuidores do artigo
+$autores_artigo = montarAutoresArtigo($pdo, $especie_id);
 
 // Mapeamento de ícones
 $icones = [
@@ -513,9 +499,59 @@ $nomes_partes = [
             margin: 15px 0;
         }
         
+        /* ── Autores ── */
+        .autores-box {
+            background: var(--branco);
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .autores-titulo {
+            font-size: 1em;
+            font-weight: bold;
+            color: var(--cor-primaria);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--cinza-200);
+            padding-bottom: 10px;
+        }
+        .autores-lista {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .autor-item {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+        .autor-pos {
+            font-size: 0.75em;
+            color: var(--cinza-400);
+            min-width: 18px;
+            text-align: right;
+        }
+        .autor-nome {
+            font-weight: 600;
+            color: var(--cinza-900);
+            min-width: 180px;
+        }
+        .autor-papeis {
+            color: var(--cinza-500);
+            font-size: 0.85em;
+        }
+
         @media (max-width: 768px) {
             .grid-2col { grid-template-columns: 1fr; }
             .radio-group { flex-direction: column; gap: 10px; }
+            .autor-nome { min-width: unset; }
         }
     </style>
 </head>
@@ -538,7 +574,11 @@ $nomes_partes = [
                 </div>
             </div>
             <div>
-                <span class="badge-status">EM REVISÃO</span>
+                <?php if ($modo === 'revisar'): ?>
+                    <span class="badge-status">REVISANDO</span>
+                <?php else: ?>
+                    <span class="badge-status" style="background:rgba(255,255,255,0.1);">VISUALIZAÇÃO</span>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -950,32 +990,51 @@ $nomes_partes = [
             </div>
         </div>
 
+        <!-- AUTORES / CONTRIBUIDORES -->
+        <?php if (!empty($autores_artigo)): ?>
+        <div class="autores-box">
+            <div class="autores-titulo">
+                <i class="fas fa-users"></i> Autores e Contribuidores
+            </div>
+            <ul class="autores-lista">
+                <?php foreach ($autores_artigo as $pos => $autor): ?>
+                <li class="autor-item">
+                    <span class="autor-pos"><?php echo $pos + 1; ?>.</span>
+                    <span class="autor-nome"><?php echo htmlspecialchars($autor['nome']); ?></span>
+                    <span class="autor-papeis"><?php echo htmlspecialchars(implode(' · ', $autor['papeis'])); ?></span>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <?php endif; ?>
+
         <?php if (!empty($_GET['erro'])): ?>
         <div style="background:#f8d7da;border:1px solid #f5c6cb;color:#721c24;padding:12px 18px;border-radius:8px;margin-bottom:16px;">
             ⚠️ <?php echo htmlspecialchars($_GET['erro']); ?>
         </div>
         <?php endif; ?>
 
+        <?php if ($modo === 'revisar'): ?>
         <!-- DECISÃO DA REVISÃO -->
         <div class="decision-box">
             <div class="decision-title">⚖️ DECISÃO DA REVISÃO</div>
-            
+
             <form id="formDecisao" method="POST" action="<?php echo APP_BASE; ?>/src/Controllers/controlador_painel_revisor.php">
                 <input type="hidden" name="especie_id" value="<?php echo $especie_id; ?>">
-                
+
                 <div class="radio-group">
                     <label>
-                        <input type="radio" name="decisao" value="aprovar" required> 
+                        <input type="radio" name="decisao" value="aprovar" required>
                         <span style="font-size: 1.2em;">✅</span> APROVAR - Dados corretos e completos
                     </label>
                     <label>
-                        <input type="radio" name="decisao" value="contestar" required> 
+                        <input type="radio" name="decisao" value="contestar" required>
                         <span style="font-size: 1.2em;">❌</span> REJEITAR (Contestar) - Precisa de ajustes
                     </label>
                 </div>
 
-                <textarea name="motivo" id="motivo" rows="4" 
-                    placeholder="Motivo da decisão (obrigatório se rejeitar)..." 
+                <textarea name="motivo" id="motivo" rows="4"
+                    placeholder="Motivo da decisão (obrigatório se rejeitar)..."
                     style="width: 100%;"><?php echo isset($_GET['motivo']) ? htmlspecialchars($_GET['motivo']) : ''; ?></textarea>
 
                 <div class="action-bar">
@@ -985,12 +1044,18 @@ $nomes_partes = [
                     <button type="submit" name="acao" value="contestar" class="btn btn-danger" onclick="return validarDecisao('contestar')">
                         ❌ CONFIRMAR REJEIÇÃO
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/penomato_mvp/src/Controllers/controlador_painel_revisor.php'">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/penomato_mvp/src/Controllers/artigos_fila.php'">
                         CANCELAR
                     </button>
                 </div>
             </form>
         </div>
+        <?php else: ?>
+        <div style="text-align:center; padding: var(--esp-8) 0; color: var(--cinza-400);">
+            <p>Você está no modo de visualização. Para revisar este artigo, volte à fila e clique em <strong>Revisar</strong>.</p>
+            <a href="/penomato_mvp/src/Controllers/artigos_fila.php" style="color: var(--cor-primaria);">← Voltar à fila</a>
+        </div>
+        <?php endif; ?>
     </div>
 
     <!-- MODAL PARA VISUALIZAR IMAGENS -->

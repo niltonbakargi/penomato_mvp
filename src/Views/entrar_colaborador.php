@@ -90,8 +90,8 @@ $todos_botoes = [
 
 // Permissões por subtipo
 $permissoes = [
-    'identificador' => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'sugestoes', 'minhas_acoes'],
-    'dev'           => ['dados_internet', 'dev_tools', 'sugestoes', 'minhas_acoes'],
+    'identificador' => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'sugestoes', 'minhas_acoes'],
+    'dev'           => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'dev_tools', 'sugestoes', 'minhas_acoes'],
     'especialista'  => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes', 'minhas_acoes'],
     'gestor'        => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes', 'minhas_acoes'],
 ];

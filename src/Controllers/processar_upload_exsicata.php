@@ -101,7 +101,7 @@ if (!$especie) {
 
 // ── Verificar exemplar aprovado ───────────────────────────────────────────────
 $stmt = $pdo->prepare("
-    SELECT id, codigo, numero_etiqueta
+    SELECT id, codigo, numero_etiqueta, especialista_id
     FROM exemplares
     WHERE id = ? AND especie_id = ? AND status = 'aprovado'
 ");
@@ -204,22 +204,93 @@ try {
         $stmt_reg->execute([$usuario_id, $especie_id]);
     }
 
+    // ── Se todas as partes prontas E artigo já confirmado → registrado ───────
+    $artigo_registrado = false;
+    if ($todas_prontas) {
+        $revisor_id = ($exemplar['especialista_id'] ?? 0) ?: null;
+        $rows = $pdo->prepare("
+            UPDATE artigos
+            SET status = 'registrado',
+                data_registrado = NOW(),
+                revisor_id = ?,
+                atualizado_em = NOW()
+            WHERE especie_id = ? AND status = 'confirmado'
+        ");
+        $rows->execute([$revisor_id, $especie_id]);
+        $artigo_registrado = $rows->rowCount() > 0;
+    }
+
     $pdo->commit();
+
+    // ── Notificar especialista quando artigo avança para registrado ───────────
+    if ($artigo_registrado) {
+        try {
+            require_once __DIR__ . '/../../config/email.php';
+            $stmt_esp = $pdo->prepare("
+                SELECT nome_cientifico FROM especies_administrativo WHERE id = ? LIMIT 1
+            ");
+            $stmt_esp->execute([$especie_id]);
+            $nome_especie = $stmt_esp->fetchColumn() ?: "ID $especie_id";
+
+            $link = APP_BASE . '/src/Controllers/artigos_fila.php';
+
+            $revisor_id_notif = ($exemplar['especialista_id'] ?? 0) ?: null;
+
+            if ($revisor_id_notif) {
+                $stmt_rev = $pdo->prepare("SELECT nome, email FROM usuarios WHERE id = ? AND ativo = 1 LIMIT 1");
+                $stmt_rev->execute([$revisor_id_notif]);
+                $rev = $stmt_rev->fetch();
+                if ($rev) {
+                    $corpo = templateEmail('Artigo pronto para revisão', "
+                        <p>Olá, <strong>" . htmlspecialchars($rev['nome']) . "</strong>!</p>
+                        <p>O artigo da espécie <em>" . htmlspecialchars($nome_especie) . "</em>
+                        está com dados confirmados e imagens registradas.</p>
+                        <p>Ele está aguardando sua revisão.</p>
+                        <p style='text-align:center;margin:24px 0;'>
+                            <a href='{$link}'
+                               style='background:#0b5e42;color:#fff;padding:12px 28px;border-radius:8px;
+                                      text-decoration:none;font-weight:bold;display:inline-block;'>
+                                Acessar fila de revisão
+                            </a>
+                        </p>
+                    ");
+                    enviarEmail($rev['email'], "Penomato — {$nome_especie} pronto para revisão", $corpo);
+                }
+            } else {
+                // Sem especialista: notificar todos
+                $todos = $pdo->query(
+                    "SELECT nome, email FROM usuarios
+                     WHERE categoria = 'revisor' AND ativo = 1 AND status_verificacao = 'verificado'"
+                )->fetchAll();
+                foreach ($todos as $rev) {
+                    $corpo = templateEmail('Artigo disponível para revisão', "
+                        <p>Olá, <strong>" . htmlspecialchars($rev['nome']) . "</strong>!</p>
+                        <p>O artigo da espécie <em>" . htmlspecialchars($nome_especie) . "</em>
+                        está pronto e <strong>sem orientador definido</strong>.</p>
+                        <p>Qualquer especialista pode assumir a revisão.</p>
+                        <p style='text-align:center;margin:24px 0;'>
+                            <a href='{$link}'
+                               style='background:#0b5e42;color:#fff;padding:12px 28px;border-radius:8px;
+                                      text-decoration:none;font-weight:bold;display:inline-block;'>
+                                Acessar fila de revisão
+                            </a>
+                        </p>
+                    ");
+                    enviarEmail($rev['email'], "Penomato — {$nome_especie} disponível para revisão", $corpo);
+                }
+            }
+        } catch (Exception $e) {
+            error_log('Aviso: falha ao notificar especialista: ' . $e->getMessage());
+        }
+    }
 
     // ── Montar mensagem de retorno ────────────────────────────────────────────
     $msg = ucfirst($parte_planta) . ' enviada com sucesso!';
 
-    if ($todas_prontas) {
-        // Verificar se também está identificada
-        $stmt_chk = $pdo->prepare("SELECT data_descrita FROM especies_administrativo WHERE id = ?");
-        $stmt_chk->execute([$especie_id]);
-        $chk = $stmt_chk->fetch();
-
-        if ($chk['data_descrita']) {
-            $msg .= ' Todas as partes completas e espécie identificada — o artigo pode ser gerado!';
-        } else {
-            $msg .= ' Todas as partes foram fotografadas. Para gerar o artigo, confirme os atributos da internet.';
-        }
+    if ($artigo_registrado) {
+        $msg .= ' Todas as partes completas — artigo enviado para revisão do especialista!';
+    } elseif ($todas_prontas) {
+        $msg .= ' Todas as partes foram fotografadas. Para enviar ao especialista, confirme os dados da internet primeiro.';
     }
 
     header("Location: {$redirect}&sucesso=" . urlencode($msg));

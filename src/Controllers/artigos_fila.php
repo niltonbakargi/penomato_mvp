@@ -39,9 +39,11 @@ $contadores = $pdo->query("
 // ================================================
 // BUSCAR ARTIGOS
 // ================================================
+$status_validos = ['rascunho', 'confirmado', 'registrado', 'revisando', 'revisado', 'publicado'];
+
 if ($filtro === 'pendentes') {
-    $where = "a.status IN ('rascunho','em_revisao')";
-} elseif (in_array($filtro, ['rascunho', 'em_revisao', 'aprovado', 'publicado'])) {
+    $where = "a.status IN ('registrado','revisando','revisado')";
+} elseif (in_array($filtro, $status_validos)) {
     $where = "a.status = " . $pdo->quote($filtro);
 } else {
     $where = "1=1";
@@ -68,10 +70,12 @@ $artigos = $pdo->query("
     GROUP BY a.id
     ORDER BY
         CASE a.status
-            WHEN 'rascunho'    THEN 1
-            WHEN 'em_revisao'  THEN 2
-            WHEN 'aprovado'    THEN 3
-            WHEN 'publicado'   THEN 4
+            WHEN 'registrado'  THEN 1
+            WHEN 'revisando'   THEN 2
+            WHEN 'revisado'    THEN 3
+            WHEN 'confirmado'  THEN 4
+            WHEN 'rascunho'    THEN 5
+            WHEN 'publicado'   THEN 6
         END,
         CASE e.prioridade
             WHEN 'urgente' THEN 1
@@ -88,8 +92,10 @@ $artigos = $pdo->query("
 // ================================================
 $labels_status_artigo = [
     'rascunho'   => ['label' => 'Rascunho',    'classe' => 'st-rascunho'],
-    'em_revisao' => ['label' => 'Em revisão',  'classe' => 'st-revisao'],
-    'aprovado'   => ['label' => 'Aprovado',    'classe' => 'st-aprovado'],
+    'confirmado' => ['label' => 'Confirmado',  'classe' => 'st-confirmado'],
+    'registrado' => ['label' => 'Registrado',  'classe' => 'st-registrado'],
+    'revisando'  => ['label' => 'Revisando',   'classe' => 'st-revisando'],
+    'revisado'   => ['label' => 'Revisado',    'classe' => 'st-revisado'],
     'publicado'  => ['label' => 'Publicado',   'classe' => 'st-publicado'],
 ];
 $labels_prio = [
@@ -198,19 +204,19 @@ $labels_prio = [
             font-weight: var(--peso-semi);
             white-space: nowrap;
         }
-        .st-rascunho  { background: var(--cinza-200);     color: var(--cinza-700); }
-        .st-revisao   { background: #fef9c3;               color: #854d0e; }
-        .st-aprovado  { background: var(--sucesso-fundo);  color: var(--sucesso-texto); }
-        .st-publicado { background: #dbeafe;               color: #1e40af; }
+        .st-rascunho   { background: var(--cinza-200);    color: var(--cinza-700); }
+        .st-confirmado { background: #e0f2fe;             color: #0369a1; }
+        .st-registrado { background: #fef9c3;             color: #854d0e; }
+        .st-revisando  { background: #ffedd5;             color: #9a3412; }
+        .st-revisado   { background: var(--sucesso-fundo); color: var(--sucesso-texto); }
+        .st-publicado  { background: #dbeafe;             color: #1e40af; }
 
         .prio-urgente { background: #fee2e2; color: #991b1b; }
         .prio-alta    { background: #ffedd5; color: #9a3412; }
         .prio-media   { background: #fef9c3; color: #854d0e; }
         .prio-baixa   { background: var(--cinza-100); color: var(--cinza-600); }
 
-        .btn-revisar {
-            background: var(--cor-primaria);
-            color: var(--branco);
+        .btn-revisar, .btn-ver {
             padding: var(--esp-2) var(--esp-4);
             border-radius: var(--raio-md);
             font-size: var(--texto-xs);
@@ -220,7 +226,23 @@ $labels_prio = [
             transition: var(--transicao);
             display: inline-block;
         }
+        .btn-revisar {
+            background: var(--cor-primaria);
+            color: var(--branco);
+        }
         .btn-revisar:hover { background: var(--cor-primaria-hover); color: var(--branco); text-decoration: none; }
+        .btn-ver {
+            background: var(--cinza-100);
+            color: var(--cinza-700);
+            border: 1px solid var(--cinza-300);
+        }
+        .btn-ver:hover { background: var(--cinza-200); color: var(--cinza-800); text-decoration: none; }
+        .btn-publicar {
+            background: #1e40af;
+            color: var(--branco);
+        }
+        .btn-publicar:hover { background: #1e3a8a; color: var(--branco); text-decoration: none; }
+        .btns-acao { display: flex; gap: var(--esp-2); flex-wrap: nowrap; }
 
         .data-cell { font-size: var(--texto-xs); color: var(--cinza-500); white-space: nowrap; }
 
@@ -252,14 +274,16 @@ $labels_prio = [
     <!-- Abas de status -->
     <div class="status-tabs">
         <?php
-        $pendentes = ($contadores['rascunho'] ?? 0) + ($contadores['em_revisao'] ?? 0);
+        $pendentes = ($contadores['registrado'] ?? 0) + ($contadores['revisando'] ?? 0) + ($contadores['revisado'] ?? 0);
         $tabs = [
             'pendentes'  => ['label' => 'Pendentes',   'num' => $pendentes],
+            'registrado' => ['label' => 'Registrado',  'num' => $contadores['registrado'] ?? 0],
+            'revisando'  => ['label' => 'Revisando',   'num' => $contadores['revisando']  ?? 0],
+            'revisado'   => ['label' => 'Revisado',    'num' => $contadores['revisado']   ?? 0],
             'rascunho'   => ['label' => 'Rascunho',    'num' => $contadores['rascunho']   ?? 0],
-            'em_revisao' => ['label' => 'Em revisão',  'num' => $contadores['em_revisao'] ?? 0],
-            'aprovado'   => ['label' => 'Aprovado',    'num' => $contadores['aprovado']   ?? 0],
+            'confirmado' => ['label' => 'Confirmado',  'num' => $contadores['confirmado'] ?? 0],
             'publicado'  => ['label' => 'Publicado',   'num' => $contadores['publicado']  ?? 0],
-            'todos'      => ['label' => 'Todos',        'num' => array_sum($contadores)],
+            'todos'      => ['label' => 'Todos',       'num' => array_sum($contadores)],
         ];
         foreach ($tabs as $key => $tab):
             $ativo = $filtro === $key ? ' ativo' : '';
@@ -318,10 +342,29 @@ $labels_prio = [
                     <?php echo date('d/m/Y', strtotime($a['gerado_em'])); ?>
                 </td>
                 <td>
-                    <a href="/penomato_mvp/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>"
-                       class="btn-revisar">
-                        <i class="fas fa-pen"></i> Revisar
-                    </a>
+                    <div class="btns-acao">
+                        <a href="/penomato_mvp/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=ver"
+                           class="btn-ver">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                        <?php if (in_array($a['status'], ['registrado', 'revisando'])): ?>
+                        <a href="/penomato_mvp/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=revisar"
+                           class="btn-revisar">
+                            <i class="fas fa-pen"></i> Revisar
+                        </a>
+                        <?php endif; ?>
+                        <?php if ($a['status'] === 'revisado' && $usuario_tipo === 'gestor'): ?>
+                        <form method="POST" action="/penomato_mvp/src/Controllers/controlador_painel_revisor.php"
+                              style="display:inline;"
+                              onsubmit="return confirm('Publicar o artigo de <?php echo htmlspecialchars($a['nome_cientifico'], ENT_QUOTES); ?>?')">
+                            <input type="hidden" name="acao"       value="publicar">
+                            <input type="hidden" name="especie_id" value="<?php echo $a['especie_id']; ?>">
+                            <button type="submit" class="btn-publicar" style="border:none;cursor:pointer;">
+                                <i class="fas fa-globe"></i> Publicar
+                            </button>
+                        </form>
+                        <?php endif; ?>
+                    </div>
                 </td>
             </tr>
             <?php endforeach; ?>
