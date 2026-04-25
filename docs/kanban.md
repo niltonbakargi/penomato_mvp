@@ -1,7 +1,7 @@
 # Kanban — Penomato MVP
-**Atualizado em:** 22/04/2026
+**Atualizado em:** 25/04/2026
 **Branch ativo:** `main`
-**Último commit:** `8759d4b` fix: aumenta timeout da IA para 110s e define max_execution_time=120 no htaccess
+**Último commit:** `ebc2914` feat: fluxo completo do artigo científico (rascunho → publicado)
 
 ---
 
@@ -87,12 +87,28 @@
 - [x] Contestar: status → `contestado`, motivo obrigatório, notifica com feedback
 - [x] Validação de erro se contestar sem motivo
 
+### Fase 11 — Fluxo Completo do Artigo Científico (`ebc2914`, 25/04)
+- [x] Migração do banco: novo ENUM de status (`rascunho → confirmado → registrado → revisando → revisado → publicado`) + coluna `revisor_id` na tabela `artigos`
+- [x] Permissões por subtipo de colaborador corrigidas — identificador e dev recebem `contestar`; dev recebe todos os cards do identificador + `dev_tools`
+- [x] `confirmar_caracteristicas.php`: ao confirmar dados, artigo avança automaticamente para `confirmado`
+- [x] `processar_upload_exsicata.php`: ao completar todas as partes, artigo avança para `registrado`, atribui `revisor_id` do exemplar e notifica especialista (ou todos, se sem orientador)
+- [x] `artigos_fila.php`: abas e badges atualizados para os 6 novos status; botões **Ver** (sempre) e **Revisar** (só em `registrado`/`revisando`); botão **Publicar** (azul, só gestor, só em `revisado`)
+- [x] `artigo_revisao.php`: parâmetro `?modo=ver|revisar`; modo revisar avança para `revisando`; formulário de decisão só exibido no modo revisar; badge de status dinâmico
+- [x] `controlador_painel_revisor.php`: aprovar → `revisado` + e-mail; contestar → volta para `registrado` + e-mail com motivo; nova ação `publicar` (gestor) → `publicado` + e-mail
+- [x] `helpers/autores_artigo.php`: função `montarAutoresArtigo()` monta lista de contribuidores por hierarquia científica (revisor, coletores, confirmador, compilador, editor) com deduplicação
+- [x] Seção "Autores e Contribuidores" exibida na página de revisão do artigo
+- [x] `docs/fluxo_artigo.md`: documentação completa do fluxo, regras de negócio e mapeamento de banco
+
 ---
 
 ## TVV PENDENTE — Teste, Validação e Verificação
 
-- [ ] **Fluxo colaborador ponta a ponta em produção** — upload → IA → confirmar → artigo no revisor
-- [ ] **Fluxo revisor: aprovar e contestar** — verificar status + e-mails chegando
+- [ ] **Fluxo completo do artigo ponta a ponta** — dados internet → confirmado → imagens → registrado → revisar → revisado → publicar → publicado
+- [ ] **Atribuição de revisor_id** — verificar que ao finalizar upload o `revisor_id` é gravado corretamente
+- [ ] **Notificações por e-mail** — especialista recebe ao chegar em `registrado`; colaborador recebe ao ser aprovado/contestado/publicado
+- [ ] **Botão Publicar** — só aparece para gestor em artigos `revisado`; não aparece para especialista
+- [ ] **Modo Ver vs Revisar** — Ver não altera status; Revisar avança de `registrado` para `revisando`
+- [ ] **Autores do artigo** — seção exibe hierarquia correta, sem duplicatas
 - [ ] **Fallback da IA** — simular falha, verificar botão "Preencher manualmente"
 - [ ] **Segurança** — dev_local.php fora do repo, páginas protegidas redirecionam sem sessão
 - [ ] **Links quebrados** — navegar menu do colaborador buscando 404 ou páginas em branco
@@ -102,12 +118,15 @@
 ## A FAZER — Pós-TVV
 
 ### Crítico
+- [ ] **Fila pessoal do especialista** — página filtrada por `revisor_id` com seções "Meus artigos" e "Disponíveis" + botão "Assumir" (atribui `revisor_id`)
+- [ ] **Badge no card "Revisar Artigos"** — contador de artigos aguardando o especialista logado
+- [ ] **Alerta ao gestor** — artigos em `confirmado` sem imagens por prazo a definir
 - [ ] **Vincular foto de identificação ao exemplar** — `exemplar_id` existe em `especies_imagens` mas o upload não pergunta; mudança cirúrgica no controller
 - [ ] **Criar 1 espécie com fluxo completo validado** — meta de demonstração para a banca
 - [ ] **Verificar requisitos formais UEMS** — projeto integrador
 
 ### Alta
-- [ ] Implementar destino do botão "Abrir Artigo" para espécies publicadas (view de artigo publicado)
+- [ ] Implementar view pública do artigo publicado (destino do botão "Abrir Artigo")
 - [ ] Implementar contato.php e sobre.php (stubs vazios)
 - [ ] Adicionar imagens reais a pelo menos 3 espécies do Cerrado
 - [ ] Escrever introdução e justificativa do TCC
@@ -178,12 +197,14 @@
 
 | Métrica | Valor |
 |---|---|
-| Total de commits | ~210 |
-| Período de desenvolvimento | 08/02 – 22/04/2026 (74 dias) |
-| Fases concluídas | 10 / 10 |
-| Controllers PHP | ~30 |
+| Total de commits | ~215 |
+| Período de desenvolvimento | 08/02 – 25/04/2026 (77 dias) |
+| Fases concluídas | 11 / 11 |
+| Controllers PHP | ~32 |
 | Views PHP | ~40 |
+| Helpers PHP | 1 (`autores_artigo.php`) |
 | Perfis de usuário | 4 (Gestor, Colaborador, Revisor/Especialista, Desenvolvedor) |
-| Status de espécie | 7 (Sem dados → Publicada) |
+| Subtipos de colaborador | 4 (Identificador, Especialista, Dev, Gestor de equipe) |
+| Status do artigo | 6 (rascunho → confirmado → registrado → revisando → revisado → publicado) |
 | Providers de IA | 4 (DeepSeek, Claude, OpenAI, Gemini) |
 | Deploy | penomato.app.br (HostGator) |
