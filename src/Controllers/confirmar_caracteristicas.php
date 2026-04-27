@@ -29,6 +29,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once __DIR__ . '/../../config/banco_de_dados.php';
+    require_once __DIR__ . '/../helpers/gerador_artigo.php';
 
     $especie_id = (int)($_POST['especie_id'] ?? 0);
     if (!$especie_id) {
@@ -192,6 +193,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ")->execute([$especie_id]);
 
         confirmarTransacao();
+
+        regenerarArtigoEspecie($pdo, $especie_id);
 
         $_SESSION['msg_sucesso'] = 'Identificação confirmada e dados salvos com sucesso!';
         header('Location: confirmar_caracteristicas.php');

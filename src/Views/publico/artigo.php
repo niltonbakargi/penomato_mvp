@@ -273,7 +273,8 @@ $data_pub = $artigo['data_publicado']
             .hero,
             .acoes,
             .pub-meta,
-            .card-creditos { display: none !important; }
+            .card-creditos,
+            .art-autores { display: none !important; }
 
             /* Remover card visual */
             .page-wrap {

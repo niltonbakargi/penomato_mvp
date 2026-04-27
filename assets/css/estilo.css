@@ -617,6 +617,13 @@ textarea:focus {
   margin-bottom: var(--esp-1);
 }
 
+.art-autores {
+  font-size: var(--texto-sm);
+  color: var(--cinza-700);
+  margin-bottom: var(--esp-4);
+  font-style: italic;
+}
+
 .art-secao {
   font-family: var(--fonte-principal);
   font-size: var(--texto-base);

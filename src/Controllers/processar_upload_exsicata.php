@@ -4,6 +4,7 @@
 // ============================================================
 session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
+require_once __DIR__ . '/../helpers/gerador_artigo.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
@@ -221,6 +222,8 @@ try {
     }
 
     $pdo->commit();
+
+    regenerarArtigoEspecie($pdo, $especie_id);
 
     // ── Notificar especialista quando artigo avança para registrado ───────────
     if ($artigo_registrado) {

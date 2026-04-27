@@ -7,6 +7,7 @@ session_start();
 
 // Carregar configuração do banco (PDO)
 require_once __DIR__ . '/../../config/banco_de_dados.php';
+require_once __DIR__ . '/../helpers/gerador_artigo.php';
 
 // Verificar se usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
@@ -105,6 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['acao'] ?? '', ['ap
                     templateEmail('Artigo aprovado pelo especialista', $corpo)
                 );
             }
+
+            regenerarArtigoEspecie($pdo, $especie_id);
 
             header('Location: ' . $url_painel . '?sucesso=' . urlencode('"' . $especie['nome_cientifico'] . '" revisada e aprovada!'));
 
@@ -230,6 +233,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['acao'] ?? '') === 'publica
                 templateEmail('Artigo publicado com sucesso', $corpo)
             );
         }
+
+        regenerarArtigoEspecie($pdo, $especie_id);
 
         header('Location: ' . $url_fila . '?sucesso=' . urlencode('"' . $especie['nome_cientifico'] . '" publicada com sucesso!'));
 
