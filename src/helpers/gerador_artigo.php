@@ -63,21 +63,19 @@ function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs, PDO $pdo): s
 
     // Caule
     $cb = artListar([
-        ['texto' => artVal($c['tipo_caule']),        'ref' => $c['tipo_caule_ref'] ?? ''],
-        ['texto' => artVal($c['estrutura_caule']),   'ref' => $c['estrutura_caule_ref'] ?? ''],
-        ['texto' => artVal($c['forma_caule']),       'ref' => $c['forma_caule_ref'] ?? ''],
-        ['texto' => artVal($c['diametro_caule']) ? 'diâmetro ' . strtolower($c['diametro_caule']) : '', 'ref' => $c['diametro_caule_ref'] ?? ''],
+        ['texto' => artVal($c['tipo_caule']),  'ref' => $c['tipo_caule_ref'] ?? ''],
+        ['texto' => artVal($c['forma_caule']), 'ref' => $c['forma_caule_ref'] ?? ''],
     ]);
     $ex = array_filter([
-        artVal($c['cor_caule'])         ? 'coloração '   . strtolower($c['cor_caule'])         . artRef($c['cor_caule_ref'] ?? '')         : '',
-        artVal($c['textura_caule'])     ? 'textura '     . strtolower($c['textura_caule'])     . artRef($c['textura_caule_ref'] ?? '')     : '',
-        artVal($c['ramificacao_caule']) ? 'ramificação ' . strtolower($c['ramificacao_caule']) . artRef($c['ramificacao_caule_ref'] ?? '') : '',
-        artVal($c['modificacao_caule']) ? strtolower($c['modificacao_caule'])                  . artRef($c['modificacao_caule_ref'] ?? '') : '',
+        artVal($c['textura_caule'])     ? strtolower($c['textura_caule'])     . artRef($c['textura_caule_ref'] ?? '')     : '',
+        artVal($c['cor_caule'])         ? 'coloração ' . strtolower($c['cor_caule'])         . artRef($c['cor_caule_ref'] ?? '')         : '',
+        artVal($c['ramificacao_caule']) ? strtolower($c['ramificacao_caule']) . artRef($c['ramificacao_caule_ref'] ?? '') : '',
+        artVal($c['modificacao_caule']) ? strtolower($c['modificacao_caule']) . artRef($c['modificacao_caule_ref'] ?? '') : '',
     ]);
     $esp = strtolower(artVal($c['possui_espinhos'], 'Não')) === 'não' ? 'desprovido de espinhos' . artRef($c['possui_espinhos_ref'] ?? '') : 'com espinhos' . artRef($c['possui_espinhos_ref'] ?? '');
     $lat = strtolower(artVal($c['possui_latex'],    'Não')) === 'não' ? 'látex ausente'          . artRef($c['possui_latex_ref'] ?? '')    : 'com látex'   . artRef($c['possui_latex_ref'] ?? '');
     $res = strtolower(artVal($c['possui_resina'],   'Não')) === 'não' ? 'resina ausente'         . artRef($c['possui_resina_ref'] ?? '')   : 'com resina'  . artRef($c['possui_resina_ref'] ?? '');
-    echo '<p class="art-paragrafo">Caule ' . $cb . ($ex ? ', com ' . implode(', ', $ex) : '') . ', ' . implode(', ', array_filter([$esp, $lat, $res])) . '.</p>';
+    echo '<p class="art-paragrafo">Caule ' . $cb . ($ex ? ', ' . implode(', ', $ex) : '') . ', ' . implode(', ', array_filter([$esp, $lat, $res])) . '.</p>';
 
     // Folhas
     $fl = artListar([

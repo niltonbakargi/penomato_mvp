@@ -139,20 +139,17 @@ function texto_semente(array $c, array $v): ?string {
 
 function texto_caule(array $c, array $v): ?string {
     $tipo        = v($v, 'tipo_caule',       $c['tipo_caule']       ?? '');
-    $estrutura   = v($v, 'estrutura_caule',  $c['estrutura_caule']  ?? '');
     $forma       = v($v, 'forma_caule',      $c['forma_caule']      ?? '');
     $textura     = v($v, 'textura_caule',    $c['textura_caule']    ?? '');
     $cor         = v($v, 'cor_caule',        $c['cor_caule']        ?? '');
-    $diametro    = v($v, 'diametro_caule',   $c['diametro_caule']   ?? '');
     $ramificacao = v($v, 'ramificacao_caule',$c['ramificacao_caule']?? '');
     $modificacao = v($v, 'modificacao_caule',$c['modificacao_caule']?? '');
 
-    $nucleo = array_filter([$tipo, $estrutura]);
-    if (empty($nucleo)) return null;
+    if (!$tipo) return null;
 
-    $frase = 'O caule é ' . implodir_lista(array_values($nucleo));
+    $frase = 'O caule é ' . $tipo;
 
-    $comp = array_filter([$forma, $textura, $cor, $diametro, $ramificacao, $modificacao]);
+    $comp = array_filter([$forma, $textura, $cor, $ramificacao, $modificacao]);
     if (!empty($comp)) {
         $frase .= ', ' . implodir_lista(array_values($comp));
     }

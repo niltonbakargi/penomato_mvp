@@ -76,13 +76,11 @@ $opcoes_validas = [
     'cor_semente'       => ['Amarela','Branca','Castanha','Cinza','Marrom','Preta','Vermelha','Alaranjada'],
     'textura_semente'   => ['Lisa','Rugosa','Estriada','Pontuada','Foveolada','Reticulada','Tuberculada'],
     'quantidade_sementes' => ['1','2–3','4–10','11–50','> 50'],
-    'tipo_caule'        => ['Ereto','Prostrado','Escandente','Trepador','Rastejante','Subterrâneo'],
-    'estrutura_caule'   => ['Herbáceo','Lenhoso','Suculento','Sublenhoso'],
-    'textura_caule'     => ['Lisa','Rugosa','Fissurada','Sulcada','Estriada','Escamosa','Suberosa','Aculeada'],
+    'tipo_caule'        => ['Tronco','Estipe','Colmo','Liana','Haste','Escapo'],
+    'textura_caule'     => ['Lisa','Rugosa','Fissurada','Sulcada','Estriada','Escamosa','Suberosa','Aculeada','Cerosa'],
     'cor_caule'         => ['Acinzentado','Alaranjado','Avermelhado','Esbranquiçado','Esverdeado','Marrom','Pardacento'],
-    'forma_caule'       => ['Cilíndrico','Quadrangular','Triangular','Achatado','Alado','Irregular'],
-    'modificacao_caule' => ['Cladódio','Espinho','Estolão','Gavinha','Rizoma','Tubérculo','Bulbo'],
-    'diametro_caule'    => ['Capilar','Delgado','Fino','Médio','Grosso','Muito grosso'],
+    'forma_caule'       => ['Cilíndrico','Quadrangular','Triangular','Achatado','Alado'],
+    'modificacao_caule' => ['Cladódio','Estolão','Gavinha','Rizoma','Tubérculo','Bulbo','Sapopema'],
     'ramificacao_caule' => ['Monopodial','Simpodial','Dicotômica','Pseudodicotômica'],
     'possui_espinhos'   => ['Sim','Não'],
     'possui_latex'      => ['Sim','Não'],
@@ -1376,31 +1374,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tipo_caule">Tipo de Caule</label>
                         <select id="tipo_caule" name="tipo_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Ereto</option><option>Prostrado</option><option>Escandente</option>
-                            <option>Trepador</option><option>Rastejante</option><option>Subterrâneo</option>
+                            <option>Tronco</option><option>Estipe</option><option>Colmo</option>
+                            <option>Liana</option><option>Haste</option><option>Escapo</option>
                         </select>
                     </div>
                     <div class="ref-col">
                         <label for="tipo_caule_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tipo_caule_ref" name="tipo_caule_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <div class="main-input">
-                        <label for="estrutura_caule">Estrutura do Caule</label>
-                        <select id="estrutura_caule" name="estrutura_caule">
-                            <option value="" disabled selected>Selecione…</option>
-                            <option>Herbáceo</option><option>Lenhoso</option><option>Suculento</option><option>Sublenhoso</option>
-                        </select>
-                    </div>
-                    <div class="ref-col">
-                        <label for="estrutura_caule_ref">Referência</label>
-                        <div class="ref-wrapper">
-                            <input type="text" id="estrutura_caule_ref" name="estrutura_caule_ref" placeholder="URL ou nº">
                             <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
@@ -1449,7 +1430,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <select id="forma_caule" name="forma_caule">
                             <option value="" disabled selected>Selecione…</option>
                             <option>Cilíndrico</option><option>Quadrangular</option><option>Triangular</option>
-                            <option>Achatado</option><option>Alado</option><option>Irregular</option>
+                            <option>Achatado</option><option>Alado</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1466,32 +1447,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="modificacao_caule">Modificações do Caule</label>
                         <select id="modificacao_caule" name="modificacao_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Cladódio</option><option>Espinho</option><option>Estolão</option>
-                            <option>Gavinha</option><option>Rizoma</option><option>Tubérculo</option><option>Bulbo</option>
+                            <option>Cladódio</option><option>Estolão</option><option>Gavinha</option>
+                            <option>Rizoma</option><option>Tubérculo</option><option>Bulbo</option><option>Sapopema</option>
                         </select>
                     </div>
                     <div class="ref-col">
                         <label for="modificacao_caule_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="modificacao_caule_ref" name="modificacao_caule_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <div class="main-input">
-                        <label for="diametro_caule">Diâmetro do Caule</label>
-                        <select id="diametro_caule" name="diametro_caule">
-                            <option value="" disabled selected>Selecione…</option>
-                            <option>Capilar</option><option>Delgado</option><option>Fino</option>
-                            <option>Médio</option><option>Grosso</option><option>Muito grosso</option>
-                        </select>
-                    </div>
-                    <div class="ref-col">
-                        <label for="diametro_caule_ref">Referência</label>
-                        <div class="ref-wrapper">
-                            <input type="text" id="diametro_caule_ref" name="diametro_caule_ref" placeholder="URL ou nº">
                             <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>

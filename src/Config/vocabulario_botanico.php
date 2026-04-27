@@ -240,17 +240,12 @@ return [
     // ═══════════════════════════════════════════════
 
     'tipo_caule' => [
-        'Ereto'       => 'ereto',
-        'Prostrado'   => 'prostrado',
-        'Rastejante'  => 'rastejante',
-        'Trepador'    => 'trepador',
-        'Subterrâneo' => 'subterrâneo',
-    ],
-
-    'estrutura_caule' => [
-        'Lenhoso'   => 'de estrutura lenhosa',
-        'Herbáceo'  => 'de estrutura herbácea',
-        'Suculento' => 'de estrutura suculenta',
+        'Tronco' => 'do tipo tronco',
+        'Estipe' => 'do tipo estipe',
+        'Colmo'  => 'do tipo colmo',
+        'Liana'  => 'do tipo liana',
+        'Haste'  => 'do tipo haste',
+        'Escapo' => 'do tipo escapo',
     ],
 
     'textura_caule' => [
@@ -258,24 +253,29 @@ return [
         'Rugosa'    => 'de superfície rugosa',
         'Sulcada'   => 'sulcado',
         'Fissurada' => 'com casca fissurada',
-        'Cerosa'    => 'de superfície cerosa',
-        'Espinhosa' => 'com superfície espinhosa',
+        'Estriada'  => 'com superfície estriada',
+        'Escamosa'  => 'com casca escamosa',
         'Suberosa'  => 'com casca suberosa',
+        'Aculeada'  => 'com superfície aculeada',
+        'Cerosa'    => 'de superfície cerosa',
     ],
 
     'cor_caule' => [
-        'Marrom'      => 'de coloração marrom',
-        'Verde'       => 'de coloração verde',
-        'Cinza'       => 'de coloração cinza',
-        'Avermelhado' => 'de coloração avermelhada',
-        'Alaranjado'  => 'de coloração alaranjada',
+        'Marrom'        => 'de coloração marrom',
+        'Acinzentado'   => 'de coloração acinzentada',
+        'Avermelhado'   => 'de coloração avermelhada',
+        'Alaranjado'    => 'de coloração alaranjada',
+        'Esbranquiçado' => 'de coloração esbranquiçada',
+        'Esverdeado'    => 'de coloração esverdeada',
+        'Pardacento'    => 'de coloração pardacenta',
     ],
 
     'forma_caule' => [
         'Cilíndrico'   => 'de secção cilíndrica',
         'Quadrangular' => 'de secção quadrangular',
+        'Triangular'   => 'de secção triangular',
         'Achatado'     => 'achatado',
-        'Irregular'    => 'de forma irregular',
+        'Alado'        => 'alado',
     ],
 
     'modificacao_caule' => [
@@ -283,19 +283,16 @@ return [
         'Cladódio'  => 'modificado em cladódio',
         'Rizoma'    => 'com rizoma',
         'Tubérculo' => 'com tubérculo',
-        'Espinhos'  => 'armado com espinhos',
-    ],
-
-    'diametro_caule' => [
-        'Fino'   => 'de diâmetro reduzido',
-        'Médio'  => 'de diâmetro mediano',
-        'Grosso' => 'de grande diâmetro',
+        'Gavinha'   => 'com gavinhas',
+        'Bulbo'     => 'com bulbo',
+        'Sapopema'  => 'com sapopemas na base',
     ],
 
     'ramificacao_caule' => [
-        'Dicotômica' => 'com ramificação dicotômica',
-        'Monopodial' => 'com ramificação monopodial',
-        'Simpodial'  => 'com ramificação simpodial',
+        'Dicotômica'       => 'com ramificação dicotômica',
+        'Monopodial'       => 'com ramificação monopodial',
+        'Simpodial'        => 'com ramificação simpodial',
+        'Pseudodicotômica' => 'com ramificação pseudodicotômica',
     ],
 
     // ═══════════════════════════════════════════════
