@@ -814,17 +814,6 @@ ob_end_clean();
                                 </tr>
                                 <?php endif; ?>
                                 
-                                <?php if (!empty($especie['estrutura_caule'])): ?>
-                                <tr>
-                                    <td>Estrutura</td>
-                                    <td>
-                                        <?php echo htmlspecialchars($especie['estrutura_caule']); ?>
-                                        <?php if (!empty($especie['estrutura_caule_ref'])): ?>
-                                            <span class="referencia-badge">REF: <?php echo htmlspecialchars($especie['estrutura_caule_ref']); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                                <?php endif; ?>
                                 
                                 <?php if (!empty($especie['textura_caule'])): ?>
                                 <tr>
@@ -874,17 +863,6 @@ ob_end_clean();
                                 </tr>
                                 <?php endif; ?>
                                 
-                                <?php if (!empty($especie['diametro_caule'])): ?>
-                                <tr>
-                                    <td>Diâmetro</td>
-                                    <td>
-                                        <?php echo htmlspecialchars($especie['diametro_caule']); ?>
-                                        <?php if (!empty($especie['diametro_caule_ref'])): ?>
-                                            <span class="referencia-badge">REF: <?php echo htmlspecialchars($especie['diametro_caule_ref']); ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                                <?php endif; ?>
                                 
                                 <?php if (!empty($especie['ramificacao_caule'])): ?>
                                 <tr>
@@ -899,10 +877,9 @@ ob_end_clean();
                                 <?php endif; ?>
                                 
                                 <?php
-                                $tem_caule = !empty($especie['tipo_caule']) || !empty($especie['estrutura_caule']) || 
-                                            !empty($especie['textura_caule']) || !empty($especie['cor_caule']) ||
-                                            !empty($especie['forma_caule']) || !empty($especie['modificacao_caule']) ||
-                                            !empty($especie['diametro_caule']) || !empty($especie['ramificacao_caule']);
+                                $tem_caule = !empty($especie['tipo_caule']) || !empty($especie['textura_caule']) ||
+                                            !empty($especie['cor_caule']) || !empty($especie['forma_caule']) ||
+                                            !empty($especie['modificacao_caule']) || !empty($especie['ramificacao_caule']);
                                 
                                 if (!$tem_caule):
                                 ?>

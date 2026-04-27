@@ -188,7 +188,7 @@ $paragrafos = gerar_paragrafos($c);
 
 // Mapeia qual parte usa quais campos de referência
 $refs_por_parte = [
-    'caule'   => ['tipo_caule','estrutura_caule','forma_caule','textura_caule','cor_caule','diametro_caule','ramificacao_caule','modificacao_caule','possui_espinhos','possui_latex','possui_seiva','possui_resina'],
+    'caule'   => ['tipo_caule','forma_caule','textura_caule','cor_caule','ramificacao_caule','modificacao_caule','possui_espinhos','possui_latex','possui_seiva','possui_resina'],
     'folha'   => ['tipo_folha','filotaxia_folha','forma_folha','textura_folha','margem_folha','venacao_folha','tamanho_folha'],
     'flor'    => ['cor_flores','simetria_floral','numero_petalas','disposicao_flores','tamanho_flor','aroma'],
     'fruto'   => ['tipo_fruto','tamanho_fruto','cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto'],

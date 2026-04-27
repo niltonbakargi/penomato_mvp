@@ -68,12 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'textura_semente','textura_semente_ref',
         'quantidade_sementes','quantidade_sementes_ref',
         'tipo_caule','tipo_caule_ref',
-        'estrutura_caule','estrutura_caule_ref',
         'textura_caule','textura_caule_ref',
         'cor_caule','cor_caule_ref',
         'forma_caule','forma_caule_ref',
         'modificacao_caule','modificacao_caule_ref',
-        'diametro_caule','diametro_caule_ref',
         'ramificacao_caule','ramificacao_caule_ref',
         'possui_espinhos','possui_espinhos_ref',
         'possui_latex','possui_latex_ref',
@@ -119,9 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'cor_fruto' => 255, 'textura_fruto' => 255, 'dispersao_fruto' => 255,
         'aroma_fruto' => 255, 'tipo_semente' => 255, 'tamanho_semente' => 255,
         'cor_semente' => 255, 'textura_semente' => 255, 'quantidade_sementes' => 255,
-        'tipo_caule' => 255, 'estrutura_caule' => 255, 'textura_caule' => 255,
+        'tipo_caule' => 255, 'textura_caule' => 255,
         'cor_caule' => 255, 'forma_caule' => 255, 'modificacao_caule' => 255,
-        'diametro_caule' => 255, 'ramificacao_caule' => 255,
+        'ramificacao_caule' => 255,
         // varchar(100)
         'familia_ref' => 100, 'forma_folha_ref' => 100, 'filotaxia_folha_ref' => 100,
         'tipo_folha_ref' => 100, 'tamanho_folha_ref' => 100, 'textura_folha_ref' => 100,
@@ -132,9 +130,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'textura_fruto_ref' => 100, 'dispersao_fruto_ref' => 100, 'aroma_fruto_ref' => 100,
         'tipo_semente_ref' => 100, 'tamanho_semente_ref' => 100, 'cor_semente_ref' => 100,
         'textura_semente_ref' => 100, 'quantidade_sementes_ref' => 100,
-        'tipo_caule_ref' => 100, 'estrutura_caule_ref' => 100, 'textura_caule_ref' => 100,
+        'tipo_caule_ref' => 100, 'textura_caule_ref' => 100,
         'cor_caule_ref' => 100, 'forma_caule_ref' => 100, 'modificacao_caule_ref' => 100,
-        'diametro_caule_ref' => 100, 'ramificacao_caule_ref' => 100,
+        'ramificacao_caule_ref' => 100,
         // varchar(50)
         'possui_espinhos_ref' => 50, 'possui_latex_ref' => 50,
         'possui_seiva_ref' => 50, 'possui_resina_ref' => 50,
@@ -1036,8 +1034,8 @@ ob_end_clean();
       <label for="tipo_caule">Tipo de Caule</label>
       <select id="tipo_caule" name="tipo_caule">
         <option value="" disabled selected>Selecione…</option>
-        <option>Ereto</option><option>Prostrado</option><option>Rastejante</option>
-        <option>Trepador</option><option>Subterrâneo</option>
+        <option>Tronco</option><option>Estipe</option><option>Colmo</option>
+        <option>Liana</option><option>Haste</option><option>Escapo</option>
       </select>
     </div>
     <div class="ref-col">
@@ -1051,29 +1049,12 @@ ob_end_clean();
 
   <div class="input-group">
     <div class="main-input">
-      <label for="estrutura_caule">Estrutura do Caule</label>
-      <select id="estrutura_caule" name="estrutura_caule">
-        <option value="" disabled selected>Selecione…</option>
-        <option>Lenhoso</option><option>Herbáceo</option><option>Suculento</option>
-      </select>
-    </div>
-    <div class="ref-col">
-      <label for="estrutura_caule_ref">Referência</label>
-      <div class="ref-wrapper">
-        <input type="text" id="estrutura_caule_ref" name="estrutura_caule_ref" placeholder="URL ou nº">
-        <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="input-group">
-    <div class="main-input">
       <label for="textura_caule">Textura do Caule</label>
       <select id="textura_caule" name="textura_caule">
         <option value="" disabled selected>Selecione…</option>
         <option>Lisa</option><option>Rugosa</option><option>Sulcada</option>
-        <option>Fissurada</option><option>Cerosa</option><option>Espinhosa</option>
-        <option>Suberosa</option>
+        <option>Fissurada</option><option>Estriada</option><option>Escamosa</option>
+        <option>Suberosa</option><option>Aculeada</option><option>Cerosa</option>
       </select>
     </div>
     <div class="ref-col">
@@ -1090,8 +1071,9 @@ ob_end_clean();
       <label for="cor_caule">Cor do Caule</label>
       <select id="cor_caule" name="cor_caule">
         <option value="" disabled selected>Selecione…</option>
-        <option>Marrom</option><option>Verde</option><option>Cinza</option>
-        <option>Avermelhado</option><option>Alaranjado</option>
+        <option>Marrom</option><option>Acinzentado</option><option>Avermelhado</option>
+        <option>Alaranjado</option><option>Esbranquiçado</option><option>Esverdeado</option>
+        <option>Pardacento</option>
       </select>
     </div>
     <div class="ref-col">
@@ -1109,7 +1091,7 @@ ob_end_clean();
       <select id="forma_caule" name="forma_caule">
         <option value="" disabled selected>Selecione…</option>
         <option>Cilíndrico</option><option>Quadrangular</option>
-        <option>Achatado</option><option>Irregular</option>
+        <option>Triangular</option><option>Achatado</option><option>Alado</option>
       </select>
     </div>
     <div class="ref-col">
@@ -1127,7 +1109,8 @@ ob_end_clean();
       <select id="modificacao_caule" name="modificacao_caule">
         <option value="" disabled selected>Selecione…</option>
         <option>Estolão</option><option>Cladódio</option><option>Rizoma</option>
-        <option>Tubérculo</option><option>Espinhos</option>
+        <option>Tubérculo</option><option>Gavinha</option><option>Bulbo</option>
+        <option>Sapopema</option>
       </select>
     </div>
     <div class="ref-col">
@@ -1141,29 +1124,11 @@ ob_end_clean();
 
   <div class="input-group">
     <div class="main-input">
-      <label for="diametro_caule">Diâmetro do Caule</label>
-      <select id="diametro_caule" name="diametro_caule">
-        <option value="" disabled selected>Selecione…</option>
-        <option value="Fino">Fino (&lt; 1 cm)</option>
-        <option value="Médio">Médio (1–5 cm)</option>
-        <option value="Grosso">Grosso (&gt; 5 cm)</option>
-      </select>
-    </div>
-    <div class="ref-col">
-      <label for="diametro_caule_ref">Referência</label>
-      <div class="ref-wrapper">
-        <input type="text" id="diametro_caule_ref" name="diametro_caule_ref" placeholder="URL ou nº">
-        <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="input-group">
-    <div class="main-input">
       <label for="ramificacao_caule">Ramificação do Caule</label>
       <select id="ramificacao_caule" name="ramificacao_caule">
         <option value="" disabled selected>Selecione…</option>
         <option>Dicotômica</option><option>Monopodial</option><option>Simpodial</option>
+        <option>Pseudodicotômica</option>
       </select>
     </div>
     <div class="ref-col">
@@ -1367,8 +1332,8 @@ document.getElementById('especie_id').addEventListener('change', function () {
         'dispersao_fruto','aroma_fruto',
         'tipo_semente','tamanho_semente','cor_semente',
         'textura_semente','quantidade_sementes',
-        'tipo_caule','estrutura_caule','textura_caule','cor_caule',
-        'forma_caule','modificacao_caule','diametro_caule','ramificacao_caule',
+        'tipo_caule','textura_caule','cor_caule',
+        'forma_caule','modificacao_caule','ramificacao_caule',
         'possui_espinhos','possui_latex','possui_seiva','possui_resina',
         'referencias'
       ].forEach(function(c) { preencherCampo(c, dados[c]); });
@@ -1384,8 +1349,8 @@ document.getElementById('especie_id').addEventListener('change', function () {
         'dispersao_fruto_ref','aroma_fruto_ref',
         'tipo_semente_ref','tamanho_semente_ref','cor_semente_ref',
         'textura_semente_ref','quantidade_sementes_ref',
-        'tipo_caule_ref','estrutura_caule_ref','textura_caule_ref','cor_caule_ref',
-        'forma_caule_ref','modificacao_caule_ref','diametro_caule_ref','ramificacao_caule_ref',
+        'tipo_caule_ref','textura_caule_ref','cor_caule_ref',
+        'forma_caule_ref','modificacao_caule_ref','ramificacao_caule_ref',
         'possui_espinhos_ref','possui_latex_ref','possui_seiva_ref','possui_resina_ref'
       ].forEach(function(refId) { preencherCampo(refId, dados[refId]); });
 

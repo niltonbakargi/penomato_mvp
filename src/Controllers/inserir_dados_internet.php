@@ -113,10 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         'tipo_semente', 'tipo_semente_ref', 'tamanho_semente', 'tamanho_semente_ref',
         'cor_semente', 'cor_semente_ref', 'textura_semente', 'textura_semente_ref',
         'quantidade_sementes', 'quantidade_sementes_ref',
-        'tipo_caule', 'tipo_caule_ref', 'estrutura_caule', 'estrutura_caule_ref',
+        'tipo_caule', 'tipo_caule_ref',
         'textura_caule', 'textura_caule_ref', 'cor_caule', 'cor_caule_ref',
         'forma_caule', 'forma_caule_ref', 'modificacao_caule', 'modificacao_caule_ref',
-        'diametro_caule', 'diametro_caule_ref', 'ramificacao_caule', 'ramificacao_caule_ref',
+        'ramificacao_caule', 'ramificacao_caule_ref',
         'possui_espinhos', 'possui_espinhos_ref', 'possui_latex', 'possui_latex_ref',
         'possui_seiva', 'possui_seiva_ref', 'possui_resina', 'possui_resina_ref',
         'referencias'

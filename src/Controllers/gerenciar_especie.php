@@ -243,7 +243,7 @@ $campos_display = [
     'Flor'     => ['cor_flores','simetria_floral','numero_petalas','disposicao_flores','tamanho_flor','aroma'],
     'Fruto'    => ['tipo_fruto','tamanho_fruto','cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto'],
     'Semente'  => ['tipo_semente','tamanho_semente','cor_semente','textura_semente','quantidade_sementes'],
-    'Caule'    => ['tipo_caule','estrutura_caule','textura_caule','cor_caule','forma_caule','diametro_caule','ramificacao_caule','modificacao_caule'],
+    'Caule'    => ['tipo_caule','textura_caule','cor_caule','forma_caule','ramificacao_caule','modificacao_caule'],
 ];
 ?>
 <!DOCTYPE html>

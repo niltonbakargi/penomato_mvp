@@ -23,8 +23,8 @@ $todos_campos = [
     'cor_flores', 'simetria_floral', 'numero_petalas', 'tamanho_flor', 'disposicao_flores', 'aroma',
     'tipo_fruto', 'tamanho_fruto', 'cor_fruto', 'textura_fruto', 'dispersao_fruto', 'aroma_fruto',
     'tipo_semente', 'tamanho_semente', 'cor_semente', 'textura_semente', 'quantidade_sementes',
-    'tipo_caule', 'estrutura_caule', 'textura_caule', 'cor_caule', 'forma_caule', 'modificacao_caule',
-    'diametro_caule', 'ramificacao_caule', 'possui_espinhos', 'possui_latex'
+    'tipo_caule', 'textura_caule', 'cor_caule', 'forma_caule', 'modificacao_caule',
+    'ramificacao_caule', 'possui_espinhos', 'possui_latex'
 ];
 
 // Mostrar todas as espécies com ao menos dados_internet
@@ -62,8 +62,8 @@ $sql = "SELECT
             c.cor_flores, c.simetria_floral, c.numero_petalas, c.tamanho_flor, c.disposicao_flores, c.aroma,
             c.tipo_fruto, c.tamanho_fruto, c.cor_fruto, c.textura_fruto, c.dispersao_fruto, c.aroma_fruto,
             c.tipo_semente, c.tamanho_semente, c.cor_semente, c.textura_semente, c.quantidade_sementes,
-            c.tipo_caule, c.estrutura_caule, c.textura_caule, c.cor_caule, c.forma_caule, c.modificacao_caule,
-            c.diametro_caule, c.ramificacao_caule,
+            c.tipo_caule, c.textura_caule, c.cor_caule, c.forma_caule, c.modificacao_caule,
+            c.ramificacao_caule,
             c.possui_espinhos, c.possui_latex, c.possui_seiva, c.possui_resina
         FROM especies_caracteristicas c
         INNER JOIN especies_administrativo e ON c.especie_id = e.id
@@ -130,11 +130,9 @@ foreach ($rows as $r) {
         ]),
         'caule' => array_filter([
             'Tipo'        => $r['tipo_caule'],
-            'Estrutura'   => $r['estrutura_caule'],
             'Textura'     => $r['textura_caule'],
             'Cor'         => $r['cor_caule'],
             'Forma'       => $r['forma_caule'],
-            'Diâmetro'    => $r['diametro_caule'],
             'Ramificação' => $r['ramificacao_caule'],
             'Modificação' => $r['modificacao_caule'],
         ]),
