@@ -687,7 +687,7 @@ header {
     <div class="logo-mark">🌿</div>
     <div>
       <div class="logo-title">Penomato</div>
-      <div class="logo-sub">MVP KANBAN · Atualizado 25/04/2026</div>
+      <div class="logo-sub">MVP KANBAN · Atualizado 15/05/2026</div>
     </div>
   </div>
 
@@ -862,7 +862,7 @@ header {
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = 'penomato_kanban_v6';
+const STORAGE_KEY = 'penomato_kanban_v7';
 
 const DEFAULT_TASKS = [
   // ── CONCLUÍDO (histórico git) ──────────────────────────────────────────
@@ -969,6 +969,25 @@ const DEFAULT_TASKS = [
   { id:103, col:'done', title:"helpers/autores_artigo.php: lista de contribuidores por hierarquia científica", prio:"p2", tag:"Fluxo Artigo", notes:"ebc2914 — função montarAutoresArtigo(): revisor → coletores (cronológico) → confirmador → compilador → editor. Deduplicação por usuario_id, papéis acumulados.", due:"2026-04-25", created:"2026-04-25" },
   { id:104, col:'done', title:"docs/fluxo_artigo.md: documentação completa do fluxo do artigo", prio:"p3", tag:"Documentação", notes:"ebc2914 — 6 etapas, regras de negócio, mapeamento de arquivos, estrutura de banco, casos de borda.", due:"2026-04-25", created:"2026-04-25" },
 
+  // ── CONCLUÍDO — Fase 12: Fila de Revisão + Gestão + Curadoria ──────────
+  { id:105, col:'done', title:"Fix HTTP 500 em artigos_fila.php: todas as queries protegidas com try/catch", prio:"p1", tag:"Deploy", notes:"15/05/2026 — site penomato.app.br retornava 500. Causa: PDOException não capturada em queries sem try/catch. Reescrita completa do arquivo com tratamento de erros.", due:"2026-05-15", created:"2026-05-15" },
+  { id:106, col:'done', title:"Gerador de artigo unificado: vocabulário botânico integrado, sistema paralelo removido", prio:"p2", tag:"Fluxo Artigo", notes:"15/05/2026 — gerador_texto_botanico.php removido. gerador_artigo.php absorve _art_caule/_art_folha/_art_flor/_art_fruto/_art_semente/_art_outros com concordância de gênero/número via vocabulario_botanico.php.", due:"2026-05-15", created:"2026-05-15" },
+  { id:107, col:'done', title:"Gestão de Artigos para o gestor: visão completa com orientador e atribuição", prio:"p1", tag:"Painel Gestor", notes:"15/05/2026 — gestao_artigos_gestor.php: 4 cards de resumo, filtro por orientador/status, tabela com destaque amarelo para artigos sem orientador, modal de atribuição de revisor, botão Publicar.", due:"2026-05-15", created:"2026-05-15" },
+  { id:108, col:'done', title:"Gerenciar Membros: página dedicada substitui modais do painel do gestor", prio:"p2", tag:"Painel Gestor", notes:"15/05/2026 — gerenciar_membros.php com seção de pendentes (badge) e membros ativos. Formulários inline de confirmação por membro. E-mail de notificação mantido.", due:"2026-05-15", created:"2026-05-15" },
+  { id:109, col:'done', title:"Curadoria Reflora: 67 espécies validadas, 32 inválidas mapeadas, SQL de atualização gerado", prio:"p2", tag:"Banco de Dados", notes:"15/05/2026 — comparação da lista do BD com Flora do Brasil (12 092 nomes aceitos). atualizar_especies_reflora.sql: remove 2 sinônimos + 30 não encontradas, insere 33 espécies aceitas do Cerrado. Total final: 100 espécies.", due:"2026-05-15", created:"2026-05-15" },
+
+  // ── A FAZER — Entrega ───────────────────────────────────────────────────
+  { id:110, col:'todo', title:"Executar atualizar_especies_reflora.sql nos dois bancos (local + produção)", prio:"p1", tag:"Banco de Dados", notes:"Abre phpMyAdmin → banco penomato → importar o arquivo database/atualizar_especies_reflora.sql. Verificar: SELECT COUNT(*) FROM especies_administrativo deve retornar 100.", due:"", created:"2026-05-15" },
+  { id:111, col:'todo', title:"Testar fluxo completo em penomato.app.br após mudanças recentes", prio:"p1", tag:"Deploy", notes:"Verificar: gerenciar_membros.php, gestao_artigos_gestor.php, artigos_fila.php (acesso especialista vs gestor). Confirmar que HTTP 500 não retornou.", due:"", created:"2026-05-15" },
+  { id:112, col:'todo', title:"Backup do banco de produção antes da apresentação da banca", prio:"p1", tag:"Manutenção", notes:"Exportar via phpMyAdmin (Export → SQL). Salvar localmente com data no nome: penomato_backup_YYYYMMDD.sql. Manter ao menos os últimos 3 backups.", due:"", created:"2026-05-15" },
+
+  // ── A FAZER — Manutenção ────────────────────────────────────────────────
+  { id:113, col:'todo', title:"Monitorar logs de erro PHP em produção regularmente", prio:"p2", tag:"Manutenção", notes:"Verificar error_log no painel HostGator ou via FTP. Qualquer HTTP 500 deve ser investigado antes da próxima demonstração.", due:"", created:"2026-05-15" },
+  { id:114, col:'todo', title:"Badge de artigos pendentes no painel do especialista (revisor_id = eu)", prio:"p2", tag:"Fluxo Artigo", notes:"No painel do colaborador especialista, o card 'Revisar Artigos' deve exibir quantos artigos aguardam revisão com revisor_id = usuario_id. Atualizado a cada carregamento.", due:"", created:"2026-05-15" },
+  { id:115, col:'todo', title:"Verificar CI/CD após cada push — confirmar deploy automático no HostGator", prio:"p2", tag:"Deploy", notes:"Após push na main, verificar no GitHub Actions se o workflow passou. Acessar penomato.app.br e confirmar que as mudanças chegaram.", due:"", created:"2026-05-15" },
+  { id:116, col:'todo', title:"Atualizar lista de espécies periodicamente com Reflora", prio:"p3", tag:"Manutenção", notes:"Procedimento: baixar lista JBRJ → comparar com especies_administrativo → remover sinônimos → inserir nomes aceitos. Frequência sugerida: trimestral ou quando houver novos artigos.", due:"", created:"2026-05-15" },
+  { id:117, col:'todo', title:"Documentar procedimento de manutenção e backup para o gestor", prio:"p3", tag:"Documentação", notes:"Criar guia simples (PDF ou doc) com: como fazer backup do banco, como verificar logs, como executar o SQL de atualização de espécies, contato de suporte técnico.", due:"", created:"2026-05-15" },
+
   // ── A FAZER — CRÍTICO: TVV ─────────────────────────────────────────────
   { id:80, col:'todo', title:"TVV — Fluxo completo do artigo ponta a ponta", prio:"p1", tag:"TVV", notes:"dados internet → confirmado → imagens → registrado → especialista revisar → revisando → aprovar → revisado → gestor publicar → publicado. Verificar status em cada etapa e e-mails.", due:"", created:"2026-04-25" },
   { id:81, col:'todo', title:"TVV — Atribuição de revisor_id ao artigo", prio:"p1", tag:"TVV", notes:"Ao finalizar upload de exsicatas, verificar que artigos.revisor_id recebe o especialista_id do exemplar. Se sem especialista, verificar que fica NULL e notifica todos.", due:"", created:"2026-04-25" },
@@ -981,7 +1000,7 @@ const DEFAULT_TASKS = [
   { id:92, col:'todo', title:"TVV — Links quebrados no menu do colaborador", prio:"p2", tag:"TVV", notes:"Navegar por todas as opções do menu buscando páginas em branco ou 404. Verificar colaborador/upload_imagem.php → deve redirecionar para enviar_imagem.php.", due:"", created:"2026-04-22" },
 
   // ── A FAZER — CRÍTICO: Fila pessoal especialista ───────────────────────
-  { id:93, col:'todo', title:"Fila pessoal do especialista (filtrada por revisor_id)", prio:"p1", tag:"Fluxo Artigo", notes:"Página com duas seções: 'Meus artigos' (revisor_id = eu) e 'Disponíveis' (revisor_id NULL). Botão 'Assumir' atribui revisor_id ao especialista logado e move para 'Meus artigos'.", due:"", created:"2026-04-25" },
+  { id:93, col:'done', title:"Fila pessoal do especialista (filtrada por revisor_id)", prio:"p1", tag:"Fluxo Artigo", notes:"artigos_fila.php reescrito: especialista vê apenas artigos com revisor_id = usuario_id. Gestor vê todos. Abas por status, descrição de cada status, botões Ver/Revisar/Publicar por papel.", due:"2026-05-15", created:"2026-04-25" },
   { id:94, col:'todo', title:"Badge no card 'Revisar Artigos' com contador de artigos pendentes", prio:"p1", tag:"Fluxo Artigo", notes:"No painel do colaborador especialista, o card deve mostrar quantos artigos estão aguardando revisão com revisor_id = usuario_id. Atualizado a cada carregamento do painel.", due:"", created:"2026-04-25" },
   { id:95, col:'todo', title:"Alerta ao gestor para artigos em 'confirmado' sem imagens há X dias", prio:"p2", tag:"Fluxo Artigo", notes:"Artigos que ficam em status=confirmado indefinidamente devem gerar alerta no painel do gestor. Definir prazo (ex: 30 dias).", due:"", created:"2026-04-25" },
 
@@ -1013,7 +1032,7 @@ const DEFAULT_TASKS = [
 
 // ── STATE ──
 let tasks = [];
-let nextId = 110;
+let nextId = 120;
 let currentFilter = 'all';
 let dragId = null;
 let ctxId = null;
