@@ -240,6 +240,17 @@
             <span class="icon">📊</span>
             Relatório de Colaboradores
         </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/artigos_fila.php'">
+            <?php if ($artigos_pendentes > 0): ?>
+                <span class="notif-badge"><?= $artigos_pendentes ?></span>
+            <?php endif; ?>
+            <span class="icon">📄</span>
+            Artigos
+        </div>
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/gestao_artigos_gestor.php'">
+            <span class="icon">🗂️</span>
+            Gestão de Artigos
+        </div>
         <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Views/entrar_colaborador.php'">
             <span class="icon">👤</span>
             Perfil Colaborador

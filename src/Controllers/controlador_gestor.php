@@ -186,6 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_membro'])) {
 $membros_pendentes  = $pdo->query("SELECT id, nome, email, categoria, status_verificacao, data_cadastro FROM usuarios WHERE status_verificacao = 'aguardando_gestor' ORDER BY data_cadastro DESC")->fetchAll(PDO::FETCH_ASSOC);
 $membros_ativos     = $pdo->query("SELECT id, nome, email, categoria FROM usuarios WHERE ativo = 1 AND status_verificacao = 'verificado' ORDER BY nome")->fetchAll(PDO::FETCH_ASSOC);
 $acoes_pendentes    = (int)$pdo->query("SELECT COUNT(*) FROM fila_aprovacao WHERE status = 'pendente'")->fetchColumn();
+$artigos_pendentes  = (int)$pdo->query("SELECT COUNT(*) FROM artigos WHERE status IN ('registrado','revisando','revisado')")->fetchColumn();
 
 // Carregar a view
 include __DIR__ . '/../Views/entrada_gestor.php';
