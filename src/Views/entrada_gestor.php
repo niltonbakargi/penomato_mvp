@@ -206,16 +206,12 @@
     </div>
 
     <div class="btn-grid">
-        <div class="action-btn" onclick="abrirModal('modal-aceitar')">
+        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/gerenciar_membros.php'">
             <?php if (count($membros_pendentes) > 0): ?>
                 <span class="notif-badge"><?= count($membros_pendentes) ?></span>
             <?php endif; ?>
-            <span class="icon">✅</span>
-            Aceitar Membro
-        </div>
-        <div class="action-btn danger" onclick="abrirModal('modal-excluir')">
-            <span class="icon">🗑️</span>
-            Excluir Membro
+            <span class="icon">👥</span>
+            Gerenciar Membros
         </div>
         <div class="action-btn" onclick="abrirModal('modal-especies')">
             <span class="icon">🌿</span>
@@ -262,96 +258,6 @@
     </button>
 
     <!-- ══════════════════════════════════════════ -->
-    <!-- MODAL: ACEITAR MEMBRO                      -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="modal-overlay" id="modal-aceitar">
-        <div class="modal">
-            <h2>✅ Aceitar Membro</h2>
-
-            <?php if (!empty($msg_aceitar)): foreach ($msg_aceitar as $m): ?>
-                <div class="msg-<?php echo $m['tipo']; ?>"><?php echo htmlspecialchars($m['texto']); ?></div>
-            <?php endforeach; endif; ?>
-
-            <?php if (!empty($membros_pendentes)): ?>
-                <div class="pendente-lista">
-                    Aguardando aprovação:
-                    <?php foreach ($membros_pendentes as $p): ?>
-                        <span>
-                            <?php echo htmlspecialchars($p['nome']); ?>
-                            <?php if ($p['status_verificacao'] === 'aguardando_gestor'): ?>
-                                ✉️
-                            <?php endif; ?>
-                        </span>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <p style="font-size:0.85em;color:#888;margin-bottom:14px;">Nenhum membro pendente no momento.</p>
-            <?php endif; ?>
-
-            <form method="POST" action="/penomato_mvp/src/Controllers/controlador_gestor.php">
-                <label>Membro</label>
-                <select name="membro_aceitar_id" required>
-                    <option value="">Selecione...</option>
-                    <?php foreach ($membros_pendentes as $u): ?>
-                        <option value="<?php echo $u['id']; ?>">
-                            <?php echo htmlspecialchars($u['nome']); ?> — <?php echo htmlspecialchars($u['email']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-
-                <label>Categoria</label>
-                <select name="categoria_aceitar">
-                    <option value="colaborador">Colaborador</option>
-                    <option value="revisor">Revisor</option>
-                    <option value="gestor">Gestor</option>
-                </select>
-
-                <label>Motivação / Observação</label>
-                <textarea name="motivacao_aceitar" placeholder="Ex: aprovado por critérios do edital XYZ..."></textarea>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-cancel" onclick="fecharModal('modal-aceitar')">Cancelar</button>
-                    <button type="submit" name="aceitar_membro" value="1" class="btn-confirm">✅ Aceitar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- MODAL: EXCLUIR MEMBRO                      -->
-    <!-- ══════════════════════════════════════════ -->
-    <div class="modal-overlay" id="modal-excluir">
-        <div class="modal">
-            <h2 class="danger">🗑️ Excluir Membro</h2>
-
-            <?php if (!empty($msg_excluir)): foreach ($msg_excluir as $m): ?>
-                <div class="msg-<?php echo $m['tipo']; ?>"><?php echo htmlspecialchars($m['texto']); ?></div>
-            <?php endforeach; endif; ?>
-
-            <form method="POST" action="/penomato_mvp/src/Controllers/controlador_gestor.php"
-                  onsubmit="return confirm('Tem certeza que deseja excluir este membro permanentemente?')">
-                <label>Membro</label>
-                <select name="membro_excluir_id" required>
-                    <option value="">Selecione...</option>
-                    <?php foreach (array_merge($membros_ativos, $membros_pendentes) as $u): ?>
-                        <option value="<?php echo $u['id']; ?>">
-                            <?php echo htmlspecialchars($u['nome']); ?> — <?php echo htmlspecialchars($u['email']); ?> (<?php echo $u['categoria']; ?>)
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-
-                <label>Motivação / Justificativa</label>
-                <textarea name="motivacao_excluir" placeholder="Ex: inatividade, violação de conduta..."></textarea>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-cancel" onclick="fecharModal('modal-excluir')">Cancelar</button>
-                    <button type="submit" name="excluir_membro" value="1" class="btn-confirm danger">🗑️ Excluir</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
     <!-- MODAL: ADICIONAR ESPÉCIES                  -->
     <!-- ══════════════════════════════════════════ -->
     <div class="modal-overlay" id="modal-especies">
@@ -394,12 +300,6 @@ Handroanthus impetiginosus"></textarea>
     });
 
     // Abrir modal automaticamente se houver mensagem de retorno
-    <?php if (!empty($msg_aceitar)): ?>
-        abrirModal('modal-aceitar');
-    <?php endif; ?>
-    <?php if (!empty($msg_excluir)): ?>
-        abrirModal('modal-excluir');
-    <?php endif; ?>
     <?php if (!empty($msg_especies)): ?>
         abrirModal('modal-especies');
     <?php endif; ?>
