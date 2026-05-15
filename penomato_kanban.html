@@ -1289,20 +1289,8 @@ function ctxCopy() {
   closeCtx();
   const src = tasks.find(x => x.id === id);
   if (!src) return;
-  const newId = nextId++;
-  const copy = Object.assign({}, src, {
-    id: newId,
-    title: 'Cópia — ' + src.title,
-    created: new Date().toISOString().slice(0,10)
-  });
-  tasks.push(copy);
-  saveState();
-  render();
-  showToast('📋 Tarefa copiada');
-  setTimeout(() => {
-    const el = document.querySelector('[data-id="' + newId + '"]');
-    if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.style.outline = '2px solid var(--g600)'; setTimeout(() => el.style.outline = '', 1500); }
-  }, 60);
+  const texto = src.title + (src.notes ? '\n\n' + src.notes : '');
+  navigator.clipboard.writeText(texto).then(() => showToast('📋 Texto copiado'));
 }
 
 function ctxMove(col) {
