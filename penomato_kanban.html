@@ -850,6 +850,7 @@ header {
 <!-- CONTEXT MENU -->
 <div class="ctx-menu" id="ctx-menu" style="display:none">
   <button class="ctx-item" onclick="ctxEdit()">✏️ Editar</button>
+  <button class="ctx-item" onclick="ctxCopy()">📋 Copiar tarefa</button>
   <button class="ctx-item" onclick="ctxMove('todo')">⬜ Mover para A fazer</button>
   <button class="ctx-item" onclick="ctxMove('doing')">🔄 Mover para Em andamento</button>
   <button class="ctx-item" onclick="ctxMove('review')">🔍 Mover para Revisão</button>
@@ -1281,6 +1282,17 @@ function closeCtx() {
 function ctxEdit() {
   closeCtx();
   openModal(null, ctxId);
+}
+
+function ctxCopy() {
+  const src = tasks.find(x => x.id === ctxId);
+  if (src) {
+    const copy = Object.assign({}, src, { id: nextId++, title: 'Cópia — ' + src.title, created: new Date().toISOString().slice(0,10) });
+    tasks.push(copy);
+    saveState(); render();
+    showToast('📋 Tarefa copiada');
+  }
+  closeCtx();
 }
 
 function ctxMove(col) {
