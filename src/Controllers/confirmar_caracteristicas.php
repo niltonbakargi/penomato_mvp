@@ -101,9 +101,15 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
     if (!isset($_SESSION['usuario_id'])) { echo json_encode(['sucesso' => false, 'erro' => 'Não autenticado.']); exit; }
     require_once __DIR__ . '/../../config/banco_de_dados.php';
 
-    $especie_id = (int)($_POST['especie_id'] ?? 0);
-    $campo      = trim($_POST['campo'] ?? '');
-    $valor      = trim($_POST['valor'] ?? '');
+    $especie_id   = (int)($_POST['especie_id'] ?? 0);
+    $campo        = trim($_POST['campo'] ?? '');
+    $valor        = trim($_POST['valor'] ?? '');
+    $refs_json    = trim($_POST['referencias_existentes'] ?? '');
+    $refs_existentes = [];
+    if ($refs_json) {
+        $decoded = json_decode($refs_json, true);
+        if (is_array($decoded)) $refs_existentes = $decoded;
+    }
 
     $labels = [
         'nome_cientifico_completo' => 'Nome Científico Completo',
@@ -141,13 +147,32 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
         echo json_encode(['sucesso' => false, 'erro' => 'API de IA não configurada.']); exit;
     }
 
-    $label  = $labels[$campo];
+    $label = $labels[$campo];
+
+    // Monta bloco de referências já cadastradas para o prompt
+    $bloco_refs = '';
+    if (!empty($refs_existentes)) {
+        $bloco_refs = "\n\nReferências já cadastradas nesta espécie:\n";
+        foreach ($refs_existentes as $r) {
+            $idx   = (int)($r['idx']   ?? 0);
+            $texto = trim($r['texto']  ?? '');
+            if ($idx > 0 && $texto !== '') {
+                $bloco_refs .= "[{$idx}] {$texto}\n";
+            }
+        }
+        $bloco_refs .= "\nSe alguma dessas referências já confirma o valor informado, "
+            . "retorne seu índice em \"ref_existente_idx\" e deixe \"referencia\" e \"url\" vazios.";
+    }
+
     $prompt = "Você é um especialista em botânica sistemática.\n"
-        . "Espécie: {$nome}\nAtributo: \"{$label}\"\nValor informado: \"{$valor}\"\n\n"
+        . "Espécie: {$nome}\nAtributo: \"{$label}\"\nValor informado: \"{$valor}\"\n"
+        . $bloco_refs . "\n\n"
         . "1. Verifique se este valor é botanicamente correto para esta espécie.\n"
-        . "2. Forneça UMA referência bibliográfica confiável (REFLORA, Lorenzi, Flora do Brasil, artigos científicos).\n\n"
+        . "2. Se uma referência já cadastrada (acima) confirma este valor, use \"ref_existente_idx\".\n"
+        . "3. Caso contrário, forneça UMA referência nova (REFLORA, Lorenzi, Flora do Brasil, artigos científicos).\n\n"
         . "Responda APENAS com JSON válido, sem markdown:\n"
-        . "{\"valido\":true,\"observacao\":\"justificativa breve em português\",\"referencia\":\"AUTOR. Título. Local, Ano.\",\"url\":\"https://... ou string vazia\"}";
+        . "{\"valido\":true,\"observacao\":\"justificativa breve em português\","
+        . "\"ref_existente_idx\":null,\"referencia\":\"AUTOR. Título. Local, Ano.\",\"url\":\"https://... ou vazio\"}";
 
     $provider = strtolower(AI_PROVIDER);
     $api_key  = AI_API_KEY;
@@ -204,8 +229,19 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
     $ia = json_decode($jl, true);
     if (json_last_error() !== JSON_ERROR_NONE) { echo json_encode(['sucesso' => false, 'erro' => 'JSON inválido da IA.']); exit; }
 
-    echo json_encode(['sucesso' => true, 'valido' => (bool)($ia['valido'] ?? true),
-        'observacao' => $ia['observacao'] ?? '', 'referencia' => $ia['referencia'] ?? '', 'url' => $ia['url'] ?? '']);
+    $ref_existente_idx = null;
+    if (isset($ia['ref_existente_idx']) && is_numeric($ia['ref_existente_idx']) && (int)$ia['ref_existente_idx'] > 0) {
+        $ref_existente_idx = (int)$ia['ref_existente_idx'];
+    }
+
+    echo json_encode([
+        'sucesso'           => true,
+        'valido'            => (bool)($ia['valido'] ?? true),
+        'observacao'        => $ia['observacao'] ?? '',
+        'ref_existente_idx' => $ref_existente_idx,
+        'referencia'        => $ia['referencia'] ?? '',
+        'url'               => $ia['url'] ?? '',
+    ]);
     exit;
 }
 
@@ -1641,10 +1677,19 @@ function searchRefCampo(campo) {
     var prev = document.getElementById('ia_result_' + campo);
     if (prev) prev.remove();
 
+    // Envia referências já cadastradas para a IA verificar antes de sugerir nova
+    var refsPayload = _refs.map(function(r, i) { return { idx: i + 1, texto: r }; });
+
     fetch('confirmar_caracteristicas.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ acao: 'buscar_ref_campo', especie_id: _especieId, campo: campo, valor: valor })
+        body: new URLSearchParams({
+            acao: 'buscar_ref_campo',
+            especie_id: _especieId,
+            campo: campo,
+            valor: valor,
+            referencias_existentes: JSON.stringify(refsPayload)
+        })
     })
     .then(function(r) { return r.json(); })
     .then(function(res) {
@@ -1671,14 +1716,24 @@ function showRefResult(campo, res) {
     } else {
         var icone = res.valido ? '✅' : '⚠️';
         var texto = res.valido ? 'Valor confirmado' : 'Atenção — valor questionado';
+        var acoesHtml;
+        if (res.ref_existente_idx) {
+            acoesHtml = '<div class="ia-ref-texto">Referência [' + res.ref_existente_idx + '] já confirma este valor.</div>'
+                + '<div class="ia-acoes">'
+                + '<button type="button" class="btn-aceitar-ref" onclick="usarRefExistente(\'' + campo + '\',' + res.ref_existente_idx + ', this)">✔ Usar [' + res.ref_existente_idx + ']</button>'
+                + '<button type="button" class="btn-rejeitar-ref" onclick="this.closest(\'.ia-result\').remove()">✖ Ignorar</button>'
+                + '</div>';
+        } else {
+            acoesHtml = '<div class="ia-ref-texto">' + escHtml(res.referencia) + '</div>'
+                + '<div class="ia-acoes">'
+                + '<button type="button" class="btn-aceitar-ref" onclick="aceitarRef(\'' + campo + '\', this)">✔ Aceitar referência</button>'
+                + '<button type="button" class="btn-rejeitar-ref" onclick="this.closest(\'.ia-result\').remove()">✖ Rejeitar</button>'
+                + '</div>';
+        }
         div.innerHTML = '<button type="button" class="btn-fechar-result" onclick="this.parentElement.remove()">✕</button>'
             + '<div class="ia-validacao ' + (res.valido ? 'ok' : 'warn') + '">' + icone + ' <strong>' + texto + '</strong>'
             + (res.observacao ? ' — ' + escHtml(res.observacao) : '') + '</div>'
-            + '<div class="ia-ref-texto">' + escHtml(res.referencia) + '</div>'
-            + '<div class="ia-acoes">'
-            + '<button type="button" class="btn-aceitar-ref" onclick="aceitarRef(\'' + campo + '\', this)">✔ Aceitar referência</button>'
-            + '<button type="button" class="btn-rejeitar-ref" onclick="this.closest(\'.ia-result\').remove()">✖ Rejeitar</button>'
-            + '</div>';
+            + acoesHtml;
         div.dataset.referencia = res.referencia || '';
         div.dataset.url        = res.url || '';
     }
@@ -1710,6 +1765,22 @@ function aceitarRef(campo, btn) {
     autoSaveRefs();
     panel.remove();
     showToast('Referência [' + newIdx + '] adicionada.');
+}
+
+function usarRefExistente(campo, idx, btn) {
+    var panel = btn.closest('.ia-result');
+    var refEl = document.getElementById(campo + '_ref');
+    if (refEl) {
+        var parts = refEl.value
+            ? refEl.value.split(',').map(function(n) { return n.trim(); }).filter(function(n) { return n && /^\d+$/.test(n); })
+            : [];
+        if (parts.indexOf(String(idx)) === -1) parts.push(String(idx));
+        refEl.value = parts.join(',');
+        buildBadges(campo, refEl.value);
+    }
+    autoSaveRefs();
+    panel.remove();
+    showToast('Campo vinculado à referência [' + idx + '].');
 }
 
 // ============================================================
