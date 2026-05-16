@@ -1199,11 +1199,17 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                         // Mostrar debug info para facilitar diagnóstico
                         if (data.debug) {
                             const d = data.debug;
-                            const vaziDiv = document.getElementById('buscaVazio');
-                            vaziDiv.innerHTML += '<p style="font-size:0.8rem;color:#666;margin-top:8px;">'
-                                + 'iNaturalist: ' + d.inat + ' | Wikimedia: ' + d.wiki
-                                + (d.erros && d.erros.length ? '<br>Erros: ' + d.erros.join('; ') : '')
-                                + '</p>';
+                            let info = 'iNaturalist: ' + d.inat + ' | Wikimedia: ' + d.wiki;
+                            if (d.erros && d.erros.length) info += '<br>Erros HTTP: ' + d.erros.join('; ');
+                            if (d.raw && d.raw.length) {
+                                d.raw.forEach(r => {
+                                    info += '<br><small style="word-break:break-all">'
+                                        + r.url + ' → HTTP ' + r.http + '<br>'
+                                        + escHtml(r.resp.substring(0, 200)) + '</small>';
+                                });
+                            }
+                            document.getElementById('buscaVazio').innerHTML +=
+                                '<div style="font-size:0.78rem;color:#555;margin-top:10px;text-align:left;background:#f5f5f5;padding:8px;border-radius:6px;">' + info + '</div>';
                         }
                     } else {
                         mostrarEstadoBusca('sem-mais');
