@@ -1196,6 +1196,15 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 if (!data.sucesso || !data.candidatas || data.candidatas.length === 0) {
                     if (busca.imagens.length === 0) {
                         mostrarEstadoBusca('vazio');
+                        // Mostrar debug info para facilitar diagnóstico
+                        if (data.debug) {
+                            const d = data.debug;
+                            const vaziDiv = document.getElementById('buscaVazio');
+                            vaziDiv.innerHTML += '<p style="font-size:0.8rem;color:#666;margin-top:8px;">'
+                                + 'iNaturalist: ' + d.inat + ' | Wikimedia: ' + d.wiki
+                                + (d.erros && d.erros.length ? '<br>Erros: ' + d.erros.join('; ') : '')
+                                + '</p>';
+                        }
                     } else {
                         mostrarEstadoBusca('sem-mais');
                     }
