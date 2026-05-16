@@ -3,10 +3,6 @@
 // UPLOAD DE IMAGENS - VERSÃO COM BOTÃO AVANÇAR
 // ================================================
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 
 require_once __DIR__ . '/../../config/banco_de_dados.php';
@@ -249,7 +245,6 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         .progress-fill {
             height: 100%;
             background-color: var(--cor-primaria);
-            width: <?php echo $progresso; ?>%;
             transition: width 0.3s ease;
         }
 
@@ -379,8 +374,8 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             padding: 8px 20px;
             border-radius: 30px;
             font-weight: 600;
-            background-color: <?php echo $contagem_por_parte[$parte_selecionada] > 0 ? '#d4edda' : '#fff3cd'; ?>;
-            color: <?php echo $contagem_por_parte[$parte_selecionada] > 0 ? '#155724' : '#856404'; ?>;
+            background-color: <?php echo ($parte_selecionada && ($contagem_por_parte[$parte_selecionada] ?? 0) > 0) ? '#d4edda' : '#fff3cd'; ?>;
+            color: <?php echo ($parte_selecionada && ($contagem_por_parte[$parte_selecionada] ?? 0) > 0) ? '#155724' : '#856404'; ?>;
         }
 
         /* ================================================ */
@@ -875,9 +870,9 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             <!-- Barra de progresso -->
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill"></div>
+                    <div class="progress-fill" id="progressFill" style="width:<?php echo $progresso; ?>%"></div>
                 </div>
-                <div class="progress-text">
+                <div class="progress-text" id="progressText">
                     <?php echo $partes_completas; ?> de <?php echo count($partes_obrigatorias); ?> partes obrigatórias completas (<?php echo $progresso; ?>%)
                 </div>
             </div>
@@ -1146,6 +1141,22 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         detalhe:           { icone: '🔍', nome: 'Detalhe',  obrigatoria: false },
     };
 
+    // Contagem atual de imagens por parte (vinda do banco, atualizada via JS)
+    const contagemPorParte = <?php echo json_encode($contagem_por_parte); ?>;
+    const totalObrigatorias = <?php echo count($partes_obrigatorias); ?>;
+
+    function atualizarBarraProgresso() {
+        let completas = 0;
+        for (const [parte, info] of Object.entries(PARTES_INFO)) {
+            if (info.obrigatoria && (contagemPorParte[parte] || 0) > 0) completas++;
+        }
+        const pct = Math.round(completas / totalObrigatorias * 100);
+        const fill = document.getElementById('progressFill');
+        const text = document.getElementById('progressText');
+        if (fill) fill.style.width = pct + '%';
+        if (text) text.textContent = completas + ' de ' + totalObrigatorias + ' partes obrigatórias completas (' + pct + '%)';
+    }
+
     let busca = {
         imagens:     [],
         indice:      0,
@@ -1387,8 +1398,12 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                         if (imgs.length > 0) {
                             const card = document.querySelector('[data-parte="' + parte + '"]');
                             if (card) card.classList.add('completa');
+                            contagemPorParte[parte] = (contagemPorParte[parte] || 0) + imgs.length;
+                            const span = document.getElementById('count-' + parte);
+                            if (span) span.textContent = contagemPorParte[parte];
                         }
                     }
+                    atualizarBarraProgresso();
                     mostrarAlertaSucesso(data.salvas + ' imagem(ns) salva(s)!');
                 } else {
                     alert('Erro ao salvar: ' + (data.erro || 'Tente novamente.'));
@@ -1482,6 +1497,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
     });
 
     // Focar no textarea ao clicar na área (delegado, funciona após recriação)
+    if (!colarArea) return; // sem parte selecionada, não há formulário
     colarArea.addEventListener('click', function() {
         const input = document.getElementById('colarInput');
         if (input) {
@@ -1538,7 +1554,9 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
     }
 
     // Validação do formulário antes de enviar
-    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    const uploadForm = document.getElementById('uploadForm');
+    if (!uploadForm) return;
+    uploadForm.addEventListener('submit', function(e) {
         if (!imagemColada) {
             e.preventDefault();
             alert('Por favor, cole uma imagem primeiro!');

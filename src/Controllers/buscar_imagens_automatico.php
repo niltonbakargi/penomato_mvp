@@ -50,8 +50,12 @@ $nome_cientifico = $especie['nome_cientifico'];
 // ============================================================
 // FUNÇÃO: requisição HTTP com cURL
 // ============================================================
+$_http_erros = [];   // acumula erros das chamadas (visível no JSON de debug)
+$_ssl_verify = (defined('APP_ENV') && APP_ENV === 'dev') ? false : true;
+
 function http_get(string $url): ?string
 {
+    global $_ssl_verify, $_http_erros;
     $ch = curl_init();
     curl_setopt_array($ch, [
         CURLOPT_URL            => $url,
@@ -60,7 +64,8 @@ function http_get(string $url): ?string
         CURLOPT_CONNECTTIMEOUT => 6,
         CURLOPT_USERAGENT      => 'Penomato/1.0 (penomato.app.br; contato@penomato.app.br)',
         CURLOPT_HTTPHEADER     => ['Accept: application/json'],
-        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYPEER => $_ssl_verify,
+        CURLOPT_SSL_VERIFYHOST => $_ssl_verify ? 2 : 0,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_MAXREDIRS      => 3,
     ]);
@@ -71,7 +76,9 @@ function http_get(string $url): ?string
     curl_close($ch);
 
     if ($erro || $http_code !== 200 || !$response) {
-        error_log("[Penomato] buscar_imagens curl erro — HTTP $http_code — $erro — URL: $url");
+        $msg = "HTTP $http_code" . ($erro ? " — $erro" : '');
+        error_log("[Penomato] buscar_imagens — $msg — URL: $url");
+        $_http_erros[] = $msg;
         return null;
     }
 
@@ -288,6 +295,11 @@ if (empty($todas)) {
         'total'      => 0,
         'candidatas' => [],
         'aviso'      => 'Nenhuma imagem encontrada.',
+        'debug'      => [
+            'inat'   => count($candidatas_inat),
+            'wiki'   => count($candidatas_wiki),
+            'erros'  => $GLOBALS['_http_erros'],
+        ],
     ]);
     exit;
 }
