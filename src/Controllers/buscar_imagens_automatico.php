@@ -50,8 +50,7 @@ $nome_cientifico = $especie['nome_cientifico'];
 // ============================================================
 // FUNÇÃO: requisição HTTP com cURL
 // ============================================================
-$_http_erros  = [];   // acumula erros das chamadas (visível no JSON de debug)
-$_raw_debug   = [];   // primeiros 300 chars de cada resposta bruta
+$_http_erros = [];   // acumula erros das chamadas cURL
 $_ssl_verify = (defined('APP_ENV') && APP_ENV === 'dev') ? false : true;
 
 function http_get(string $url): ?string
@@ -82,13 +81,6 @@ function http_get(string $url): ?string
         $_http_erros[] = $msg;
         return null;
     }
-
-    // Captura snippet para debug
-    $GLOBALS['_raw_debug'][] = [
-        'url'   => substr($url, 0, 80),
-        'http'  => $http_code,
-        'resp'  => substr($response, 0, 300),
-    ];
 
     return $response;
 }
@@ -307,10 +299,9 @@ if (empty($todas)) {
         'candidatas' => [],
         'aviso'      => 'Nenhuma imagem encontrada.',
         'debug'      => [
-            'inat'   => count($candidatas_inat),
-            'wiki'   => count($candidatas_wiki),
-            'erros'  => $GLOBALS['_http_erros'],
-            'raw'    => $GLOBALS['_raw_debug'],
+            'inat'  => count($candidatas_inat),
+            'wiki'  => count($candidatas_wiki),
+            'erros' => $GLOBALS['_http_erros'],
         ],
     ]);
     exit;
