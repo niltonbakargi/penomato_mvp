@@ -14,11 +14,11 @@ ALTER TABLE especies_caracteristicas
 -- 2. Corrigir espécies da família Arecaceae cujo forma_folha
 --    estava como 'Palmada' (incorreto — folhas pinadas em palmas)
 UPDATE especies_caracteristicas ec
-JOIN   especies_administrativo   ea ON ea.id = ec.especie_id
+JOIN   especies_administrativo   ea  ON ea.id  = ec.especie_id
 JOIN   especies_caracteristicas  ec2 ON ec2.especie_id = ea.id
-WHERE  ec2.familia IN ('Arecaceae')
-  AND  ec.forma_folha = 'Palmada'
-SET    ec.forma_folha = 'Pinada';
+SET    ec.forma_folha = 'Pinada'
+WHERE  ec2.familia = 'Arecaceae'
+  AND  ec.forma_folha = 'Palmada';
 
 -- 3. Corrigir Acrocomia aculeata especificamente (caso não esteja
 --    com família preenchida ou tenha sido importado errado)
