@@ -9,7 +9,7 @@
 //   campos_divergentes → precisam de revisão no modal
 // ============================================================
 
-@set_time_limit(60);
+@set_time_limit(120);
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 
@@ -243,9 +243,10 @@ if ($provider === 'claude') {
 
     $modelo_usado = $model ?? 'claude-opus-4-6';
     $payload = json_encode([
-        'model'      => $modelo_usado,
-        'max_tokens' => 4096,
-        'messages'   => [['role' => 'user', 'content' => $prompt]],
+        'model'       => $modelo_usado,
+        'max_tokens'  => 4096,
+        'temperature' => 0.2,
+        'messages'    => [['role' => 'user', 'content' => $prompt]],
     ]);
 
     $ch = curl_init('https://api.anthropic.com/v1/messages');

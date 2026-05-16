@@ -191,18 +191,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         .input-group textarea:focus { border-color: var(--cor-primaria); outline: none; }
         .input-group textarea { resize: vertical; }
         .auto-filled { border-color: var(--cor-primaria) !important; background: #f0faf5; }
-        .ref-wrapper { display: flex; gap: 5px; align-items: center; }
+        .ref-wrapper { display: flex; }
         .ref-wrapper input { flex: 1; }
-        .confirm-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 32px; height: 32px; border-radius: 5px;
-            border: 2px solid #ccc; background: #f8f9fa; color: #ccc;
-            font-size: 1.1em; font-weight: 700; flex-shrink: 0;
-            cursor: pointer; padding: 0; line-height: 1; user-select: none;
-            transition: background 0.15s, border-color 0.15s, color 0.15s;
-        }
-        .confirm-btn:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
-        .confirm-btn.confirmed { background: var(--cor-primaria); border-color: var(--cor-primaria); color: #fff; }
         /* ── Botão IA ── */
         .ia-toolbar {
             display: flex; align-items: center; justify-content: flex-end;
@@ -861,7 +851,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="nome_cientifico_completo_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="nome_cientifico_completo_ref" name="nome_cientifico_completo_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -875,7 +864,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="sinonimos_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="sinonimos_ref" name="sinonimos_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -889,7 +877,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="nome_popular_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="nome_popular_ref" name="nome_popular_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -903,7 +890,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="familia_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="familia_ref" name="familia_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -926,7 +912,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="forma_folha_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="forma_folha_ref" name="forma_folha_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -944,7 +929,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="filotaxia_folha_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="filotaxia_folha_ref" name="filotaxia_folha_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -963,7 +947,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tipo_folha_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tipo_folha_ref" name="tipo_folha_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -981,7 +964,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_folha_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tamanho_folha_ref" name="tamanho_folha_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1000,7 +982,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_folha_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="textura_folha_ref" name="textura_folha_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1019,7 +1000,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="margem_folha_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="margem_folha_ref" name="margem_folha_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1037,7 +1017,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="venacao_folha_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="venacao_folha_ref" name="venacao_folha_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1060,7 +1039,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_flores_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="cor_flores_ref" name="cor_flores_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1079,7 +1057,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="simetria_floral_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="simetria_floral_ref" name="simetria_floral_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1097,7 +1074,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="numero_petalas_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="numero_petalas_ref" name="numero_petalas_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1116,7 +1092,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="disposicao_flores_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="disposicao_flores_ref" name="disposicao_flores_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1134,7 +1109,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="aroma_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="aroma_ref" name="aroma_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1152,7 +1126,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_flor_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tamanho_flor_ref" name="tamanho_flor_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1175,7 +1148,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tipo_fruto_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tipo_fruto_ref" name="tipo_fruto_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1193,7 +1165,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_fruto_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tamanho_fruto_ref" name="tamanho_fruto_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1212,7 +1183,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_fruto_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="cor_fruto_ref" name="cor_fruto_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1231,7 +1201,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_fruto_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="textura_fruto_ref" name="textura_fruto_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1249,7 +1218,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="dispersao_fruto_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="dispersao_fruto_ref" name="dispersao_fruto_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1267,7 +1235,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="aroma_fruto_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="aroma_fruto_ref" name="aroma_fruto_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1288,7 +1255,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tipo_semente_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tipo_semente_ref" name="tipo_semente_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1306,7 +1272,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_semente_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tamanho_semente_ref" name="tamanho_semente_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1325,7 +1290,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_semente_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="cor_semente_ref" name="cor_semente_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1343,7 +1307,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_semente_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="textura_semente_ref" name="textura_semente_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1361,7 +1324,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="quantidade_sementes_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="quantidade_sementes_ref" name="quantidade_sementes_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1382,7 +1344,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tipo_caule_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tipo_caule_ref" name="tipo_caule_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1401,7 +1362,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_caule_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="textura_caule_ref" name="textura_caule_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1419,7 +1379,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_caule_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="cor_caule_ref" name="cor_caule_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1437,7 +1396,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="forma_caule_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="forma_caule_ref" name="forma_caule_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1455,7 +1413,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="modificacao_caule_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="modificacao_caule_ref" name="modificacao_caule_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1473,7 +1430,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="ramificacao_caule_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="ramificacao_caule_ref" name="ramificacao_caule_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1493,7 +1449,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="possui_espinhos_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="possui_espinhos_ref" name="possui_espinhos_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1510,7 +1465,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="possui_latex_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="possui_latex_ref" name="possui_latex_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1527,7 +1481,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="possui_seiva_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="possui_seiva_ref" name="possui_seiva_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1544,7 +1497,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="possui_resina_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="possui_resina_ref" name="possui_resina_ref" placeholder="URL ou nº">
-                            <button type="button" class="confirm-btn" title="Marcar como confirmado">✓</button>
                         </div>
                     </div>
                 </div>
@@ -1596,13 +1548,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
     </div>
     
     <script>
-    // ================================================
-    // CONFIRM-BTNS: toggle e progresso visual
-    // ================================================
-    document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.confirm-btn');
-        if (btn) btn.classList.toggle('confirmed');
-    });
 
     // ================================================
     // PREENCHER campo visível (select ou input/textarea)
@@ -1636,7 +1581,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             el.value = ''; el.classList.remove('auto-filled');
             if (el.options[0] && el.options[0].disabled) el.selectedIndex = 0;
         });
-        document.querySelectorAll('.confirm-btn').forEach(b => b.classList.remove('confirmed'));
+
     }
 
     // ================================================
