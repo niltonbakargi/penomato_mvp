@@ -1482,64 +1482,47 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         }
     }
 
-    // Evento de colar (Ctrl+V) — usa delegação para funcionar após removerImagem()
-    document.addEventListener('paste', function(e) {
-        if (colarArea.contains(document.activeElement) || document.activeElement === colarArea) {
-            e.preventDefault();
-            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image') !== -1) {
-                    processarImagemColada(items[i]);
-                    break;
+    // Seção de colar imagem — só existe quando uma parte está selecionada
+    if (colarArea) {
+
+        // Evento de colar (Ctrl+V)
+        document.addEventListener('paste', function(e) {
+            if (colarArea.contains(document.activeElement) || document.activeElement === colarArea) {
+                e.preventDefault();
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        processarImagemColada(items[i]);
+                        break;
+                    }
                 }
             }
-        }
-    });
-
-    // Focar no textarea ao clicar na área (delegado, funciona após recriação)
-    if (!colarArea) return; // sem parte selecionada, não há formulário
-    colarArea.addEventListener('click', function() {
-        const input = document.getElementById('colarInput');
-        if (input) {
-            input.focus();
-            colarArea.style.backgroundColor = '#e0f0e0';
-            colarArea.style.borderColor = 'var(--cor-primaria-hover)';
-        }
-    });
-
-    // Função para remover a imagem e restaurar a área de colar
-    function removerImagem() {
-        imagemColada = null;
-        imagemBase64.value = '';
-        previewContainer.innerHTML = '';
-        btnEnviar.disabled = true;
-        btnEnviar.innerHTML = '📤 ADICIONAR À SESSÃO TEMPORÁRIA';
-
-        colarArea.innerHTML = `
-            <div class="icone">📋</div>
-            <div class="texto">Cole a imagem aqui (Ctrl+V)</div>
-            <div class="subtexto">Copie a imagem de qualquer lugar e cole neste campo</div>
-            <textarea id="colarInput" placeholder="Clique aqui e pressione Ctrl+V para colar a imagem..."></textarea>
-        `;
-        colarArea.style.backgroundColor = 'var(--verde-50)';
-        colarArea.style.borderColor = 'var(--cor-primaria)';
-        colarArea.style.padding = '40px';
-
-        // Reanexar referência ao novo textarea
-        const novoColarInput = document.getElementById('colarInput');
-        novoColarInput.addEventListener('focus', function() {
-            colarArea.style.backgroundColor = '#e0f0e0';
-            colarArea.style.borderColor = 'var(--cor-primaria-hover)';
         });
-        novoColarInput.addEventListener('blur', function() {
-            if (!imagemColada) {
-                colarArea.style.backgroundColor = 'var(--verde-50)';
-                colarArea.style.borderColor = 'var(--cor-primaria)';
+
+        // Focar no textarea ao clicar na área
+        colarArea.addEventListener('click', function() {
+            const input = document.getElementById('colarInput');
+            if (input) {
+                input.focus();
+                colarArea.style.backgroundColor = '#e0f0e0';
+                colarArea.style.borderColor = 'var(--cor-primaria-hover)';
             }
         });
-    }
 
-    // Mostrar/esconder campo "Outros" na licença
+        // Validação do formulário antes de enviar
+        const uploadForm = document.getElementById('uploadForm');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function(e) {
+                if (!imagemColada) {
+                    e.preventDefault();
+                    alert('Por favor, cole uma imagem primeiro!');
+                }
+            });
+        }
+
+    } // fim do bloco colarArea
+
+    // Mostrar/esconder campo "Outros" na licença (sempre presente na página)
     function toggleLicencaOutros(valor) {
         const grupo = document.getElementById('licenca_outros_grupo');
         const input = document.getElementById('licenca_outros');
@@ -1552,17 +1535,6 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             input.value = '';
         }
     }
-
-    // Validação do formulário antes de enviar
-    const uploadForm = document.getElementById('uploadForm');
-    if (!uploadForm) return;
-    uploadForm.addEventListener('submit', function(e) {
-        if (!imagemColada) {
-            e.preventDefault();
-            alert('Por favor, cole uma imagem primeiro!');
-            return;
-        }
-    });
 
     </script>
 </body>
