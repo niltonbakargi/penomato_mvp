@@ -115,6 +115,15 @@ function inserirImagem(
 
     if (!$ok) return false;
 
+    // Evitar duplicata pelo caminho físico
+    $dup = $pdo->prepare("SELECT id FROM especies_imagens WHERE caminho_imagem = ?");
+    $dup->execute([$caminho_relativo]);
+    if ($dup->fetch()) {
+        // Arquivo já registrado — remove o físico recém-salvo e retorna sem erro
+        @unlink($caminho_completo);
+        return false;
+    }
+
     $stmt = $pdo->prepare("
         INSERT INTO especies_imagens
             (especie_id, tipo_imagem, origem, parte_planta,
