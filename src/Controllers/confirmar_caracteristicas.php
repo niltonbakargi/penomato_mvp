@@ -251,7 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
     }
 
     $enums_validos = [
-        'forma_folha'     => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Lobada'],
+        'forma_folha'     => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Pinada','Lobada'],
         'filotaxia_folha' => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
         'tamanho_folha'   => ['Microfilas (< 2 cm)','Nanofilas (2–7 cm)','Mesofilas (7–20 cm)','Macrófilas (20–50 cm)','Megafilas (> 50 cm)'],
         'possui_espinhos' => ['Sim','Não'], 'possui_latex' => ['Sim','Não'],
@@ -654,7 +654,7 @@ ob_end_clean();
             <option>Lanceolada</option><option>Linear</option><option>Elíptica</option>
             <option>Ovada</option><option>Orbicular</option><option>Cordiforme</option>
             <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
-            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Lobada</option>
+            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Pinada</option><option>Lobada</option>
           </select>
         </div>
         <div class="field-refs">
