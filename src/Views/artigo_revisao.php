@@ -102,6 +102,14 @@ try {
         $imagens[$parte] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    // Observações por campo
+    $obs_rows = $pdo->prepare("SELECT campo, observacao FROM especies_caracteristicas_obs WHERE especie_id = ?");
+    $obs_rows->execute([$especie_id]);
+    $GLOBALS['_ec_obs'] = [];
+    foreach ($obs_rows->fetchAll(PDO::FETCH_ASSOC) as $o) {
+        $GLOBALS['_ec_obs'][$o['campo']] = $o['observacao'];
+    }
+
     // Processar referências
     $referencias = [];
     if ($carac && !empty($carac['referencias'])) {
@@ -118,9 +126,9 @@ try {
 // ================================================
 // FUNÇÃO AUXILIAR
 // ================================================
-function exibirCaracteristica($valor, $ref) {
+function exibirCaracteristica($valor, $ref, $campo = '') {
     if (empty($valor) && $valor !== '0') return '';
-    
+
     $html = htmlspecialchars($valor);
     if (!empty($ref)) {
         $refs = explode(',', $ref);
@@ -130,6 +138,9 @@ function exibirCaracteristica($valor, $ref) {
                 $html .= " <span class='ref-link' data-ref='$r'>[$r]</span>";
             }
         }
+    }
+    if ($campo && !empty($GLOBALS['_ec_obs'][$campo])) {
+        $html .= ' <em class="obs-inline">(' . htmlspecialchars($GLOBALS['_ec_obs'][$campo]) . ')</em>';
     }
     return $html;
 }
@@ -272,6 +283,13 @@ $nomes_partes = [
             flex-wrap: wrap;
         }
         
+        .obs-inline {
+            color: var(--cinza-600, #6b7280);
+            font-size: 0.88em;
+            font-style: italic;
+            margin-left: 2px;
+        }
+
         .ref-link {
             background: var(--cinza-200);
             color: var(--cor-primaria);
@@ -598,7 +616,8 @@ $nomes_partes = [
                             <div class="char-value">
                                 <?php echo exibirCaracteristica(
                                     $carac['nome_cientifico_completo'],
-                                    $carac['nome_cientifico_completo_ref'] ?? ''
+                                    $carac['nome_cientifico_completo_ref'] ?? '',
+                                    'nome_cientifico_completo'
                                 ); ?>
                             </div>
                         </div>
@@ -625,7 +644,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['forma_folha'],
-                                            $carac['forma_folha_ref'] ?? ''
+                                            $carac['forma_folha_ref'] ?? '',
+                                            'forma_folha'
                                         ); ?>
                                     </div>
                                 </div>
@@ -637,7 +657,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['filotaxia'],
-                                            $carac['filotaxia_ref'] ?? ''
+                                            $carac['filotaxia_ref'] ?? '',
+                                            'filotaxia_folha'
                                         ); ?>
                                     </div>
                                 </div>
@@ -649,7 +670,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['tipo_folha'],
-                                            $carac['tipo_folha_ref'] ?? ''
+                                            $carac['tipo_folha_ref'] ?? '',
+                                            'tipo_folha'
                                         ); ?>
                                     </div>
                                 </div>
@@ -661,7 +683,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['margem_folha'],
-                                            $carac['margem_folha_ref'] ?? ''
+                                            $carac['margem_folha_ref'] ?? '',
+                                            'margem_folha'
                                         ); ?>
                                     </div>
                                 </div>
@@ -673,7 +696,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['textura_folha'],
-                                            $carac['textura_folha_ref'] ?? ''
+                                            $carac['textura_folha_ref'] ?? '',
+                                            'textura_folha'
                                         ); ?>
                                     </div>
                                 </div>
@@ -685,7 +709,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['tamanho_folha'],
-                                            $carac['tamanho_folha_ref'] ?? ''
+                                            $carac['tamanho_folha_ref'] ?? '',
+                                            'tamanho_folha'
                                         ); ?>
                                     </div>
                                 </div>
@@ -714,7 +739,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['cor_flor'],
-                                            $carac['cor_flor_ref'] ?? ''
+                                            $carac['cor_flor_ref'] ?? '',
+                                            'cor_flores'
                                         ); ?>
                                     </div>
                                 </div>
@@ -726,7 +752,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['aroma_flor'],
-                                            $carac['aroma_flor_ref'] ?? ''
+                                            $carac['aroma_flor_ref'] ?? '',
+                                            'aroma'
                                         ); ?>
                                     </div>
                                 </div>
@@ -738,7 +765,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['numero_petalas'],
-                                            $carac['numero_petalas_ref'] ?? ''
+                                            $carac['numero_petalas_ref'] ?? '',
+                                            'numero_petalas'
                                         ); ?>
                                     </div>
                                 </div>
@@ -750,7 +778,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['simetria_flor'],
-                                            $carac['simetria_flor_ref'] ?? ''
+                                            $carac['simetria_flor_ref'] ?? '',
+                                            'simetria_floral'
                                         ); ?>
                                     </div>
                                 </div>
@@ -778,7 +807,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['tipo_fruto'],
-                                            $carac['tipo_fruto_ref'] ?? ''
+                                            $carac['tipo_fruto_ref'] ?? '',
+                                            'tipo_fruto'
                                         ); ?>
                                     </div>
                                 </div>
@@ -790,7 +820,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['dispersao_fruto'],
-                                            $carac['dispersao_fruto_ref'] ?? ''
+                                            $carac['dispersao_fruto_ref'] ?? '',
+                                            'dispersao_fruto'
                                         ); ?>
                                     </div>
                                 </div>
@@ -802,7 +833,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['cor_fruto'],
-                                            $carac['cor_fruto_ref'] ?? ''
+                                            $carac['cor_fruto_ref'] ?? '',
+                                            'cor_fruto'
                                         ); ?>
                                     </div>
                                 </div>
@@ -828,7 +860,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['tipo_semente'],
-                                            $carac['tipo_semente_ref'] ?? ''
+                                            $carac['tipo_semente_ref'] ?? '',
+                                            'tipo_semente'
                                         ); ?>
                                     </div>
                                 </div>
@@ -840,7 +873,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['cor_semente'],
-                                            $carac['cor_semente_ref'] ?? ''
+                                            $carac['cor_semente_ref'] ?? '',
+                                            'cor_semente'
                                         ); ?>
                                     </div>
                                 </div>
@@ -866,7 +900,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['tipo_caule'],
-                                            $carac['tipo_caule_ref'] ?? ''
+                                            $carac['tipo_caule_ref'] ?? '',
+                                            'tipo_caule'
                                         ); ?>
                                     </div>
                                 </div>
@@ -878,7 +913,8 @@ $nomes_partes = [
                                     <div class="char-value">
                                         <?php echo exibirCaracteristica(
                                             $carac['textura_caule'],
-                                            $carac['textura_caule_ref'] ?? ''
+                                            $carac['textura_caule_ref'] ?? '',
+                                            'textura_caule'
                                         ); ?>
                                     </div>
                                 </div>

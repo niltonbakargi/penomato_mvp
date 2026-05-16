@@ -18,6 +18,15 @@ if (isset($_GET['acao']) && $_GET['acao'] === 'dados') {
              WHERE ec.especie_id = :id",
             [':id' => $id]
         );
+        if ($dados) {
+            $obs_rows = buscarTodos(
+                "SELECT campo, observacao FROM especies_caracteristicas_obs WHERE especie_id = :id",
+                [':id' => $id]
+            ) ?? [];
+            $obs_map = [];
+            foreach ($obs_rows as $o) $obs_map[$o['campo']] = $o['observacao'];
+            $dados['_obs'] = $obs_map;
+        }
         echo json_encode($dados ?: null);
     } else {
         echo json_encode(null);
@@ -89,6 +98,49 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_referencias') {
         echo json_encode(['ok' => true]);
     } catch (Exception $e) {
         echo json_encode(['ok' => false]);
+    }
+    exit;
+}
+
+// ── AJAX: salvar observação de um campo ────────────────────
+if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_obs') {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    header('Content-Type: application/json; charset=utf-8');
+    if (!isset($_SESSION['usuario_id'])) { echo json_encode(['ok' => false]); exit; }
+    require_once __DIR__ . '/../../config/banco_de_dados.php';
+
+    $especie_id = (int)($_POST['especie_id'] ?? 0);
+    $campo      = trim($_POST['campo'] ?? '');
+    $observacao = trim($_POST['observacao'] ?? '');
+
+    $whitelist_obs = [
+        'nome_cientifico_completo','sinonimos','nome_popular','familia',
+        'forma_folha','filotaxia_folha','tipo_folha','tamanho_folha','textura_folha',
+        'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
+        'disposicao_flores','aroma','tamanho_flor','tipo_fruto','tamanho_fruto',
+        'cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto','tipo_semente',
+        'tamanho_semente','cor_semente','textura_semente','quantidade_sementes',
+        'tipo_caule','textura_caule','cor_caule','forma_caule','modificacao_caule',
+        'ramificacao_caule','possui_espinhos','possui_latex','possui_seiva','possui_resina',
+    ];
+
+    if (!$especie_id || !in_array($campo, $whitelist_obs, true)) {
+        echo json_encode(['ok' => false, 'erro' => 'Campo inválido.']); exit;
+    }
+
+    try {
+        if ($observacao === '') {
+            $pdo->prepare("DELETE FROM especies_caracteristicas_obs WHERE especie_id = ? AND campo = ?")
+                ->execute([$especie_id, $campo]);
+        } else {
+            $pdo->prepare("INSERT INTO especies_caracteristicas_obs (especie_id, campo, observacao)
+                           VALUES (?, ?, ?)
+                           ON DUPLICATE KEY UPDATE observacao = VALUES(observacao), atualizado_em = CURRENT_TIMESTAMP")
+                ->execute([$especie_id, $campo, $observacao]);
+        }
+        echo json_encode(['ok' => true]);
+    } catch (Exception $e) {
+        echo json_encode(['ok' => false, 'erro' => $e->getMessage()]);
     }
     exit;
 }
@@ -463,6 +515,24 @@ ob_end_clean();
     }
     .btn-buscar-ref:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); background: #f0faf5; }
     .btn-buscar-ref:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── obs button ── */
+    .obs-btn {
+      background: none; border: 1px solid #ccc; border-radius: 5px;
+      padding: 4px 7px; cursor: pointer; font-size: 0.85em; color: #888;
+      transition: all 0.15s; margin-left: 4px; opacity: 0.55;
+    }
+    .obs-btn:hover { border-color: #f59e0b; color: #b45309; background: #fffbeb; opacity: 1; }
+    .obs-btn.has-obs { opacity: 1; border-color: #f59e0b; background: #fffbeb; color: #b45309; }
+    .obs-row { padding: 4px 0 10px; }
+    .obs-textarea {
+      width: 100%; box-sizing: border-box;
+      border: 1px solid #d1d5db; border-radius: 4px;
+      padding: 8px 10px; font-size: 0.85em; color: #374151;
+      resize: vertical; min-height: 54px; font-style: italic;
+      background: #fffdf5;
+    }
+    .obs-textarea:focus { outline: none; border-color: #f59e0b; }
 
     /* ── confirm button ── */
     .confirm-btn {
@@ -1489,6 +1559,7 @@ ob_end_clean();
 // ============================================================
 var _refs      = [];   // array 0-indexed de textos de referência
 var _especieId = 0;
+var _obs       = {};   // mapa campo → texto de observação
 var _saveRefTimer = null;
 
 // ============================================================
@@ -1858,6 +1929,8 @@ function loadEspecieData(especieId) {
                 if (refEl && dados[c + '_ref']) refEl.value = dados[c + '_ref'];
             });
             buildRefManager(dados.referencias || '');
+            _obs = dados._obs || {};
+            injetarBotoesObs();
             badge.textContent = '✅ Dados carregados. Verifique cada campo e clique ✓ para confirmar.';
             badge.className = 'tem-dados';
             checkProgress();
@@ -1866,6 +1939,62 @@ function loadEspecieData(especieId) {
             badge.textContent = '⚠️ Erro ao buscar dados.';
             badge.className = 'sem-dados-status';
         });
+}
+
+// ============================================================
+// OBSERVAÇÕES POR CAMPO
+// ============================================================
+function injetarBotoesObs() {
+    document.querySelectorAll('.field-row[data-campo]').forEach(function(row) {
+        var campo = row.dataset.campo;
+        if (row.querySelector('.obs-btn')) return; // já injetado
+        var confirmDiv = row.querySelector('.field-confirm');
+        if (!confirmDiv) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'obs-btn' + (_obs[campo] ? ' has-obs' : '');
+        btn.dataset.campo = campo;
+        btn.title = 'Observação sobre este atributo';
+        btn.textContent = '💬';
+        btn.addEventListener('click', function() { toggleObs(campo); });
+        confirmDiv.appendChild(btn);
+    });
+}
+
+function toggleObs(campo) {
+    var rowId = 'obs_row_' + campo;
+    var existing = document.getElementById(rowId);
+    if (existing) {
+        existing.style.display = existing.style.display === 'none' ? '' : 'none';
+        if (existing.style.display !== 'none') existing.querySelector('textarea').focus();
+        return;
+    }
+    var fieldRow = document.querySelector('.field-row[data-campo="' + campo + '"]');
+    if (!fieldRow) return;
+    var div = document.createElement('div');
+    div.id = rowId;
+    div.className = 'obs-row';
+    var ta = document.createElement('textarea');
+    ta.className = 'obs-textarea';
+    ta.dataset.campo = campo;
+    ta.placeholder = 'Observação sobre este atributo (aparecerá entre parênteses no artigo)…';
+    ta.value = _obs[campo] || '';
+    ta.addEventListener('blur', function() { salvarObs(campo, this.value); });
+    div.appendChild(ta);
+    fieldRow.after(div);
+    ta.focus();
+}
+
+function salvarObs(campo, texto) {
+    texto = texto.trim();
+    _obs[campo] = texto;
+    var btn = document.querySelector('.obs-btn[data-campo="' + campo + '"]');
+    if (btn) btn.classList.toggle('has-obs', !!texto);
+    fetch('confirmar_caracteristicas.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ acao: 'salvar_obs', especie_id: _especieId, campo: campo, observacao: texto })
+    });
 }
 
 // ============================================================
