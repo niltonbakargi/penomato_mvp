@@ -170,7 +170,7 @@ function buscar_inaturalist(string $nome, int $pagina = 1): array
         'photos'        => 'true',
         'per_page'      => 15,
         'page'          => $pagina,
-        'place_id'      => 6744,    // Brasil
+        'captive'       => 'false',
         'order'         => 'desc',
         'order_by'      => 'votes',
     ]);
@@ -256,10 +256,13 @@ function buscar_wikimedia(string $nome, int $pagina = 1): array
         $info = $page['imageinfo'][0] ?? null;
         if (!$info) continue;
 
-        $url_foto = $info['url'] ?? '';
+        // url pode vir depois de thumburl no JSON — usar thumburl como fallback
+        $url_foto      = $info['url']      ?? ($info['thumburl'] ?? '');
+        $url_thumbnail = $info['thumburl'] ?? $url_foto;
 
-        // Aceitar apenas formatos de imagem raster (excluir SVG, OGG, PDF)
-        if (!preg_match('/\.(jpg|jpeg|png|gif|webp)$/i', $url_foto)) continue;
+        // Aceitar apenas formatos de imagem raster (excluir SVG, OGG, PDF, WebM)
+        // Regex sem âncora $ para tolerar query params na URL
+        if (!$url_foto || !preg_match('/\.(jpg|jpeg|png|gif|webp)/i', $url_foto)) continue;
 
         $meta    = $info['extmetadata'] ?? [];
         $licenca = normalizar_licenca(
@@ -270,7 +273,7 @@ function buscar_wikimedia(string $nome, int $pagina = 1): array
 
         $candidatas[] = [
             'url_foto'        => $url_foto,
-            'url_thumbnail'   => $info['thumburl'] ?? $url_foto,
+            'url_thumbnail'   => $url_thumbnail,
             'fonte'           => 'wikimedia',
             'fonte_url'       => 'https://commons.wikimedia.org/wiki/' . urlencode($page['title'] ?? ''),
             'fonte_nome'      => 'Wikimedia Commons',
