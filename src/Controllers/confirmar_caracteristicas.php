@@ -575,6 +575,26 @@ ob_end_clean();
       padding: 5px 14px; background: #e2e8f0; color: #2d3748;
       border: none; border-radius: 20px; cursor: pointer; font-size: 0.82em;
     }
+    .btn-aceitar-obs {
+      padding: 5px 14px; background: #fff3cd; color: #856404;
+      border: 1px solid #ffc107; border-radius: 20px; cursor: pointer; font-size: 0.82em; font-weight: 600;
+    }
+    .btn-aceitar-obs:hover { background: #ffc107; color: #3d2b00; }
+    .obs-confirm-area {
+      margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ffc107;
+    }
+    .obs-confirm-area textarea {
+      width: 100%; box-sizing: border-box; padding: 8px 10px;
+      border: 1px solid #ffc107; border-radius: 6px; font-size: 0.85em;
+      color: #374151; background: #fffdf5; resize: vertical; min-height: 60px; font-style: italic;
+    }
+    .obs-confirm-area textarea:focus { outline: none; border-color: #f59e0b; }
+    .obs-confirm-area .obs-confirm-actions { display: flex; gap: 8px; margin-top: 6px; }
+    .btn-confirmar-obs {
+      padding: 5px 14px; background: #f59e0b; color: #fff;
+      border: none; border-radius: 20px; cursor: pointer; font-size: 0.82em; font-weight: 600;
+    }
+    .btn-confirmar-obs:hover { background: #d97706; }
     .ia-err { color: #856404; font-size: 0.88em; }
 
     /* ── submit area ── */
@@ -1795,9 +1815,13 @@ function showRefResult(campo, res) {
                 + '<button type="button" class="btn-rejeitar-ref" onclick="this.closest(\'.ia-result\').remove()">✖ Ignorar</button>'
                 + '</div>';
         } else {
+            var btnObs = !res.valido
+                ? '<button type="button" class="btn-aceitar-obs" onclick="abrirAceitarComObs(\'' + campo + '\', this)">✏ Aceitar com observação</button>'
+                : '';
             acoesHtml = '<div class="ia-ref-texto">' + escHtml(res.referencia) + '</div>'
                 + '<div class="ia-acoes">'
                 + '<button type="button" class="btn-aceitar-ref" onclick="aceitarRef(\'' + campo + '\', this)">✔ Aceitar referência</button>'
+                + btnObs
                 + '<button type="button" class="btn-rejeitar-ref" onclick="this.closest(\'.ia-result\').remove()">✖ Rejeitar</button>'
                 + '</div>';
         }
@@ -1805,8 +1829,9 @@ function showRefResult(campo, res) {
             + '<div class="ia-validacao ' + (res.valido ? 'ok' : 'warn') + '">' + icone + ' <strong>' + texto + '</strong>'
             + (res.observacao ? ' — ' + escHtml(res.observacao) : '') + '</div>'
             + acoesHtml;
-        div.dataset.referencia = res.referencia || '';
-        div.dataset.url        = res.url || '';
+        div.dataset.referencia  = res.referencia  || '';
+        div.dataset.url         = res.url         || '';
+        div.dataset.observacao  = res.observacao  || '';
     }
 
     fieldRow.after(div);
@@ -1863,6 +1888,75 @@ function usarRefExistente(campo, idx, btn) {
     _autoConfirmarCampo(campo, panel);
     panel.remove();
     showToast('Campo vinculado à referência [' + idx + '].');
+}
+
+function abrirAceitarComObs(campo, btn) {
+    var panel = btn.closest('.ia-result');
+    // Evita abrir duas vezes
+    if (panel.querySelector('.obs-confirm-area')) return;
+
+    var obsTexto = (panel.dataset.observacao || '').trim();
+
+    var area = document.createElement('div');
+    area.className = 'obs-confirm-area';
+    area.innerHTML = '<textarea placeholder="Edite ou confirme a observação da IA…">'
+        + escHtml(obsTexto) + '</textarea>'
+        + '<div class="obs-confirm-actions">'
+        + '<button type="button" class="btn-confirmar-obs" onclick="confirmarComObs(\'' + campo + '\', this)">✔ Confirmar observação</button>'
+        + '<button type="button" class="btn-rejeitar-ref" onclick="this.closest(\'.obs-confirm-area\').remove()">✖ Cancelar</button>'
+        + '</div>';
+    panel.appendChild(area);
+    area.querySelector('textarea').focus();
+}
+
+function confirmarComObs(campo, btn) {
+    var panel  = btn.closest('.ia-result');
+    var area   = btn.closest('.obs-confirm-area');
+    var texto  = area.querySelector('textarea').value.trim();
+
+    // 1. Salva observação
+    if (texto) {
+        _obs[campo] = texto;
+        var obsBtn = document.querySelector('.obs-btn[data-campo="' + campo + '"]');
+        if (obsBtn) obsBtn.classList.add('has-obs');
+        fetch('confirmar_caracteristicas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ acao: 'salvar_obs', especie_id: _especieId, campo: campo, observacao: texto })
+        });
+        // Atualiza textarea de obs se já estiver visível
+        var ta = document.querySelector('#obs_row_' + campo + ' textarea');
+        if (ta) ta.value = texto;
+    }
+
+    // 2. Adiciona a referência
+    var url  = (panel.dataset.url || '').trim();
+    var cit  = (panel.dataset.referencia || '').trim();
+    var ref  = (url && /^https?:\/\//.test(url)) ? url : cit;
+    if (ref) {
+        _refs.push(ref);
+        var newIdx = _refs.length;
+        var refEl = document.getElementById(campo + '_ref');
+        if (refEl) {
+            var parts = refEl.value
+                ? refEl.value.split(',').map(function(n) { return n.trim(); }).filter(function(n) { return n && /^\d+$/.test(n); })
+                : [];
+            if (parts.indexOf(String(newIdx)) === -1) parts.push(String(newIdx));
+            refEl.value = parts.join(',');
+            buildBadges(campo, refEl.value);
+        }
+        renderRefList();
+        autoSaveRefs();
+    }
+
+    // 3. Confirma o campo
+    var confirmBtn = document.querySelector('.confirm-btn[data-campo="' + campo + '"]');
+    if (confirmBtn && !confirmBtn.classList.contains('confirmed')) {
+        handleConfirm(confirmBtn);
+    }
+
+    panel.remove();
+    showToast('Observação salva e campo confirmado.');
 }
 
 // ============================================================
