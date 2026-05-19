@@ -1431,6 +1431,7 @@ ob_end_clean();
           <label for="modificacao_caule">Modificação</label>
           <select id="modificacao_caule" name="modificacao_caule">
             <option value="" disabled selected>Selecione…</option>
+            <option>Nenhuma</option>
             <option>Cladódio</option><option>Estolão</option><option>Gavinha</option>
             <option>Rizoma</option><option>Tubérculo</option><option>Bulbo</option><option>Sapopema</option>
           </select>
