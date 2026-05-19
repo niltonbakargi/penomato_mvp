@@ -182,7 +182,7 @@ try {
         ) VALUES (
             ?, ?, ?, ?,
             ?, ?, ?, ?, ?, ?,
-            ?, ?, NOW(), 'aguardando_revisao'
+            ?, ?, NOW(), 'aprovado'
         )
     ");
 
