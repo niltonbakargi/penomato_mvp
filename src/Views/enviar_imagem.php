@@ -20,7 +20,7 @@ $exemplar_id = isset($_GET['exemplar_id']) ? (int)$_GET['exemplar_id'] : 0;
 $especies = $pdo->query("
     SELECT id, nome_cientifico, status
     FROM especies_administrativo
-    WHERE status NOT IN ('publicado')
+    WHERE status NOT IN ('sem_dados', 'publicado')
     ORDER BY nome_cientifico
 ")->fetchAll();
 
