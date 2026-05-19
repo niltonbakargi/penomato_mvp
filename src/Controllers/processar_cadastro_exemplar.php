@@ -236,7 +236,7 @@ try {
     }
 
     $msg = "Exemplar {$codigo} cadastrado com sucesso! Aguardando revisão do especialista.";
-    header("Location: {$redirect}&sucesso=" . urlencode($msg));
+    header("Location: {$redirect}&sucesso=" . urlencode($msg) . "&novo_exemplar_id=" . $exemplar_id);
 
 } catch (Exception $e) {
     $pdo->rollBack();

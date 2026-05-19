@@ -34,8 +34,9 @@ $especialistas = $pdo->query("
 // ── Espécie pré-selecionada via GET ───────────────────────────────────────────
 $especie_pre = isset($_GET['especie_id']) ? (int)$_GET['especie_id'] : 0;
 
-$mensagem_sucesso = isset($_GET['sucesso']) ? urldecode($_GET['sucesso']) : '';
-$mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
+$mensagem_sucesso  = isset($_GET['sucesso'])          ? urldecode($_GET['sucesso']) : '';
+$mensagem_erro     = isset($_GET['erro'])             ? urldecode($_GET['erro'])    : '';
+$novo_exemplar_id  = isset($_GET['novo_exemplar_id']) ? (int)$_GET['novo_exemplar_id'] : 0;
 
 // ── Pré-visualização do próximo código ───────────────────────────────────────
 $stmt_prox = $pdo->query("SELECT MAX(CAST(SUBSTRING(codigo, 3) AS UNSIGNED)) FROM exemplares WHERE codigo REGEXP '^PN[0-9]{3}$'");
@@ -242,9 +243,14 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
 
         <!-- Mensagens -->
         <?php if ($mensagem_sucesso): ?>
-            <div class="alerta alerta-success">
-                <i class="fas fa-check-circle"></i>
-                <span><?= htmlspecialchars($mensagem_sucesso) ?></span>
+            <div class="alerta alerta-success" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                <span><i class="fas fa-check-circle"></i> <?= htmlspecialchars($mensagem_sucesso) ?></span>
+                <?php if ($novo_exemplar_id > 0): ?>
+                    <a href="/penomato_mvp/src/Views/enviar_imagem.php?exemplar_id=<?= $novo_exemplar_id ?>&especie_id=<?= $especie_pre ?>"
+                       style="background:var(--cor-primaria);color:#fff;padding:6px 16px;border-radius:20px;text-decoration:none;font-size:0.88em;font-weight:600;white-space:nowrap;">
+                        <i class="fas fa-camera"></i> Adicionar imagens
+                    </a>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
         <?php if ($mensagem_erro): ?>
