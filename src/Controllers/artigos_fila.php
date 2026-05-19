@@ -286,6 +286,14 @@ $voltar_url = $is_gestor
         .btn-revisar:hover { background: var(--cor-primaria-hover); color: var(--branco); text-decoration: none; }
         .btn-publicar { background: #1e40af; color: var(--branco); }
         .btn-publicar:hover { background: #1e3a8a; color: var(--branco); text-decoration: none; }
+        .btn-voltar {
+            background: rgba(255,255,255,0.15); color: var(--branco);
+            border: 1px solid rgba(255,255,255,0.5); border-radius: var(--raio-md);
+            padding: var(--esp-2) var(--esp-5); font-size: var(--texto-sm);
+            font-weight: var(--peso-semi); text-decoration: none; display: inline-flex;
+            align-items: center; gap: var(--esp-2); transition: var(--transicao);
+        }
+        .btn-voltar:hover { background: rgba(255,255,255,0.30); text-decoration: none; }
 
         .data-cell { font-size: var(--texto-xs); color: var(--cinza-500); white-space: nowrap; }
 
@@ -311,8 +319,8 @@ $voltar_url = $is_gestor
                 <?php endif; ?>
             </p>
         </div>
-        <a href="<?php echo $voltar_url; ?>" class="btn btn-outline-branco">
-            <i class="fas fa-arrow-left"></i> Voltar
+        <a href="<?php echo $voltar_url; ?>" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar ao painel
         </a>
     </div>
 
