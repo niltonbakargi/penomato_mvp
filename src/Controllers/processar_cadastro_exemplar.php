@@ -197,10 +197,10 @@ try {
     // Registrar no histórico
     $stmt_hist = $pdo->prepare("
         INSERT INTO historico_alteracoes
-            (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_novo, tipo_acao)
-        VALUES (?, ?, 'exemplares', 'codigo', ?, 'insercao')
+            (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_novo, tipo_acao, dados_extras)
+        VALUES (?, ?, 'exemplares', 'codigo', ?, 'insercao', ?)
     ");
-    $stmt_hist->execute([$especie_id, $usuario_id, $codigo]);
+    $stmt_hist->execute([$especie_id, $usuario_id, $codigo, json_encode(['exemplar_id' => $exemplar_id])]);
 
     $pdo->commit();
 

@@ -135,6 +135,36 @@ if ($acao === 'desfazer' && $dentro_prazo) {
         ")->execute([$especie_id]);
     }
 
+    // 6. Cadastro de exemplar → remove exemplar e sua foto
+    elseif ($hist['tabela_afetada'] === 'exemplares' && $hist['tipo_acao'] === 'insercao') {
+        $exemplar_id_del = (int)($extras['exemplar_id'] ?? 0);
+        // fallback: buscar pelo código se não tiver no extras
+        if (!$exemplar_id_del && !empty($hist['valor_novo'])) {
+            $r = $pdo->prepare("SELECT id FROM exemplares WHERE codigo = ? AND especie_id = ?");
+            $r->execute([$hist['valor_novo'], $especie_id]);
+            $exemplar_id_del = (int)($r->fetchColumn() ?: 0);
+        }
+        if ($exemplar_id_del) {
+            // Remove foto de identificação
+            $r = $pdo->prepare("SELECT foto_identificacao FROM exemplares WHERE id = ?");
+            $r->execute([$exemplar_id_del]);
+            $foto = $r->fetchColumn();
+            if ($foto) {
+                $_arq = realpath(__DIR__ . '/../../' . $foto);
+                if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
+            }
+            // Remove imagens associadas ao exemplar
+            $r = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE exemplar_id = ?");
+            $r->execute([$exemplar_id_del]);
+            foreach ($r->fetchAll(PDO::FETCH_COLUMN) as $caminho) {
+                $_arq = realpath(__DIR__ . '/../../' . $caminho);
+                if ($_arq && $_raiz_uploads && str_starts_with($_arq, $_raiz_uploads)) unlink($_arq);
+            }
+            $pdo->prepare("DELETE FROM especies_imagens WHERE exemplar_id = ?")->execute([$exemplar_id_del]);
+            $pdo->prepare("DELETE FROM exemplares WHERE id = ?")->execute([$exemplar_id_del]);
+        }
+    }
+
     // Marcar como revertida
     $pdo->prepare("UPDATE historico_alteracoes SET revertida = 1 WHERE id = ?")
         ->execute([$hist_id]);
