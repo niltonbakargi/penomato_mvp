@@ -281,13 +281,15 @@ try {
     }
 
     // ================================================
-    // 7. CONTAR IMAGENS SALVAS E LIMPAR SESSÃO
+    // 7. CONTAR IMAGENS NOVAS E LIMPAR SESSÃO
     // ================================================
     $stmt_count = $pdo->prepare(
-        "SELECT COUNT(*) FROM especies_imagens WHERE especie_id = ? AND status_validacao = 'aprovado'"
+        "SELECT COUNT(*) FROM especies_imagens WHERE especie_id = ?"
     );
     $stmt_count->execute([$especie_id]);
-    $imagens_salvas = (int) $stmt_count->fetchColumn();
+    $total_atual    = (int) $stmt_count->fetchColumn();
+    $imagens_antes  = (int) ($dados_temporarios['imagens_antes'] ?? 0);
+    $imagens_salvas = max(0, $total_atual - $imagens_antes);
 
     unset($_SESSION['importacao_temporaria']);
     error_log("Sessão temporária limpa");

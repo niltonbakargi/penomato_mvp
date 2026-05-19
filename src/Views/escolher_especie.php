@@ -69,15 +69,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
         // Gerar ID único para a sessão temporária
         $temp_id = uniqid('temp_', true);
 
+        // Contar imagens existentes antes do upload desta sessão
+        $stmt_cnt = $pdo->prepare("SELECT COUNT(*) FROM especies_imagens WHERE especie_id = ?");
+        $stmt_cnt->execute([$especie_id]);
+        $imagens_antes = (int) $stmt_cnt->fetchColumn();
+
         // Armazenar na sessão
         $_SESSION['importacao_temporaria'] = [
-            'temp_id'       => $temp_id,
-            'especie_id'    => $especie_id,
-            'usuario_id'    => $id_usuario,
-            'orientador_id' => $orientador_id,
-            'status_inicial'=> 'sem_dados',
-            'dados'         => [],
-            'data_criacao'  => time()
+            'temp_id'        => $temp_id,
+            'especie_id'     => $especie_id,
+            'usuario_id'     => $id_usuario,
+            'orientador_id'  => $orientador_id,
+            'status_inicial' => 'sem_dados',
+            'dados'          => [],
+            'data_criacao'   => time(),
+            'imagens_antes'  => $imagens_antes,
         ];
 
         // Redirecionar para upload de imagens

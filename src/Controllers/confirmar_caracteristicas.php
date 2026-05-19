@@ -1812,6 +1812,15 @@ function showRefResult(campo, res) {
     fieldRow.after(div);
 }
 
+function _autoConfirmarCampo(campo, panel) {
+    // Só confirma se o painel não tem classe 'warn' (= IA validou positivamente)
+    if (panel.classList.contains('warn')) return;
+    var confirmBtn = document.querySelector('.confirm-btn[data-campo="' + campo + '"]');
+    if (confirmBtn && !confirmBtn.classList.contains('confirmed')) {
+        handleConfirm(confirmBtn);
+    }
+}
+
 function aceitarRef(campo, btn) {
     var panel = btn.closest('.ia-result');
     var url   = (panel.dataset.url || '').trim();
@@ -1834,6 +1843,7 @@ function aceitarRef(campo, btn) {
 
     renderRefList();
     autoSaveRefs();
+    _autoConfirmarCampo(campo, panel);
     panel.remove();
     showToast('Referência [' + newIdx + '] adicionada.');
 }
@@ -1850,6 +1860,7 @@ function usarRefExistente(campo, idx, btn) {
         buildBadges(campo, refEl.value);
     }
     autoSaveRefs();
+    _autoConfirmarCampo(campo, panel);
     panel.remove();
     showToast('Campo vinculado à referência [' + idx + '].');
 }
