@@ -355,9 +355,17 @@ $info_status = [
             <h1><i class="fas fa-file-alt"></i> Gestão de Artigos</h1>
             <p>Todos os artigos do sistema — orientadores e status</p>
         </div>
-        <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn btn-outline-branco">
-            <i class="fas fa-arrow-left"></i> Voltar
-        </a>
+        <div style="display:flex;gap:var(--esp-3);flex-wrap:wrap;align-items:center;">
+            <a href="/penomato_mvp/src/Controllers/admin_regenerar_artigos.php"
+               class="btn btn-outline-branco"
+               onclick="return confirm('Regenerar o HTML de todos os artigos com os dados atuais do banco?')"
+               title="Regera o texto de todos os artigos com os dados mais recentes das espécies">
+                <i class="fas fa-rotate"></i> Regenerar artigos
+            </a>
+            <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn btn-outline-branco">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
     </div>
 
     <?php if ($msg): ?>
