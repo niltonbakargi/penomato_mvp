@@ -597,18 +597,6 @@ $ast_info = $artigo_status_info[$artigo['artigo_status']] ?? $artigo_status_info
         <div class="hero-familia">Família <?= htmlspecialchars($artigo['familia']) ?></div>
     <?php endif; ?>
 
-    <?php if ($autores_raw): ?>
-    <div class="hero-autores">
-        <?php foreach ($autores_raw as $i => $a): ?>
-            <?php if ($i > 0): ?><span class="hero-autores-sep">·</span><?php endif; ?>
-            <span class="hero-autor-nome"><?= htmlspecialchars($a['nome']) ?></span>
-            <?php if ($a['numeros']): ?>
-            <sup class="hero-autor-nums"><?= implode(',', $a['numeros']) ?></sup>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-
     <div class="hero-badge" style="background:<?= $ast_info['cor'] ?>; border-color:<?= $ast_info['cor'] ?>;">
         <i class="fas fa-circle-dot"></i> <?= htmlspecialchars($ast_info['label']) ?>
         <?php if ($artigo['artigo_status'] === 'publicado'): ?>
