@@ -189,6 +189,9 @@ $ast_info = $artigo_status_info[$artigo['artigo_status']] ?? $artigo_status_info
             margin-bottom: 24px;
         }
 
+        /* autores omitidos do corpo — aparecem no card de créditos */
+        .card-artigo .art-autores { display: none; }
+
         /* imagens do artigo maiores na página pública */
         .card-artigo .art-figura img {
             width: 180px;
