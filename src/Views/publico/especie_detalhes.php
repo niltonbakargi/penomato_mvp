@@ -1517,12 +1517,9 @@ foreach ($especies as $esp):
         <!-- Texto do artigo -->
         <div class="ficha-attrs ficha-artigo-texto">
         <?php if (!empty($esp['artigo_html'])):
-            // Remove seções que pertencem apenas ao artigo completo
-            $html_ficha = preg_replace(
-                '/<h[23][^>]*class="art-secao"[^>]*>\s*(Prancha Fotogr[aá]fica|Refer[eê]ncias)\s*<\/h[23]>/i',
-                '',
-                $esp['artigo_html']
-            );
+            $html_ficha = $esp['artigo_html'];
+            $html_ficha = str_replace('<h3 class="art-secao">Prancha Fotográfica</h3>', '', $html_ficha);
+            $html_ficha = str_replace('<h3 class="art-secao">Referências</h3>', '', $html_ficha);
             echo $html_ficha;
         else: ?>
             <p class="ficha-sem-attrs">Artigo ainda não gerado para esta espécie.</p>
