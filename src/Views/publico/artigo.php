@@ -6,6 +6,7 @@
 
 session_start();
 require_once __DIR__ . '/../../../config/banco_de_dados.php';
+require_once __DIR__ . '/../../helpers/autores_artigo.php';
 
 $especie_id = (int)($_GET['id'] ?? 0);
 if (!$especie_id) {
@@ -46,6 +47,37 @@ try {
 $data_pub = $artigo['data_publicado']
     ? date('d/m/Y', strtotime($artigo['data_publicado']))
     : '—';
+
+// ── Contribuidores com números de ação ──
+$legenda_acoes = [
+    1 => 'Adicionou dados da internet',
+    2 => 'Confirmou os dados morfológicos',
+    3 => 'Registrou as imagens',
+    4 => 'Fez a revisão científica',
+    5 => 'Publicou',
+];
+$papel_para_num = [
+    'Compilação de dados'   => 1,
+    'Validação morfológica' => 2,
+    'Coleta de campo'       => 3,
+    'Revisão científica'    => 4,
+    'Gestão editorial'      => 5,
+];
+$autores_raw = montarAutoresArtigo($pdo, $especie_id);
+$acoes_usadas = [];
+foreach ($autores_raw as &$autor) {
+    $nums = [];
+    foreach ($autor['papeis'] as $papel) {
+        foreach ($papel_para_num as $chave => $num) {
+            if (str_starts_with($papel, $chave)) { $nums[] = $num; break; }
+        }
+    }
+    sort($nums);
+    $autor['numeros'] = $nums;
+    foreach ($nums as $n) $acoes_usadas[$n] = true;
+}
+unset($autor);
+ksort($acoes_usadas);
 
 $artigo_status_info = [
     'rascunho'   => ['label' => 'Rascunho',   'cor' => '#64748b', 'aviso' => 'Este artigo é um rascunho preliminar gerado por IA — ainda não foi revisado por especialista.'],
@@ -236,6 +268,88 @@ $ast_info = $artigo_status_info[$artigo['artigo_status']] ?? $artigo_status_info
             color: #475569;
         }
         .btn-busca:hover { background: #e2e8f0; }
+
+        /* ── AUTORES NO HERO ── */
+        .hero-autores {
+            margin: 14px 0 4px;
+            font-size: .9rem;
+            opacity: .92;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: baseline;
+            gap: 4px 10px;
+        }
+        .hero-autores-sep { opacity: .5; }
+        .hero-autor-nome  { font-weight: 600; }
+        .hero-autor-nums  {
+            font-size: .7em;
+            font-weight: 700;
+            vertical-align: super;
+            letter-spacing: .03em;
+        }
+
+        /* ── CRÉDITOS NOVO FORMATO ── */
+        .creditos-pessoas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 24px;
+            margin-bottom: 16px;
+        }
+        .credito-pessoa {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .credito-pessoa-nome {
+            font-size: .9rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .credito-pessoa-nums {
+            display: flex;
+            gap: 3px;
+        }
+        .credito-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--cor-primaria);
+            color: white;
+            font-size: .68rem;
+            font-weight: 700;
+            cursor: default;
+        }
+        .creditos-legenda {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 24px;
+        }
+        .legenda-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .78rem;
+            color: #64748b;
+        }
+        .legenda-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #475569;
+            font-size: .68rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
 
         /* ── DATA PUBLICAÇÃO ── */
         .pub-meta {
@@ -477,11 +591,24 @@ $ast_info = $artigo_status_info[$artigo['artigo_status']] ?? $artigo_status_info
 
 <!-- HERO -->
 <div class="hero">
-    <div class="hero-label">Artigo Científico Publicado</div>
+    <div class="hero-label">Artigo Científico</div>
     <div class="hero-nome"><?= htmlspecialchars($artigo['nome_cientifico']) ?></div>
     <?php if ($artigo['familia']): ?>
         <div class="hero-familia">Família <?= htmlspecialchars($artigo['familia']) ?></div>
     <?php endif; ?>
+
+    <?php if ($autores_raw): ?>
+    <div class="hero-autores">
+        <?php foreach ($autores_raw as $i => $a): ?>
+            <?php if ($i > 0): ?><span class="hero-autores-sep">·</span><?php endif; ?>
+            <span class="hero-autor-nome"><?= htmlspecialchars($a['nome']) ?></span>
+            <?php if ($a['numeros']): ?>
+            <sup class="hero-autor-nums"><?= implode(',', $a['numeros']) ?></sup>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
     <div class="hero-badge" style="background:<?= $ast_info['cor'] ?>; border-color:<?= $ast_info['cor'] ?>;">
         <i class="fas fa-circle-dot"></i> <?= htmlspecialchars($ast_info['label']) ?>
         <?php if ($artigo['artigo_status'] === 'publicado'): ?>
@@ -543,34 +670,40 @@ $ast_info = $artigo_status_info[$artigo['artigo_status']] ?? $artigo_status_info
 
     <!-- Créditos -->
     <div class="card-creditos">
-        <div class="creditos-titulo"><i class="fas fa-users"></i> Créditos</div>
-        <div class="creditos-grid">
-            <?php if (!empty($artigo['nome_colaborador'])): ?>
-            <div class="credito-item">
-                <div class="credito-papel">Colaborador</div>
-                <div class="credito-nome"><?= htmlspecialchars($artigo['nome_colaborador']) ?></div>
-                <?php if (!empty($artigo['inst_colaborador'])): ?>
-                <div class="credito-inst"><?= htmlspecialchars($artigo['inst_colaborador']) ?></div>
+        <div class="creditos-titulo"><i class="fas fa-users"></i> Contribuições</div>
+
+        <?php if ($autores_raw): ?>
+        <!-- Contribuidores: nome + números -->
+        <div class="creditos-pessoas">
+            <?php foreach ($autores_raw as $a): ?>
+            <div class="credito-pessoa">
+                <span class="credito-pessoa-nome"><?= htmlspecialchars($a['nome']) ?></span>
+                <?php if ($a['numeros']): ?>
+                <span class="credito-pessoa-nums">
+                    <?php foreach ($a['numeros'] as $n): ?>
+                    <span class="credito-num" title="<?= htmlspecialchars($legenda_acoes[$n]) ?>"><?= $n ?></span>
+                    <?php endforeach; ?>
+                </span>
                 <?php endif; ?>
             </div>
-            <?php endif; ?>
-
-            <?php if (!empty($artigo['nome_publicador'])): ?>
-            <div class="credito-item">
-                <div class="credito-papel">Especialista Revisor</div>
-                <div class="credito-nome"><?= htmlspecialchars($artigo['nome_publicador']) ?></div>
-                <?php if (!empty($artigo['inst_publicador'])): ?>
-                <div class="credito-inst"><?= htmlspecialchars($artigo['inst_publicador']) ?></div>
-                <?php endif; ?>
-            </div>
-            <?php endif; ?>
-
-            <div class="credito-item">
-                <div class="credito-papel">Plataforma</div>
-                <div class="credito-nome">Penomato MVP</div>
-                <div class="credito-inst">UFMS / UEMS — Cerrado</div>
+            <?php endforeach; ?>
+            <div class="credito-pessoa">
+                <span class="credito-pessoa-nome" style="color:#94a3b8;">Penomato — UFMS / UEMS</span>
             </div>
         </div>
+
+        <!-- Legenda das ações -->
+        <?php if ($acoes_usadas): ?>
+        <div class="creditos-legenda">
+            <?php foreach ($acoes_usadas as $n => $_): ?>
+            <div class="legenda-item">
+                <span class="legenda-num"><?= $n ?></span>
+                <span class="legenda-txt"><?= htmlspecialchars($legenda_acoes[$n]) ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <?php endif; ?>
     </div>
 
     <div class="pub-meta">
