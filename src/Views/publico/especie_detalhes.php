@@ -399,41 +399,15 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             color: #1e293b; text-align: justify;
             text-indent: 1.2em; margin-bottom: 0;
         }
-        .ficha-artigo-texto .art-galeria { display: none; } /* galeria fica na coluna direita */
-        .ficha-artigo-texto .art-refs { display: none; }    /* referências ficam no artigo completo */
-        .ficha-artigo-texto style { display: none; }        /* ocultar tags <style> embutidas */
+        .ficha-artigo-texto .art-galeria,
+        .ficha-artigo-texto .art-refs,
+        .ficha-artigo-texto style       { display: none; }
 
         /* ── COLUNA DIREITA: imagens ── */
         .ficha-imgs {
             background: #f8fafc;
             padding: 20px;
             display: flex; flex-direction: column; gap: 14px;
-        }
-        .foto-principal {
-            position: relative; border-radius: 10px;
-            overflow: hidden; cursor: zoom-in;
-            background: #1a2634;
-            aspect-ratio: 4/3;
-        }
-        .foto-principal img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform .3s;
-        }
-        .foto-principal:hover img { transform: scale(1.03); }
-        .foto-credito {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            background: rgba(0,0,0,.6);
-            color: #e2e8f0; font-size: .7rem;
-            padding: 5px 10px;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .foto-sem { /* placeholder quando não há imagem */
-            aspect-ratio: 4/3; border-radius: 10px;
-            background: #1a2634;
-            display: flex; align-items: center; justify-content: center;
-            color: rgba(255,255,255,.2); font-size: 2.5rem;
         }
 
         /* Galeria de miniaturas por parte */
@@ -1551,17 +1525,6 @@ foreach ($especies as $esp):
 
         <!-- Imagens -->
         <div class="ficha-imgs">
-            <?php if ($foto_principal): ?>
-            <div class="foto-principal" onclick="abrirLightbox('<?= addslashes($foto_principal) ?>', '<?= addslashes($foto_credito) ?>')">
-                <img src="<?= htmlspecialchars($foto_principal) ?>" alt="<?= htmlspecialchars($esp['nome']) ?>">
-                <?php if ($foto_credito): ?>
-                <div class="foto-credito"><i class="fas fa-camera"></i> <?= $foto_credito ?></div>
-                <?php endif; ?>
-            </div>
-            <?php else: ?>
-            <div class="foto-sem"><i class="fas fa-image"></i></div>
-            <?php endif; ?>
-
             <!-- Galeria por parte -->
             <?php
             $tem_galeria = false;
