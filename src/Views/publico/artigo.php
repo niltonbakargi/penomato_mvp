@@ -596,18 +596,19 @@ document.addEventListener('DOMContentLoaded', function () {
         );
     });
 
-    // ── 2. Transforma <sup> em links clicáveis ──
-    document.querySelectorAll('.card-artigo sup').forEach(function (sup) {
-        var texto = sup.textContent.trim();
+    // ── 2. Transforma <sup class="art-ref"> em links clicáveis ──
+    // O gerador produz: <sup class="art-ref">[1,2]</sup> — remove colchetes antes de processar
+    document.querySelectorAll('.card-artigo sup.art-ref').forEach(function (sup) {
+        var texto = sup.textContent.trim().replace(/[\[\]]/g, '');
         // Pode ser "2" ou "2,4" ou "1,2,3"
         var numeros = texto.split(',').map(function (n) { return n.trim(); });
         var links = numeros.map(function (n) {
             var ref = document.getElementById('ref-' + n);
             if (ref) {
                 // Referência existe — link âncora
-                return '<a href="#ref-' + n + '" class="sup-link" title="Ver referência ' + n + '">' + n + '</a>';
+                return '<a href="#ref-' + n + '" class="sup-link" title="Ver referência ' + n + '">[' + n + ']</a>';
             }
-            return n;
+            return '[' + n + ']';
         });
         sup.innerHTML = links.join(',');
     });
