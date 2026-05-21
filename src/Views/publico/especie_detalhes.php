@@ -277,14 +277,215 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultado da Busca — Penomato</title>
+    <title>Espécies — Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
-        body {
-            background: #f0f2f5;
-            color: #1a2634;
+        body { background: #eef0f3; color: #1a2634; margin: 0; }
+
+        /* ── HEADER ── */
+        .header {
+            height: 56px;
+            background: var(--cor-primaria);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+        .header-logo { font-size: 1.1rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 8px; }
+        .header-count { font-size: .85rem; color: rgba(255,255,255,.75); }
+        .btn-voltar {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,.15); color: white;
+            text-decoration: none; padding: 7px 16px;
+            border-radius: 30px; font-size: .875rem; font-weight: 600;
+            transition: background .2s;
+        }
+        .btn-voltar:hover { background: rgba(255,255,255,.28); }
+
+        /* ── WRAPPER PRINCIPAL ── */
+        .paginas { max-width: 1060px; margin: 0 auto; padding: 32px 20px 60px; display: flex; flex-direction: column; gap: 40px; }
+
+        /* ── FICHA (cada espécie = uma página) ── */
+        .ficha {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,.07);
+            overflow: hidden;
+        }
+
+        /* Cabeçalho da ficha */
+        .ficha-cab {
+            padding: 24px 32px 18px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .ficha-familia {
+            font-size: .72rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .12em;
+            color: #94a3b8; margin-bottom: 4px;
+        }
+        .ficha-popular {
+            font-size: 1.9rem; font-weight: 800;
+            color: #1a2634; line-height: 1.2; margin-bottom: 4px;
+        }
+        .ficha-cientifico {
+            font-size: 1.05rem; font-style: italic;
+            color: var(--cor-primaria); margin-bottom: 10px;
+        }
+        .ficha-status {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 3px 12px; border-radius: 20px;
+            font-size: .75rem; font-weight: 700;
+        }
+        .st-publicado      { background: #dcfce7; color: #15803d; }
+        .st-revisada       { background: #dbeafe; color: #1d4ed8; }
+        .st-em_revisao     { background: #ede9fe; color: #6d28d9; }
+        .st-registrada     { background: #cffafe; color: #0e7490; }
+        .st-descrita       { background: #fef3c7; color: #92400e; }
+        .st-dados_internet { background: #f1f5f9; color: #475569; }
+        .st-contestado     { background: #fee2e2; color: #991b1b; }
+
+        /* Corpo: 2 colunas */
+        .ficha-corpo {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+        }
+
+        /* ── COLUNA ESQUERDA: atributos ── */
+        .ficha-attrs {
+            padding: 24px 28px;
+            border-right: 1px solid #e2e8f0;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .attr-grupo { }
+        .attr-grupo-titulo {
+            font-size: .68rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .1em;
+            color: #94a3b8; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .attr-linha {
+            display: flex; align-items: baseline; gap: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .attr-label {
+            font-size: .75rem; color: #94a3b8;
+            font-weight: 700; min-width: 90px; flex-shrink: 0;
+        }
+        .attr-val { font-size: .88rem; color: #1a2634; font-weight: 500; }
+        .ficha-sem-attrs {
+            color: #94a3b8; font-size: .9rem; font-style: italic;
+            padding: 12px 0;
+        }
+
+        /* ── COLUNA DIREITA: imagens ── */
+        .ficha-imgs {
+            background: #f8fafc;
+            padding: 20px;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .foto-principal {
+            position: relative; border-radius: 10px;
+            overflow: hidden; cursor: zoom-in;
+            background: #1a2634;
+            aspect-ratio: 4/3;
+        }
+        .foto-principal img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform .3s;
+        }
+        .foto-principal:hover img { transform: scale(1.03); }
+        .foto-credito {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,.6);
+            color: #e2e8f0; font-size: .7rem;
+            padding: 5px 10px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .foto-sem { /* placeholder quando não há imagem */
+            aspect-ratio: 4/3; border-radius: 10px;
+            background: #1a2634;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,.2); font-size: 2.5rem;
+        }
+
+        /* Galeria de miniaturas por parte */
+        .galeria { display: flex; flex-direction: column; gap: 10px; }
+        .galeria-parte { }
+        .galeria-parte-label {
+            font-size: .65rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .1em;
+            color: #94a3b8; margin-bottom: 5px;
+        }
+        .galeria-thumbs { display: flex; flex-wrap: wrap; gap: 5px; }
+        .thumb {
+            width: 68px; height: 68px; border-radius: 6px;
+            overflow: hidden; cursor: zoom-in;
+            border: 2px solid transparent;
+            transition: border-color .15s, transform .15s;
+            flex-shrink: 0;
+        }
+        .thumb:hover { border-color: var(--cor-primaria); transform: scale(1.05); }
+        .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* ── RODAPÉ DA FICHA ── */
+        .ficha-rodape {
+            padding: 14px 32px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: 12px;
+        }
+        .btn-artigo-completo {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--cor-primaria); color: white;
+            text-decoration: none; padding: 9px 22px;
+            border-radius: 30px; font-weight: 700; font-size: .875rem;
+            transition: background .2s;
+        }
+        .btn-artigo-completo:hover { background: var(--cor-primaria-hover); }
+        .btn-sem-artigo {
+            font-size: .8rem; color: #94a3b8; font-style: italic;
+        }
+
+        /* ── LIGHTBOX ── */
+        .lightbox {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.93); z-index: 9999;
+            align-items: center; justify-content: center;
+            flex-direction: column; padding: 20px;
+        }
+        .lightbox.ativo { display: flex; }
+        .lightbox img {
+            max-width: 92vw; max-height: 84vh;
+            object-fit: contain; border-radius: 6px;
+        }
+        .lightbox-credito {
+            color: #cbd5e1; font-size: .78rem;
+            margin-top: 12px; text-align: center; line-height: 1.6;
+        }
+        .lightbox-fechar {
+            position: absolute; top: 16px; right: 20px;
+            color: white; font-size: 1.8rem; cursor: pointer;
+            background: none; border: none; line-height: 1;
+            opacity: .7; transition: opacity .2s;
+        }
+        .lightbox-fechar:hover { opacity: 1; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .ficha-corpo { grid-template-columns: 1fr; }
+            .ficha-imgs { border-top: 1px solid #e2e8f0; }
+            .ficha-cab { padding: 20px 20px 14px; }
+            .ficha-attrs { padding: 18px 20px; }
+            .ficha-rodape { padding: 12px 20px; }
+            .ficha-popular { font-size: 1.4rem; }
         }
 
         /* ── HEADER ── */
@@ -1222,524 +1423,207 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
 </head>
 <body>
 
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="fecharLightbox(event)">
+    <button class="lightbox-fechar" onclick="fecharLightbox(null)">&times;</button>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-credito" id="lightbox-credito"></div>
+</div>
+
 <!-- HEADER -->
 <div class="header">
-    <div class="header-left">
-        <span class="header-logo">🌿 Penomato</span>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span class="header-logo"><i class="fas fa-leaf"></i> Penomato</span>
         <span class="header-count"><?= $total ?> espécie(s) encontrada(s)</span>
     </div>
-    <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php" class="btn-voltar">
+    <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php" class="btn-voltar">
         <i class="fas fa-arrow-left"></i> Voltar à busca
     </a>
 </div>
 
-<!-- LAYOUT: sidebar + painel -->
-<div class="layout">
-    <div class="sidebar">
-        <div class="sidebar-header">Espécies encontradas</div>
-        <?php foreach ($especies as $idx => $esp): ?>
-        <button class="especie-item<?= $idx === 0 ? ' ativo' : '' ?>" onclick="selecionarEspecie(<?= $idx ?>)">
-            <span class="status-dot <?= htmlspecialchars($esp['status']) ?>"></span>
-            <span class="especie-item-texto">
-                <span class="especie-item-nome"><?= htmlspecialchars($esp['nome']) ?></span>
-                <?php if ($esp['nome_popular']): ?>
-                <span class="especie-item-popular"><?= htmlspecialchars($esp['nome_popular']) ?></span>
-                <?php endif; ?>
-            </span>
-        </button>
-        <?php endforeach; ?>
-    </div>
+<!-- FICHAS: uma por espécie -->
+<div class="paginas">
+<?php
 
-    <div class="painel" id="painel">
-        <!-- status banner -->
-        <div id="status-banner"></div>
-        <!-- artigo nome -->
-        <div class="artigo-nome" id="artigo-nome"></div>
-        <!-- artigo meta badges -->
-        <div class="artigo-meta" id="artigo-meta"></div>
-        <!-- btn artigo -->
-        <div id="btn-artigo-wrapper" style="margin: 12px 0 4px;"></div>
+$partes_info = [
+    'habito'           => 'Hábito',
+    'folha'            => 'Folha',
+    'flor'             => 'Flor',
+    'fruto'            => 'Fruto',
+    'caule'            => 'Caule',
+    'semente'          => 'Semente',
+    'exsicata_completa'=> 'Exsicata',
+    'detalhe'          => 'Detalhe',
+];
 
-        <!-- CARROSSEL -->
-        <div class="carrossel-wrapper">
-            <button class="nav-btn nav-prev" onclick="navCarrossel(-1)"><i class="fas fa-chevron-left"></i></button>
-            <div class="carrossel-tela" id="carrossel-tela">
-                <div id="carrossel-conteudo" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
-            </div>
-            <button class="nav-btn nav-next" onclick="navCarrossel(1)"><i class="fas fa-chevron-right"></i></button>
-            <div class="carrossel-footer">
-                <div class="partes-btns" id="partes-btns">
-                    <button class="parte-btn" onclick="trocarParte('folha')">🍃 Folha</button>
-                    <button class="parte-btn" onclick="trocarParte('flor')">🌸 Flor</button>
-                    <button class="parte-btn" onclick="trocarParte('fruto')">🍎 Fruto</button>
-                    <button class="parte-btn" onclick="trocarParte('caule')">🌿 Caule</button>
-                    <button class="parte-btn" onclick="trocarParte('semente')">🌱 Semente</button>
-                    <button class="parte-btn" onclick="trocarParte('habito')">🌳 Hábito</button>
-                    <button class="parte-btn" onclick="trocarParte('exsicata_completa')">📋 Exsicata</button>
-                    <button class="parte-btn" onclick="trocarParte('detalhe')">🔍 Detalhe</button>
-                </div>
-                <span class="carrossel-counter" id="carrossel-counter">— / —</span>
-            </div>
-        </div>
+$secoes_attr = [
+    '🍃 Folha'   => 'folha',
+    '🌸 Flor'    => 'flor',
+    '🍎 Fruto'   => 'fruto',
+    '🌱 Semente' => 'semente',
+    '🌿 Caule'   => 'caule',
+    '⚡ Outras'  => 'outras',
+];
 
-        <!-- BTN MAPA -->
-        <button class="btn-mapa" onclick="toggleMapa()">
-            <i class="fas fa-map-marked-alt"></i> Ver no mapa
-        </button>
+$status_label = [
+    'publicado'      => 'Publicado',
+    'revisada'       => 'Revisada',
+    'em_revisao'     => 'Em revisão',
+    'registrada'     => 'Registrada',
+    'descrita'       => 'Descrita',
+    'dados_internet' => 'Dados de internet',
+    'contestado'     => 'Contestado',
+    'sem_dados'      => 'Sem dados',
+];
 
-        <!-- ABAS -->
-        <div class="artigo-tabs">
-            <button class="artigo-tab ativo" id="tab-artigo" onclick="trocarTab('artigo')">
-                <i class="fas fa-book-open"></i> Artigo Científico
-            </button>
-            <button class="artigo-tab" id="tab-atributos" onclick="trocarTab('atributos')">
-                <i class="fas fa-list"></i> Atributos
-            </button>
-        </div>
+foreach ($especies as $esp):
+    $espId   = $esp['id'];
+    $imgs_esp = $imagens[$espId] ?? [];
 
-        <!-- PIPELINE DE STATUS -->
-        <div id="artigo-pipeline"></div>
-
-        <!-- AVISO contextual -->
-        <div id="caract-aviso"></div>
-
-        <!-- ARTIGO PREVIEW (aba artigo) -->
-        <div class="artigo-preview-card" id="artigo-preview"></div>
-
-        <!-- CARACTERÍSTICAS (aba atributos) -->
-        <div class="caract-container" id="caract-container" style="display:none;"></div>
-    </div>
-</div>
-
-<!-- MAPA (oculto por padrão) -->
-<div class="mapa-secao" id="mapa-secao">
-    <div class="mapa-titulo" id="mapa-titulo">📍 Exemplares</div>
-    <div id="mapa-leaflet"></div>
-</div>
-
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
-<script>
-const ESPECIES   = <?= $j_especies ?>;
-const IMAGENS    = <?= $j_imagens ?>;
-const EXEMPLARES = <?= $j_exemplares ?>;
-const PARTES     = ['folha', 'flor', 'fruto', 'caule', 'semente', 'habito', 'exsicata_completa', 'detalhe'];
-
-let especieAtual   = 0;
-let parteCarrossel = 'folha';
-let idxCarrossel   = 0;
-let parteBrowse    = 'folha';
-let mapaLeaflet    = null;
-let mapaIniciado   = false;
-let marcadores     = [];
-
-// ── INIT ──────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function () {
-    selecionarEspecie(0);
-    renderBrowse();
-});
-
-// ── SIDEBAR ───────────────────────────────────────
-function selecionarEspecie(idx) {
-    especieAtual = idx;
-
-    document.querySelectorAll('.especie-item').forEach(function (el, i) {
-        el.classList.toggle('ativo', i === idx);
-    });
-
-    renderArtigo(ESPECIES[idx]);
-    esconderMapa();
-}
-
-// ── MAPA DE STATUS ────────────────────────────────
-var STATUS_LABEL = {
-    publicado:      '✅ Publicado',
-    revisada:       '🔵 Revisada',
-    em_revisao:     '🟣 Em revisão',
-    registrada:     '🔷 Registrada',
-    descrita:       '🟡 Descrita',
-    dados_internet: '⚪ Dados de internet',
-    contestado:     '🔴 Contestado',
-    sem_dados:      '⬜ Sem dados',
-};
-
-// ── ARTIGO ────────────────────────────────────────
-function renderArtigo(esp) {
-    // Status banner
-    var statusLabel = STATUS_LABEL[esp.status] || esp.status;
-    document.getElementById('status-banner').innerHTML =
-        '<span class="status-banner ' + esc(esp.status) + '">' + statusLabel + '</span>';
-
-    document.getElementById('artigo-nome').textContent = esp.nome;
-
-    var meta = '';
-    if (esp.familia)      meta += '<span class="badge badge-familia">' + esc(esp.familia) + '</span>';
-    if (esp.nome_popular) meta += '<span class="badge badge-popular">' + esc(esp.nome_popular) + '</span>';
-    if (esp.sinonimos) {
-        esp.sinonimos.split(/[;,]/).forEach(function (s) {
-            s = s.trim();
-            if (s) meta += '<span class="badge badge-sinonimo">' + esc(s) + '</span>';
-        });
-    }
-    document.getElementById('artigo-meta').innerHTML = meta;
-
-    // Badge do artigo
-    var ARTIGO_ICONS  = { rascunho:'fa-file-pen', escrito:'fa-file-alt', revisado:'fa-file-circle-check', publicado:'fa-book-open' };
-    var ARTIGO_LABELS = { rascunho:'Rascunho', escrito:'Escrito', revisado:'Revisado', publicado:'Publicado' };
-    var btnWrapper = document.getElementById('btn-artigo-wrapper');
-    if (esp.artigo_html) {
-        var icon  = ARTIGO_ICONS[esp.artigo_status]  || 'fa-file-alt';
-        var label = ARTIGO_LABELS[esp.artigo_status] || 'Artigo';
-        if (esp.artigo_status === 'publicado') {
-            btnWrapper.innerHTML = '<a href="<?= APP_BASE ?>/src/Views/publico/artigo.php?id=' + esp.id + '" class="btn-artigo ativo"><i class="fas ' + icon + '"></i> Abrir Artigo</a>';
-        } else {
-            btnWrapper.innerHTML = '<span class="btn-artigo ativo" title="Aguardando publicação"><i class="fas ' + icon + '"></i> Artigo: ' + label + '</span>';
-        }
-    } else {
-        btnWrapper.innerHTML = '<span class="btn-artigo desativado"><i class="fas fa-lock"></i> Sem artigo</span>';
-    }
-
-    // Determinar primeira parte disponível para o carrossel
-    var espId = esp.id;
-    var imgs  = IMAGENS[espId] || {};
-    var partInicial = null;
-    for (var i = 0; i < PARTES.length; i++) {
-        if (imgs[PARTES[i]] && imgs[PARTES[i]].length > 0) {
-            partInicial = PARTES[i];
+    // Foto principal: habito primeiro, senão qualquer parte disponível
+    $foto_principal = null;
+    $foto_credito   = '';
+    foreach (['habito','folha','flor','fruto','caule','semente','exsicata_completa','detalhe'] as $p) {
+        if (!empty($imgs_esp[$p])) {
+            $img0 = $imgs_esp[$p][0];
+            $foto_principal = $img0['url'];
+            $credito_parts  = [];
+            if ($img0['autor'])  $credito_parts[] = htmlspecialchars($img0['autor']);
+            if ($img0['fonte'])  $credito_parts[] = htmlspecialchars($img0['fonte']);
+            if ($img0['licenca']) $credito_parts[] = '(' . htmlspecialchars($img0['licenca']) . ')';
+            $foto_credito = implode(' · ', $credito_parts);
             break;
         }
     }
-    parteCarrossel = partInicial || 'folha';
-    idxCarrossel   = 0;
 
-    renderCarrossel();
+    // Status CSS class
+    $st_cls = 'st-' . ($esp['status'] ?? 'sem_dados');
+    $st_lbl = $status_label[$esp['status'] ?? ''] ?? ($esp['status'] ?? '');
+?>
+<div class="ficha">
 
-    // Pipeline de status
-    renderPipeline(esp.status, esp.artigo_status);
+    <!-- Cabeçalho -->
+    <div class="ficha-cab">
+        <?php if ($esp['familia']): ?>
+        <div class="ficha-familia"><?= htmlspecialchars($esp['familia']) ?></div>
+        <?php endif; ?>
+        <?php if ($esp['nome_popular']): ?>
+        <div class="ficha-popular"><?= htmlspecialchars(strtoupper($esp['nome_popular'])) ?></div>
+        <?php endif; ?>
+        <div class="ficha-cientifico"><?= htmlspecialchars($esp['nome']) ?></div>
+        <?php if ($esp['status'] && $esp['status'] !== 'sem_dados'): ?>
+        <span class="ficha-status <?= $st_cls ?>"><?= htmlspecialchars($st_lbl) ?></span>
+        <?php endif; ?>
+    </div>
 
-    // Aviso contextual por status
-    var AVISO_STATUS = {
-        'dados_internet': 'Dados preliminares de fontes externas — aguardando verificação científica.',
-        'descrita':       'Espécie descrita — aguardando registro de exemplar em campo.',
-        'registrada':     'Exemplar registrado — aguardando revisão por especialista.',
-        'em_revisao':     'Em processo de revisão por especialista.',
-        'revisada':       'Revisada pelo especialista — aguardando publicação.',
-        'contestado':     'Informações desta espécie estão sendo revisadas após contestação.'
-    };
-    var aviso = '';
-    if (esp.status !== 'publicado' && AVISO_STATUS[esp.status]) {
-        aviso = '<div class="dados-internet-aviso">'
-              + '<i class="fas fa-exclamation-triangle" style="flex-shrink:0;margin-top:2px;"></i>'
-              + '<span>' + AVISO_STATUS[esp.status] + '</span>'
-              + '</div>';
-    }
-    document.getElementById('caract-aviso').innerHTML = aviso;
+    <!-- Corpo: atributos + imagens -->
+    <div class="ficha-corpo">
 
-    // ── Renderizar artigo no preview card ──
-    var preview = document.getElementById('artigo-preview');
-    if (esp.artigo_html) {
-        preview.innerHTML = esp.artigo_html;
+        <!-- Atributos morfológicos -->
+        <div class="ficha-attrs">
+        <?php
+        $tem_attrs = false;
+        foreach ($secoes_attr as $titulo => $chave):
+            $dados = $esp[$chave] ?? [];
+            if (empty($dados)) continue;
+            $tem_attrs = true;
+        ?>
+            <div class="attr-grupo">
+                <div class="attr-grupo-titulo"><?= $titulo ?></div>
+                <?php foreach ($dados as $label => $val):
+                    if ($val === null || $val === '') continue;
+                ?>
+                <div class="attr-linha">
+                    <span class="attr-label"><?= htmlspecialchars($label) ?></span>
+                    <span class="attr-val"><?= htmlspecialchars($val) ?></span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endforeach; ?>
+        <?php if (!$tem_attrs): ?>
+            <p class="ficha-sem-attrs">Atributos morfológicos ainda não cadastrados.</p>
+        <?php endif; ?>
+        </div>
 
-        // Injetar bloco de autores após art-nomes (ou art-titulo como fallback)
-        if (esp.autores && esp.autores.length > 0) {
-            var autoresHtml = '<div class="art-autores">';
-            autoresHtml += '<span class="art-autores-label">Autores:</span> ';
-            var partes = esp.autores.map(function(a) {
-                var txt = esc(a.nome);
-                if (a.inst) txt += ' <span class="art-autores-inst">(' + esc(a.inst) + ')</span>';
-                txt += ' <span class="art-autores-papel">[' + esc(a.papel) + ']</span>';
-                return txt;
-            });
-            autoresHtml += partes.join(' &nbsp;·&nbsp; ');
-            autoresHtml += '</div>';
-            var alvo = preview.querySelector('.art-nomes') || preview.querySelector('.art-titulo');
-            if (alvo && alvo.parentNode) {
-                var divA = document.createElement('div');
-                divA.innerHTML = autoresHtml;
-                alvo.parentNode.insertBefore(divA.firstChild, alvo.nextSibling);
+        <!-- Imagens -->
+        <div class="ficha-imgs">
+            <?php if ($foto_principal): ?>
+            <div class="foto-principal" onclick="abrirLightbox('<?= addslashes($foto_principal) ?>', '<?= addslashes($foto_credito) ?>')">
+                <img src="<?= htmlspecialchars($foto_principal) ?>" alt="<?= htmlspecialchars($esp['nome']) ?>">
+                <?php if ($foto_credito): ?>
+                <div class="foto-credito"><i class="fas fa-camera"></i> <?= $foto_credito ?></div>
+                <?php endif; ?>
+            </div>
+            <?php else: ?>
+            <div class="foto-sem"><i class="fas fa-image"></i></div>
+            <?php endif; ?>
+
+            <!-- Galeria por parte -->
+            <?php
+            $tem_galeria = false;
+            foreach ($partes_info as $parte => $parte_label) {
+                if (!empty($imgs_esp[$parte])) { $tem_galeria = true; break; }
             }
-        }
-    } else {
-        preview.innerHTML = '<div class="artigo-sem-dados">'
-            + '<i class="fas fa-hourglass-half"></i>'
-            + '<p>O artigo será gerado automaticamente após o upload de dados e imagens.</p>'
-            + '</div>';
-    }
+            ?>
+            <?php if ($tem_galeria): ?>
+            <div class="galeria">
+            <?php foreach ($partes_info as $parte => $parte_label):
+                if (empty($imgs_esp[$parte])) continue;
+            ?>
+                <div class="galeria-parte">
+                    <div class="galeria-parte-label"><?= htmlspecialchars($parte_label) ?></div>
+                    <div class="galeria-thumbs">
+                    <?php foreach ($imgs_esp[$parte] as $img):
+                        $cred_parts = [];
+                        if ($img['autor'])  $cred_parts[] = addslashes($img['autor']);
+                        if ($img['fonte'])  $cred_parts[] = addslashes($img['fonte']);
+                        if ($img['licenca']) $cred_parts[] = '(' . addslashes($img['licenca']) . ')';
+                        $cred_str = implode(' · ', $cred_parts);
+                    ?>
+                        <div class="thumb" onclick="abrirLightbox('<?= addslashes($img['url']) ?>', '<?= $cred_str ?>')">
+                            <img src="<?= htmlspecialchars($img['url']) ?>" alt="<?= htmlspecialchars($parte_label) ?>" loading="lazy">
+                        </div>
+                    <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
 
-    // ── Renderizar características na aba atributos ──
-    renderCaracteristicas(esp);
+    </div><!-- /ficha-corpo -->
 
-    // Garantir que a aba ativa está correta
-    trocarTab(tabAtiva);
+    <!-- Rodapé -->
+    <div class="ficha-rodape">
+        <?php if ($esp['artigo_status'] === 'publicado'): ?>
+        <a href="<?= APP_BASE ?>/src/Views/publico/artigo.php?id=<?= $espId ?>" class="btn-artigo-completo">
+            <i class="fas fa-book-open"></i> Ver artigo completo
+        </a>
+        <?php else: ?>
+        <span class="btn-sem-artigo">Artigo em preparação</span>
+        <?php endif; ?>
+    </div>
+
+</div><!-- /ficha -->
+<?php endforeach; ?>
+</div><!-- /paginas -->
+
+<script>
+function abrirLightbox(url, credito) {
+    document.getElementById('lightbox-img').src = url;
+    document.getElementById('lightbox-credito').textContent = credito || '';
+    document.getElementById('lightbox').classList.add('ativo');
+    document.body.style.overflow = 'hidden';
 }
-
-// ── PIPELINE DE STATUS ─────────────────────────────
-function renderPipeline(statusEspecie, statusArtigo) {
-    var passos = [
-        { key: 'dados_internet', label: 'Dados',     icon: '1' },
-        { key: 'registrada',     label: 'Exemplar',  icon: '2' },
-        { key: 'em_revisao',     label: 'Revisão',   icon: '3' },
-        { key: 'publicado',      label: 'Publicado', icon: '✓' },
-    ];
-    var ordem = ['sem_dados','dados_internet','descrita','registrada','em_revisao','revisada','contestado','publicado'];
-    var idxAtual = ordem.indexOf(statusEspecie);
-
-    var html = '<div class="artigo-pipeline">';
-    passos.forEach(function(p, i) {
-        var idxPasso = ordem.indexOf(p.key);
-        var cls = '';
-        if (idxAtual > idxPasso) cls = 'feito';
-        else if (statusEspecie === p.key || (p.key === 'em_revisao' && statusEspecie === 'revisada') || (p.key === 'publicado' && statusEspecie === 'publicado')) cls = 'feito';
-        else if (
-            (p.key === 'dados_internet' && statusEspecie === 'dados_internet') ||
-            (p.key === 'registrada'     && (statusEspecie === 'registrada' || statusEspecie === 'descrita')) ||
-            (p.key === 'em_revisao'     && (statusEspecie === 'em_revisao' || statusEspecie === 'contestado')) ||
-            (p.key === 'publicado'      && statusEspecie === 'publicado')
-        ) cls = 'atual';
-        html += '<div class="pipeline-step ' + cls + '">';
-        html += '<div class="pipeline-dot">' + (cls === 'feito' ? '✓' : p.icon) + '</div>';
-        html += '<div class="pipeline-label">' + p.label + '</div>';
-        html += '</div>';
-    });
-    html += '</div>';
-    document.getElementById('artigo-pipeline').innerHTML = html;
+function fecharLightbox(e) {
+    if (e && e.target !== document.getElementById('lightbox') && !e.target.classList.contains('lightbox-fechar')) return;
+    document.getElementById('lightbox').classList.remove('ativo');
+    document.getElementById('lightbox-img').src = '';
+    document.body.style.overflow = '';
 }
-
-// ── TROCAR ABA ─────────────────────────────────────
-var tabAtiva = 'artigo';
-function trocarTab(qual) {
-    tabAtiva = qual;
-    document.getElementById('artigo-preview').style.display  = qual === 'artigo'    ? '' : 'none';
-    document.getElementById('caract-container').style.display = qual === 'atributos' ? '' : 'none';
-    document.getElementById('tab-artigo').classList.toggle('ativo',    qual === 'artigo');
-    document.getElementById('tab-atributos').classList.toggle('ativo', qual === 'atributos');
-}
-
-// ── CARROSSEL ─────────────────────────────────────
-function renderCarrossel() {
-    var esp   = ESPECIES[especieAtual];
-    var espId = esp.id;
-    var imgs  = (IMAGENS[espId] && IMAGENS[espId][parteCarrossel]) ? IMAGENS[espId][parteCarrossel] : [];
-
-    if (imgs.length === 0) {
-        idxCarrossel = 0;
-    } else {
-        idxCarrossel = ((idxCarrossel % imgs.length) + imgs.length) % imgs.length;
-    }
-
-    var conteudo = document.getElementById('carrossel-conteudo');
-    if (imgs.length > 0) {
-        var img = imgs[idxCarrossel];
-        var credito = '';
-        if (img.autor || img.fonte) {
-            credito = '<div class="img-credito">'
-                    + '<i class="fas fa-camera"></i>';
-            if (img.autor) credito += ' ' + esc(img.autor);
-            if (img.fonte && img.fonte_url) {
-                credito += ' · <a href="' + esc(img.fonte_url) + '" target="_blank" rel="noopener">' + esc(img.fonte) + '</a>';
-            } else if (img.fonte) {
-                credito += ' · ' + esc(img.fonte);
-            }
-            if (img.licenca) credito += ' <span style="opacity:.7">(' + esc(img.licenca) + ')</span>';
-            credito += '</div>';
-        }
-        conteudo.innerHTML = '<div class="img-credito-wrapper" style="width:100%;height:100%;position:relative;display:flex;align-items:center;justify-content:center;">'
-            + '<img src="' + esc(img.url) + '" alt="Imagem de ' + esc(parteCarrossel) + '" style="max-width:100%;max-height:340px;object-fit:contain;">'
-            + credito
-            + '</div>';
-    } else {
-        conteudo.innerHTML = '<div class="carrossel-placeholder"><i class="fas fa-image"></i><span>Sem imagem para esta parte</span></div>';
-    }
-
-    var counter = imgs.length > 0 ? (idxCarrossel + 1) + '/' + imgs.length : '—/—';
-    document.getElementById('carrossel-counter').textContent = counter;
-
-    // Atualizar estado dos botões de parte
-    document.querySelectorAll('.parte-btn').forEach(function (btn) {
-        var m = btn.getAttribute('onclick').match(/'([^']+)'/);
-        if (m) btn.classList.toggle('ativo', m[1] === parteCarrossel);
-    });
-}
-
-function navCarrossel(dir) {
-    var espId = ESPECIES[especieAtual].id;
-    var imgs  = (IMAGENS[espId] && IMAGENS[espId][parteCarrossel]) ? IMAGENS[espId][parteCarrossel] : [];
-
-    var novoIdx = idxCarrossel + dir;
-
-    // Ainda dentro da mesma parte
-    if (novoIdx >= 0 && novoIdx < imgs.length) {
-        idxCarrossel = novoIdx;
-        renderCarrossel();
-        return;
-    }
-
-    // Passou do limite — vai para a parte anterior/próxima com imagens
-    var partesComImagem = PARTES.filter(function(p) {
-        return IMAGENS[espId] && IMAGENS[espId][p] && IMAGENS[espId][p].length > 0;
-    });
-    if (partesComImagem.length === 0) return;
-
-    var idxParte = partesComImagem.indexOf(parteCarrossel);
-    var novaParte = partesComImagem[(idxParte + dir + partesComImagem.length) % partesComImagem.length];
-
-    parteCarrossel = novaParte;
-    var novasImgs  = IMAGENS[espId][novaParte];
-    idxCarrossel   = dir > 0 ? 0 : novasImgs.length - 1;
-    renderCarrossel();
-}
-
-function trocarParte(parte) {
-    parteCarrossel = parte;
-    idxCarrossel   = 0;
-    renderCarrossel();
-}
-
-// ── CARACTERÍSTICAS ───────────────────────────────
-function renderCaracteristicas(esp) {
-    var secoes = [
-        { chave: 'folha',   titulo: '🍃 Folha',   dados: esp.folha   },
-        { chave: 'flor',    titulo: '🌸 Flor',    dados: esp.flor    },
-        { chave: 'fruto',   titulo: '🍎 Fruto',   dados: esp.fruto   },
-        { chave: 'semente', titulo: '🌱 Semente', dados: esp.semente },
-        { chave: 'caule',   titulo: '🌿 Caule',   dados: esp.caule   },
-        { chave: 'outras',  titulo: '⚡ Outras',   dados: esp.outras  },
-    ];
-
-    var html = '';
-    secoes.forEach(function (s) {
-        if (!s.dados || Object.keys(s.dados).length === 0) return;
-        var items = '';
-        Object.keys(s.dados).forEach(function (label) {
-            var val = s.dados[label];
-            if (val === null || val === undefined || val === '') return;
-            items += '<div class="caract-item">'
-                   +   '<div class="caract-label">' + esc(label) + '</div>'
-                   +   '<div class="caract-valor">' + esc(String(val)) + '</div>'
-                   + '</div>';
-        });
-        if (!items) return;
-        html += '<div class="caract-secao">'
-              +   '<div class="caract-header aberto" onclick="toggleSecao(this)">'
-              +     '<span>' + s.titulo + '</span>'
-              +     '<i class="fas fa-chevron-down toggle-icon"></i>'
-              +   '</div>'
-              +   '<div class="caract-grid">' + items + '</div>'
-              + '</div>';
-    });
-
-    if (esp.referencias && esp.referencias.trim()) {
-        html += '<div class="caract-secao">'
-              +   '<div class="caract-header aberto" onclick="toggleSecao(this)">'
-              +     '<span>📚 Referências</span>'
-              +     '<i class="fas fa-chevron-down toggle-icon"></i>'
-              +   '</div>'
-              +   '<div class="referencias-texto">' + esc(esp.referencias) + '</div>'
-              + '</div>';
-    }
-
-    document.getElementById('caract-container').innerHTML = html;
-}
-
-function toggleSecao(header) {
-    var grid = header.nextElementSibling;
-    header.classList.toggle('aberto');
-    grid.style.display = header.classList.contains('aberto') ? '' : 'none';
-}
-
-// ── BROWSE ────────────────────────────────────────
-function selecionarBrowse(parte) {
-    parteBrowse = parte;
-    document.querySelectorAll('.browse-parte-btn').forEach(function (btn) {
-        var m = btn.getAttribute('onclick').match(/'([^']+)'/);
-        if (m) btn.classList.toggle('ativo', m[1] === parte);
-    });
-    renderBrowse();
-}
-
-function renderBrowse() {
-    var trilha = document.getElementById('browse-trilha');
-    var html   = '';
-
-    ESPECIES.forEach(function (esp, idx) {
-        var espId = esp.id;
-        var imgs  = (IMAGENS[espId] && IMAGENS[espId][parteBrowse]) ? IMAGENS[espId][parteBrowse] : [];
-        var imgHtml;
-        if (imgs.length > 0) {
-            imgHtml = '<img class="browse-card-img" src="' + esc(imgs[0].url) + '" alt="' + esc(esp.nome) + '">';
-        } else {
-            imgHtml = '<div class="browse-card-placeholder"><i class="fas fa-image"></i></div>';
-        }
-        html += '<div class="browse-card" onclick="selecionarEspecie(' + idx + '); document.getElementById(\'painel\').scrollIntoView({behavior:\'smooth\'})">'
-              +   imgHtml
-              +   '<div class="browse-card-nome">' + esc(esp.nome) + '</div>'
-              + '</div>';
-    });
-
-    trilha.innerHTML = html;
-}
-
-// ── MAPA ──────────────────────────────────────────
-function toggleMapa() {
-    var secao = document.getElementById('mapa-secao');
-    if (secao.classList.contains('visivel')) {
-        esconderMapa();
-    } else {
-        secao.classList.add('visivel');
-        iniciarMapa();
-        secao.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-function iniciarMapa() {
-    var esp   = ESPECIES[especieAtual];
-    var espId = esp.id;
-    var exs   = EXEMPLARES[espId] || [];
-
-    if (!mapaIniciado) {
-        mapaLeaflet = L.map('mapa-leaflet').setView([-20, -55], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 18
-        }).addTo(mapaLeaflet);
-        mapaIniciado = true;
-    }
-
-    // Limpar marcadores anteriores
-    marcadores.forEach(function (m) { mapaLeaflet.removeLayer(m); });
-    marcadores = [];
-
-    var bounds = [];
-    exs.forEach(function (ex) {
-        var popup = '<strong>' + esc(ex.codigo || '') + '</strong>';
-        if (ex.cidade || ex.estado) {
-            popup += '<br>' + esc((ex.cidade || '') + (ex.estado ? ', ' + ex.estado : ''));
-        }
-        var m = L.marker([parseFloat(ex.lat), parseFloat(ex.lng)]).bindPopup(popup).addTo(mapaLeaflet);
-        marcadores.push(m);
-        bounds.push([parseFloat(ex.lat), parseFloat(ex.lng)]);
-    });
-
-    if (bounds.length > 0) {
-        mapaLeaflet.fitBounds(bounds, { padding: [40, 40] });
-    }
-
-    document.getElementById('mapa-titulo').textContent = '📍 Exemplares — ' + esp.nome;
-}
-
-function esconderMapa() {
-    document.getElementById('mapa-secao').classList.remove('visivel');
-}
-
-// ── UTIL ──────────────────────────────────────────
-function esc(str) {
-    if (str === null || str === undefined) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') fecharLightbox(null);
+});
 </script>
 </body>
 </html>
