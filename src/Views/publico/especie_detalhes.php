@@ -484,9 +484,15 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             transition: background .2s;
         }
         .btn-artigo-completo:hover { background: var(--cor-primaria-hover); }
-        .btn-sem-artigo {
-            font-size: .8rem; color: #94a3b8; font-style: italic;
-        }
+        .btn-sem-artigo { font-size: .8rem; color: #94a3b8; font-style: italic; }
+        .art-st-rascunho   { background: #64748b; }
+        .art-st-rascunho:hover { background: #475569; }
+        .art-st-revisao    { background: #7c3aed; }
+        .art-st-revisao:hover  { background: #6d28d9; }
+        .art-st-aprovado   { background: #0891b2; }
+        .art-st-aprovado:hover { background: #0e7490; }
+        .art-st-publicado  { background: var(--cor-primaria); }
+        .art-st-publicado:hover { background: var(--cor-primaria-hover); }
 
         /* ── LIGHTBOX ── */
         .lightbox {
@@ -1609,12 +1615,21 @@ foreach ($especies as $esp):
 
     <!-- Rodapé -->
     <div class="ficha-rodape">
-        <?php if ($esp['artigo_status'] === 'publicado'): ?>
-        <a href="<?= APP_BASE ?>/src/Views/publico/artigo.php?id=<?= $espId ?>" class="btn-artigo-completo">
-            <i class="fas fa-book-open"></i> Ver artigo completo
+        <?php
+        $artigo_status_label = [
+            'rascunho'   => ['label' => 'Rascunho',   'icon' => 'fa-file-pen',          'cls' => 'art-st-rascunho'],
+            'em_revisao' => ['label' => 'Em revisão',  'icon' => 'fa-magnifying-glass',  'cls' => 'art-st-revisao'],
+            'aprovado'   => ['label' => 'Aprovado',    'icon' => 'fa-file-circle-check', 'cls' => 'art-st-aprovado'],
+            'publicado'  => ['label' => 'Publicado',   'icon' => 'fa-book-open',         'cls' => 'art-st-publicado'],
+        ];
+        $ast = $artigo_status_label[$esp['artigo_status']] ?? null;
+        ?>
+        <?php if (!empty($esp['artigo_html']) && $ast): ?>
+        <a href="<?= APP_BASE ?>/src/Views/publico/artigo.php?id=<?= $espId ?>" class="btn-artigo-completo <?= $ast['cls'] ?>">
+            <i class="fas <?= $ast['icon'] ?>"></i> Ver artigo — <?= $ast['label'] ?>
         </a>
         <?php else: ?>
-        <span class="btn-sem-artigo">Artigo em preparação</span>
+        <span class="btn-sem-artigo">Artigo ainda não gerado</span>
         <?php endif; ?>
     </div>
 

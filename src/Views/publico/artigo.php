@@ -14,9 +14,8 @@ if (!$especie_id) {
 }
 
 try {
-    // Artigo publicado
     $stmt = $pdo->prepare("
-        SELECT a.texto_html, a.gerado_em, a.atualizado_em,
+        SELECT a.texto_html, a.gerado_em, a.atualizado_em, a.status AS artigo_status,
                e.nome_cientifico, e.prioridade,
                e.data_publicado, e.autor_publicado_id,
                up.nome AS nome_publicador, up.instituicao AS inst_publicador,
@@ -27,7 +26,7 @@ try {
         LEFT JOIN especies_caracteristicas c ON c.especie_id = e.id
         LEFT JOIN usuarios up ON up.id = e.autor_publicado_id
         LEFT JOIN usuarios uc ON uc.id = e.autor_dados_internet_id
-        WHERE a.especie_id = ? AND a.status = 'publicado'
+        WHERE a.especie_id = ?
         LIMIT 1
     ");
     $stmt->execute([$especie_id]);
@@ -47,6 +46,14 @@ try {
 $data_pub = $artigo['data_publicado']
     ? date('d/m/Y', strtotime($artigo['data_publicado']))
     : '—';
+
+$artigo_status_info = [
+    'rascunho'   => ['label' => 'Rascunho',   'cor' => '#64748b', 'aviso' => 'Este artigo é um rascunho preliminar gerado por IA — ainda não foi revisado por especialista.'],
+    'em_revisao' => ['label' => 'Em revisão',  'cor' => '#7c3aed', 'aviso' => 'Este artigo está em processo de revisão por um especialista.'],
+    'aprovado'   => ['label' => 'Aprovado',    'cor' => '#0891b2', 'aviso' => 'Artigo aprovado pelo especialista — aguardando publicação oficial.'],
+    'publicado'  => ['label' => 'Publicado',   'cor' => '#0b5e42', 'aviso' => ''],
+];
+$ast_info = $artigo_status_info[$artigo['artigo_status']] ?? $artigo_status_info['rascunho'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -475,9 +482,17 @@ $data_pub = $artigo['data_publicado']
     <?php if ($artigo['familia']): ?>
         <div class="hero-familia">Família <?= htmlspecialchars($artigo['familia']) ?></div>
     <?php endif; ?>
-    <div class="hero-badge">
-        <i class="fas fa-book-open"></i> Publicado em <?= $data_pub ?>
+    <div class="hero-badge" style="background:<?= $ast_info['cor'] ?>; border-color:<?= $ast_info['cor'] ?>;">
+        <i class="fas fa-circle-dot"></i> <?= htmlspecialchars($ast_info['label']) ?>
+        <?php if ($artigo['artigo_status'] === 'publicado'): ?>
+         · <?= $data_pub ?>
+        <?php endif; ?>
     </div>
+    <?php if ($ast_info['aviso']): ?>
+    <div style="margin-top:14px; background:rgba(0,0,0,.25); border-radius:8px; padding:10px 18px; font-size:.82rem; max-width:600px;">
+        <i class="fas fa-circle-info"></i> <?= htmlspecialchars($ast_info['aviso']) ?>
+    </div>
+    <?php endif; ?>
 </div>
 
 <!-- CONTEÚDO -->
