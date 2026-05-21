@@ -340,6 +340,14 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             padding: 3px 12px; border-radius: 20px;
             font-size: .75rem; font-weight: 700;
         }
+        .ficha-meta-linha {
+            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .ficha-autor {
+            font-size: .8rem; color: #64748b;
+            display: flex; align-items: center; gap: 5px;
+        }
         .st-publicado      { background: #dcfce7; color: #15803d; }
         .st-revisada       { background: #dbeafe; color: #1d4ed8; }
         .st-em_revisao     { background: #ede9fe; color: #6d28d9; }
@@ -1502,9 +1510,17 @@ foreach ($especies as $esp):
         <div class="ficha-popular"><?= htmlspecialchars(strtoupper($esp['nome_popular'])) ?></div>
         <?php endif; ?>
         <div class="ficha-cientifico"><?= htmlspecialchars($esp['nome']) ?></div>
-        <?php if ($esp['status'] && $esp['status'] !== 'sem_dados'): ?>
-        <span class="ficha-status <?= $st_cls ?>"><?= htmlspecialchars($st_lbl) ?></span>
-        <?php endif; ?>
+        <div class="ficha-meta-linha">
+            <?php if ($esp['status'] && $esp['status'] !== 'sem_dados'): ?>
+            <span class="ficha-status <?= $st_cls ?>"><?= htmlspecialchars($st_lbl) ?></span>
+            <?php endif; ?>
+            <?php if (!empty($esp['autores'])): ?>
+            <span class="ficha-autor">
+                <i class="fas fa-user"></i>
+                <?= htmlspecialchars($esp['autores'][0]['nome']) ?>
+            </span>
+            <?php endif; ?>
+        </div>
     </div>
 
     <!-- Corpo: atributos + imagens -->
