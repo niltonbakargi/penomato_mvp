@@ -122,6 +122,23 @@ function _art_outros(array $c): ?string {
     return 'A espécie ' . _art_lista(array_values($itens)) . '.';
 }
 
+// ── Helper: coleta refs de uma parte e retorna <sup> ─────────
+
+function _art_sup_refs(array $c, array $campos): string {
+    $nums = [];
+    foreach ($campos as $campo) {
+        $r = trim($c[$campo . '_ref'] ?? '');
+        if ($r === '') continue;
+        foreach (explode(',', $r) as $n) {
+            $n = (int)trim($n);
+            if ($n > 0) $nums[$n] = true;
+        }
+    }
+    if (!$nums) return '';
+    ksort($nums);
+    return '<sup class="art-ref">[' . implode(',', array_keys($nums)) . ']</sup>';
+}
+
 // ── Gerador principal ────────────────────────────────────────
 
 function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs, PDO $pdo): string {
@@ -158,15 +175,26 @@ function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs, PDO $pdo): s
     // ── Descrição
     echo '<h3 class="art-secao">Descrição</h3>';
 
-    foreach (array_filter([
-        _art_caule($c),
-        _art_folha($c),
-        _art_flor($c),
-        _art_fruto($c),
-        _art_semente($c),
-        _art_outros($c),
-    ]) as $paragrafo) {
-        echo '<p class="art-paragrafo">' . $h($paragrafo) . '</p>';
+    $partes_campos = [
+        'caule'   => ['tipo_caule','forma_caule','textura_caule','cor_caule','ramificacao_caule','modificacao_caule'],
+        'folha'   => ['tipo_folha','filotaxia_folha','forma_folha','textura_folha','margem_folha','venacao_folha','tamanho_folha'],
+        'flor'    => ['cor_flores','simetria_floral','numero_petalas','disposicao_flores','tamanho_flor','aroma'],
+        'fruto'   => ['tipo_fruto','tamanho_fruto','cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto'],
+        'semente' => ['tipo_semente','tamanho_semente','cor_semente','textura_semente','quantidade_sementes'],
+        'outros'  => ['possui_espinhos','possui_latex','possui_seiva','possui_resina'],
+    ];
+    $geradores = [
+        'caule'   => _art_caule($c),
+        'folha'   => _art_folha($c),
+        'flor'    => _art_flor($c),
+        'fruto'   => _art_fruto($c),
+        'semente' => _art_semente($c),
+        'outros'  => _art_outros($c),
+    ];
+    foreach ($geradores as $parte => $paragrafo) {
+        if (!$paragrafo) continue;
+        $sup = _art_sup_refs($c, $partes_campos[$parte]);
+        echo '<p class="art-paragrafo">' . $h($paragrafo) . $sup . '</p>';
     }
 
     // ── Prancha fotográfica
