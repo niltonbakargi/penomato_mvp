@@ -201,6 +201,23 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
 
     $label = $labels[$campo];
 
+    // Contexto extra para margem de folha composta
+    $contexto_margem = '';
+    if ($campo === 'margem_folha') {
+        $tipo_folha = trim($_POST['tipo_folha'] ?? '');
+        $compostas_bipinadas = ['Composta bipinada', 'Composta tripinada'];
+        $compostas_simples   = ['Composta digitada', 'Composta imparipinada', 'Composta paripinada', 'Composta pinnada', 'Composta trifoliada'];
+        if (in_array($tipo_folha, $compostas_bipinadas)) {
+            $contexto_margem = "\nObservação importante: esta espécie possui folha do tipo \"{$tipo_folha}\". "
+                . "A margem informada refere-se ao FOLÍOLULO (a menor subdivisão da folha), não à folha inteira. "
+                . "Considere isso ao validar o valor e ao buscar referências.";
+        } elseif (in_array($tipo_folha, $compostas_simples)) {
+            $contexto_margem = "\nObservação importante: esta espécie possui folha do tipo \"{$tipo_folha}\". "
+                . "A margem informada refere-se ao FOLÍOLO, não à folha inteira. "
+                . "Considere isso ao validar o valor e ao buscar referências.";
+        }
+    }
+
     // Monta bloco de referências já cadastradas para o prompt
     $bloco_refs = '';
     if (!empty($refs_existentes)) {
@@ -218,6 +235,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
 
     $prompt = "Você é um especialista em botânica sistemática.\n"
         . "Espécie: {$nome}\nAtributo: \"{$label}\"\nValor informado: \"{$valor}\"\n"
+        . $contexto_margem
         . $bloco_refs . "\n\n"
         . "1. Verifique se este valor é botanicamente correto para esta espécie.\n"
         . "2. Se uma referência já cadastrada (acima) confirma este valor, use \"ref_existente_idx\".\n"
@@ -1776,16 +1794,23 @@ function searchRefCampo(campo) {
     // Envia referências já cadastradas para a IA verificar antes de sugerir nova
     var refsPayload = _refs.map(function(r, i) { return { idx: i + 1, texto: r }; });
 
+    // Se for margem da folha, envia também o tipo de folha para contextualizar a IA
+    var params = {
+        acao: 'buscar_ref_campo',
+        especie_id: _especieId,
+        campo: campo,
+        valor: valor,
+        referencias_existentes: JSON.stringify(refsPayload)
+    };
+    if (campo === 'margem_folha') {
+        var tipoFolhaEl = document.getElementById('tipo_folha');
+        if (tipoFolhaEl && tipoFolhaEl.value) params.tipo_folha = tipoFolhaEl.value;
+    }
+
     fetch('confirmar_caracteristicas.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            acao: 'buscar_ref_campo',
-            especie_id: _especieId,
-            campo: campo,
-            valor: valor,
-            referencias_existentes: JSON.stringify(refsPayload)
-        })
+        body: new URLSearchParams(params)
     })
     .then(function(r) { return r.json(); })
     .then(function(res) {
