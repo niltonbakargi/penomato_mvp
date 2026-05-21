@@ -234,8 +234,9 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
                 $bloco_refs .= "[{$idx}] {$texto}\n";
             }
         }
-        $bloco_refs .= "\nSe alguma dessas referências já confirma o valor informado, "
-            . "retorne seu índice em \"ref_existente_idx\" e deixe \"referencia\" e \"url\" vazios.";
+        $bloco_refs .= "\nREGRA OBRIGATÓRIA: se qualquer uma dessas referências já confirma o valor informado, "
+            . "você DEVE retornar seu número em \"ref_existente_idx\" e deixar \"referencia\" e \"url\" como strings vazias. "
+            . "NÃO sugira uma referência nova se uma das listadas já serve.";
     }
 
     $prompt = "Você é um especialista em botânica sistemática.\n"
@@ -1646,7 +1647,10 @@ function renderRefList() {
 
 function addRef(text) {
     if (!text.trim()) return;
-    _refs.push(text.trim());
+    var norm = text.trim();
+    var existing = _refs.findIndex(function(r) { return r.trim() === norm; });
+    if (existing >= 0) { showToast('Referência já cadastrada como [' + (existing + 1) + '].'); return; }
+    _refs.push(norm);
     renderRefList();
     autoSaveRefs();
 }
@@ -1888,8 +1892,16 @@ function aceitarRef(campo, btn) {
     var texto = (url && /^https?:\/\//.test(url)) ? url : cit;
     if (!texto) { panel.remove(); return; }
 
-    _refs.push(texto);
-    var newIdx = _refs.length; // 1-based
+    var existingIdx = _refs.findIndex(function(r) { return r.trim() === texto.trim(); });
+    var newIdx;
+    if (existingIdx >= 0) {
+        newIdx = existingIdx + 1; // reutiliza índice existente
+    } else {
+        _refs.push(texto);
+        newIdx = _refs.length;
+        renderRefList();
+        autoSaveRefs();
+    }
 
     var refEl = document.getElementById(campo + '_ref');
     if (refEl) {
@@ -1901,11 +1913,9 @@ function aceitarRef(campo, btn) {
         buildBadges(campo, refEl.value);
     }
 
-    renderRefList();
-    autoSaveRefs();
     _autoConfirmarCampo(campo, panel);
     panel.remove();
-    showToast('Referência [' + newIdx + '] adicionada.');
+    showToast(existingIdx >= 0 ? 'Referência [' + newIdx + '] já existente — reutilizada.' : 'Referência [' + newIdx + '] adicionada.');
 }
 
 function usarRefExistente(campo, idx, btn) {
@@ -1964,13 +1974,19 @@ function confirmarComObs(campo, btn) {
         if (ta) ta.value = texto;
     }
 
-    // 2. Adiciona a referência
+    // 2. Adiciona a referência (sem duplicar)
     var url  = (panel.dataset.url || '').trim();
     var cit  = (panel.dataset.referencia || '').trim();
     var ref  = (url && /^https?:\/\//.test(url)) ? url : cit;
     if (ref) {
-        _refs.push(ref);
-        var newIdx = _refs.length;
+        var existingRefIdx = _refs.findIndex(function(r) { return r.trim() === ref.trim(); });
+        var newIdx;
+        if (existingRefIdx >= 0) {
+            newIdx = existingRefIdx + 1;
+        } else {
+            _refs.push(ref);
+            newIdx = _refs.length;
+        }
         var refEl = document.getElementById(campo + '_ref');
         if (refEl) {
             var parts = refEl.value
