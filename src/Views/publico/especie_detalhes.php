@@ -314,14 +314,32 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         .btn-voltar:hover { background: rgba(255,255,255,.28); }
 
         /* ── WRAPPER PRINCIPAL ── */
-        .paginas { max-width: 1060px; margin: 0 auto; padding: 32px 20px 60px; display: flex; flex-direction: column; gap: 40px; }
+        .paginas { max-width: 1060px; margin: 0 auto; padding: 32px 20px 80px; display: flex; flex-direction: column; gap: 56px; }
 
         /* ── FICHA (cada espécie = uma página) ── */
         .ficha {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(0,0,0,.07);
+            border-radius: 4px;
+            box-shadow: 0 4px 24px rgba(0,0,0,.13), 0 1px 4px rgba(0,0,0,.07);
             overflow: hidden;
+            border-top: 5px solid var(--cor-primaria);
+            position: relative;
+        }
+        /* Efeito de páginas empilhadas atrás da ficha */
+        .ficha::before,
+        .ficha::after {
+            content: '';
+            position: absolute;
+            left: 6px; right: 6px; bottom: -6px;
+            height: 100%;
+            background: #e8e2d9;
+            border-radius: 4px;
+            z-index: -1;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        }
+        .ficha::after {
+            left: 12px; right: 12px; bottom: -11px;
+            background: #ddd7cd;
         }
 
         /* Cabeçalho da ficha */
