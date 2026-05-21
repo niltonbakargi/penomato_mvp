@@ -578,5 +578,70 @@ $ast_info = $artigo_status_info[$artigo['artigo_status']] ?? $artigo_status_info
     </div>
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ── 1. Adiciona id em cada <li> da lista de referências ──
+    var refs = document.querySelectorAll('.art-refs li');
+    refs.forEach(function (li, i) {
+        var n = i + 1;
+        li.id = 'ref-' + n;
+        li.style.scrollMarginTop = '80px';
+
+        // Detecta URLs no texto e transforma em link clicável
+        li.innerHTML = li.innerHTML.replace(
+            /(https?:\/\/[^\s<"]+)/g,
+            '<a href="$1" target="_blank" rel="noopener" class="ref-url">$1</a>'
+        );
+    });
+
+    // ── 2. Transforma <sup> em links clicáveis ──
+    document.querySelectorAll('.card-artigo sup').forEach(function (sup) {
+        var texto = sup.textContent.trim();
+        // Pode ser "2" ou "2,4" ou "1,2,3"
+        var numeros = texto.split(',').map(function (n) { return n.trim(); });
+        var links = numeros.map(function (n) {
+            var ref = document.getElementById('ref-' + n);
+            if (ref) {
+                // Referência existe — link âncora
+                return '<a href="#ref-' + n + '" class="sup-link" title="Ver referência ' + n + '">' + n + '</a>';
+            }
+            return n;
+        });
+        sup.innerHTML = links.join(',');
+    });
+
+});
+</script>
+
+<style>
+.sup-link {
+    color: var(--cor-primaria);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: .75em;
+    vertical-align: super;
+    border-bottom: 1px dotted var(--cor-primaria);
+    transition: color .15s;
+}
+.sup-link:hover { color: var(--cor-primaria-hover); }
+
+.ref-url {
+    color: var(--cor-primaria);
+    word-break: break-all;
+    font-size: .9em;
+}
+.ref-url:hover { text-decoration: underline; }
+
+/* Destaque ao rolar até a referência */
+.art-refs li:target {
+    background: #f0fdf4;
+    border-left: 3px solid var(--cor-primaria);
+    padding-left: 10px;
+    border-radius: 4px;
+    transition: background .3s;
+}
+</style>
 </body>
 </html>
