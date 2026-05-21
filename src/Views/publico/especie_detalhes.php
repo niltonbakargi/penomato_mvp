@@ -280,8 +280,15 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
     <title>Espécies — Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
     <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,400;1,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { background: #eef0f3; color: #1a2634; margin: 0; }
+        body {
+            background: #f5f0ea;
+            color: #1a1a1a;
+            margin: 0;
+            font-family: 'DM Sans', sans-serif;
+        }
 
         /* ── HEADER ── */
         .header {
@@ -323,16 +330,19 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             border-bottom: 1px solid #e2e8f0;
         }
         .ficha-familia {
-            font-size: .72rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: .12em;
-            color: #94a3b8; margin-bottom: 4px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .72rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .14em;
+            color: #a0876a; margin-bottom: 6px;
         }
         .ficha-popular {
-            font-size: 1.9rem; font-weight: 800;
-            color: #1a2634; line-height: 1.2; margin-bottom: 4px;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem; font-weight: 800;
+            color: #1a1a1a; line-height: 1.15; margin-bottom: 6px;
         }
         .ficha-cientifico {
-            font-size: 1.05rem; font-style: italic;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-style: italic;
             color: var(--cor-primaria); margin-bottom: 10px;
         }
         .ficha-status {
@@ -396,14 +406,16 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         .ficha-artigo-texto .art-sinonimos,
         .ficha-artigo-texto .art-nomes    { display: none; } /* já estão no cabeçalho da ficha */
         .ficha-artigo-texto .art-secao {
-            font-size: .78rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: .08em;
-            color: var(--cor-primaria); margin: 20px 0 6px;
-            border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem; font-weight: 700; font-style: italic;
+            color: var(--cor-primaria); margin: 22px 0 8px;
+            border-bottom: 1px solid #e5ddd4; padding-bottom: 4px;
+            letter-spacing: 0;
         }
         .ficha-artigo-texto .art-paragrafo {
-            font-size: .9rem; line-height: 1.75;
-            color: #1e293b; text-align: justify;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .92rem; line-height: 1.8;
+            color: #2c2c2c; text-align: justify;
             text-indent: 1.2em; margin-bottom: 0;
         }
         .ficha-artigo-texto .art-galeria,
@@ -413,7 +425,7 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
 
         /* ── GALERIA: linha por parte ── */
         .ficha-imgs {
-            background: #f8fafc;
+            background: #f0ebe3;
             padding: 20px 32px;
             display: flex; flex-direction: column; gap: 16px;
         }
@@ -422,9 +434,10 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         .galeria { display: flex; flex-direction: column; gap: 10px; }
         .galeria-parte { }
         .galeria-parte-label {
-            font-size: .65rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: .1em;
-            color: #94a3b8; margin-bottom: 5px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .12em;
+            color: #a0876a; margin-bottom: 5px;
         }
         .galeria-thumbs { display: flex; flex-wrap: nowrap; gap: 8px; }
         .thumb {
@@ -440,8 +453,8 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         /* ── RODAPÉ DA FICHA ── */
         .ficha-rodape {
             padding: 14px 32px;
-            border-top: 1px solid #e2e8f0;
-            background: #f8fafc;
+            border-top: 1px solid #e5ddd4;
+            background: #f0ebe3;
             display: flex; align-items: center; justify-content: flex-end;
             gap: 12px;
         }
