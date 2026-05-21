@@ -408,6 +408,7 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         }
         .ficha-artigo-texto .art-galeria,
         .ficha-artigo-texto .art-refs,
+        .ficha-artigo-texto .art-autores,
         .ficha-artigo-texto style       { display: none; }
 
         /* ── GALERIA: linha por parte ── */
