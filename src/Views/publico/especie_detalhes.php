@@ -382,6 +382,27 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             padding: 12px 0;
         }
 
+        /* Artigo dentro da ficha: tipografia limpa, sem títulos duplos */
+        .ficha-artigo-texto { overflow-y: auto; max-height: 600px; }
+        .ficha-artigo-texto .art-titulo,
+        .ficha-artigo-texto .art-familia,
+        .ficha-artigo-texto .art-sinonimos,
+        .ficha-artigo-texto .art-nomes    { display: none; } /* já estão no cabeçalho da ficha */
+        .ficha-artigo-texto .art-secao {
+            font-size: .78rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .08em;
+            color: var(--cor-primaria); margin: 20px 0 6px;
+            border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;
+        }
+        .ficha-artigo-texto .art-paragrafo {
+            font-size: .9rem; line-height: 1.75;
+            color: #1e293b; text-align: justify;
+            text-indent: 1.2em; margin-bottom: 0;
+        }
+        .ficha-artigo-texto .art-galeria { display: none; } /* galeria fica na coluna direita */
+        .ficha-artigo-texto .art-refs { display: none; }    /* referências ficam no artigo completo */
+        .ficha-artigo-texto style { display: none; }        /* ocultar tags <style> embutidas */
+
         /* ── COLUNA DIREITA: imagens ── */
         .ficha-imgs {
             background: #f8fafc;
@@ -1519,29 +1540,12 @@ foreach ($especies as $esp):
     <!-- Corpo: atributos + imagens -->
     <div class="ficha-corpo">
 
-        <!-- Atributos morfológicos -->
-        <div class="ficha-attrs">
-        <?php
-        $tem_attrs = false;
-        foreach ($secoes_attr as $titulo => $chave):
-            $dados = $esp[$chave] ?? [];
-            if (empty($dados)) continue;
-            $tem_attrs = true;
-        ?>
-            <div class="attr-grupo">
-                <div class="attr-grupo-titulo"><?= $titulo ?></div>
-                <?php foreach ($dados as $label => $val):
-                    if ($val === null || $val === '') continue;
-                ?>
-                <div class="attr-linha">
-                    <span class="attr-label"><?= htmlspecialchars($label) ?></span>
-                    <span class="attr-val"><?= htmlspecialchars($val) ?></span>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endforeach; ?>
-        <?php if (!$tem_attrs): ?>
-            <p class="ficha-sem-attrs">Atributos morfológicos ainda não cadastrados.</p>
+        <!-- Texto do artigo -->
+        <div class="ficha-attrs ficha-artigo-texto">
+        <?php if (!empty($esp['artigo_html'])): ?>
+            <?= $esp['artigo_html'] ?>
+        <?php else: ?>
+            <p class="ficha-sem-attrs">Artigo ainda não gerado para esta espécie.</p>
         <?php endif; ?>
         </div>
 
