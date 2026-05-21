@@ -201,9 +201,14 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
 
     $label = $labels[$campo];
 
-    // Contexto extra para margem de folha composta
+    // Contexto extra por campo — esclarece à IA distinções que ela tende a confundir
     $contexto_margem = '';
-    if ($campo === 'margem_folha') {
+    if ($campo === 'modificacao_caule') {
+        $contexto_margem = "\nObservação importante: neste sistema, \"Modificação do caule\" refere-se exclusivamente "
+            . "a estruturas derivadas do caule com função adaptada: estolão, cladódio, rizoma, tubérculo, gavinha, bulbo, sapopema. "
+            . "Estipe, colmo e tronco são TIPOS de caule, não modificações — portanto NÃO devem ser considerados ao avaliar este campo. "
+            . "Se a espécie não apresenta nenhuma das estruturas acima, o valor \"Nenhuma\" é botanicamente correto.";
+    } elseif ($campo === 'margem_folha') {
         $tipo_folha = trim($_POST['tipo_folha'] ?? '');
         $compostas_bipinadas = ['Composta bipinada', 'Composta tripinada'];
         $compostas_simples   = ['Composta digitada', 'Composta imparipinada', 'Composta paripinada', 'Composta pinnada', 'Composta trifoliada'];
