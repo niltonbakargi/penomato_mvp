@@ -88,9 +88,10 @@ if ($acao === 'desfazer' && $dentro_prazo) {
             ->execute([$especie_id]);
     }
 
-    // 2. Inserção de dados da internet → apaga dados + artigo + volta sem_dados
+    // 2. Inserção de dados da internet → apaga dados + artigo + obs + volta sem_dados
     elseif ($hist['tabela_afetada'] === 'especies_caracteristicas' && $hist['tipo_acao'] === 'insercao') {
         $pdo->prepare("DELETE FROM especies_caracteristicas WHERE especie_id = ?")->execute([$especie_id]);
+        $pdo->prepare("DELETE FROM especies_caracteristicas_obs WHERE especie_id = ?")->execute([$especie_id]);
         $pdo->prepare("DELETE FROM artigos WHERE especie_id = ?")->execute([$especie_id]);
         // Imagens de internet também
         $stmt = $pdo->prepare("SELECT caminho_imagem FROM especies_imagens WHERE especie_id = ? AND origem = 'internet'");
@@ -104,13 +105,14 @@ if ($acao === 'desfazer' && $dentro_prazo) {
             ->execute([$especie_id]);
     }
 
-    // 3. Confirmação de dados (descrita) → volta para dados_internet
+    // 3. Confirmação de dados (descrita) → volta para dados_internet + apaga obs
     elseif ($hist['campo_alterado'] === 'status' && $hist['valor_novo'] === 'descrita') {
         $pdo->prepare("
             UPDATE especies_administrativo
             SET status = 'dados_internet', data_ultima_atualizacao = NOW()
             WHERE id = ?
         ")->execute([$especie_id]);
+        $pdo->prepare("DELETE FROM especies_caracteristicas_obs WHERE especie_id = ?")->execute([$especie_id]);
     }
 
     // 4. Aprovação (publicado) → volta para em_revisao, artigo volta rascunho
