@@ -348,17 +348,16 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         .st-dados_internet { background: #f1f5f9; color: #475569; }
         .st-contestado     { background: #fee2e2; color: #991b1b; }
 
-        /* Corpo: 2 colunas */
+        /* Corpo: coluna única */
         .ficha-corpo {
-            display: grid;
-            grid-template-columns: 1fr 380px;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* ── COLUNA ESQUERDA: atributos ── */
+        /* ── TEXTO DO ARTIGO ── */
         .ficha-attrs {
-            padding: 24px 28px;
-            border-right: 1px solid #e2e8f0;
-            display: flex; flex-direction: column; gap: 20px;
+            padding: 24px 32px;
+            border-bottom: 1px solid #e2e8f0;
         }
         .attr-grupo { }
         .attr-grupo-titulo {
@@ -403,11 +402,11 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         .ficha-artigo-texto .art-refs,
         .ficha-artigo-texto style       { display: none; }
 
-        /* ── COLUNA DIREITA: imagens ── */
+        /* ── GALERIA: linha por parte ── */
         .ficha-imgs {
             background: #f8fafc;
-            padding: 20px;
-            display: flex; flex-direction: column; gap: 14px;
+            padding: 20px 32px;
+            display: flex; flex-direction: column; gap: 16px;
         }
 
         /* Galeria de miniaturas por parte */
@@ -418,15 +417,15 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             text-transform: uppercase; letter-spacing: .1em;
             color: #94a3b8; margin-bottom: 5px;
         }
-        .galeria-thumbs { display: flex; flex-wrap: wrap; gap: 5px; }
+        .galeria-thumbs { display: flex; flex-wrap: nowrap; gap: 8px; }
         .thumb {
-            width: 68px; height: 68px; border-radius: 6px;
+            width: 140px; height: 110px; border-radius: 8px;
             overflow: hidden; cursor: zoom-in;
             border: 2px solid transparent;
             transition: border-color .15s, transform .15s;
             flex-shrink: 0;
         }
-        .thumb:hover { border-color: var(--cor-primaria); transform: scale(1.05); }
+        .thumb:hover { border-color: var(--cor-primaria); transform: scale(1.03); }
         .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         /* ── RODAPÉ DA FICHA ── */
@@ -474,13 +473,10 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         .lightbox-fechar:hover { opacity: 1; }
 
         /* ── RESPONSIVE ── */
-        @media (max-width: 768px) {
-            .ficha-corpo { grid-template-columns: 1fr; }
-            .ficha-imgs { border-top: 1px solid #e2e8f0; }
-            .ficha-cab { padding: 20px 20px 14px; }
-            .ficha-attrs { padding: 18px 20px; }
-            .ficha-rodape { padding: 12px 20px; }
+        @media (max-width: 640px) {
+            .ficha-cab, .ficha-attrs, .ficha-imgs { padding-left: 16px; padding-right: 16px; }
             .ficha-popular { font-size: 1.4rem; }
+            .thumb { width: 100px; height: 80px; }
         }
 
         /* ── HEADER ── */
@@ -1543,7 +1539,7 @@ foreach ($especies as $esp):
                 <div class="galeria-parte">
                     <div class="galeria-parte-label"><?= htmlspecialchars($parte_label) ?></div>
                     <div class="galeria-thumbs">
-                    <?php foreach ($imgs_esp[$parte] as $img):
+                    <?php foreach (array_slice($imgs_esp[$parte], 0, 5) as $img):
                         $cred_parts = [];
                         if ($img['autor'])  $cred_parts[] = addslashes($img['autor']);
                         if ($img['fonte'])  $cred_parts[] = addslashes($img['fonte']);
