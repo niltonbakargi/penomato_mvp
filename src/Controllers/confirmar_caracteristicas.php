@@ -912,6 +912,10 @@ ob_end_clean();
         </div>
       </div>
 
+      <div id="obs-margem-composta" style="display:none; margin: -4px 0 10px; padding: 8px 12px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 0 6px 6px 0; font-size: .82rem; color: #78350f;">
+        <strong>Observação:</strong> <span id="obs-margem-texto"></span>
+      </div>
+
       <div class="field-row" data-campo="venacao_folha">
         <div class="field-main">
           <label for="venacao_folha">Venação</label>
@@ -1980,6 +1984,40 @@ function preencherCampo(id, valor) {
         el.classList.add('auto-filled');
     }
 }
+
+// ============================================================
+// OBSERVAÇÃO: MARGEM EM FOLHAS COMPOSTAS
+// ============================================================
+(function () {
+    var tipoSel = document.getElementById('tipo_folha');
+    var obs     = document.getElementById('obs-margem-composta');
+    var txt     = document.getElementById('obs-margem-texto');
+
+    var mensagens = {
+        'Composta bipinada':    'Em folhas compostas bipinadas a margem se refere ao <strong>folíolulo</strong> (a menor subdivisão da folha).',
+        'Composta tripinada':   'Em folhas compostas tripinadas a margem se refere ao <strong>folíolulo</strong> (a menor subdivisão da folha).',
+        'Composta digitada':    'Em folhas compostas digitadas a margem se refere ao <strong>folíolo</strong>.',
+        'Composta imparipinada':'Em folhas compostas imparipinadas a margem se refere ao <strong>folíolo</strong>.',
+        'Composta paripinada':  'Em folhas compostas paripinadas a margem se refere ao <strong>folíolo</strong>.',
+        'Composta pinnada':     'Em folhas compostas pinnadas a margem se refere ao <strong>folíolo</strong>.',
+        'Composta trifoliada':  'Em folhas compostas trifoliadas a margem se refere ao <strong>folíolo</strong>.',
+    };
+
+    function atualizar() {
+        var v = tipoSel ? tipoSel.value : '';
+        if (mensagens[v]) {
+            txt.innerHTML = mensagens[v];
+            obs.style.display = 'block';
+        } else {
+            obs.style.display = 'none';
+        }
+    }
+
+    if (tipoSel) {
+        tipoSel.addEventListener('change', atualizar);
+        atualizar(); // aplica ao carregar se já houver valor
+    }
+})();
 
 // ============================================================
 // CARREGAR DADOS DA ESPÉCIE
