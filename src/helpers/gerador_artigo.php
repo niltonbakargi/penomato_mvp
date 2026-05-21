@@ -22,6 +22,20 @@ function _art_v(string $atrib, ?string $campo): ?string {
     return $v[$atrib][$campo] ?? null;
 }
 
+/** Resolve valor no vocabulário e retorna <strong>valor</strong><sup>[N]</sup> */
+function _art_vr(string $atrib, ?string $campo, string $ref = ''): ?string {
+    $valor = _art_v($atrib, $campo);
+    if ($valor === null) return null;
+    $out = '<strong>' . htmlspecialchars($valor) . '</strong>';
+    $ref = trim($ref);
+    if ($ref !== '') {
+        $nums = array_unique(array_filter(array_map('intval', explode(',', $ref))));
+        sort($nums);
+        if ($nums) $out .= '<sup class="art-ref">[' . implode(',', $nums) . ']</sup>';
+    }
+    return $out;
+}
+
 /** Junta lista com vírgulas e "e" no último item */
 function _art_lista(array $itens): string {
     $itens = array_values(array_filter($itens, fn($i) => $i !== null && $i !== ''));
@@ -34,14 +48,14 @@ function _art_lista(array $itens): string {
 // ── Parágrafos por parte da planta ───────────────────────────
 
 function _art_caule(array $c): ?string {
-    $tipo = _art_v('tipo_caule', $c['tipo_caule'] ?? '');
+    $tipo = _art_vr('tipo_caule', $c['tipo_caule'] ?? '', $c['tipo_caule_ref'] ?? '');
     if (!$tipo) return null;
     $comp = array_filter([
-        _art_v('forma_caule',       $c['forma_caule']       ?? ''),
-        _art_v('textura_caule',     $c['textura_caule']     ?? ''),
-        _art_v('cor_caule',         $c['cor_caule']         ?? ''),
-        _art_v('ramificacao_caule', $c['ramificacao_caule'] ?? ''),
-        _art_v('modificacao_caule', $c['modificacao_caule'] ?? ''),
+        _art_vr('forma_caule',       $c['forma_caule']       ?? '', $c['forma_caule_ref']       ?? ''),
+        _art_vr('textura_caule',     $c['textura_caule']     ?? '', $c['textura_caule_ref']     ?? ''),
+        _art_vr('cor_caule',         $c['cor_caule']         ?? '', $c['cor_caule_ref']         ?? ''),
+        _art_vr('ramificacao_caule', $c['ramificacao_caule'] ?? '', $c['ramificacao_caule_ref'] ?? ''),
+        _art_vr('modificacao_caule', $c['modificacao_caule'] ?? '', $c['modificacao_caule_ref'] ?? ''),
     ]);
     $frase = 'O caule é ' . $tipo;
     if ($comp) $frase .= ', ' . _art_lista(array_values($comp));
@@ -49,63 +63,63 @@ function _art_caule(array $c): ?string {
 }
 
 function _art_folha(array $c): ?string {
-    $tipo  = _art_v('tipo_folha',  $c['tipo_folha']  ?? '');
-    $forma = _art_v('forma_folha', $c['forma_folha'] ?? '');
+    $tipo  = _art_vr('tipo_folha',  $c['tipo_folha']  ?? '', $c['tipo_folha_ref']  ?? '');
+    $forma = _art_vr('forma_folha', $c['forma_folha'] ?? '', $c['forma_folha_ref'] ?? '');
     $nucleo = array_filter([$tipo, $forma]);
     if (!$nucleo) return null;
     $frase = 'As folhas são ' . _art_lista(array_values($nucleo));
     $comp = array_filter([
-        _art_v('textura_folha',   $c['textura_folha']   ?? ''),
-        _art_v('margem_folha',    $c['margem_folha']    ?? ''),
-        _art_v('venacao_folha',   $c['venacao_folha']   ?? ''),
-        _art_v('filotaxia_folha', $c['filotaxia_folha'] ?? ''),
-        _art_v('tamanho_folha',   $c['tamanho_folha']   ?? ''),
+        _art_vr('textura_folha',   $c['textura_folha']   ?? '', $c['textura_folha_ref']   ?? ''),
+        _art_vr('margem_folha',    $c['margem_folha']    ?? '', $c['margem_folha_ref']    ?? ''),
+        _art_vr('venacao_folha',   $c['venacao_folha']   ?? '', $c['venacao_folha_ref']   ?? ''),
+        _art_vr('filotaxia_folha', $c['filotaxia_folha'] ?? '', $c['filotaxia_folha_ref'] ?? ''),
+        _art_vr('tamanho_folha',   $c['tamanho_folha']   ?? '', $c['tamanho_folha_ref']   ?? ''),
     ]);
     if ($comp) $frase .= ', ' . _art_lista(array_values($comp));
     return $frase . '.';
 }
 
 function _art_flor(array $c): ?string {
-    $cor      = _art_v('cor_flores',      $c['cor_flores']      ?? '');
-    $simetria = _art_v('simetria_floral', $c['simetria_floral'] ?? '');
+    $cor      = _art_vr('cor_flores',      $c['cor_flores']      ?? '', $c['cor_flores_ref']      ?? '');
+    $simetria = _art_vr('simetria_floral', $c['simetria_floral'] ?? '', $c['simetria_floral_ref'] ?? '');
     $nucleo = array_filter([$cor, $simetria]);
     if (!$nucleo) return null;
     $frase = 'As flores são ' . _art_lista(array_values($nucleo));
     $comp = array_filter([
-        _art_v('numero_petalas',    $c['numero_petalas']    ?? ''),
-        _art_v('disposicao_flores', $c['disposicao_flores'] ?? ''),
-        _art_v('tamanho_flor',      $c['tamanho_flor']      ?? ''),
-        _art_v('aroma',             $c['aroma']             ?? ''),
+        _art_vr('numero_petalas',    $c['numero_petalas']    ?? '', $c['numero_petalas_ref']    ?? ''),
+        _art_vr('disposicao_flores', $c['disposicao_flores'] ?? '', $c['disposicao_flores_ref'] ?? ''),
+        _art_vr('tamanho_flor',      $c['tamanho_flor']      ?? '', $c['tamanho_flor_ref']      ?? ''),
+        _art_vr('aroma',             $c['aroma']             ?? '', $c['aroma_ref']             ?? ''),
     ]);
     if ($comp) $frase .= ', ' . _art_lista(array_values($comp));
     return $frase . '.';
 }
 
 function _art_fruto(array $c): ?string {
-    $tipo = _art_v('tipo_fruto', $c['tipo_fruto'] ?? '');
+    $tipo = _art_vr('tipo_fruto', $c['tipo_fruto'] ?? '', $c['tipo_fruto_ref'] ?? '');
     if (!$tipo) return null;
     $frase = 'Os frutos são ' . $tipo;
     $comp = array_filter([
-        _art_v('tamanho_fruto',   $c['tamanho_fruto']   ?? ''),
-        _art_v('cor_fruto',       $c['cor_fruto']       ?? ''),
-        _art_v('textura_fruto',   $c['textura_fruto']   ?? ''),
-        _art_v('aroma_fruto',     $c['aroma_fruto']     ?? ''),
-        _art_v('dispersao_fruto', $c['dispersao_fruto'] ?? ''),
+        _art_vr('tamanho_fruto',   $c['tamanho_fruto']   ?? '', $c['tamanho_fruto_ref']   ?? ''),
+        _art_vr('cor_fruto',       $c['cor_fruto']       ?? '', $c['cor_fruto_ref']       ?? ''),
+        _art_vr('textura_fruto',   $c['textura_fruto']   ?? '', $c['textura_fruto_ref']   ?? ''),
+        _art_vr('aroma_fruto',     $c['aroma_fruto']     ?? '', $c['aroma_fruto_ref']     ?? ''),
+        _art_vr('dispersao_fruto', $c['dispersao_fruto'] ?? '', $c['dispersao_fruto_ref'] ?? ''),
     ]);
     if ($comp) $frase .= ', ' . _art_lista(array_values($comp));
     return $frase . '.';
 }
 
 function _art_semente(array $c): ?string {
-    $tipo    = _art_v('tipo_semente',    $c['tipo_semente']    ?? '');
-    $tamanho = _art_v('tamanho_semente', $c['tamanho_semente'] ?? '');
+    $tipo    = _art_vr('tipo_semente',    $c['tipo_semente']    ?? '', $c['tipo_semente_ref']    ?? '');
+    $tamanho = _art_vr('tamanho_semente', $c['tamanho_semente'] ?? '', $c['tamanho_semente_ref'] ?? '');
     $nucleo  = array_filter([$tipo, $tamanho]);
     if (!$nucleo) return null;
     $frase = 'As sementes são ' . _art_lista(array_values($nucleo));
     $comp = array_filter([
-        _art_v('cor_semente',         $c['cor_semente']         ?? ''),
-        _art_v('textura_semente',     $c['textura_semente']     ?? ''),
-        _art_v('quantidade_sementes', $c['quantidade_sementes'] ?? ''),
+        _art_vr('cor_semente',         $c['cor_semente']         ?? '', $c['cor_semente_ref']         ?? ''),
+        _art_vr('textura_semente',     $c['textura_semente']     ?? '', $c['textura_semente_ref']     ?? ''),
+        _art_vr('quantidade_sementes', $c['quantidade_sementes'] ?? '', $c['quantidade_sementes_ref'] ?? ''),
     ]);
     if ($comp) $frase .= ', ' . _art_lista(array_values($comp));
     return $frase . '.';
@@ -113,10 +127,10 @@ function _art_semente(array $c): ?string {
 
 function _art_outros(array $c): ?string {
     $itens = array_filter([
-        _art_v('possui_espinhos', $c['possui_espinhos'] ?? ''),
-        _art_v('possui_latex',    $c['possui_latex']    ?? ''),
-        _art_v('possui_seiva',    $c['possui_seiva']    ?? ''),
-        _art_v('possui_resina',   $c['possui_resina']   ?? ''),
+        _art_vr('possui_espinhos', $c['possui_espinhos'] ?? '', $c['possui_espinhos_ref'] ?? ''),
+        _art_vr('possui_latex',    $c['possui_latex']    ?? '', $c['possui_latex_ref']    ?? ''),
+        _art_vr('possui_seiva',    $c['possui_seiva']    ?? '', $c['possui_seiva_ref']    ?? ''),
+        _art_vr('possui_resina',   $c['possui_resina']   ?? '', $c['possui_resina_ref']   ?? ''),
     ]);
     if (!$itens) return null;
     return 'A espécie ' . _art_lista(array_values($itens)) . '.';
@@ -175,26 +189,16 @@ function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs, PDO $pdo): s
     // ── Descrição
     echo '<h3 class="art-secao">Descrição</h3>';
 
-    $partes_campos = [
-        'caule'   => ['tipo_caule','forma_caule','textura_caule','cor_caule','ramificacao_caule','modificacao_caule'],
-        'folha'   => ['tipo_folha','filotaxia_folha','forma_folha','textura_folha','margem_folha','venacao_folha','tamanho_folha'],
-        'flor'    => ['cor_flores','simetria_floral','numero_petalas','disposicao_flores','tamanho_flor','aroma'],
-        'fruto'   => ['tipo_fruto','tamanho_fruto','cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto'],
-        'semente' => ['tipo_semente','tamanho_semente','cor_semente','textura_semente','quantidade_sementes'],
-        'outros'  => ['possui_espinhos','possui_latex','possui_seiva','possui_resina'],
-    ];
-    $geradores = [
-        'caule'   => _art_caule($c),
-        'folha'   => _art_folha($c),
-        'flor'    => _art_flor($c),
-        'fruto'   => _art_fruto($c),
-        'semente' => _art_semente($c),
-        'outros'  => _art_outros($c),
-    ];
-    foreach ($geradores as $parte => $paragrafo) {
-        if (!$paragrafo) continue;
-        $sup = _art_sup_refs($c, $partes_campos[$parte]);
-        echo '<p class="art-paragrafo">' . $h($paragrafo) . $sup . '</p>';
+    // Os parágrafos já retornam HTML com <strong> e <sup> inline — não escapar
+    foreach (array_filter([
+        _art_caule($c),
+        _art_folha($c),
+        _art_flor($c),
+        _art_fruto($c),
+        _art_semente($c),
+        _art_outros($c),
+    ]) as $paragrafo) {
+        echo '<p class="art-paragrafo">' . $paragrafo . '</p>';
     }
 
     // ── Prancha fotográfica
