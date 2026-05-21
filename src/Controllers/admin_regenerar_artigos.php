@@ -4,7 +4,7 @@
 // Acesso: apenas administradores
 // ================================================
 session_start();
-require_once __DIR__ . '/../../../config/banco_de_dados.php';
+require_once __DIR__ . '/../../config/banco_de_dados.php';
 require_once __DIR__ . '/../helpers/gerador_artigo.php';
 
 if (empty($_SESSION['usuario_id']) || ($_SESSION['usuario_tipo'] ?? '') !== 'gestor') {
