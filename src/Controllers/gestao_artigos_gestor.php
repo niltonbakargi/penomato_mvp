@@ -338,6 +338,23 @@ $info_status = [
             font-size: var(--texto-sm); color: var(--cinza-700); font-style: italic;
         }
 
+        /* ── Botões do header ── */
+        .btn-header {
+            display: inline-flex; align-items: center; gap: var(--esp-2);
+            background: rgba(255,255,255,.15);
+            color: var(--branco);
+            border: 1px solid rgba(255,255,255,.4);
+            border-radius: var(--raio-pill);
+            padding: var(--esp-2) var(--esp-5);
+            font-size: var(--texto-sm); font-weight: var(--peso-semi);
+            text-decoration: none; transition: var(--transicao);
+        }
+        .btn-header:hover {
+            background: rgba(255,255,255,.28);
+            color: var(--branco);
+            text-decoration: none;
+        }
+
         @media (max-width: 768px) {
             .resumo-grid { grid-template-columns: repeat(2, 1fr); }
             .col-md { display: none; }
@@ -357,12 +374,12 @@ $info_status = [
         </div>
         <div style="display:flex;gap:var(--esp-3);flex-wrap:wrap;align-items:center;">
             <a href="/penomato_mvp/src/Controllers/admin_regenerar_artigos.php"
-               class="btn btn-outline-branco"
+               class="btn-header"
                onclick="return confirm('Regenerar o HTML de todos os artigos com os dados atuais do banco?')"
                title="Regera o texto de todos os artigos com os dados mais recentes das espécies">
                 <i class="fas fa-rotate"></i> Regenerar artigos
             </a>
-            <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn btn-outline-branco">
+            <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn-header">
                 <i class="fas fa-arrow-left"></i> Voltar
             </a>
         </div>
