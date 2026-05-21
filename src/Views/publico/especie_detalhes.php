@@ -1570,6 +1570,7 @@ foreach ($especies as $esp):
             $html_ficha = $esp['artigo_html'];
             $html_ficha = str_replace('<h3 class="art-secao">Prancha Fotográfica</h3>', '', $html_ficha);
             $html_ficha = str_replace('<h3 class="art-secao">Referências</h3>', '', $html_ficha);
+            $html_ficha = preg_replace('/<sup class="art-ref">\[[\d,]+\]<\/sup>/', '', $html_ficha);
             echo $html_ficha;
         else: ?>
             <p class="ficha-sem-attrs">Artigo ainda não gerado para esta espécie.</p>
