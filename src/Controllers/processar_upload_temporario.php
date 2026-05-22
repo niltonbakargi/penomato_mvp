@@ -83,9 +83,16 @@ function validarImagem($arquivo, &$erro) {
         $erro = "Arquivo muito grande. Máximo: 10 MB.";
         return false;
     }
-    $finfo     = finfo_open(FILEINFO_MIME_TYPE);
-    $mime_type = finfo_file($finfo, $arquivo['tmp_name']);
-    finfo_close($finfo);
+    if (function_exists('finfo_open')) {
+        $finfo     = finfo_open(FILEINFO_MIME_TYPE);
+        $mime_type = finfo_file($finfo, $arquivo['tmp_name']);
+        finfo_close($finfo);
+    } elseif (function_exists('mime_content_type')) {
+        $mime_type = mime_content_type($arquivo['tmp_name']);
+    } else {
+        $ext_tmp   = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
+        $mime_type = ($ext_tmp === 'png') ? 'image/png' : 'image/jpeg';
+    }
     if (!in_array($mime_type, $GLOBALS['formatos_permitidos'])) {
         $erro = "Formato não permitido. Use JPG ou PNG.";
         return false;
