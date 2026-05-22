@@ -142,7 +142,7 @@ function inserirImagem(
              descricao, fonte_nome, fonte_url, autor_imagem, licenca,
              id_usuario_identificador, status_validacao)
         VALUES
-            (?, 'provisoria', 'upload', ?,
+            (?, 'provisoria', 'internet', ?,
              ?, ?, ?, ?,
              ?, ?, ?, ?, ?,
              ?, 'aprovado')
