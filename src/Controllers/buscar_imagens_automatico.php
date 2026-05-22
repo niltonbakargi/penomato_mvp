@@ -361,8 +361,10 @@ function buscar_gbif(string $nome, int $pagina = 1): array
 // mas o frontend exibe botão de link direto para o site.
 // Licença: CC BY-NC-SA 4.0
 // ============================================================
-function buscar_flora_digital(string $nome): array
+function buscar_flora_digital(string $nome, int $pagina = 1): array
 {
+    if ($pagina > 1) return []; // scraping estático — sem paginação real
+
     // 1. Confirmar que a espécie existe no Flora Digital
     $url_search = 'https://floradigital.ufsc.br/search_sp.php?query=' . urlencode($nome);
     $resp_search = http_get($url_search);
@@ -434,8 +436,9 @@ function buscar_flora_digital(string $nome): array
 // Usa IPNI API para obter o fqId e raspa a página do POWO.
 // Licença: CC BY 3.0 (dados Kew)
 // ============================================================
-function buscar_powo(string $nome): array
+function buscar_powo(string $nome, int $pagina = 1): array
 {
+    if ($pagina > 1) return []; // scraping estático — sem paginação real
     // 1. Buscar fqId via IPNI
     $url_ipni = 'https://www.ipni.org/api/1/search?' . http_build_query([
         'q' => $nome,
@@ -525,8 +528,8 @@ function buscar_powo(string $nome): array
 $candidatas_inat  = in_array($fonte_filtro, ['todas','inaturalist'])   ? buscar_inaturalist($nome_cientifico, $pagina)  : [];
 $candidatas_wiki  = in_array($fonte_filtro, ['todas','wikimedia'])     ? buscar_wikimedia($nome_cientifico, $pagina)    : [];
 $candidatas_gbif  = in_array($fonte_filtro, ['todas','gbif'])          ? buscar_gbif($nome_cientifico, $pagina)         : [];
-$candidatas_flora = in_array($fonte_filtro, ['todas','flora_digital']) ? buscar_flora_digital($nome_cientifico)         : [];
-$candidatas_powo  = in_array($fonte_filtro, ['todas','powo'])          ? buscar_powo($nome_cientifico)                  : [];
+$candidatas_flora = in_array($fonte_filtro, ['todas','flora_digital']) ? buscar_flora_digital($nome_cientifico, $pagina) : [];
+$candidatas_powo  = in_array($fonte_filtro, ['todas','powo'])          ? buscar_powo($nome_cientifico, $pagina)          : [];
 
 $todas = array_merge($candidatas_inat, $candidatas_wiki, $candidatas_gbif, $candidatas_flora, $candidatas_powo);
 
