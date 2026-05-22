@@ -1063,10 +1063,13 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
             <div class="busca-corpo">
 
+                <!-- Botão Flora Digital UFSC (aparece se a espécie for encontrada lá) -->
+                <div id="floraDigitalLink" style="display:none;text-align:center;"></div>
+
                 <!-- Loading -->
                 <div id="buscaLoading" class="busca-loading">
                     <div class="spinner"></div>
-                    <p style="color:var(--cinza-600);">Buscando no iNaturalist e Wikimedia Commons...</p>
+                    <p style="color:var(--cinza-600);">Buscando no iNaturalist, GBIF, Wikimedia e Flora Digital UFSC...</p>
                 </div>
 
                 <!-- Sem resultados -->
@@ -1193,6 +1196,12 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             .then(r => r.json())
             .then(data => {
                 busca.carregando = false;
+
+                // Botão Flora Digital (sempre que a espécie for encontrada lá)
+                if (data.flora_digital_url) {
+                    mostrarBotaoFloraDigital(data.flora_digital_url, data.flora_digital_nome);
+                }
+
                 if (!data.sucesso || !data.candidatas || data.candidatas.length === 0) {
                     if (busca.imagens.length === 0) {
                         mostrarEstadoBusca('vazio');
@@ -1220,6 +1229,17 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         document.getElementById('buscaVazio').style.display     = estado === 'vazio'    ? 'block' : 'none';
         document.getElementById('buscaSemMais').style.display   = estado === 'sem-mais' ? 'block' : 'none';
         document.getElementById('buscaConteudo').style.display  = estado === 'imagem'   ? 'block' : 'none';
+    }
+
+    function mostrarBotaoFloraDigital(url, nome) {
+        const container = document.getElementById('floraDigitalLink');
+        if (!container) return;
+        container.innerHTML =
+            '<a href="' + url + '" target="_blank" rel="noopener" ' +
+            'style="display:inline-flex;align-items:center;gap:6px;background:#1a6b3c;color:#fff;' +
+            'padding:7px 14px;border-radius:8px;font-size:.82rem;font-weight:600;text-decoration:none;margin-top:8px;">' +
+            '🌿 Ver <em>' + nome + '</em> no Flora Digital UFSC</a>';
+        container.style.display = 'block';
     }
 
     // ------------------------------------------------

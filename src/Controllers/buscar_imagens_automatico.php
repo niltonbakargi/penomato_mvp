@@ -117,9 +117,10 @@ function pontuar(array $c): int
 {
     $pts = 0;
 
-    // Fonte (iNaturalist = observação de campo validada; GBIF = acervo científico global)
-    if ($c['fonte'] === 'inaturalist') $pts += 15;
-    elseif ($c['fonte'] === 'gbif')    $pts += 12;
+    // Fonte
+    if ($c['fonte'] === 'inaturalist')   $pts += 15;
+    elseif ($c['fonte'] === 'gbif')      $pts += 12;
+    elseif ($c['fonte'] === 'flora_digital') $pts += 18; // fonte botânica acadêmica brasileira
 
     // Licença (quanto mais aberta, melhor)
     $lic = strtolower($c['licenca'] ?? '');
@@ -353,13 +354,95 @@ function buscar_gbif(string $nome, int $pagina = 1): array
 }
 
 // ============================================================
+// BUSCA 4 — Flora Digital UFSC
+// Tenta raspar imagens do HTML estático. Se JS dinâmico, retorna 0
+// mas o frontend exibe botão de link direto para o site.
+// Licença: CC BY-NC-SA 4.0
+// ============================================================
+function buscar_flora_digital(string $nome): array
+{
+    // 1. Confirmar que a espécie existe no Flora Digital
+    $url_search = 'https://floradigital.ufsc.br/search_sp.php?query=' . urlencode($nome);
+    $resp_search = http_get($url_search);
+    if (!$resp_search) return [];
+
+    $nomes = json_decode($resp_search, true);
+    if (!is_array($nomes) || empty($nomes)) return [];
+
+    // Encontrar correspondência exata ou parcial
+    $nome_lower = strtolower($nome);
+    $nome_encontrado = null;
+    foreach ($nomes as $n) {
+        if (strtolower($n) === $nome_lower) { $nome_encontrado = $n; break; }
+    }
+    if (!$nome_encontrado) {
+        // Correspondência parcial (apenas gênero+epíteto, sem autoridade)
+        $partes = explode(' ', $nome);
+        $prefixo = strtolower(implode(' ', array_slice($partes, 0, 2)));
+        foreach ($nomes as $n) {
+            if (str_starts_with(strtolower($n), $prefixo)) { $nome_encontrado = $n; break; }
+        }
+    }
+    if (!$nome_encontrado) return [];
+
+    // 2. Tentar raspar a página da espécie
+    $url_sp = 'https://floradigital.ufsc.br/open_sp.php?sp=' . urlencode($nome_encontrado);
+    $html = http_get($url_sp);
+
+    $candidatas = [];
+
+    if ($html) {
+        // Buscar padrões de imagem no HTML estático
+        preg_match_all('/imagens\/([a-f0-9]+\.(jpg|jpeg|png))/i', $html, $matches);
+        $urls_vistas = [];
+
+        foreach ($matches[0] as $caminho) {
+            $url_foto = 'https://floradigital.ufsc.br/' . $caminho;
+            $url_thumb = str_replace('imagens/', 'thumbs/', $url_foto);
+
+            if (in_array($url_foto, $urls_vistas)) continue;
+            $urls_vistas[] = $url_foto;
+
+            $candidatas[] = [
+                'url_foto'        => $url_foto,
+                'url_thumbnail'   => $url_thumb,
+                'fonte'           => 'flora_digital',
+                'fonte_url'       => $url_sp,
+                'fonte_nome'      => 'Flora Digital UFSC',
+                'id_externo'      => md5($url_foto),
+                'autor'           => null,
+                'licenca'         => 'CC BY-NC-SA 4.0',
+                'local_coleta'    => 'Brasil',
+                'latitude'        => null,
+                'longitude'       => null,
+                'data_observacao' => null,
+                'largura_px'      => null,
+                'altura_px'       => null,
+            ];
+
+            if (count($candidatas) >= 6) break;
+        }
+    }
+
+    // Sempre retorna o link direto para uso no frontend
+    $GLOBALS['_flora_digital_url'] = $url_sp;
+    $GLOBALS['_flora_digital_nome'] = $nome_encontrado;
+
+    return $candidatas;
+}
+
+// ============================================================
 // EXECUTAR BUSCAS
 // ============================================================
-$candidatas_inat = buscar_inaturalist($nome_cientifico, $pagina);
-$candidatas_wiki = buscar_wikimedia($nome_cientifico, $pagina);
-$candidatas_gbif = buscar_gbif($nome_cientifico, $pagina);
+$GLOBALS['_flora_digital_url']  = null;
+$GLOBALS['_flora_digital_nome'] = null;
 
-$todas = array_merge($candidatas_inat, $candidatas_wiki, $candidatas_gbif);
+$candidatas_inat  = buscar_inaturalist($nome_cientifico, $pagina);
+$candidatas_wiki  = buscar_wikimedia($nome_cientifico, $pagina);
+$candidatas_gbif  = buscar_gbif($nome_cientifico, $pagina);
+$candidatas_flora = buscar_flora_digital($nome_cientifico);
+
+$todas = array_merge($candidatas_inat, $candidatas_wiki, $candidatas_gbif, $candidatas_flora);
 
 if (empty($todas)) {
     echo json_encode([
@@ -393,9 +476,11 @@ $top10 = array_slice($todas, 0, 10);
 // RESPOSTA
 // ============================================================
 echo json_encode([
-    'sucesso'    => true,
-    'total'      => count($top10),
-    'pagina'     => $pagina,
-    'especie'    => $nome_cientifico,
-    'candidatas' => $top10,
+    'sucesso'           => true,
+    'total'             => count($top10),
+    'pagina'            => $pagina,
+    'especie'           => $nome_cientifico,
+    'candidatas'        => $top10,
+    'flora_digital_url' => $GLOBALS['_flora_digital_url'],
+    'flora_digital_nome'=> $GLOBALS['_flora_digital_nome'],
 ]);
