@@ -31,7 +31,7 @@ $nome_usuario = $_SESSION['usuario_nome'] ?? 'Usuário';
 $especialistas = $pdo->query(
     "SELECT id, nome, subtipo_colaborador
      FROM usuarios
-     WHERE categoria IN ('revisor') AND ativo = 1 AND status_verificacao = 'verificado'
+     WHERE subtipo_colaborador = 'especialista' AND ativo = 1 AND status_verificacao = 'verificado'
      ORDER BY nome"
 )->fetchAll();
 
