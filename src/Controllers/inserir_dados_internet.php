@@ -797,7 +797,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             <div class="subtitle">PASSO 3: Preencha as características morfológicas manualmente ou use a pesquisa por IA abaixo</div>
         </div>
 
-        <?php if (isset($erro)): ?>
+        <?php if (!empty($erro)): ?>
             <div class="alert alert-danger">❌ <?php echo $erro; ?></div>
         <?php endif; ?>
 
