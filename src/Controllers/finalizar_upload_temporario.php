@@ -129,33 +129,21 @@ try {
     error_log("Status atualizado para 'dados_internet'");
 
     // ================================================
-    // 3. (IMAGENS JÁ SALVAS) — verificar partes obrigatórias no BD
+    // 3. (IMAGENS JÁ SALVAS) — verificar se há ao menos uma imagem
     // ================================================
-    $partes_obrigatorias = ['folha', 'flor', 'fruto', 'caule', 'habito'];
-
     $stmt_partes = $pdo->prepare(
-        "SELECT DISTINCT parte_planta FROM especies_imagens
+        "SELECT COUNT(*) FROM especies_imagens
          WHERE especie_id = ? AND status_validacao = 'aprovado'"
     );
     $stmt_partes->execute([$especie_id]);
-    $partes_com_imagem = array_column($stmt_partes->fetchAll(), null, 'parte_planta');
 
-    $partes_faltando = [];
-    foreach ($partes_obrigatorias as $parte) {
-        if (empty($partes_com_imagem[$parte])) {
-            $partes_faltando[] = ucfirst($parte);
-        }
-    }
-
-    if (!empty($partes_faltando)) {
-        $msg = 'Imagens obrigatórias ausentes: ' . implode(', ', $partes_faltando) . '. Adicione ao menos uma imagem para cada parte obrigatória.';
-        error_log("ERRO: Partes sem imagem: " . implode(', ', $partes_faltando));
+    if ((int)$stmt_partes->fetchColumn() === 0) {
         $pdo->rollBack();
-        header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode($msg));
+        header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode("Adicione ao menos uma imagem antes de avançar."));
         exit;
     }
 
-    error_log("Partes obrigatórias confirmadas no banco");
+    error_log("Imagem confirmada no banco");
 
     // ================================================
     // COMMIT - TUDO OK
