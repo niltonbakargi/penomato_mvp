@@ -65,6 +65,22 @@ $mime_para_ext = [
 ];
 
 // ============================================================
+// APAGAR IMAGENS ANTERIORES DA INTERNET PARA ESTA ESPÉCIE
+// ============================================================
+$stmt_antigas = $pdo->prepare(
+    "SELECT caminho_imagem FROM especies_imagens WHERE especie_id = ? AND origem = 'internet'"
+);
+$stmt_antigas->execute([$especie_id]);
+$raiz_uploads = realpath(__DIR__ . '/../../uploads/');
+foreach ($stmt_antigas->fetchAll(PDO::FETCH_COLUMN) as $caminho_antigo) {
+    $arq = realpath(__DIR__ . '/../../' . $caminho_antigo);
+    if ($arq && $raiz_uploads && str_starts_with($arq, $raiz_uploads)) {
+        @unlink($arq);
+    }
+}
+$pdo->prepare("DELETE FROM especies_imagens WHERE especie_id = ? AND origem = 'internet'")->execute([$especie_id]);
+
+// ============================================================
 // PROCESSAR CADA ATRIBUIÇÃO
 // ============================================================
 $salvas = 0;
