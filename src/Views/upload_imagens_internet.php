@@ -1080,7 +1080,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 <button onclick="trocarFonte('inaturalist')"   class="btn-fonte" data-fonte="inaturalist">🦋 iNaturalist</button>
                 <button onclick="trocarFonte('gbif')"          class="btn-fonte" data-fonte="gbif">🔬 GBIF</button>
                 <button onclick="trocarFonte('wikimedia')"     class="btn-fonte" data-fonte="wikimedia">📷 Wikimedia</button>
-                <button onclick="trocarFonte('flora_digital')" class="btn-fonte" data-fonte="flora_digital">🌿 Flora Digital</button>
+                <button class="btn-fonte" disabled title="Flora Digital carrega imagens via JavaScript — indisponível" style="opacity:.4;cursor:not-allowed;">🌿 Flora Digital</button>
                 <button onclick="trocarFonte('powo')"          class="btn-fonte" data-fonte="powo">🏛️ POWO/Kew</button>
             </div>
 

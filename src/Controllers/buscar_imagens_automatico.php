@@ -446,56 +446,53 @@ function buscar_powo(string $nome, int $pagina = 1): array
     ]);
 
     $resp_ipni = http_get($url_ipni);
-    if (!$resp_ipni) return [];
+    if (!$resp_ipni) { error_log("[POWO] IPNI falhou: $nome"); return []; }
 
     $dados_ipni = json_decode($resp_ipni, true);
     $resultados = $dados_ipni['results'] ?? [];
-    if (empty($resultados)) return [];
+    if (empty($resultados)) { error_log("[POWO] IPNI sem resultados: $nome"); return []; }
 
     // Encontrar resultado aceito no POWO com correspondência de nome
     $fq_id = null;
     $nome_lower = strtolower($nome);
-    $partes = explode(' ', $nome);
+    $partes  = explode(' ', $nome);
     $prefixo = strtolower(implode(' ', array_slice($partes, 0, 2)));
 
     foreach ($resultados as $r) {
         if (empty($r['inPowo']) || empty($r['fqId'])) continue;
         $nome_resultado = strtolower(trim(($r['genus'] ?? '') . ' ' . ($r['species'] ?? '')));
         if ($nome_resultado === $prefixo || strtolower($r['name'] ?? '') === $nome_lower) {
-            $fq_id = $r['fqId'];
-            break;
+            $fq_id = $r['fqId']; break;
         }
     }
-
-    // Fallback: primeiro resultado que esteja no POWO
     if (!$fq_id) {
         foreach ($resultados as $r) {
-            if (!empty($r['inPowo']) && !empty($r['fqId'])) {
-                $fq_id = $r['fqId'];
-                break;
-            }
+            if (!empty($r['inPowo']) && !empty($r['fqId'])) { $fq_id = $r['fqId']; break; }
         }
     }
 
-    if (!$fq_id) return [];
+    if (!$fq_id) { error_log("[POWO] fqId não encontrado: $nome"); return []; }
+    error_log("[POWO] fqId: $fq_id");
 
     // 2. Raspar página do POWO
     $url_powo = 'https://powo.science.kew.org/taxon/' . urlencode($fq_id);
     $html = http_get($url_powo);
-    if (!$html) return [];
+    if (!$html) { error_log("[POWO] página falhou: $url_powo"); return []; }
+    error_log("[POWO] HTML: " . strlen($html) . " bytes");
 
-    // 3. Extrair imagens do CloudFront (CDN do POWO)
+    // 3. Extrair imagens do CloudFront — padrão amplo
     preg_match_all(
-        '#//d2seqvvyy3b8p2\.cloudfront\.net/([a-f0-9]+\.(?:jpg|jpeg|png))#i',
+        '#(?:https?:)?//d2seqvvyy3b8p2\.cloudfront\.net/\S+\.(?:jpg|jpeg|png)#i',
         $html,
         $matches
     );
+    error_log("[POWO] imagens encontradas: " . count($matches[0]));
 
     $candidatas  = [];
     $urls_vistas = [];
 
-    foreach ($matches[0] as $caminho) {
-        $url_foto = 'https:' . $caminho;
+    foreach ($matches[0] as $url_foto) {
+        if (!str_starts_with($url_foto, 'http')) $url_foto = 'https:' . $url_foto;
         if (in_array($url_foto, $urls_vistas)) continue;
         $urls_vistas[] = $url_foto;
 
@@ -528,7 +525,7 @@ function buscar_powo(string $nome, int $pagina = 1): array
 $candidatas_inat  = in_array($fonte_filtro, ['todas','inaturalist'])   ? buscar_inaturalist($nome_cientifico, $pagina)  : [];
 $candidatas_wiki  = in_array($fonte_filtro, ['todas','wikimedia'])     ? buscar_wikimedia($nome_cientifico, $pagina)    : [];
 $candidatas_gbif  = in_array($fonte_filtro, ['todas','gbif'])          ? buscar_gbif($nome_cientifico, $pagina)         : [];
-$candidatas_flora = in_array($fonte_filtro, ['todas','flora_digital']) ? buscar_flora_digital($nome_cientifico, $pagina) : [];
+$candidatas_flora = []; // Flora Digital carrega imagens via JS — scraping não funciona
 $candidatas_powo  = in_array($fonte_filtro, ['todas','powo'])          ? buscar_powo($nome_cientifico, $pagina)          : [];
 
 $todas = array_merge($candidatas_inat, $candidatas_wiki, $candidatas_gbif, $candidatas_flora, $candidatas_powo);
