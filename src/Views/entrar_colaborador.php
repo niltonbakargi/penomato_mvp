@@ -112,13 +112,21 @@ $labels_subtipo = [
     'gestor'        => 'Gestor de Equipe',
 ];
 $label_subtipo = $labels_subtipo[$subtipo] ?? ucfirst($subtipo ?: 'Colaborador');
+
+$titulos_painel = [
+    'identificador' => 'Painel do Identificador',
+    'dev'           => 'Painel do Desenvolvedor',
+    'especialista'  => 'Painel do Especialista',
+    'gestor'        => 'Painel do Gestor',
+];
+$titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Colaborador — Penomato</title>
+    <title><?php echo $titulo_painel; ?> — Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
     <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
     <style>
@@ -261,7 +269,7 @@ $label_subtipo = $labels_subtipo[$subtipo] ?? ucfirst($subtipo ?: 'Colaborador')
     <?php endif; ?>
 
     <div class="header">
-        <h1>🌿 Painel do Colaborador</h1>
+        <h1>🌿 <?php echo $titulo_painel; ?></h1>
         <p><?php echo htmlspecialchars($nome_usuario); ?></p>
         <?php if ($subtipo): ?>
             <span class="subtipo-badge"><?php echo htmlspecialchars($label_subtipo); ?></span>
