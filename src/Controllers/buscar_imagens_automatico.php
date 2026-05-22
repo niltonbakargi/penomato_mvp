@@ -27,6 +27,7 @@ $usuario_id = (int)$_SESSION['usuario_id'];
 // ============================================================
 $especie_id = (int)($_POST['especie_id'] ?? 0);
 $pagina     = max(1, (int)($_POST['pagina'] ?? 1));
+$fonte_filtro = trim($_POST['fonte'] ?? 'todas'); // todas | inaturalist | gbif | wikimedia | flora_digital | powo
 
 if (!$especie_id) {
     echo json_encode(['sucesso' => false, 'erro' => 'Parâmetros inválidos']);
@@ -521,11 +522,11 @@ function buscar_powo(string $nome): array
 // ============================================================
 // EXECUTAR BUSCAS
 // ============================================================
-$candidatas_inat  = buscar_inaturalist($nome_cientifico, $pagina);
-$candidatas_wiki  = buscar_wikimedia($nome_cientifico, $pagina);
-$candidatas_gbif  = buscar_gbif($nome_cientifico, $pagina);
-$candidatas_flora = buscar_flora_digital($nome_cientifico);
-$candidatas_powo  = buscar_powo($nome_cientifico);
+$candidatas_inat  = in_array($fonte_filtro, ['todas','inaturalist'])   ? buscar_inaturalist($nome_cientifico, $pagina)  : [];
+$candidatas_wiki  = in_array($fonte_filtro, ['todas','wikimedia'])     ? buscar_wikimedia($nome_cientifico, $pagina)    : [];
+$candidatas_gbif  = in_array($fonte_filtro, ['todas','gbif'])          ? buscar_gbif($nome_cientifico, $pagina)         : [];
+$candidatas_flora = in_array($fonte_filtro, ['todas','flora_digital']) ? buscar_flora_digital($nome_cientifico)         : [];
+$candidatas_powo  = in_array($fonte_filtro, ['todas','powo'])          ? buscar_powo($nome_cientifico)                  : [];
 
 $todas = array_merge($candidatas_inat, $candidatas_wiki, $candidatas_gbif, $candidatas_flora, $candidatas_powo);
 

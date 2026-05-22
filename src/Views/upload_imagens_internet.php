@@ -689,6 +689,19 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             margin: 0;
             white-space: nowrap;
         }
+        .btn-fonte {
+            padding: 5px 11px;
+            border: 2px solid var(--cinza-300);
+            border-radius: var(--raio-full);
+            background: var(--branco);
+            color: var(--cinza-600);
+            font-size: var(--texto-xs);
+            font-weight: var(--peso-semi);
+            cursor: pointer;
+            transition: var(--transicao);
+        }
+        .btn-fonte:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
+        .btn-fonte.ativo { background: var(--cor-primaria); border-color: var(--cor-primaria); color: var(--branco); }
         .busca-especie-nome {
             color: var(--cinza-500);
             font-style: italic;
@@ -1056,9 +1069,19 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
 
             <!-- Cabeçalho -->
             <div class="busca-header">
-                <h2>🔍 Busca Automática</h2>
+                <h2>🔍 Busca de Imagens</h2>
                 <span id="buscaNomeEspecie" class="busca-especie-nome"></span>
                 <button id="btnFecharBusca" class="btn-fechar-busca" onclick="cancelarBusca()" title="Cancelar e fechar sem salvar">✕</button>
+            </div>
+
+            <!-- Botões de fonte -->
+            <div id="buscaFontes" style="display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;border-bottom:1px solid var(--cinza-200);">
+                <button onclick="trocarFonte('todas')"         class="btn-fonte ativo" data-fonte="todas">🌐 Todas</button>
+                <button onclick="trocarFonte('inaturalist')"   class="btn-fonte" data-fonte="inaturalist">🦋 iNaturalist</button>
+                <button onclick="trocarFonte('gbif')"          class="btn-fonte" data-fonte="gbif">🔬 GBIF</button>
+                <button onclick="trocarFonte('wikimedia')"     class="btn-fonte" data-fonte="wikimedia">📷 Wikimedia</button>
+                <button onclick="trocarFonte('flora_digital')" class="btn-fonte" data-fonte="flora_digital">🌿 Flora Digital</button>
+                <button onclick="trocarFonte('powo')"          class="btn-fonte" data-fonte="powo">🏛️ POWO/Kew</button>
             </div>
 
             <div class="busca-corpo">
@@ -1169,10 +1192,28 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
     // Abrir modal de busca
     // ------------------------------------------------
     function abrirBusca() {
-        busca = { imagens: [], indice: 0, pagina: 1, carregando: false, atribuicoes: {} };
+        busca = { imagens: [], indice: 0, pagina: 1, carregando: false, atribuicoes: {}, fonte: 'todas' };
 
         document.getElementById('buscaModal').classList.add('aberto');
         document.getElementById('buscaNomeEspecie').textContent = NOME_CIENT;
+
+        // Reset botões de fonte
+        document.querySelectorAll('.btn-fonte').forEach(b => b.classList.remove('ativo'));
+        document.querySelector('.btn-fonte[data-fonte="todas"]').classList.add('ativo');
+
+        mostrarEstadoBusca('loading');
+        carregarImagens();
+    }
+
+    function trocarFonte(fonte) {
+        busca.imagens    = [];
+        busca.indice     = 0;
+        busca.pagina     = 1;
+        busca.carregando = false;
+        busca.fonte      = fonte;
+
+        document.querySelectorAll('.btn-fonte').forEach(b => b.classList.remove('ativo'));
+        document.querySelector('.btn-fonte[data-fonte="' + fonte + '"]').classList.add('ativo');
 
         mostrarEstadoBusca('loading');
         carregarImagens();
@@ -1188,6 +1229,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
         const fd = new FormData();
         fd.append('especie_id', ESPECIE_ID);
         fd.append('pagina',     busca.pagina);
+        fd.append('fonte',      busca.fonte || 'todas');
 
         fetch('../Controllers/buscar_imagens_automatico.php', { method: 'POST', body: fd })
             .then(r => r.json())
