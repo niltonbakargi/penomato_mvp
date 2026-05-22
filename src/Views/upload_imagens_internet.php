@@ -1069,7 +1069,7 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
                 <!-- Loading -->
                 <div id="buscaLoading" class="busca-loading">
                     <div class="spinner"></div>
-                    <p style="color:var(--cinza-600);">Buscando no iNaturalist, GBIF, Wikimedia e Flora Digital UFSC...</p>
+                    <p style="color:var(--cinza-600);">Buscando no iNaturalist, GBIF, Wikimedia, Flora Digital UFSC e POWO/Kew...</p>
                 </div>
 
                 <!-- Sem resultados -->
@@ -1197,9 +1197,12 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
             .then(data => {
                 busca.carregando = false;
 
-                // Botão Flora Digital (sempre que a espécie for encontrada lá)
+                // Botões de fontes externas
                 if (data.flora_digital_url) {
                     mostrarBotaoFloraDigital(data.flora_digital_url, data.flora_digital_nome);
+                }
+                if (data.powo_url) {
+                    mostrarBotaoPowo(data.powo_url);
                 }
 
                 if (!data.sucesso || !data.candidatas || data.candidatas.length === 0) {
@@ -1234,11 +1237,22 @@ $parte_selecionada = isset($_GET['parte']) ? $_GET['parte'] : '';
     function mostrarBotaoFloraDigital(url, nome) {
         const container = document.getElementById('floraDigitalLink');
         if (!container) return;
-        container.innerHTML =
+        container.innerHTML +=
             '<a href="' + url + '" target="_blank" rel="noopener" ' +
             'style="display:inline-flex;align-items:center;gap:6px;background:#1a6b3c;color:#fff;' +
-            'padding:7px 14px;border-radius:8px;font-size:.82rem;font-weight:600;text-decoration:none;margin-top:8px;">' +
-            '🌿 Ver <em>' + nome + '</em> no Flora Digital UFSC</a>';
+            'padding:7px 14px;border-radius:8px;font-size:.82rem;font-weight:600;text-decoration:none;margin:4px;">' +
+            '🌿 Flora Digital UFSC — <em>' + nome + '</em></a>';
+        container.style.display = 'block';
+    }
+
+    function mostrarBotaoPowo(url) {
+        const container = document.getElementById('floraDigitalLink');
+        if (!container) return;
+        container.innerHTML +=
+            '<a href="' + url + '" target="_blank" rel="noopener" ' +
+            'style="display:inline-flex;align-items:center;gap:6px;background:#2c5f8a;color:#fff;' +
+            'padding:7px 14px;border-radius:8px;font-size:.82rem;font-weight:600;text-decoration:none;margin:4px;">' +
+            '🌍 POWO / Kew Gardens</a>';
         container.style.display = 'block';
     }
 

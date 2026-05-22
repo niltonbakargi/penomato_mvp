@@ -118,9 +118,10 @@ function pontuar(array $c): int
     $pts = 0;
 
     // Fonte
-    if ($c['fonte'] === 'inaturalist')   $pts += 15;
-    elseif ($c['fonte'] === 'gbif')      $pts += 12;
+    if ($c['fonte'] === 'inaturalist')       $pts += 15;
+    elseif ($c['fonte'] === 'gbif')          $pts += 12;
     elseif ($c['fonte'] === 'flora_digital') $pts += 18; // fonte botânica acadêmica brasileira
+    elseif ($c['fonte'] === 'powo')          $pts += 16; // Kew Gardens — referência taxonômica global
 
     // Licença (quanto mais aberta, melhor)
     $lic = strtolower($c['licenca'] ?? '');
@@ -432,17 +433,113 @@ function buscar_flora_digital(string $nome): array
 }
 
 // ============================================================
+// BUSCA 5 — Plants of the World Online (POWO / Kew)
+// Usa IPNI API para obter o fqId e raspa a página do POWO.
+// Licença: CC BY 3.0 (dados Kew)
+// ============================================================
+function buscar_powo(string $nome): array
+{
+    // 1. Buscar fqId via IPNI
+    $url_ipni = 'https://www.ipni.org/api/1/search?' . http_build_query([
+        'q' => $nome,
+        'f' => 'infraspecific',
+    ]);
+
+    $resp_ipni = http_get($url_ipni);
+    if (!$resp_ipni) return [];
+
+    $dados_ipni = json_decode($resp_ipni, true);
+    $resultados = $dados_ipni['results'] ?? [];
+    if (empty($resultados)) return [];
+
+    // Encontrar resultado aceito no POWO com correspondência de nome
+    $fq_id = null;
+    $nome_lower = strtolower($nome);
+    $partes = explode(' ', $nome);
+    $prefixo = strtolower(implode(' ', array_slice($partes, 0, 2)));
+
+    foreach ($resultados as $r) {
+        if (empty($r['inPowo']) || empty($r['fqId'])) continue;
+        $nome_resultado = strtolower(trim(($r['genus'] ?? '') . ' ' . ($r['species'] ?? '')));
+        if ($nome_resultado === $prefixo || strtolower($r['name'] ?? '') === $nome_lower) {
+            $fq_id = $r['fqId'];
+            break;
+        }
+    }
+
+    // Fallback: primeiro resultado que esteja no POWO
+    if (!$fq_id) {
+        foreach ($resultados as $r) {
+            if (!empty($r['inPowo']) && !empty($r['fqId'])) {
+                $fq_id = $r['fqId'];
+                break;
+            }
+        }
+    }
+
+    if (!$fq_id) return [];
+
+    // 2. Raspar página do POWO
+    $url_powo = 'https://powo.science.kew.org/taxon/' . urlencode($fq_id);
+    $html = http_get($url_powo);
+    if (!$html) return [];
+
+    // 3. Extrair imagens do CloudFront (CDN do POWO)
+    preg_match_all(
+        '#//d2seqvvyy3b8p2\.cloudfront\.net/([a-f0-9]+\.(?:jpg|jpeg|png))#i',
+        $html,
+        $matches
+    );
+
+    $candidatas  = [];
+    $urls_vistas = [];
+
+    foreach ($matches[0] as $caminho) {
+        $url_foto = 'https:' . $caminho;
+        if (in_array($url_foto, $urls_vistas)) continue;
+        $urls_vistas[] = $url_foto;
+
+        $candidatas[] = [
+            'url_foto'        => $url_foto,
+            'url_thumbnail'   => $url_foto,
+            'fonte'           => 'powo',
+            'fonte_url'       => $url_powo,
+            'fonte_nome'      => 'POWO / Kew',
+            'id_externo'      => md5($url_foto),
+            'autor'           => 'Royal Botanic Gardens, Kew',
+            'licenca'         => 'CC BY 3.0',
+            'local_coleta'    => null,
+            'latitude'        => null,
+            'longitude'       => null,
+            'data_observacao' => null,
+            'largura_px'      => null,
+            'altura_px'       => null,
+        ];
+
+        if (count($candidatas) >= 6) break;
+    }
+
+    $GLOBALS['_powo_url']  = $url_powo;
+    $GLOBALS['_powo_nome'] = $fq_id;
+
+    return $candidatas;
+}
+
+// ============================================================
 // EXECUTAR BUSCAS
 // ============================================================
 $GLOBALS['_flora_digital_url']  = null;
 $GLOBALS['_flora_digital_nome'] = null;
+$GLOBALS['_powo_url']           = null;
+$GLOBALS['_powo_nome']          = null;
 
 $candidatas_inat  = buscar_inaturalist($nome_cientifico, $pagina);
 $candidatas_wiki  = buscar_wikimedia($nome_cientifico, $pagina);
 $candidatas_gbif  = buscar_gbif($nome_cientifico, $pagina);
 $candidatas_flora = buscar_flora_digital($nome_cientifico);
+$candidatas_powo  = buscar_powo($nome_cientifico);
 
-$todas = array_merge($candidatas_inat, $candidatas_wiki, $candidatas_gbif, $candidatas_flora);
+$todas = array_merge($candidatas_inat, $candidatas_wiki, $candidatas_gbif, $candidatas_flora, $candidatas_powo);
 
 if (empty($todas)) {
     echo json_encode([
@@ -476,11 +573,12 @@ $top10 = array_slice($todas, 0, 10);
 // RESPOSTA
 // ============================================================
 echo json_encode([
-    'sucesso'           => true,
-    'total'             => count($top10),
-    'pagina'            => $pagina,
-    'especie'           => $nome_cientifico,
-    'candidatas'        => $top10,
-    'flora_digital_url' => $GLOBALS['_flora_digital_url'],
-    'flora_digital_nome'=> $GLOBALS['_flora_digital_nome'],
+    'sucesso'            => true,
+    'total'              => count($top10),
+    'pagina'             => $pagina,
+    'especie'            => $nome_cientifico,
+    'candidatas'         => $top10,
+    'flora_digital_url'  => $GLOBALS['_flora_digital_url'],
+    'flora_digital_nome' => $GLOBALS['_flora_digital_nome'],
+    'powo_url'           => $GLOBALS['_powo_url'],
 ]);
