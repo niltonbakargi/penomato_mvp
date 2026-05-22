@@ -425,10 +425,6 @@ function buscar_flora_digital(string $nome): array
         }
     }
 
-    // Sempre retorna o link direto para uso no frontend
-    $GLOBALS['_flora_digital_url'] = $url_sp;
-    $GLOBALS['_flora_digital_nome'] = $nome_encontrado;
-
     return $candidatas;
 }
 
@@ -519,20 +515,12 @@ function buscar_powo(string $nome): array
         if (count($candidatas) >= 6) break;
     }
 
-    $GLOBALS['_powo_url']  = $url_powo;
-    $GLOBALS['_powo_nome'] = $fq_id;
-
     return $candidatas;
 }
 
 // ============================================================
 // EXECUTAR BUSCAS
 // ============================================================
-$GLOBALS['_flora_digital_url']  = null;
-$GLOBALS['_flora_digital_nome'] = null;
-$GLOBALS['_powo_url']           = null;
-$GLOBALS['_powo_nome']          = null;
-
 $candidatas_inat  = buscar_inaturalist($nome_cientifico, $pagina);
 $candidatas_wiki  = buscar_wikimedia($nome_cientifico, $pagina);
 $candidatas_gbif  = buscar_gbif($nome_cientifico, $pagina);
@@ -573,12 +561,9 @@ $top10 = array_slice($todas, 0, 10);
 // RESPOSTA
 // ============================================================
 echo json_encode([
-    'sucesso'            => true,
-    'total'              => count($top10),
-    'pagina'             => $pagina,
-    'especie'            => $nome_cientifico,
-    'candidatas'         => $top10,
-    'flora_digital_url'  => $GLOBALS['_flora_digital_url'],
-    'flora_digital_nome' => $GLOBALS['_flora_digital_nome'],
-    'powo_url'           => $GLOBALS['_powo_url'],
+    'sucesso'    => true,
+    'total'      => count($top10),
+    'pagina'     => $pagina,
+    'especie'    => $nome_cientifico,
+    'candidatas' => $top10,
 ]);
