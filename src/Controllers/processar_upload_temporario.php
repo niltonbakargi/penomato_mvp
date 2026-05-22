@@ -5,6 +5,10 @@
 // Salva diretamente em especies_imagens — sem pasta temporária.
 // ================================================
 
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../../logs/upload_erro.log');
+error_reporting(E_ALL);
+
 session_start();
 ob_start();
 
