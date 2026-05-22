@@ -117,8 +117,9 @@ function pontuar(array $c): int
 {
     $pts = 0;
 
-    // Fonte (iNaturalist = observação de campo validada)
+    // Fonte (iNaturalist = observação de campo validada; GBIF = acervo científico global)
     if ($c['fonte'] === 'inaturalist') $pts += 15;
+    elseif ($c['fonte'] === 'gbif')    $pts += 12;
 
     // Licença (quanto mais aberta, melhor)
     $lic = strtolower($c['licenca'] ?? '');
@@ -285,12 +286,80 @@ function buscar_wikimedia(string $nome, int $pagina = 1): array
 }
 
 // ============================================================
+// BUSCA 3 — GBIF (Global Biodiversity Information Facility)
+// Busca ocorrências com mídia fotográfica, priorizando Brasil
+// ============================================================
+function buscar_gbif(string $nome, int $pagina = 1): array
+{
+    $url = 'https://api.gbif.org/v1/occurrence/search?' . http_build_query([
+        'scientificName' => $nome,
+        'mediaType'      => 'StillImage',
+        'country'        => 'BR',
+        'limit'          => 20,
+        'offset'         => ($pagina - 1) * 20,
+    ]);
+
+    $response = http_get($url);
+    if (!$response) return [];
+
+    $data = json_decode($response, true);
+    if (empty($data['results'])) return [];
+
+    $candidatas = [];
+
+    foreach ($data['results'] as $occ) {
+        if (empty($occ['media'])) continue;
+
+        foreach ($occ['media'] as $media) {
+            if (($media['type'] ?? '') !== 'StillImage') continue;
+
+            $url_foto = $media['identifier'] ?? '';
+            if (!$url_foto || !preg_match('/\.(jpg|jpeg|png|gif|webp)/i', $url_foto)) continue;
+
+            // Normalizar licença — GBIF retorna URL da licença
+            $lic_raw = $media['license'] ?? '';
+            if (str_contains($lic_raw, 'cc0'))         $licenca = 'CC0';
+            elseif (str_contains($lic_raw, '/by/'))    $licenca = 'CC BY 4.0';
+            elseif (str_contains($lic_raw, '/by-sa/')) $licenca = 'CC BY-SA 4.0';
+            elseif (str_contains($lic_raw, '/by-nc/')) $licenca = 'CC BY-NC 4.0';
+            else                                        $licenca = normalizar_licenca($lic_raw);
+
+            $estado = $occ['stateProvince'] ?? null;
+            $local  = trim(implode(', ', array_filter([$estado, 'Brasil'])));
+
+            $candidatas[] = [
+                'url_foto'        => $url_foto,
+                'url_thumbnail'   => $url_foto,
+                'fonte'           => 'gbif',
+                'fonte_url'       => 'https://www.gbif.org/occurrence/' . ($occ['key'] ?? ''),
+                'fonte_nome'      => 'GBIF',
+                'id_externo'      => (string)($occ['key'] ?? ''),
+                'autor'           => $media['rightsHolder'] ?? ($occ['recordedBy'] ?? null),
+                'licenca'         => $licenca,
+                'local_coleta'    => $local ?: null,
+                'latitude'        => $occ['decimalLatitude']  ?? null,
+                'longitude'       => $occ['decimalLongitude'] ?? null,
+                'data_observacao' => isset($occ['eventDate']) ? substr($occ['eventDate'], 0, 10) : null,
+                'largura_px'      => null,
+                'altura_px'       => null,
+            ];
+
+            // Uma imagem por ocorrência é suficiente
+            break;
+        }
+    }
+
+    return $candidatas;
+}
+
+// ============================================================
 // EXECUTAR BUSCAS
 // ============================================================
 $candidatas_inat = buscar_inaturalist($nome_cientifico, $pagina);
 $candidatas_wiki = buscar_wikimedia($nome_cientifico, $pagina);
+$candidatas_gbif = buscar_gbif($nome_cientifico, $pagina);
 
-$todas = array_merge($candidatas_inat, $candidatas_wiki);
+$todas = array_merge($candidatas_inat, $candidatas_wiki, $candidatas_gbif);
 
 if (empty($todas)) {
     echo json_encode([
@@ -301,6 +370,7 @@ if (empty($todas)) {
         'debug'      => [
             'inat'  => count($candidatas_inat),
             'wiki'  => count($candidatas_wiki),
+            'gbif'  => count($candidatas_gbif),
             'erros' => $GLOBALS['_http_erros'],
         ],
     ]);
