@@ -44,10 +44,14 @@ TIMEOUT = 30                 # segundos por requisição
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
+}
+
 def get(params):
-    # Token enviado no corpo POST para evitar bloqueio de WAF/ModSecurity
     data = {'token': BACKUP_TOKEN}
-    r = requests.post(BASE_URL, params=params, data=data, timeout=TIMEOUT)
+    r = requests.post(BASE_URL, params=params, data=data, headers=HEADERS, timeout=TIMEOUT)
     r.raise_for_status()
     return r
 
