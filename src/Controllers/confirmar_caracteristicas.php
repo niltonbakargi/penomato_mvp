@@ -2104,6 +2104,16 @@ function preencherCampo(id, valor) {
 }
 
 // ============================================================
+// UTILITÁRIO: re-dispara cascata após preenchimento programático
+// ============================================================
+function dispararCascataFolha() {
+    ['tipo_folha','divisao_folha'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.dispatchEvent(new Event('change'));
+    });
+}
+
+// ============================================================
 // CASCATA: tipo_folha → divisao_folha → paridade_pinnacao
 // ============================================================
 (function () {
@@ -2223,6 +2233,7 @@ function loadEspecieData(especieId) {
                 return;
             }
             _allCampos.forEach(function(c) { preencherCampo(c, dados[c]); });
+            dispararCascataFolha();
             _allCampos.forEach(function(c) {
                 var refEl = document.getElementById(c + '_ref');
                 if (refEl && dados[c + '_ref']) refEl.value = dados[c + '_ref'];
@@ -2397,6 +2408,8 @@ checkProgress();
                     preenchidos++;
                 });
             }
+
+            dispararCascataFolha();
 
             statusDiv.style.display = 'block';
             statusDiv.style.background = '#d1e7dd';
