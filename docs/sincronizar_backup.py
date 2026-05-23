@@ -24,7 +24,7 @@ from pathlib import Path
 # ============================================================
 # CONFIGURAÇÃO — ajuste conforme necessário
 # ============================================================
-BASE_URL   = "https://penomato.app.br/src/Controllers/api_backup.php"
+BASE_URL   = "https://penomato.app.br/src/Controllers/api_sync.php"
 
 # Token: deve ser o mesmo calculado pelo PHP
 # O PHP usa: 'penomato_backup_2026_' + md5(DB_PASS)
