@@ -122,17 +122,26 @@ function baixarBanco() {
     btn.disabled = true;
     setStatus('status-banco', 'run', '⏳ Gerando exportação do banco…');
 
-    // Cria iframe invisível para download — não bloqueia a página
-    var iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = '/penomato_mvp/src/Controllers/backup_banco.php';
-    document.body.appendChild(iframe);
-
-    // Aguarda alguns segundos e considera sucesso (o browser vai baixar o arquivo)
-    setTimeout(function() {
-        btn.disabled = false;
-        setStatus('status-banco', 'ok', '✅ Download iniciado. Verifique sua pasta de downloads.');
-    }, 4000);
+    fetch('/penomato_mvp/src/Controllers/backup_banco.php')
+        .then(function(res) {
+            if (!res.ok) return res.text().then(function(t) { throw new Error(t); });
+            return res.blob();
+        })
+        .then(function(blob) {
+            var url  = URL.createObjectURL(blob);
+            var a    = document.createElement('a');
+            var data = new Date().toISOString().slice(0,10);
+            a.href     = url;
+            a.download = 'banco_penomato_' + data + '.sql';
+            a.click();
+            URL.revokeObjectURL(url);
+            btn.disabled = false;
+            setStatus('status-banco', 'ok', '✅ Arquivo baixado com sucesso.');
+        })
+        .catch(function(err) {
+            btn.disabled = false;
+            setStatus('status-banco', 'err', '❌ Erro: ' + err.message);
+        });
 }
 
 function baixarImagens() {
@@ -140,15 +149,32 @@ function baixarImagens() {
     btn.disabled = true;
     setStatus('status-imgs', 'run', '⏳ Compactando imagens…');
 
-    var iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = '/penomato_mvp/src/Controllers/backup_imagens.php';
-    document.body.appendChild(iframe);
-
-    setTimeout(function() {
-        btn.disabled = false;
-        setStatus('status-imgs', 'ok', '✅ Download iniciado. Verifique sua pasta de downloads.');
-    }, 6000);
+    fetch('/penomato_mvp/src/Controllers/backup_imagens.php')
+        .then(function(res) {
+            if (res.status === 204) {
+                btn.disabled = false;
+                setStatus('status-imgs', 'ok', '⚠️ Nenhuma imagem encontrada em disco. Nada para baixar.');
+                return null;
+            }
+            if (!res.ok) return res.text().then(function(t) { throw new Error(t); });
+            return res.blob();
+        })
+        .then(function(blob) {
+            if (!blob) return;
+            var url  = URL.createObjectURL(blob);
+            var a    = document.createElement('a');
+            var data = new Date().toISOString().slice(0,10);
+            a.href     = url;
+            a.download = 'imagens_penomato_' + data + '.zip';
+            a.click();
+            URL.revokeObjectURL(url);
+            btn.disabled = false;
+            setStatus('status-imgs', 'ok', '✅ Arquivo baixado com sucesso.');
+        })
+        .catch(function(err) {
+            btn.disabled = false;
+            setStatus('status-imgs', 'err', '❌ Erro: ' + err.message);
+        });
 }
 </script>
 </body>
