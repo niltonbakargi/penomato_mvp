@@ -1,0 +1,155 @@
+<?php
+session_start();
+require_once __DIR__ . '/../../config/banco_de_dados.php';
+if (!isset($_SESSION['usuario_id'])) {
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php'); exit;
+}
+$stmt = $pdo->prepare("SELECT categoria FROM usuarios WHERE id = ? LIMIT 1");
+$stmt->execute([(int)$_SESSION['usuario_id']]);
+if ($stmt->fetchColumn() !== 'gestor') { http_response_code(403); die('Acesso restrito.'); }
+
+// Contagens para exibir
+$total_especies = $pdo->query("SELECT COUNT(*) FROM especies_administrativo")->fetchColumn();
+$total_imagens  = $pdo->query("SELECT COUNT(*) FROM especies_imagens")->fetchColumn();
+$dir_uploads    = __DIR__ . '/../../uploads/';
+$tamanho_uploads = 0;
+if (is_dir($dir_uploads)) {
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir_uploads, RecursiveDirectoryIterator::SKIP_DOTS));
+    foreach ($it as $f) { if ($f->isFile()) $tamanho_uploads += $f->getSize(); }
+}
+$tamanho_fmt = $tamanho_uploads > 1048576
+    ? round($tamanho_uploads / 1048576, 1) . ' MB'
+    : round($tamanho_uploads / 1024, 1) . ' KB';
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup — Penomato</title>
+    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <style>
+        body { background:#f0f4f0; font-family:'Segoe UI',sans-serif; padding:32px 20px; color:#1e2e1e; }
+        .container { max-width:600px; margin:0 auto; }
+        .header { background:var(--cor-primaria); color:#fff; padding:18px 28px; border-radius:10px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; }
+        .header h1 { font-size:1.2em; font-weight:600; }
+        .btn-voltar { background:rgba(255,255,255,.2); color:#fff; border:none; padding:7px 16px; border-radius:20px; cursor:pointer; text-decoration:none; font-size:.85em; }
+        .btn-voltar:hover { background:rgba(255,255,255,.35); }
+
+        .info-card { background:#fff; border-radius:10px; padding:20px 24px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,.07); display:flex; gap:32px; }
+        .info-item { text-align:center; }
+        .info-item .num { font-size:1.6em; font-weight:700; color:var(--cor-primaria); }
+        .info-item .label { font-size:.78em; color:#888; margin-top:2px; }
+
+        .etapa { background:#fff; border-radius:10px; padding:22px 24px; margin-bottom:16px; box-shadow:0 2px 8px rgba(0,0,0,.07); }
+        .etapa-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+        .etapa-num { width:32px; height:32px; border-radius:50%; background:var(--cor-primaria); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:.9em; flex-shrink:0; }
+        .etapa h2 { font-size:1em; font-weight:600; margin:0; }
+        .etapa p { font-size:.85em; color:#666; margin:0 0 14px 44px; }
+
+        .btn-etapa { display:inline-flex; align-items:center; gap:8px; background:var(--cor-primaria); color:#fff; border:none; padding:10px 22px; border-radius:8px; cursor:pointer; font-size:.88em; font-weight:600; text-decoration:none; margin-left:44px; transition:background .15s; }
+        .btn-etapa:hover { background:var(--cor-primaria-hover); }
+        .btn-etapa:disabled { background:#aaa; cursor:not-allowed; }
+
+        .status { margin-left:44px; margin-top:10px; font-size:.83em; padding:8px 12px; border-radius:6px; display:none; }
+        .status.ok  { background:#d4edda; color:#155724; display:block; }
+        .status.err { background:#f8d7da; color:#721c24; display:block; }
+        .status.run { background:#cce5ff; color:#004085; display:block; }
+
+        .aviso { background:#fff3cd; color:#856404; border-radius:8px; padding:12px 16px; font-size:.83em; margin-bottom:20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>💾 Backup do Sistema</h1>
+        <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar</a>
+    </div>
+
+    <div class="info-card">
+        <div class="info-item">
+            <div class="num"><?= $total_especies ?></div>
+            <div class="label">Espécies</div>
+        </div>
+        <div class="info-item">
+            <div class="num"><?= $total_imagens ?></div>
+            <div class="label">Imagens no banco</div>
+        </div>
+        <div class="info-item">
+            <div class="num"><?= $tamanho_fmt ?></div>
+            <div class="label">Arquivos em disco</div>
+        </div>
+    </div>
+
+    <div class="aviso">
+        💡 Faça o backup em duas etapas. Guarde os dois arquivos juntos — são necessários para uma restauração completa.
+    </div>
+
+    <!-- ETAPA 1 -->
+    <div class="etapa">
+        <div class="etapa-header">
+            <div class="etapa-num">1</div>
+            <h2>Banco de dados</h2>
+        </div>
+        <p>Exporta todas as tabelas em formato SQL. Inclui espécies, características, artigos, usuários e histórico.</p>
+        <button class="btn-etapa" id="btn-banco" onclick="baixarBanco()">⬇ Baixar banco.sql</button>
+        <div class="status" id="status-banco"></div>
+    </div>
+
+    <!-- ETAPA 2 -->
+    <div class="etapa">
+        <div class="etapa-header">
+            <div class="etapa-num">2</div>
+            <h2>Imagens</h2>
+        </div>
+        <p>Compacta todos os arquivos de imagem em um .zip. Tamanho atual em disco: <strong><?= $tamanho_fmt ?></strong>.</p>
+        <button class="btn-etapa" id="btn-imgs" onclick="baixarImagens()"><?= $tamanho_uploads === 0 ? '⬇ Baixar imagens.zip (vazio)' : '⬇ Baixar imagens.zip' ?></button>
+        <div class="status" id="status-imgs"></div>
+    </div>
+
+</div>
+
+<script>
+function setStatus(id, tipo, msg) {
+    var el = document.getElementById(id);
+    el.className = 'status ' + tipo;
+    el.textContent = msg;
+}
+
+function baixarBanco() {
+    var btn = document.getElementById('btn-banco');
+    btn.disabled = true;
+    setStatus('status-banco', 'run', '⏳ Gerando exportação do banco…');
+
+    // Cria iframe invisível para download — não bloqueia a página
+    var iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = '/penomato_mvp/src/Controllers/backup_banco.php';
+    document.body.appendChild(iframe);
+
+    // Aguarda alguns segundos e considera sucesso (o browser vai baixar o arquivo)
+    setTimeout(function() {
+        btn.disabled = false;
+        setStatus('status-banco', 'ok', '✅ Download iniciado. Verifique sua pasta de downloads.');
+    }, 4000);
+}
+
+function baixarImagens() {
+    var btn = document.getElementById('btn-imgs');
+    btn.disabled = true;
+    setStatus('status-imgs', 'run', '⏳ Compactando imagens…');
+
+    var iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = '/penomato_mvp/src/Controllers/backup_imagens.php';
+    document.body.appendChild(iframe);
+
+    setTimeout(function() {
+        btn.disabled = false;
+        setStatus('status-imgs', 'ok', '✅ Download iniciado. Verifique sua pasta de downloads.');
+    }, 6000);
+}
+</script>
+</body>
+</html>
