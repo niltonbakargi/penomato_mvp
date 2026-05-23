@@ -2,13 +2,13 @@
 // ============================================================
 // batch_ia.php — Processar espécies com IA uma a uma
 // ============================================================
-session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: ' . (defined('APP_BASE') ? APP_BASE : '') . '/src/Views/auth/login.php');
-    exit;
-}
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 require_once __DIR__ . '/../helpers/gerador_artigo.php';
+session_start();
+if (!isset($_SESSION['usuario_id'])) {
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
+    exit;
+}
 
 // ============================================================
 // AJAX: processar uma espécie
