@@ -108,14 +108,18 @@ return [
     // ═══════════════════════════════════════════════
 
     'cor_flores' => [
-        'Brancas'   => 'brancas',
-        'Amarelas'  => 'amarelas',
-        'Vermelhas' => 'vermelhas',
-        'Rosadas'   => 'rosadas',
-        'Roxas'     => 'roxas',
-        'Azuis'     => 'azuis',
-        'Laranjas'  => 'alaranjadas',
-        'Verdes'    => 'esverdeadas',
+        'Alaranjada' => 'alaranjadas',
+        'Amarela'    => 'amarelas',
+        'Avermelhada'=> 'avermelhadas',
+        'Azul'       => 'azuis',
+        'Branca'     => 'brancas',
+        'Esverdeada' => 'esverdeadas',
+        'Lilás'      => 'lilases',
+        'Púrpura'    => 'púrpuras',
+        'Rósea'      => 'róseas',
+        'Roxa'       => 'roxas',
+        'Vermelha'   => 'vermelhas',
+        'Vinácea'    => 'vinácias',
     ],
 
     'simetria_floral' => [
@@ -125,22 +129,32 @@ return [
     ],
 
     'numero_petalas' => [
-        '3 pétalas'    => 'com três pétalas',
-        '4 pétalas'    => 'com quatro pétalas',
-        '5 pétalas'    => 'com cinco pétalas',
+        '3 pétalas'      => 'com três pétalas',
+        '4 pétalas'      => 'com quatro pétalas',
+        '5 pétalas'      => 'com cinco pétalas',
+        '6 pétalas'      => 'com seis pétalas',
         'Muitas pétalas' => 'com numerosas pétalas',
+        'Ausentes'       => 'apétalas',
     ],
 
     'disposicao_flores' => [
-        'Isoladas'       => 'solitárias',
-        'Inflorescência' => 'reunidas em inflorescências',
+        'Solitária' => 'solitárias',
+        'Capítulo'  => 'reunidas em capítulos',
+        'Cacho'     => 'reunidas em cachos',
+        'Corimbo'   => 'reunidas em corimbos',
+        'Espádice'  => 'reunidas em espádices',
+        'Espiga'    => 'reunidas em espigas',
+        'Panícula'  => 'reunidas em panículas',
+        'Umbela'    => 'reunidas em umbelas',
     ],
 
     'aroma' => [
-        'Sem cheiro'       => null,
-        'Aroma suave'      => 'levemente perfumadas',
-        'Aroma forte'      => 'intensamente perfumadas',
-        'Aroma desagradável' => 'com odor desagradável',
+        'Ausente'      => null,
+        'Suave'        => 'levemente perfumadas',
+        'Forte'        => 'intensamente perfumadas',
+        'Desagradável' => 'com odor desagradável',
+        'Adocicada'    => 'com aroma adocicado',
+        'Cítrica'      => 'com aroma cítrico',
     ],
 
     'tamanho_flor' => [
@@ -201,10 +215,12 @@ return [
     ],
 
     'aroma_fruto' => [
-        'Sem cheiro'        => null,
-        'Aroma suave'       => 'levemente aromáticos',
-        'Aroma forte'       => 'intensamente aromáticos',
-        'Aroma desagradável'=> 'de odor desagradável',
+        'Ausente'      => null,
+        'Suave'        => 'levemente aromáticos',
+        'Forte'        => 'intensamente aromáticos',
+        'Adocicado'    => 'com aroma adocicado',
+        'Cítrico'      => 'com aroma cítrico',
+        'Desagradável' => 'de odor desagradável',
     ],
 
     // ═══════════════════════════════════════════════
