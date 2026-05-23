@@ -49,7 +49,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_campo') {
 
     $whitelist = [
         'nome_cientifico_completo','sinonimos','nome_popular','familia',
-        'forma_folha','filotaxia_folha','tipo_folha','tamanho_folha','textura_folha',
+        'forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao',
+        'tamanho_folha','textura_folha',
         'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
         'disposicao_flores','aroma','tamanho_flor','tipo_fruto','tamanho_fruto',
         'cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto','tipo_semente',
@@ -115,7 +116,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_obs') {
 
     $whitelist_obs = [
         'nome_cientifico_completo','sinonimos','nome_popular','familia',
-        'forma_folha','filotaxia_folha','tipo_folha','tamanho_folha','textura_folha',
+        'forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao',
+        'tamanho_folha','textura_folha',
         'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
         'disposicao_flores','aroma','tamanho_flor','tipo_fruto','tamanho_fruto',
         'cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto','tipo_semente',
@@ -167,7 +169,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
         'nome_cientifico_completo' => 'Nome Científico Completo',
         'sinonimos' => 'Sinônimos', 'nome_popular' => 'Nome Popular', 'familia' => 'Família',
         'forma_folha' => 'Forma da Folha', 'filotaxia_folha' => 'Filotaxia da Folha',
-        'tipo_folha' => 'Tipo de Folha', 'tamanho_folha' => 'Tamanho da Folha',
+        'tipo_folha' => 'Tipo de Folha', 'divisao_folha' => 'Divisão da Folha',
+        'paridade_pinnacao' => 'Paridade da Pinação', 'tamanho_folha' => 'Tamanho da Folha',
         'textura_folha' => 'Textura da Folha', 'margem_folha' => 'Margem da Folha',
         'venacao_folha' => 'Venação da Folha', 'cor_flores' => 'Cor das Flores',
         'simetria_floral' => 'Simetria Floral', 'numero_petalas' => 'Número de Pétalas',
@@ -209,15 +212,16 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
             . "Estipe, colmo e tronco são TIPOS de caule, não modificações — portanto NÃO devem ser considerados ao avaliar este campo. "
             . "Se a espécie não apresenta nenhuma das estruturas acima, o valor \"Nenhuma\" é botanicamente correto.";
     } elseif ($campo === 'margem_folha') {
-        $tipo_folha = trim($_POST['tipo_folha'] ?? '');
-        $compostas_bipinadas = ['Composta bipinada', 'Composta tripinada'];
-        $compostas_simples   = ['Composta digitada', 'Composta imparipinada', 'Composta paripinada', 'Composta pinnada', 'Composta trifoliada'];
-        if (in_array($tipo_folha, $compostas_bipinadas)) {
-            $contexto_margem = "\nObservação importante: esta espécie possui folha do tipo \"{$tipo_folha}\". "
+        $tipo_folha    = trim($_POST['tipo_folha']        ?? '');
+        $divisao_folha = trim($_POST['divisao_folha']     ?? '');
+        $divisoes_foliolo = ['Bipinnada','Tripinnada','Tetrapinnada'];
+        $divisoes_foliolo_simples = ['Pinnada','Trifoliada','Digitada'];
+        if ($tipo_folha === 'Composta' && in_array($divisao_folha, $divisoes_foliolo)) {
+            $contexto_margem = "\nObservação importante: esta espécie possui folha composta {$divisao_folha}. "
                 . "A margem informada refere-se ao FOLÍOLULO (a menor subdivisão da folha), não à folha inteira. "
                 . "Considere isso ao validar o valor e ao buscar referências.";
-        } elseif (in_array($tipo_folha, $compostas_simples)) {
-            $contexto_margem = "\nObservação importante: esta espécie possui folha do tipo \"{$tipo_folha}\". "
+        } elseif ($tipo_folha === 'Composta' && in_array($divisao_folha, $divisoes_foliolo_simples)) {
+            $contexto_margem = "\nObservação importante: esta espécie possui folha composta {$divisao_folha}. "
                 . "A margem informada refere-se ao FOLÍOLO, não à folha inteira. "
                 . "Considere isso ao validar o valor e ao buscar referências.";
         }
@@ -338,7 +342,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
         'nome_cientifico_completo','nome_cientifico_completo_ref','sinonimos','sinonimos_ref',
         'nome_popular','nome_popular_ref','familia','familia_ref',
         'forma_folha','forma_folha_ref','filotaxia_folha','filotaxia_folha_ref',
-        'tipo_folha','tipo_folha_ref','tamanho_folha','tamanho_folha_ref',
+        'tipo_folha','tipo_folha_ref','divisao_folha','divisao_folha_ref',
+        'paridade_pinnacao','paridade_pinnacao_ref','tamanho_folha','tamanho_folha_ref',
         'textura_folha','textura_folha_ref','margem_folha','margem_folha_ref',
         'venacao_folha','venacao_folha_ref','cor_flores','cor_flores_ref',
         'simetria_floral','simetria_floral_ref','numero_petalas','numero_petalas_ref',
@@ -847,9 +852,8 @@ ob_end_clean();
           <label for="tipo_folha">Tipo</label>
           <select id="tipo_folha" name="tipo_folha">
             <option value="" disabled selected>Selecione…</option>
-            <option>Simples</option><option>Composta bipinada</option><option>Composta digitada</option>
-            <option>Composta imparipinada</option><option>Composta paripinada</option>
-            <option>Composta pinnada</option><option>Composta trifoliada</option><option>Composta tripinada</option>
+            <option>Simples</option>
+            <option>Composta</option>
           </select>
         </div>
         <div class="field-refs">
@@ -862,6 +866,54 @@ ob_end_clean();
         </div>
         <div class="field-confirm">
           <button type="button" class="confirm-btn" data-campo="tipo_folha" title="Confirmar">✓</button>
+        </div>
+      </div>
+
+      <div class="field-row" data-campo="divisao_folha" id="row-divisao-folha" style="display:none">
+        <div class="field-main">
+          <label for="divisao_folha">Divisão</label>
+          <select id="divisao_folha" name="divisao_folha">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Trifoliada</option>
+            <option>Digitada</option>
+            <option>Pinnada</option>
+            <option>Bipinnada</option>
+            <option>Tripinnada</option>
+            <option>Tetrapinnada</option>
+          </select>
+        </div>
+        <div class="field-refs">
+          <label>Refs</label>
+          <div class="ref-badges-wrap">
+            <div class="ref-badges" id="badges_divisao_folha"></div>
+            <button type="button" class="btn-buscar-ref" data-campo="divisao_folha" title="Buscar referência via IA">🔍</button>
+          </div>
+          <input type="hidden" id="divisao_folha_ref" name="divisao_folha_ref">
+        </div>
+        <div class="field-confirm">
+          <button type="button" class="confirm-btn" data-campo="divisao_folha" title="Confirmar">✓</button>
+        </div>
+      </div>
+
+      <div class="field-row" data-campo="paridade_pinnacao" id="row-paridade-pinnacao" style="display:none">
+        <div class="field-main">
+          <label for="paridade_pinnacao">Paridade</label>
+          <select id="paridade_pinnacao" name="paridade_pinnacao">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Paripinnada</option>
+            <option>Imparipinnada</option>
+          </select>
+        </div>
+        <div class="field-refs">
+          <label>Refs</label>
+          <div class="ref-badges-wrap">
+            <div class="ref-badges" id="badges_paridade_pinnacao"></div>
+            <button type="button" class="btn-buscar-ref" data-campo="paridade_pinnacao" title="Buscar referência via IA">🔍</button>
+          </div>
+          <input type="hidden" id="paridade_pinnacao_ref" name="paridade_pinnacao_ref">
+        </div>
+        <div class="field-confirm">
+          <button type="button" class="confirm-btn" data-campo="paridade_pinnacao" title="Confirmar">✓</button>
         </div>
       </div>
 
@@ -1812,8 +1864,10 @@ function searchRefCampo(campo) {
         referencias_existentes: JSON.stringify(refsPayload)
     };
     if (campo === 'margem_folha') {
-        var tipoFolhaEl = document.getElementById('tipo_folha');
-        if (tipoFolhaEl && tipoFolhaEl.value) params.tipo_folha = tipoFolhaEl.value;
+        var tipoFolhaEl    = document.getElementById('tipo_folha');
+        var divisaoFolhaEl = document.getElementById('divisao_folha');
+        if (tipoFolhaEl    && tipoFolhaEl.value)    params.tipo_folha    = tipoFolhaEl.value;
+        if (divisaoFolhaEl && divisaoFolhaEl.value) params.divisao_folha = divisaoFolhaEl.value;
     }
 
     fetch('confirmar_caracteristicas.php', {
@@ -2032,37 +2086,72 @@ function preencherCampo(id, valor) {
 }
 
 // ============================================================
+// CASCATA: tipo_folha → divisao_folha → paridade_pinnacao
+// ============================================================
+(function () {
+    var divPinadas   = ['Pinnada','Bipinnada','Tripinnada'];
+    var tipoSel      = document.getElementById('tipo_folha');
+    var divisaoSel   = document.getElementById('divisao_folha');
+    var paridadeSel  = document.getElementById('paridade_pinnacao');
+    var rowDivisao   = document.getElementById('row-divisao-folha');
+    var rowParidade  = document.getElementById('row-paridade-pinnacao');
+
+    function atualizarCascata() {
+        var tipo    = tipoSel    ? tipoSel.value    : '';
+        var divisao = divisaoSel ? divisaoSel.value : '';
+
+        if (tipo === 'Composta') {
+            rowDivisao.style.display = '';
+        } else {
+            rowDivisao.style.display = 'none';
+            if (divisaoSel)  divisaoSel.value  = '';
+            if (paridadeSel) paridadeSel.value = '';
+            rowParidade.style.display = 'none';
+        }
+
+        if (divPinadas.indexOf(divisao) !== -1) {
+            rowParidade.style.display = '';
+        } else {
+            rowParidade.style.display = 'none';
+            if (paridadeSel) paridadeSel.value = '';
+        }
+    }
+
+    if (tipoSel)    tipoSel.addEventListener('change', atualizarCascata);
+    if (divisaoSel) divisaoSel.addEventListener('change', atualizarCascata);
+    atualizarCascata();
+})();
+
+// ============================================================
 // OBSERVAÇÃO: MARGEM EM FOLHAS COMPOSTAS
 // ============================================================
 (function () {
-    var tipoSel = document.getElementById('tipo_folha');
-    var obs     = document.getElementById('obs-margem-composta');
-    var txt     = document.getElementById('obs-margem-texto');
+    var tipoSel    = document.getElementById('tipo_folha');
+    var divisaoSel = document.getElementById('divisao_folha');
+    var obs        = document.getElementById('obs-margem-composta');
+    var txt        = document.getElementById('obs-margem-texto');
 
-    var mensagens = {
-        'Composta bipinada':    'Em folhas compostas bipinadas a margem se refere ao <strong>folíolulo</strong> (a menor subdivisão da folha).',
-        'Composta tripinada':   'Em folhas compostas tripinadas a margem se refere ao <strong>folíolulo</strong> (a menor subdivisão da folha).',
-        'Composta digitada':    'Em folhas compostas digitadas a margem se refere ao <strong>folíolo</strong>.',
-        'Composta imparipinada':'Em folhas compostas imparipinadas a margem se refere ao <strong>folíolo</strong>.',
-        'Composta paripinada':  'Em folhas compostas paripinadas a margem se refere ao <strong>folíolo</strong>.',
-        'Composta pinnada':     'Em folhas compostas pinnadas a margem se refere ao <strong>folíolo</strong>.',
-        'Composta trifoliada':  'Em folhas compostas trifoliadas a margem se refere ao <strong>folíolo</strong>.',
-    };
+    var msgFoliolo   = 'Em folhas compostas a margem se refere ao <strong>folíolulo</strong> (a menor subdivisão da folha).';
+    var msgFoliolo_s = 'Em folhas compostas a margem se refere ao <strong>folíolo</strong>.';
+    var divFoliolo   = ['Bipinnada','Tripinnada','Tetrapinnada'];
+    var divFolioloS  = ['Pinnada','Trifoliada','Digitada'];
 
     function atualizar() {
-        var v = tipoSel ? tipoSel.value : '';
-        if (mensagens[v]) {
-            txt.innerHTML = mensagens[v];
-            obs.style.display = 'block';
+        var tipo    = tipoSel    ? tipoSel.value    : '';
+        var divisao = divisaoSel ? divisaoSel.value : '';
+        if (tipo !== 'Composta') { obs.style.display = 'none'; return; }
+        if (divFoliolo.indexOf(divisao) !== -1) {
+            txt.innerHTML = msgFoliolo; obs.style.display = 'block';
+        } else if (divFolioloS.indexOf(divisao) !== -1) {
+            txt.innerHTML = msgFoliolo_s; obs.style.display = 'block';
         } else {
             obs.style.display = 'none';
         }
     }
 
-    if (tipoSel) {
-        tipoSel.addEventListener('change', atualizar);
-        atualizar(); // aplica ao carregar se já houver valor
-    }
+    if (tipoSel)    tipoSel.addEventListener('change', atualizar);
+    if (divisaoSel) divisaoSel.addEventListener('change', atualizar);
+    atualizar();
 })();
 
 // ============================================================
@@ -2070,7 +2159,8 @@ function preencherCampo(id, valor) {
 // ============================================================
 var _allCampos = [
     'nome_cientifico_completo','sinonimos','nome_popular','familia',
-    'forma_folha','filotaxia_folha','tipo_folha','tamanho_folha','textura_folha',
+    'forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao',
+    'tamanho_folha','textura_folha',
     'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
     'disposicao_flores','aroma','tamanho_flor','tipo_fruto','tamanho_fruto',
     'cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto','tipo_semente',

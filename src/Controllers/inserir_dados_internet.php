@@ -52,9 +52,11 @@ $nome_cientifico = $stmt_nome->fetchColumn() ?: 'Espécie desconhecida';
 // LISTA DE VALORES PADRONIZADOS PARA VALIDAÇÃO
 // ================================================
 $opcoes_validas = [
-    'forma_folha'       => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Pinada','Lobada'],
+    'forma_folha'       => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Lobada'],
     'filotaxia_folha'   => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
-    'tipo_folha'        => ['Simples','Composta bipinada','Composta digitada','Composta imparipinada','Composta paripinada','Composta pinnada','Composta trifoliada','Composta tripinada'],
+    'tipo_folha'        => ['Simples','Composta'],
+    'divisao_folha'     => ['Trifoliada','Digitada','Pinnada','Bipinnada','Tripinnada','Tetrapinnada'],
+    'paridade_pinnacao' => ['Paripinnada','Imparipinnada'],
     'tamanho_folha'     => ['Microfilas (< 2 cm)','Nanofilas (2–7 cm)','Mesofilas (7–20 cm)','Macrófilas (20–50 cm)','Megafilas (> 50 cm)'],
     'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],
     'margem_folha'      => ['Crenada','Dentada','Inteira','Lobada','Ondulada','Serreada','Serrilhada','Partida'],
@@ -102,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         'sinonimos', 'sinonimos_ref', 'nome_popular', 'nome_popular_ref',
         'familia', 'familia_ref', 'forma_folha', 'forma_folha_ref',
         'filotaxia_folha', 'filotaxia_folha_ref', 'tipo_folha', 'tipo_folha_ref',
+        'divisao_folha', 'divisao_folha_ref', 'paridade_pinnacao', 'paridade_pinnacao_ref',
         'tamanho_folha', 'tamanho_folha_ref', 'textura_folha', 'textura_folha_ref',
         'margem_folha', 'margem_folha_ref', 'venacao_folha', 'venacao_folha_ref',
         'cor_flores', 'cor_flores_ref', 'simetria_floral', 'simetria_floral_ref',
@@ -938,15 +941,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tipo_folha">Tipo</label>
                         <select id="tipo_folha" name="tipo_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Simples</option><option>Composta bipinada</option><option>Composta digitada</option>
-                            <option>Composta imparipinada</option><option>Composta paripinada</option>
-                            <option>Composta pinnada</option><option>Composta trifoliada</option><option>Composta tripinada</option>
+                            <option>Simples</option>
+                            <option>Composta</option>
                         </select>
                     </div>
                     <div class="ref-col">
                         <label for="tipo_folha_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="tipo_folha_ref" name="tipo_folha_ref" placeholder="URL ou nº">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group" id="grp-divisao-folha" style="display:none">
+                    <div class="main-input">
+                        <label for="divisao_folha">Divisão</label>
+                        <select id="divisao_folha" name="divisao_folha">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Trifoliada</option>
+                            <option>Digitada</option>
+                            <option>Pinnada</option>
+                            <option>Bipinnada</option>
+                            <option>Tripinnada</option>
+                            <option>Tetrapinnada</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="divisao_folha_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="divisao_folha_ref" name="divisao_folha_ref" placeholder="URL ou nº">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group" id="grp-paridade-pinnacao" style="display:none">
+                    <div class="main-input">
+                        <label for="paridade_pinnacao">Paridade</label>
+                        <select id="paridade_pinnacao" name="paridade_pinnacao">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Paripinnada</option>
+                            <option>Imparipinnada</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="paridade_pinnacao_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="paridade_pinnacao_ref" name="paridade_pinnacao_ref" placeholder="URL ou nº">
                         </div>
                     </div>
                 </div>
@@ -1734,6 +1774,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             document.body.style.overflow = 'auto';
         }
     };
+    // ── CASCATA: tipo_folha → divisao_folha → paridade_pinnacao ──
+    (function () {
+        var divPinadas = ['Pinnada','Bipinnada','Tripinnada'];
+        var tipoSel      = document.getElementById('tipo_folha');
+        var divisaoSel   = document.getElementById('divisao_folha');
+        var paridadeSel  = document.getElementById('paridade_pinnacao');
+        var grpDivisao   = document.getElementById('grp-divisao-folha');
+        var grpParidade  = document.getElementById('grp-paridade-pinnacao');
+
+        function atualizarCascata() {
+            var tipo    = tipoSel    ? tipoSel.value    : '';
+            var divisao = divisaoSel ? divisaoSel.value : '';
+
+            if (tipo === 'Composta') {
+                grpDivisao.style.display = '';
+            } else {
+                grpDivisao.style.display = 'none';
+                if (divisaoSel) divisaoSel.value = '';
+                if (paridadeSel) paridadeSel.value = '';
+                grpParidade.style.display = 'none';
+            }
+
+            if (divPinadas.indexOf(divisao) !== -1) {
+                grpParidade.style.display = '';
+            } else {
+                grpParidade.style.display = 'none';
+                if (paridadeSel) paridadeSel.value = '';
+            }
+        }
+
+        if (tipoSel)    tipoSel.addEventListener('change', atualizarCascata);
+        if (divisaoSel) divisaoSel.addEventListener('change', atualizarCascata);
+        atualizarCascata();
+    })();
     </script>
 </body>
 </html>

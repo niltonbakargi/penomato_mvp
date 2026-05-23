@@ -71,9 +71,11 @@ $model    = defined('AI_MODEL') ? AI_MODEL : null;
 // O prompt abaixo é gerado a partir desta mesma lista.
 // ============================================================
 $opcoes_validas = [
-    'forma_folha'       => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Pinada','Lobada'],
+    'forma_folha'       => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Lobada'],
     'filotaxia_folha'   => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
-    'tipo_folha'        => ['Simples','Composta bipinada','Composta digitada','Composta imparipinada','Composta paripinada','Composta pinnada','Composta trifoliada','Composta tripinada'],
+    'tipo_folha'        => ['Simples','Composta'],
+    'divisao_folha'     => ['Trifoliada','Digitada','Pinnada','Bipinnada','Tripinnada','Tetrapinnada'],
+    'paridade_pinnacao' => ['Paripinnada','Imparipinnada'],
     'tamanho_folha'     => ['Microfilas (< 2 cm)','Nanofilas (2–7 cm)','Mesofilas (7–20 cm)','Macrófilas (20–50 cm)','Megafilas (> 50 cm)'],
     'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],
     'margem_folha'      => ['Crenada','Dentada','Inteira','Lobada','Ondulada','Serreada','Serrilhada','Partida'],
@@ -137,6 +139,11 @@ REGRAS OBRIGATÓRIAS — leia antes de responder:
 
 7. CAMPOS OPCIONAIS INAPLICÁVEIS: Use string vazia "".
 
+10. DEPENDÊNCIA DE FOLHA COMPOSTA:
+    - "divisao_folha" só deve ser preenchido se "tipo_folha" = "Composta". Caso contrário use "".
+    - "paridade_pinnacao" só deve ser preenchido se "divisao_folha" for "Pinnada", "Bipinnada" ou "Tripinnada". Caso contrário use "".
+    - "forma_folha" descreve a forma do folíolo quando a folha for composta.
+
 8. DADOS AUSENTES: Se não puder ser confirmado com segurança, use "Não informado" para campos de seleção e "" para campos livres. NUNCA invente dados.
 
 9. especie_id deve conter EXATAMENTE: {$nome_cientifico}
@@ -166,6 +173,10 @@ ESTRUTURA DO JSON DE SAÍDA (preencha todos os campos):
   "filotaxia_folha_ref": "",
   "tipo_folha": "",
   "tipo_folha_ref": "",
+  "divisao_folha": "",
+  "divisao_folha_ref": "",
+  "paridade_pinnacao": "",
+  "paridade_pinnacao_ref": "",
   "tamanho_folha": "",
   "tamanho_folha_ref": "",
   "textura_folha": "",

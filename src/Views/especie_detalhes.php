@@ -443,6 +443,30 @@ ob_end_clean();
                                     </td>
                                 </tr>
                                 <?php endif; ?>
+
+                                <?php if (!empty($especie['divisao_folha'])): ?>
+                                <tr>
+                                    <td>Divisão</td>
+                                    <td>
+                                        <?php echo htmlspecialchars($especie['divisao_folha']); ?>
+                                        <?php if (!empty($especie['divisao_folha_ref'])): ?>
+                                            <span class="referencia-badge">REF: <?php echo htmlspecialchars($especie['divisao_folha_ref']); ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
+
+                                <?php if (!empty($especie['paridade_pinnacao'])): ?>
+                                <tr>
+                                    <td>Paridade</td>
+                                    <td>
+                                        <?php echo htmlspecialchars($especie['paridade_pinnacao']); ?>
+                                        <?php if (!empty($especie['paridade_pinnacao_ref'])): ?>
+                                            <span class="referencia-badge">REF: <?php echo htmlspecialchars($especie['paridade_pinnacao_ref']); ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
                                 
                                 <?php if (!empty($especie['tamanho_folha'])): ?>
                                 <tr>
@@ -493,8 +517,9 @@ ob_end_clean();
                                 <?php endif; ?>
                                 
                                 <?php
-                                $tem_folha = !empty($especie['forma_folha']) || !empty($especie['filotaxia_folha']) || 
-                                            !empty($especie['tipo_folha']) || !empty($especie['tamanho_folha']) ||
+                                $tem_folha = !empty($especie['forma_folha']) || !empty($especie['filotaxia_folha']) ||
+                                            !empty($especie['tipo_folha']) || !empty($especie['divisao_folha']) ||
+                                            !empty($especie['paridade_pinnacao']) || !empty($especie['tamanho_folha']) ||
                                             !empty($especie['textura_folha']) || !empty($especie['margem_folha']) ||
                                             !empty($especie['venacao_folha']);
                                 

@@ -625,9 +625,11 @@ $nomes_partes = [
 
                         <!-- FOLHA -->
                         <?php 
-                        $tem_folha = !empty($carac['forma_folha']) || 
-                                     !empty($carac['filotaxia']) || 
+                        $tem_folha = !empty($carac['forma_folha']) ||
+                                     !empty($carac['filotaxia']) ||
                                      !empty($carac['tipo_folha']) ||
+                                     !empty($carac['divisao_folha']) ||
+                                     !empty($carac['paridade_pinnacao']) ||
                                      !empty($carac['margem_folha']) ||
                                      !empty($carac['textura_folha']) ||
                                      !empty($carac['venacao_folha']) ||
@@ -672,6 +674,32 @@ $nomes_partes = [
                                             $carac['tipo_folha'],
                                             $carac['tipo_folha_ref'] ?? '',
                                             'tipo_folha'
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($carac['divisao_folha'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Divisão</div>
+                                    <div class="char-value">
+                                        <?php echo exibirCaracteristica(
+                                            $carac['divisao_folha'],
+                                            $carac['divisao_folha_ref'] ?? '',
+                                            'divisao_folha'
+                                        ); ?>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($carac['paridade_pinnacao'])): ?>
+                                <div class="char-item">
+                                    <div class="char-label">Paridade</div>
+                                    <div class="char-value">
+                                        <?php echo exibirCaracteristica(
+                                            $carac['paridade_pinnacao'],
+                                            $carac['paridade_pinnacao_ref'] ?? '',
+                                            'paridade_pinnacao'
                                         ); ?>
                                     </div>
                                 </div>

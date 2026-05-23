@@ -239,7 +239,7 @@ $status_labels = [
 ];
 
 $campos_display = [
-    'Folha'    => ['forma_folha','filotaxia_folha','tipo_folha','tamanho_folha','textura_folha','margem_folha','venacao_folha'],
+    'Folha'    => ['forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao','tamanho_folha','textura_folha','margem_folha','venacao_folha'],
     'Flor'     => ['cor_flores','simetria_floral','numero_petalas','disposicao_flores','tamanho_flor','aroma'],
     'Fruto'    => ['tipo_fruto','tamanho_fruto','cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto'],
     'Semente'  => ['tipo_semente','tamanho_semente','cor_semente','textura_semente','quantidade_sementes'],

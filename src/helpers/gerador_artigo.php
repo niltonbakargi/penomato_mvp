@@ -63,7 +63,33 @@ function _art_caule(array $c): ?string {
 }
 
 function _art_folha(array $c): ?string {
-    $tipo  = _art_vr('tipo_folha',  $c['tipo_folha']  ?? '', $c['tipo_folha_ref']  ?? '');
+    $tipo_val     = $c['tipo_folha']        ?? '';
+    $divisao_val  = $c['divisao_folha']     ?? '';
+    $paridade_val = $c['paridade_pinnacao'] ?? '';
+
+    // Funde refs dos três campos para um único <sup>
+    $ref_combinada = implode(';', array_filter([
+        $c['tipo_folha_ref']        ?? '',
+        $c['divisao_folha_ref']     ?? '',
+        $c['paridade_pinnacao_ref'] ?? '',
+    ]));
+
+    $tipo = null;
+    if ($tipo_val === 'Simples') {
+        $tipo = _art_vr('tipo_folha', 'Simples', $ref_combinada);
+    } elseif ($tipo_val === 'Composta') {
+        if ($paridade_val) {
+            // paridade é mais específica: "compostas paripinadas"
+            $paridade_texto = _art_vr('paridade_pinnacao', $paridade_val, $ref_combinada);
+            $tipo = $paridade_texto ? 'compostas ' . $paridade_texto : null;
+        } elseif ($divisao_val) {
+            $divisao_texto = _art_vr('divisao_folha', $divisao_val, $ref_combinada);
+            $tipo = $divisao_texto ? 'compostas ' . $divisao_texto : _art_vr('tipo_folha', 'Composta', $ref_combinada);
+        } else {
+            $tipo = _art_vr('tipo_folha', 'Composta', $ref_combinada);
+        }
+    }
+
     $forma = _art_vr('forma_folha', $c['forma_folha'] ?? '', $c['forma_folha_ref'] ?? '');
     $nucleo = array_filter([$tipo, $forma]);
     if (!$nucleo) return null;

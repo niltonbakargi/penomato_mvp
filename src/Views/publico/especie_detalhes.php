@@ -19,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $campos_like = ['nome_cientifico_completo', 'nome_popular', 'familia'];
 $todos_campos = [
     'nome_cientifico_completo', 'nome_popular', 'familia',
-    'forma_folha', 'filotaxia_folha', 'tipo_folha', 'tamanho_folha', 'textura_folha', 'margem_folha', 'venacao_folha',
+    'forma_folha', 'filotaxia_folha', 'tipo_folha', 'divisao_folha', 'paridade_pinnacao',
+    'tamanho_folha', 'textura_folha', 'margem_folha', 'venacao_folha',
     'cor_flores', 'simetria_floral', 'numero_petalas', 'tamanho_flor', 'disposicao_flores', 'aroma',
     'tipo_fruto', 'tamanho_fruto', 'cor_fruto', 'textura_fruto', 'dispersao_fruto', 'aroma_fruto',
     'tipo_semente', 'tamanho_semente', 'cor_semente', 'textura_semente', 'quantidade_sementes',
@@ -58,7 +59,8 @@ $sql = "SELECT
             c.familia,
             c.sinonimos,
             c.referencias,
-            c.forma_folha, c.filotaxia_folha, c.tipo_folha, c.tamanho_folha, c.textura_folha, c.margem_folha, c.venacao_folha,
+            c.forma_folha, c.filotaxia_folha, c.tipo_folha, c.divisao_folha, c.paridade_pinnacao,
+            c.tamanho_folha, c.textura_folha, c.margem_folha, c.venacao_folha,
             c.cor_flores, c.simetria_floral, c.numero_petalas, c.tamanho_flor, c.disposicao_flores, c.aroma,
             c.tipo_fruto, c.tamanho_fruto, c.cor_fruto, c.textura_fruto, c.dispersao_fruto, c.aroma_fruto,
             c.tipo_semente, c.tamanho_semente, c.cor_semente, c.textura_semente, c.quantidade_sementes,
@@ -100,6 +102,8 @@ foreach ($rows as $r) {
             'Forma'     => $r['forma_folha'],
             'Filotaxia' => $r['filotaxia_folha'],
             'Tipo'      => $r['tipo_folha'],
+            'Divisão'   => $r['divisao_folha'],
+            'Paridade'  => $r['paridade_pinnacao'],
             'Tamanho'   => $r['tamanho_folha'],
             'Textura'   => $r['textura_folha'],
             'Margem'    => $r['margem_folha'],

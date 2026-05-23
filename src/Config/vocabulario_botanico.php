@@ -45,11 +45,22 @@ return [
     ],
 
     'tipo_folha' => [
-        'Simples'              => 'simples',
-        'Composta pinnada'     => 'compostas pinadas',
-        'Composta bipinada'    => 'compostas bipinadas',
-        'Composta tripinada'   => 'compostas tripinadas',
-        'Composta tetrapinada' => 'compostas tetrapinadas',
+        'Simples'   => 'simples',
+        'Composta'  => 'compostas',
+    ],
+
+    'divisao_folha' => [
+        'Trifoliada'   => 'trifoliadas',
+        'Digitada'     => 'digitadas',
+        'Pinnada'      => 'pinadas',
+        'Bipinnada'    => 'bipinadas',
+        'Tripinnada'   => 'tripinadas',
+        'Tetrapinnada' => 'tetrapinadas',
+    ],
+
+    'paridade_pinnacao' => [
+        'Paripinnada'   => 'paripinadas',
+        'Imparipinnada' => 'imparipinadas',
     ],
 
     'tamanho_folha' => [
@@ -201,11 +212,13 @@ return [
     // ═══════════════════════════════════════════════
 
     'tipo_semente' => [
-        'Alada'   => 'aladas',
-        'Carnosa' => 'carnosas',
-        'Dura'    => 'de tegumento duro',
-        'Oleosa'  => 'oleosas',
-        'Peluda'  => 'pilosas',
+        'Alada'      => 'aladas',
+        'Carnosa'    => 'carnosas',
+        'Dura'       => 'de tegumento duro',
+        'Oleaginosa' => 'oleaginosas',
+        'Plumosa'    => 'plumosas',
+        'Ruminada'   => 'ruminadas',
+        'Arilada'    => 'ariladas',
     ],
 
     'tamanho_semente' => [
