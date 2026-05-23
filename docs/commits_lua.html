@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Penomato — Commits vs Fase da Lua</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 32px 24px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #c9d1d9;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 0.82rem;
+    color: #8b949e;
+    margin-bottom: 36px;
+  }
+  .chart-wrap {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 28px 20px 20px;
+    max-width: 1100px;
+    margin: 0 auto 32px;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    justify-content: center;
+    max-width: 1100px;
+    margin: 0 auto 32px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: #8b949e;
+  }
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .stat-card {
+    background: #161b22;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+    padding: 18px 28px;
+    text-align: center;
+    min-width: 150px;
+  }
+  .stat-card .moon { font-size: 1.8rem; margin-bottom: 6px; }
+  .stat-card .count { font-size: 1.6rem; font-weight: 700; }
+  .stat-card .label { font-size: 0.75rem; color: #8b949e; margin-top: 4px; }
+  .nova   .count { color: #a8b2bf; }
+  .cresc  .count { color: #58a6ff; }
+  .cheia  .count { color: #f0c97a; }
+  .ming   .count { color: #da6e6e; }
+</style>
+</head>
+<body>
+
+<h1>Penomato — Commits por Dia &amp; Fase da Lua</h1>
+<p class="subtitle">Fevereiro – Abril 2026 &nbsp;·&nbsp; 157 commits totais &nbsp;·&nbsp; 36 dias ativos</p>
+
+<div class="chart-wrap">
+  <canvas id="chart" height="90"></canvas>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#a8b2bf"></div> 🌑 Lua Nova</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div> 🌒 Crescente</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f0c97a"></div> 🌕 Lua Cheia</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#da6e6e"></div> 🌘 Minguante</div>
+  <div class="legend-item">
+    <div style="width:14px;height:3px;background:#30363d;border-top:2px dashed #58a6ff;"></div>
+    linha de fase da lua (0–29)
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card nova">
+    <div class="moon">🌑</div>
+    <div class="count">30</div>
+    <div class="label">Lua Nova</div>
+  </div>
+  <div class="stat-card cresc">
+    <div class="moon">🌒</div>
+    <div class="count">90</div>
+    <div class="label">Crescente</div>
+  </div>
+  <div class="stat-card cheia">
+    <div class="moon">🌕</div>
+    <div class="count">23</div>
+    <div class="label">Lua Cheia</div>
+  </div>
+  <div class="stat-card ming">
+    <div class="moon">🌘</div>
+    <div class="count">14</div>
+    <div class="label">Minguante</div>
+  </div>
+</div>
+
+<script>
+// Todos os dias com commits
+const rawData = [
+  ['2026-02-08', 2], ['2026-02-09', 3], ['2026-02-12', 2], ['2026-02-13', 2],
+  ['2026-02-15', 1], ['2026-02-17', 1], ['2026-02-18', 3], ['2026-02-19', 2],
+  ['2026-02-20', 1], ['2026-02-27', 1], ['2026-03-02', 1], ['2026-03-12', 2],
+  ['2026-03-16', 2], ['2026-03-17', 9], ['2026-03-18', 1], ['2026-03-19', 3],
+  ['2026-03-20', 2], ['2026-03-21', 1], ['2026-03-22', 3], ['2026-03-23', 35],
+  ['2026-03-24', 13], ['2026-03-25', 4], ['2026-03-28', 19], ['2026-04-02', 1],
+  ['2026-04-08', 11], ['2026-04-11', 4], ['2026-04-12', 8], ['2026-04-14', 2],
+  ['2026-04-15', 3], ['2026-04-20', 8], ['2026-04-21', 4], ['2026-04-22', 5],
+  ['2026-04-23', 11], ['2026-04-24', 3], ['2026-04-25', 4], ['2026-04-27', 4],
+];
+
+// Calcula fase da lua (algoritmo de Conway simplificado, retorna 0-29)
+function moonPhase(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  let r = year % 100;
+  r %= 19;
+  if (r > 9) r -= 19;
+  r = ((r * 11) % 30) + month + day;
+  if (month < 3) r += 2;
+  r -= 8.3; // year >= 2000
+  r = Math.floor(r + 0.5) % 30;
+  return r < 0 ? r + 30 : r;
+}
+
+function phaseColor(p) {
+  if (p <= 1 || p >= 29) return '#a8b2bf'; // nova
+  if (p <= 14) return '#58a6ff';            // crescente
+  if (p <= 16) return '#f0c97a';            // cheia
+  return '#da6e6e';                          // minguante
+}
+
+function phaseEmoji(p) {
+  if (p <= 1 || p >= 29) return '🌑';
+  if (p <= 6)  return '🌒';
+  if (p <= 8)  return '🌓';
+  if (p <= 13) return '🌔';
+  if (p <= 15) return '🌕';
+  if (p <= 21) return '🌖';
+  if (p <= 23) return '🌗';
+  return '🌘';
+}
+
+const labels   = rawData.map(d => d[0]);
+const commits  = rawData.map(d => d[1]);
+const phases   = rawData.map(d => moonPhase(d[0]));
+const colors   = rawData.map(d => phaseColor(moonPhase(d[0])));
+
+// Fundo por fase (banda colorida suave)
+function bgColor(p) {
+  if (p <= 1 || p >= 29) return 'rgba(168,178,191,0.08)';
+  if (p <= 14) return 'rgba(88,166,255,0.07)';
+  if (p <= 16) return 'rgba(240,201,122,0.10)';
+  return 'rgba(218,110,110,0.07)';
+}
+
+const ctx = document.getElementById('chart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'Commits',
+        data: commits,
+        backgroundColor: colors,
+        borderColor: colors.map(c => c + 'cc'),
+        borderWidth: 1,
+        borderRadius: 4,
+        yAxisID: 'yCommits',
+        order: 2,
+      },
+      {
+        label: 'Dia do Ciclo Lunar (0–29)',
+        data: phases,
+        type: 'line',
+        borderColor: 'rgba(88,166,255,0.45)',
+        backgroundColor: 'transparent',
+        borderDash: [4, 3],
+        borderWidth: 1.5,
+        pointRadius: 5,
+        pointBackgroundColor: colors,
+        pointBorderColor: '#0d1117',
+        pointBorderWidth: 1.5,
+        tension: 0.35,
+        yAxisID: 'yLua',
+        order: 1,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        labels: { color: '#8b949e', font: { size: 11 } }
+      },
+      tooltip: {
+        backgroundColor: '#1c2128',
+        borderColor: '#30363d',
+        borderWidth: 1,
+        titleColor: '#e6edf3',
+        bodyColor: '#8b949e',
+        padding: 12,
+        callbacks: {
+          title: ctx => ctx[0].label,
+          label: ctx => {
+            if (ctx.datasetIndex === 0) {
+              return '  commits: ' + ctx.parsed.y;
+            } else {
+              const p = ctx.parsed.y;
+              return '  lua: dia ' + p + '  ' + phaseEmoji(p);
+            }
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#8b949e',
+          font: { size: 10 },
+          maxRotation: 45,
+          minRotation: 35,
+        },
+        grid: { color: '#21262d' }
+      },
+      yCommits: {
+        position: 'left',
+        title: { display: true, text: 'Commits', color: '#58a6ff', font: { size: 11 } },
+        ticks: { color: '#8b949e', font: { size: 10 } },
+        grid: { color: '#21262d' },
+        beginAtZero: true,
+      },
+      yLua: {
+        position: 'right',
+        title: { display: true, text: 'Dia do ciclo lunar', color: 'rgba(88,166,255,0.5)', font: { size: 11 } },
+        ticks: {
+          color: '#8b949e',
+          font: { size: 10 },
+          callback: v => {
+            const labels = { 0: '🌑 0', 7: '🌓 7', 14: '🌔 14', 15: '🌕 15', 22: '🌗 22', 29: '🌑 29' };
+            return labels[v] !== undefined ? labels[v] : v;
+          }
+        },
+        grid: { display: false },
+        min: 0,
+        max: 29,
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

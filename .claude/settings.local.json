@@ -15,7 +15,13 @@
       "Bash(\"C:/xampp/mysql/bin/mysql\" -u root -e \"SELECT id, especie_id, status FROM penomato.artigos WHERE especie_id = 32;\")",
       "Bash(\"C:/xampp/mysql/bin/mysql\" -u root -e \"SELECT id, especie_id, status, LENGTH\\(texto_html\\) as tamanho FROM penomato.artigos;\")",
       "Bash(\"C:/xampp/mysql/bin/mysql\" -u root penomato -e \"SELECT id, especie_id, status FROM artigos LIMIT 10;\")",
-      "Bash(\"C:/xampp/mysql/bin/mysql\" -u root penomato -e \"SELECT COUNT\\(*\\) FROM especies_imagens WHERE especie_id=32;\")"
+      "Bash(\"C:/xampp/mysql/bin/mysql\" -u root penomato -e \"SELECT COUNT\\(*\\) FROM especies_imagens WHERE especie_id=32;\")",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "WebFetch(domain:api.github.com)",
+      "Read(//c/Users/Acer/Downloads//**)",
+      "Read(//c/Users/Acer/**)",
+      "Read(//c/Users/Acer//**)"
     ]
   }
 }
