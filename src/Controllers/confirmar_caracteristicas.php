@@ -73,6 +73,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_campo') {
             $pdo->prepare("INSERT INTO especies_caracteristicas (especie_id, `{$campo}`, `{$cr}`, referencias) VALUES (?,?,?,?)")
                 ->execute([$especie_id, $valor ?: null, $ref ?: null, $referencias ?: null]);
         }
+        $pdo->prepare("UPDATE especies_administrativo SET data_ultima_atualizacao = NOW() WHERE id = ?")
+            ->execute([$especie_id]);
         echo json_encode(['ok' => true]);
     } catch (Exception $e) {
         echo json_encode(['ok' => false, 'erro' => $e->getMessage()]);
@@ -387,7 +389,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
         } else {
             inserir('especies_caracteristicas', $dados);
         }
-        // Não altera status — espécie permanece como 'dados_internet'
+        // Não altera status — atualiza apenas data_ultima_atualizacao
+        $pdo->prepare("UPDATE especies_administrativo SET data_ultima_atualizacao = NOW() WHERE id = ?")
+            ->execute([$especie_id]);
         confirmarTransacao();
         regenerarArtigoEspecie($pdo, $especie_id);
         $_SESSION['msg_sucesso'] = 'Características salvas e artigo atualizado com sucesso!';
