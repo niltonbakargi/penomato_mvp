@@ -446,13 +446,13 @@ $campos_display = [
             transition: .15s;
             letter-spacing: .01em;
         }
-        .btn-primario   { background: var(--cor-primaria); color: #fff; }
+        .btn-primario,   a.btn-primario,   a.btn-primario:visited { background: var(--cor-primaria); color: #fff !important; }
         .btn-primario:hover { background: var(--cor-primaria-hover); }
-        .btn-secundario { background: #334155; color: #fff; }
+        .btn-secundario, a.btn-secundario, a.btn-secundario:visited { background: #334155; color: #fff !important; }
         .btn-secundario:hover { background: #1e293b; }
-        .btn-aviso      { background: #b45309; color: #fff; }
+        .btn-aviso,      a.btn-aviso,      a.btn-aviso:visited      { background: #b45309; color: #fff !important; }
         .btn-aviso:hover { background: #92400e; }
-        .btn-perigo     { background: #b91c1c; color: #fff; }
+        .btn-perigo,     a.btn-perigo,     a.btn-perigo:visited     { background: #b91c1c; color: #fff !important; }
         .btn-perigo:hover { background: #991b1b; }
 
         /* Zona de perigo */
