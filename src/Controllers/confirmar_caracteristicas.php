@@ -673,8 +673,8 @@ ob_end_clean();
 
 <form action="confirmar_caracteristicas.php" method="post" id="form-principal">
 
-  <!-- ── SELEÇÃO DE ESPÉCIE ── -->
-  <div class="card">
+  <!-- ── SELEÇÃO DE ESPÉCIE (oculto quando especie_id vem na URL) ── -->
+  <div class="card" <?php if ($especie_id_url) echo 'style="display:none"'; ?>>
     <label for="especie_id">Espécie (Nome Científico)</label>
     <select id="especie_id" name="especie_id" required>
       <option value="" disabled selected>Selecione uma espécie…</option>
