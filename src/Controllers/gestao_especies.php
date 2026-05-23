@@ -223,7 +223,10 @@ $colaboradores = $pdo->query("
 
     <div class="header">
         <h1>🌿 Gestão de Espécies</h1>
-        <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar ao painel</a>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <a href="batch_ia.php" class="btn-voltar" style="background:rgba(255,255,255,0.2)">🤖 Batch IA</a>
+            <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar ao painel</a>
+        </div>
     </div>
 
     <!-- Filtros por status -->
