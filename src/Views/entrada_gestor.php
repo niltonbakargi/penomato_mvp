@@ -251,6 +251,10 @@
             <span class="icon">👤</span>
             Perfil Colaborador
         </div>
+        <div class="action-btn" onclick="abrirModal('modal-backup')">
+            <span class="icon">💾</span>
+            Backup
+        </div>
     </div>
 
     <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
@@ -285,7 +289,47 @@ Handroanthus impetiginosus"></textarea>
         </div>
     </div>
 
+    <!-- ══════════════════════════════════════════ -->
+    <!-- MODAL: BACKUP                              -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-backup">
+        <div class="modal">
+            <h2>💾 Backup do Sistema</h2>
+            <p style="font-size:0.9em;color:#555;margin-bottom:16px;">
+                O backup roda no seu PC e salva o banco de dados completo + imagens em <code>docs/backup_local/</code>.
+            </p>
+
+            <label>1. Abra o terminal na pasta do projeto</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
+                <input type="text" id="cmd-cd" value="cd C:\xampp\htdocs\penomato_mvp" readonly
+                       style="flex:1;font-family:monospace;font-size:0.82em;background:#f4f4f4;">
+                <button onclick="copiar('cmd-cd', this)" style="padding:8px 12px;background:var(--cor-primaria);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.82em;white-space:nowrap;">Copiar</button>
+            </div>
+
+            <label>2. Execute o script de backup</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;">
+                <input type="text" id="cmd-py" value="python docs/sincronizar_backup.py" readonly
+                       style="flex:1;font-family:monospace;font-size:0.82em;background:#f4f4f4;">
+                <button onclick="copiar('cmd-py', this)" style="padding:8px 12px;background:var(--cor-primaria);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.82em;white-space:nowrap;">Copiar</button>
+            </div>
+            <small style="color:#888;font-size:0.8em;">Primeira vez: <code>pip install requests</code></small>
+
+            <div class="modal-footer" style="margin-top:20px;">
+                <button type="button" class="btn-cancel" onclick="fecharModal('modal-backup')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+    function copiar(inputId, btn) {
+        var val = document.getElementById(inputId).value;
+        navigator.clipboard.writeText(val).then(function() {
+            var orig = btn.textContent;
+            btn.textContent = '✓ Copiado';
+            setTimeout(function() { btn.textContent = orig; }, 1500);
+        });
+    }
+
     function abrirModal(id) {
         document.getElementById(id).classList.add('ativo');
     }
