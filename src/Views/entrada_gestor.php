@@ -251,10 +251,6 @@
             <span class="icon">👤</span>
             Perfil Colaborador
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/backup_painel.php'">
-            <span class="icon">💾</span>
-            Backup
-        </div>
     </div>
 
     <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
