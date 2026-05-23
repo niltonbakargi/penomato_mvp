@@ -412,6 +412,7 @@ ob_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 $especies = [];
 $mensagem_erro = '';
+$especie_id_url = (int)($_GET['especie_id'] ?? 0);
 try {
     $especies = buscarTodos(
         "SELECT id, nome_cientifico, status FROM especies_administrativo
@@ -694,14 +695,14 @@ ob_end_clean();
         if ($com_dados): ?>
           <optgroup label="⚡ Com dados da internet (verificar)">
             <?php foreach ($com_dados as $e): ?>
-              <option value="<?php echo $e['id']; ?>"><?php echo htmlspecialchars($e['nome_cientifico']); ?></option>
+              <option value="<?php echo $e['id']; ?>" <?php if ($especie_id_url === (int)$e['id']) echo 'selected'; ?>><?php echo htmlspecialchars($e['nome_cientifico']); ?></option>
             <?php endforeach; ?>
           </optgroup>
         <?php endif;
         if ($sem_dados): ?>
           <optgroup label="📋 Sem dados (preencher manualmente)">
             <?php foreach ($sem_dados as $e): ?>
-              <option value="<?php echo $e['id']; ?>"><?php echo htmlspecialchars($e['nome_cientifico']); ?></option>
+              <option value="<?php echo $e['id']; ?>" <?php if ($especie_id_url === (int)$e['id']) echo 'selected'; ?>><?php echo htmlspecialchars($e['nome_cientifico']); ?></option>
             <?php endforeach; ?>
           </optgroup>
         <?php endif;
@@ -2331,6 +2332,12 @@ function escAttr(str) {
 document.getElementById('especie_id').addEventListener('change', function() {
     if (this.value) loadEspecieData(this.value);
 });
+
+// Auto-load quando especie_id vem na URL
+(function() {
+    var presel = <?php echo $especie_id_url ?: 'null'; ?>;
+    if (presel) loadEspecieData(presel);
+})();
 
 document.addEventListener('click', function(e) {
     var confBtn = e.target.closest('.confirm-btn');
