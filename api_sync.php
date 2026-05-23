@@ -75,8 +75,8 @@ if ($acao === 'imagem') {
         exit;
     }
 
-    $arquivo = realpath(__DIR__ . '/../../' . $caminho);
-    $raiz    = realpath(__DIR__ . '/../../uploads/');
+    $arquivo = realpath(__DIR__ . '/' . $caminho);
+    $raiz    = realpath(__DIR__ . '/uploads/');
 
     if (!$arquivo || !$raiz || !str_starts_with($arquivo, $raiz) || !file_exists($arquivo)) {
         http_response_code(404);
