@@ -8,6 +8,9 @@ $stmt = $pdo->prepare("SELECT categoria FROM usuarios WHERE id = ? LIMIT 1");
 $stmt->execute([(int)$_SESSION['usuario_id']]);
 if ($stmt->fetchColumn() !== 'gestor') { http_response_code(403); die('Acesso restrito.'); }
 
+// Token da API de backup (mesmo cálculo do api_backup.php)
+$backup_token = 'penomato_backup_2026_' . md5(DB_PASS ?? 'token');
+
 // Contagens para exibir
 $total_especies = $pdo->query("SELECT COUNT(*) FROM especies_administrativo")->fetchColumn();
 $total_imagens  = $pdo->query("SELECT COUNT(*) FROM especies_imagens")->fetchColumn();
@@ -110,6 +113,24 @@ foreach ($rows_img as $cam) {
         💡 Faça o backup em duas etapas. Guarde os dois arquivos juntos — são necessários para uma restauração completa.
     </div>
 
+    <!-- SINCRONIZAÇÃO PYTHON -->
+    <div class="etapa">
+        <div class="etapa-header">
+            <div class="etapa-num" style="background:#334155">🐍</div>
+            <h2>Sincronização automática via Python</h2>
+        </div>
+        <p style="margin-left:44px">Use o script <code>docs/sincronizar_backup.py</code> no seu PC para backup automático sem sobrecarregar o servidor. Configure o token abaixo no script antes de rodar.</p>
+        <div style="margin-left:44px;margin-top:8px;">
+            <label style="font-size:.8em;color:#555;font-weight:600;">TOKEN DA API (cole no script Python):</label>
+            <div style="display:flex;gap:8px;margin-top:4px;align-items:center;">
+                <input type="text" id="token-api" value="<?= htmlspecialchars($backup_token) ?>"
+                       readonly style="flex:1;font-family:monospace;font-size:.78em;padding:8px 10px;border:1px solid #ddd;border-radius:6px;background:#f8f8f8;">
+                <button onclick="copiarToken()" style="padding:8px 14px;background:var(--cor-primaria);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:.82em;">Copiar</button>
+            </div>
+            <p style="margin:6px 0 0;font-size:.78em;color:#888;">Instale dependências: <code>pip install requests</code> — depois rode: <code>python sincronizar_backup.py</code></p>
+        </div>
+    </div>
+
     <!-- ETAPA 1 -->
     <div class="etapa">
         <div class="etapa-header">
@@ -135,6 +156,13 @@ foreach ($rows_img as $cam) {
 </div>
 
 <script>
+function copiarToken() {
+    var el = document.getElementById('token-api');
+    navigator.clipboard.writeText(el.value).then(function() {
+        alert('Token copiado!');
+    });
+}
+
 function setStatus(id, tipo, msg) {
     var el = document.getElementById(id);
     el.className = 'status ' + tipo;
