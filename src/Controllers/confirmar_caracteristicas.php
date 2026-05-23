@@ -387,14 +387,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
         } else {
             inserir('especies_caracteristicas', $dados);
         }
-        $autor_id = $_SESSION['usuario_id'] ?? null;
-        atualizar('especies_administrativo',
-            ['status' => 'descrita', 'data_descrita' => date('Y-m-d H:i:s'), 'autor_descrita_id' => $autor_id],
-            'id = :id', [':id' => $especie_id]);
-        $pdo->prepare("INSERT INTO historico_alteracoes (especie_id, id_usuario, tabela_afetada, campo_alterado, valor_anterior, valor_novo, tipo_acao) VALUES (?,?,'especies_administrativo','status','dados_internet','descrita','edicao')")
-            ->execute([$especie_id, $autor_id]);
-        $pdo->prepare("UPDATE artigos SET status='confirmado', data_confirmado=NOW(), atualizado_em=NOW() WHERE especie_id=? AND status='rascunho'")
-            ->execute([$especie_id]);
+        // Não altera status — espécie permanece como 'dados_internet'
         confirmarTransacao();
         regenerarArtigoEspecie($pdo, $especie_id);
         $_SESSION['msg_sucesso'] = 'Identificação confirmada e dados salvos com sucesso!';
