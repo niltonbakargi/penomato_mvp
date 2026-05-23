@@ -11,15 +11,29 @@ if ($stmt->fetchColumn() !== 'gestor') { http_response_code(403); die('Acesso re
 // Contagens para exibir
 $total_especies = $pdo->query("SELECT COUNT(*) FROM especies_administrativo")->fetchColumn();
 $total_imagens  = $pdo->query("SELECT COUNT(*) FROM especies_imagens")->fetchColumn();
-$dir_uploads    = __DIR__ . '/../../uploads/';
+
+// Verificar quantos arquivos existem de facto em disco
+$dir_uploads     = __DIR__ . '/../../uploads/';
 $tamanho_uploads = 0;
+$arquivos_disco  = 0;
 if (is_dir($dir_uploads)) {
     $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir_uploads, RecursiveDirectoryIterator::SKIP_DOTS));
-    foreach ($it as $f) { if ($f->isFile()) $tamanho_uploads += $f->getSize(); }
+    foreach ($it as $f) { if ($f->isFile()) { $tamanho_uploads += $f->getSize(); $arquivos_disco++; } }
 }
 $tamanho_fmt = $tamanho_uploads > 1048576
     ? round($tamanho_uploads / 1048576, 1) . ' MB'
     : round($tamanho_uploads / 1024, 1) . ' KB';
+
+// Verificar quantos caminhos do BD existem em disco
+$raiz = realpath(__DIR__ . '/../../');
+$rows_img = $pdo->query("SELECT caminho_imagem FROM especies_imagens")->fetchAll(PDO::FETCH_COLUMN);
+$existem_disco = 0;
+$sample_path   = '';
+foreach ($rows_img as $cam) {
+    $full = $raiz . '/' . $cam;
+    if (file_exists($full)) $existem_disco++;
+    if (!$sample_path) $sample_path = $cam; // pega primeiro caminho como amostra
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -74,13 +88,23 @@ $tamanho_fmt = $tamanho_uploads > 1048576
         </div>
         <div class="info-item">
             <div class="num"><?= $total_imagens ?></div>
-            <div class="label">Imagens no banco</div>
+            <div class="label">Registros no banco</div>
+        </div>
+        <div class="info-item">
+            <div class="num" style="color:<?= $existem_disco > 0 ? 'var(--cor-primaria)' : '#c0392b' ?>"><?= $existem_disco ?></div>
+            <div class="label">Arquivos em disco</div>
         </div>
         <div class="info-item">
             <div class="num"><?= $tamanho_fmt ?></div>
-            <div class="label">Arquivos em disco</div>
+            <div class="label">Tamanho</div>
         </div>
     </div>
+    <?php if ($existem_disco === 0 && $total_imagens > 0): ?>
+    <div class="aviso" style="background:#f8d7da;color:#721c24;">
+        ⚠️ O banco tem <?= $total_imagens ?> registros de imagens mas <strong>nenhum arquivo existe em disco</strong>.<br>
+        Caminho esperado (exemplo): <code><?= htmlspecialchars($sample_path) ?></code>
+    </div>
+    <?php endif; ?>
 
     <div class="aviso">
         💡 Faça o backup em duas etapas. Guarde os dois arquivos juntos — são necessários para uma restauração completa.
