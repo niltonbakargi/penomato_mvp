@@ -298,9 +298,15 @@ function regenerarArtigoEspecie(PDO $pdo, int $especie_id): void {
 
         $html = gerarHtmlArtigoRascunho($adm, $c, $imgs, $pdo);
 
-        $pdo->prepare("
-            UPDATE artigos SET texto_html = ?, atualizado_em = NOW() WHERE especie_id = ?
-        ")->execute([$html, $especie_id]);
+        $existe_artigo = $pdo->prepare("SELECT id FROM artigos WHERE especie_id = ? LIMIT 1");
+        $existe_artigo->execute([$especie_id]);
+        if ($existe_artigo->fetch()) {
+            $pdo->prepare("UPDATE artigos SET texto_html = ?, atualizado_em = NOW() WHERE especie_id = ?")
+                ->execute([$html, $especie_id]);
+        } else {
+            $pdo->prepare("INSERT INTO artigos (especie_id, texto_html, status, criado_em, atualizado_em) VALUES (?, ?, 'rascunho', NOW(), NOW())")
+                ->execute([$especie_id, $html]);
+        }
 
         error_log("regenerarArtigoEspecie: artigo ID={$especie_id} atualizado (" . strlen($html) . " bytes)");
     } catch (Exception $e) {

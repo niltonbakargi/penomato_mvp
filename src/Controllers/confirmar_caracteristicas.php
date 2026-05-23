@@ -390,13 +390,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
         // Não altera status — espécie permanece como 'dados_internet'
         confirmarTransacao();
         regenerarArtigoEspecie($pdo, $especie_id);
-        $_SESSION['msg_sucesso'] = 'Identificação confirmada e dados salvos com sucesso!';
-        header('Location: confirmar_caracteristicas.php'); exit;
+        $_SESSION['msg_sucesso'] = 'Características salvas e artigo atualizado com sucesso!';
+        header("Location: confirmar_caracteristicas.php?especie_id={$especie_id}"); exit;
     } catch (Exception $e) {
         reverterTransacao();
         error_log('Erro confirmar_caracteristicas: ' . $e->getMessage());
         $_SESSION['msg_erro'] = 'Erro ao salvar. Tente novamente.';
-        header('Location: confirmar_caracteristicas.php'); exit;
+        header("Location: confirmar_caracteristicas.php?especie_id={$especie_id}"); exit;
     }
 }
 
@@ -1657,7 +1657,7 @@ ob_end_clean();
     <!-- ── SUBMIT ── -->
     <div class="card submit-area">
       <button type="submit" id="btn-confirmar" class="submit-btn">
-        ✅ Confirmar Identificação
+        💾 Confirmar Edição
       </button>
     </div>
 
