@@ -251,6 +251,10 @@
             <span class="icon">👤</span>
             Perfil Colaborador
         </div>
+        <div class="action-btn" onclick="confirmarBackup()">
+            <span class="icon">💾</span>
+            Backup
+        </div>
     </div>
 
     <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
@@ -286,6 +290,12 @@ Handroanthus impetiginosus"></textarea>
     </div>
 
     <script>
+    function confirmarBackup() {
+        if (confirm('Gerar backup completo (banco + imagens)?\nIsso pode levar alguns segundos.')) {
+            window.location.href = '/penomato_mvp/src/Controllers/backup.php';
+        }
+    }
+
     function abrirModal(id) {
         document.getElementById(id).classList.add('ativo');
     }
