@@ -32,7 +32,7 @@ BASE_URL   = "https://penomato.app.br/src/Controllers/api_backup.php"
 # (o servidor vai retornar 403 e você ajusta)
 # Para descobrir o token, acesse temporariamente api_backup.php com o token correto
 # ou peça ao Claude para exibir o token no painel do gestor.
-BACKUP_TOKEN = ""  # preencha após ver o token no painel
+BACKUP_TOKEN = "penomato_backup_2026_b49a8884c362210bee8214335efbbadb"  # preencha após ver o token no painel
 
 PASTA_BACKUP = Path(__file__).parent / "backup_local"
 PAUSA_ENTRE_TABELAS = 1.0   # segundos entre cada tabela (evita sobrecarga)
@@ -45,8 +45,9 @@ def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
 def get(params):
-    params['token'] = BACKUP_TOKEN
-    r = requests.get(BASE_URL, params=params, timeout=TIMEOUT)
+    # Token enviado no corpo POST para evitar bloqueio de WAF/ModSecurity
+    data = {'token': BACKUP_TOKEN}
+    r = requests.post(BASE_URL, params=params, data=data, timeout=TIMEOUT)
     r.raise_for_status()
     return r
 

@@ -12,7 +12,11 @@ header('Content-Type: application/json; charset=utf-8');
 // Defina um token forte aqui e coloque o mesmo no script Python
 define('BACKUP_TOKEN', 'penomato_backup_2026_' . md5(DB_PASS ?? 'token'));
 
-$token = $_GET['token'] ?? $_POST['token'] ?? '';
+// Aceita token via POST body (preferido), header ou query string (legado)
+$token = $_POST['token']
+      ?? $_SERVER['HTTP_X_BACKUP_TOKEN']
+      ?? $_GET['token']
+      ?? '';
 if ($token !== BACKUP_TOKEN) {
     http_response_code(403);
     echo json_encode(['erro' => 'Token inválido']);
