@@ -4,7 +4,7 @@
 // Chamado pelo script Python no PC do gestor
 // ============================================================
 session_start();
-require_once __DIR__ . '/../../config/banco_de_dados.php';
+require_once __DIR__ . '/config/banco_de_dados.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
