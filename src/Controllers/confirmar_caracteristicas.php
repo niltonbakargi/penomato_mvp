@@ -636,7 +636,16 @@ ob_end_clean();
     .ia-err { color: #856404; font-size: 0.88em; }
 
     /* ── submit area ── */
-    .submit-area { text-align: center; margin-top: 10px; }
+    .submit-area { display: none; }
+    .sticky-save {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--cor-primaria); padding: 10px 20px;
+      display: none; justify-content: flex-end; align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
+    .sticky-save .submit-btn {
+      width: auto; padding: 9px 28px; font-size: 0.97em; border-radius: 40px;
+    }
     #aviso-confirmacao { font-size: 0.85em; color: #856404; margin-bottom: 10px; display: none; }
     .submit-btn {
       width: 100%; background: var(--cor-primaria); color: #fff;
@@ -664,6 +673,10 @@ ob_end_clean();
 <div class="page-header">
   <h1>🔍 Confirmar Identificação de Espécie</h1>
   <a class="back-link" href="/penomato_mvp/src/Views/entrar_colaborador.php">← Voltar ao painel</a>
+</div>
+
+<div class="sticky-save" id="sticky-save">
+  <button type="submit" form="form-principal" class="submit-btn">💾 Confirmar Edição</button>
 </div>
 
 <?php if (!empty($_SESSION['msg_sucesso'])): ?>
@@ -2213,6 +2226,7 @@ function loadEspecieData(especieId) {
     document.getElementById('form-sections').style.display = 'block';
     document.getElementById('progress-wrap').style.display = 'flex';
     document.getElementById('card-busca-ia').style.display = 'block';
+    document.getElementById('sticky-save').style.display = 'flex';
     buildRefManager('');
     checkProgress();
 
