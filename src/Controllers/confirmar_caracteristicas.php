@@ -545,6 +545,16 @@ ob_end_clean();
     .btn-buscar-ref:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); background: #f0faf5; }
     .btn-buscar-ref:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    .btn-pesquisar-ia {
+      background: var(--cor-primaria); color: #fff; border: none; border-radius: 8px;
+      padding: 10px 24px; cursor: pointer; font-size: 1em; font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-pesquisar-ia:hover { background: #0a4c35; }
+    .btn-pesquisar-ia:disabled { opacity: 0.6; cursor: not-allowed; }
+    .ia-status-ok  { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .ia-status-err { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+
     /* ── obs button ── */
     .obs-btn {
       background: none; border: 1px solid #ccc; border-radius: 5px;
@@ -702,6 +712,14 @@ ob_end_clean();
       <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
       <span class="progress-label" id="progress-label">0 / 38 confirmados</span>
     </div>
+  </div>
+
+  <!-- ── BUSCA IA ── -->
+  <div class="card" id="card-busca-ia" style="display:none">
+    <div class="section-title">🤖 Pesquisar dados com IA</div>
+    <p style="font-size:0.9em;color:#555;margin:0 0 12px">Busca automaticamente os valores dos atributos botânicos na internet e pré-preenche os campos. Revise e confirme campo a campo.</p>
+    <button type="button" id="btn-pesquisar-ia" class="btn-pesquisar-ia">🤖 Pesquisar com IA</button>
+    <div id="ia-status" style="display:none;margin-top:10px;padding:10px;border-radius:6px;font-size:0.9em"></div>
   </div>
 
   <!-- ── GERENCIADOR DE REFERÊNCIAS ── -->
@@ -2192,6 +2210,7 @@ function loadEspecieData(especieId) {
     document.getElementById('ref-manager').style.display = 'block';
     document.getElementById('form-sections').style.display = 'block';
     document.getElementById('progress-wrap').style.display = 'flex';
+    document.getElementById('card-busca-ia').style.display = 'block';
     buildRefManager('');
     checkProgress();
 
@@ -2328,6 +2347,74 @@ document.getElementById('ref-new-input').addEventListener('keydown', function(e)
 });
 
 checkProgress();
+
+// ============================================================
+// BUSCA COM IA
+// ============================================================
+(function() {
+    var btnIA     = document.getElementById('btn-pesquisar-ia');
+    var statusDiv = document.getElementById('ia-status');
+    if (!btnIA) return;
+
+    btnIA.addEventListener('click', function() {
+        if (!_especieId) return;
+
+        btnIA.disabled    = true;
+        btnIA.textContent = '⏳ Pesquisando...';
+        statusDiv.style.display = 'none';
+
+        var fd = new FormData();
+        fd.append('especie_id', _especieId);
+
+        fetch('buscar_dados_especie_ai.php', { method: 'POST', body: fd })
+        .then(function(r) { return r.json(); })
+        .then(function(resp) {
+            btnIA.disabled    = false;
+            btnIA.textContent = '🤖 Pesquisar com IA';
+
+            if (!resp.sucesso) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.color      = '#856404';
+                statusDiv.style.border     = '1px solid #ffc107';
+                statusDiv.textContent = '⚠️ ' + (resp.erro || 'Erro desconhecido.');
+                return;
+            }
+
+            var validos    = resp.campos_validos    || {};
+            var divergentes = resp.campos_divergentes || [];
+            var preenchidos = 0;
+
+            Object.keys(validos).forEach(function(campo) {
+                preencherCampo(campo, validos[campo]);
+                preenchidos++;
+            });
+
+            if (divergentes.length > 0) {
+                // Preenche divergentes também (já confirmados pelo usuário não serão sobrescritos)
+                divergentes.forEach(function(item) {
+                    preencherCampo(item.campo, item.ia);
+                    preenchidos++;
+                });
+            }
+
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#d1e7dd';
+            statusDiv.style.color      = '#0f5132';
+            statusDiv.style.border     = '1px solid #badbcc';
+            statusDiv.textContent = '✅ ' + preenchidos + ' campo(s) preenchido(s). Revise e confirme campo a campo.';
+        })
+        .catch(function(err) {
+            btnIA.disabled    = false;
+            btnIA.textContent = '🤖 Pesquisar com IA';
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#fff3cd';
+            statusDiv.style.color      = '#856404';
+            statusDiv.style.border     = '1px solid #ffc107';
+            statusDiv.textContent = '⚠️ Erro de rede: ' + err.message;
+        });
+    });
+})();
 </script>
 </body>
 </html>

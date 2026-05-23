@@ -24,21 +24,29 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // ============================================================
-// VALIDAR SESSÃO TEMPORÁRIA VIA temp_id
+// VALIDAR SESSÃO — aceita temp_id (fluxo inserir) ou especie_id direto
 // ============================================================
-$temp_id = trim($_POST['temp_id'] ?? '');
+$temp_id    = trim($_POST['temp_id'] ?? '');
+$especie_id = 0;
 
-if (
-    empty($temp_id) ||
-    !isset($_SESSION['importacao_temporaria']) ||
-    $_SESSION['importacao_temporaria']['temp_id'] !== $temp_id ||
-    $_SESSION['importacao_temporaria']['usuario_id'] != $_SESSION['usuario_id']
-) {
+if (!empty($temp_id)) {
+    // Fluxo inserir_dados_internet: valida via sessão temporária
+    if (
+        !isset($_SESSION['importacao_temporaria']) ||
+        $_SESSION['importacao_temporaria']['temp_id'] !== $temp_id ||
+        $_SESSION['importacao_temporaria']['usuario_id'] != $_SESSION['usuario_id']
+    ) {
+        echo json_encode(['sucesso' => false, 'erro' => 'Sessão inválida ou expirada.']);
+        exit;
+    }
+    $especie_id = $_SESSION['importacao_temporaria']['especie_id'];
+} elseif (!empty($_POST['especie_id'])) {
+    // Fluxo confirmar_caracteristicas: especie_id direto (usuário já autenticado)
+    $especie_id = (int)$_POST['especie_id'];
+} else {
     echo json_encode(['sucesso' => false, 'erro' => 'Sessão inválida ou expirada.']);
     exit;
 }
-
-$especie_id = $_SESSION['importacao_temporaria']['especie_id'];
 
 // ============================================================
 // BUSCAR NOME CIENTÍFICO NO BANCO
