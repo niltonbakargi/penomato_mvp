@@ -27,8 +27,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'processar') {
     $status = $row['status'];
     $etapas = [];
 
-    // ── Busca IA (apenas sem_dados) ───────────────────────
-    if ($status === 'sem_dados') {
+    // ── Busca IA para todas as espécies ──────────────────
+    if (true) {
         if (!defined('AI_PROVIDER') || !defined('AI_API_KEY') || AI_API_KEY === '') {
             echo json_encode(['ok' => false, 'erro' => 'API de IA não configurada.']); exit;
         }
@@ -161,8 +161,6 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'processar') {
         }
         $pdo->prepare("UPDATE especies_administrativo SET status='dados_internet', data_ultima_atualizacao=NOW() WHERE id=?")->execute([$especie_id]);
         $etapas[] = 'IA: dados salvos';
-    } else {
-        $etapas[] = 'IA: pulado (já tem dados)';
     }
 
     // Regenerar artigo
@@ -211,7 +209,7 @@ tr:last-child td { border-bottom: none; }
 <body>
 <div class="page-wrap">
   <h1>🤖 Batch IA</h1>
-  <p class="sub">Clique em <strong>Processar</strong> para cada espécie. Espécies <em>sem_dados</em> buscam na IA e salvam. Espécies com dados apenas regeneram o artigo.</p>
+  <p class="sub">Clique em <strong>Processar</strong> para cada espécie. A IA busca os dados, sobrescreve o BD e regenera o artigo.</p>
 
   <table>
     <thead>
