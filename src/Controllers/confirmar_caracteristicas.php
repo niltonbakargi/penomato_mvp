@@ -568,7 +568,8 @@ ob_end_clean();
     .obs-textarea:focus { outline: none; border-color: #f59e0b; }
 
     /* ── confirm button ── */
-    .confirm-btn {
+    .confirm-btn { display: none !important; }
+    .confirm-btn-UNUSED {
       display: inline-flex; align-items: center; justify-content: center;
       width: 34px; height: 34px; border-radius: 6px;
       border: 2px solid #ccc; background: #f8f9fa; color: #ccc;
@@ -1655,8 +1656,7 @@ ob_end_clean();
 
     <!-- ── SUBMIT ── -->
     <div class="card submit-area">
-      <div id="aviso-confirmacao">⚠️ Confirme todos os campos (✓) para habilitar o envio.</div>
-      <button type="submit" id="btn-confirmar" class="submit-btn" disabled>
+      <button type="submit" id="btn-confirmar" class="submit-btn">
         ✅ Confirmar Identificação
       </button>
     </div>
@@ -1833,19 +1833,9 @@ function handleConfirm(btn) {
 // PROGRESSO
 // ============================================================
 function checkProgress() {
-    var total  = document.querySelectorAll('.confirm-btn').length;
-    var done   = document.querySelectorAll('.confirm-btn.confirmed').length;
-    var btn    = document.getElementById('btn-confirmar');
-    var aviso  = document.getElementById('aviso-confirmacao');
-    var fill   = document.getElementById('progress-fill');
-    var label  = document.getElementById('progress-label');
-
-    btn.disabled      = (done < total);
-    btn.style.opacity = done >= total ? '1' : '0.45';
-    aviso.style.display = (done > 0 && done < total) ? 'block' : 'none';
-
-    if (fill)  fill.style.width  = (total > 0 ? Math.round(done / total * 100) : 0) + '%';
-    if (label) label.textContent = done + ' / ' + total + ' confirmados';
+    // Botão sempre habilitado — confirmação campo a campo removida
+    var btn = document.getElementById('btn-confirmar');
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
 }
 
 // ============================================================
