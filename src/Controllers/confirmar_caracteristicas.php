@@ -667,9 +667,13 @@ ob_end_clean();
 </div>
 
 <?php if (!empty($_SESSION['msg_sucesso'])): ?>
-  <div style="max-width:900px;margin:0 auto 16px;padding:12px 18px;background:#d1fadf;color:var(--cor-primaria);border-radius:8px;font-weight:600;">
-    ✅ <?php echo htmlspecialchars($_SESSION['msg_sucesso']); unset($_SESSION['msg_sucesso']); ?>
+<div id="modal-sucesso" style="position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999">
+  <div style="background:#fff;border-radius:14px;padding:36px 32px;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)">
+    <div style="font-size:2.5rem;margin-bottom:12px">✅</div>
+    <p style="font-size:1.1rem;font-weight:600;color:#166534;margin:0 0 24px"><?php echo htmlspecialchars($_SESSION['msg_sucesso']); unset($_SESSION['msg_sucesso']); ?></p>
+    <a href="gestao_especies.php" style="display:inline-block;background:var(--cor-primaria);color:#fff;padding:11px 28px;border-radius:40px;text-decoration:none;font-weight:600;font-size:1rem">← Voltar à gestão</a>
   </div>
+</div>
 <?php elseif (!empty($_SESSION['msg_erro'])): ?>
   <div style="max-width:900px;margin:0 auto 16px;padding:12px 18px;background:#ffe8e8;color:#c0392b;border-radius:8px;font-weight:600;">
     ⚠️ <?php echo htmlspecialchars($_SESSION['msg_erro']); unset($_SESSION['msg_erro']); ?>
