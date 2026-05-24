@@ -1,4 +1,4 @@
--- ============================================================
+/* -- ============================================================
 -- MIGRAÇÃO 002 — Proteger espécies_caracteristicas com ENUM
 -- ============================================================
 -- Converte todos os campos de características botânicas de
@@ -290,3 +290,4 @@ ALTER TABLE `especies_caracteristicas`
 -- ── já eram ENUM: possui_espinhos, possui_latex, possui_seiva, possui_resina
 -- ── permanecem VARCHAR: familia, nome_cientifico_completo, sinonimos,
 --    nome_popular, e todos os campos _ref (referências bibliográficas)
+ */

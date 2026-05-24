@@ -1031,8 +1031,8 @@ ob_end_clean();
           <label for="venacao_folha">Venação</label>
           <select id="venacao_folha" name="venacao_folha">
             <option value="" disabled selected>Selecione…</option>
-            <option>Curvinérvea</option><option>Dicotômica</option><option>Paralela</option>
-            <option>Peninérvea</option><option>Reticulada palmada</option><option>Reticulada pinada</option>
+            <option>Reticulada Pinnada</option><option>Reticulada Palmada</option><option>Paralela</option>
+            <option>Peninérvea</option><option>Dicotômica</option><option>Curvinérvea</option>
           </select>
         </div>
         <div class="field-refs">

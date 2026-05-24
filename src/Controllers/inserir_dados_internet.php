@@ -58,9 +58,9 @@ $opcoes_validas = [
     'divisao_folha'     => ['Trifoliada','Digitada','Pinnada','Bipinnada','Tripinnada','Tetrapinnada'],
     'paridade_pinnacao' => ['Paripinnada','Imparipinnada'],
     'tamanho_folha'     => ['Microfilas (< 2 cm)','Nanofilas (2–7 cm)','Mesofilas (7–20 cm)','Macrófilas (20–50 cm)','Megafilas (> 50 cm)'],
-    'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],
-    'margem_folha'      => ['Crenada','Dentada','Inteira','Lobada','Ondulada','Serreada','Serrilhada','Partida'],
-    'venacao_folha'     => ['Curvinérvea','Dicotômica','Paralela','Peninérvea','Reticulada palmada','Reticulada pinada'],
+    'textura_folha'     => ['Coriácea','Cartácea','Membranácea','Suculenta','Pilosa','Glabra','Rugosa','Cerosa'],
+    'margem_folha'      => ['Inteira','Serrada','Dentada','Crenada','Ondulada','Lobada','Partida','Revoluta','Involuta'],
+    'venacao_folha'     => ['Reticulada Pinnada','Reticulada Palmada','Paralela','Peninérvea','Dicotômica','Curvinérvea'],
     'cor_flores'        => ['Alaranjada','Amarela','Avermelhada','Azul','Branca','Esverdeada','Lilás','Púrpura','Rósea','Roxa','Vermelha','Vinácea'],
     'simetria_floral'   => ['Actinomorfa','Zigomorfa','Assimétrica'],
     'numero_petalas'    => ['3 pétalas','4 pétalas','5 pétalas','6 pétalas','Muitas pétalas','Ausentes'],
@@ -908,7 +908,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                             <option>Lanceolada</option><option>Linear</option><option>Elíptica</option>
                             <option>Ovada</option><option>Orbicular</option><option>Cordiforme</option>
                             <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
-                            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Pinada</option><option>Lobada</option>
+                            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Lobada</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1013,9 +1013,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_folha">Textura</label>
                         <select id="textura_folha" name="textura_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Cartácea</option><option>Coriácea</option><option>Glabra</option>
-                            <option>Membranácea</option><option>Pilosa</option><option>Pubescente</option>
-                            <option>Rugosa</option><option>Suculenta</option><option>Tomentosa</option><option>Cerosa</option>
+                            <option>Coriácea</option><option>Cartácea</option><option>Membranácea</option>
+                            <option>Suculenta</option><option>Pilosa</option><option>Glabra</option>
+                            <option>Rugosa</option><option>Cerosa</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1031,9 +1031,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="margem_folha">Margem</label>
                         <select id="margem_folha" name="margem_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Crenada</option><option>Dentada</option><option>Inteira</option>
-                            <option>Lobada</option><option>Ondulada</option><option>Serreada</option>
-                            <option>Serrilhada</option><option>Partida</option>
+                            <option>Inteira</option><option>Serrada</option><option>Dentada</option>
+                            <option>Crenada</option><option>Ondulada</option><option>Lobada</option>
+                            <option>Partida</option><option>Revoluta</option><option>Involuta</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1044,13 +1044,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     </div>
                 </div>
 
+                <div id="obs-margem-composta" style="display:none; margin: -4px 0 14px; padding: 8px 12px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 0 6px 6px 0; font-size: .82rem; color: #78350f;">
+                    <strong>Observação:</strong> <span id="obs-margem-texto"></span>
+                </div>
+
                 <div class="input-group">
                     <div class="main-input">
                         <label for="venacao_folha">Venação</label>
                         <select id="venacao_folha" name="venacao_folha">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Curvinérvea</option><option>Dicotômica</option><option>Paralela</option>
-                            <option>Peninérvea</option><option>Reticulada palmada</option><option>Reticulada pinada</option>
+                            <option>Reticulada Pinnada</option><option>Reticulada Palmada</option><option>Paralela</option>
+                            <option>Peninérvea</option><option>Dicotômica</option><option>Curvinérvea</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1807,6 +1811,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         if (tipoSel)    tipoSel.addEventListener('change', atualizarCascata);
         if (divisaoSel) divisaoSel.addEventListener('change', atualizarCascata);
         atualizarCascata();
+    })();
+
+    // ── OBSERVAÇÃO: margem em folhas compostas ──
+    (function () {
+        var tipoSel    = document.getElementById('tipo_folha');
+        var divisaoSel = document.getElementById('divisao_folha');
+        var obs        = document.getElementById('obs-margem-composta');
+        var txt        = document.getElementById('obs-margem-texto');
+
+        var msgFoliolo   = 'Em folhas compostas a margem se refere ao <strong>folíolulo</strong> (a menor subdivisão da folha).';
+        var msgFolioloS  = 'Em folhas compostas a margem se refere ao <strong>folíolo</strong>.';
+        var divFoliolo   = ['Bipinnada','Tripinnada','Tetrapinnada'];
+        var divFolioloS  = ['Pinnada','Trifoliada','Digitada'];
+
+        function atualizar() {
+            var tipo    = tipoSel    ? tipoSel.value    : '';
+            var divisao = divisaoSel ? divisaoSel.value : '';
+            if (tipo !== 'Composta') { obs.style.display = 'none'; return; }
+            if (divFoliolo.indexOf(divisao) !== -1) {
+                txt.innerHTML = msgFoliolo; obs.style.display = 'block';
+            } else if (divFolioloS.indexOf(divisao) !== -1) {
+                txt.innerHTML = msgFolioloS; obs.style.display = 'block';
+            } else {
+                obs.style.display = 'none';
+            }
+        }
+
+        if (tipoSel)    tipoSel.addEventListener('change', atualizar);
+        if (divisaoSel) divisaoSel.addEventListener('change', atualizar);
+        atualizar();
     })();
     </script>
 </body>
