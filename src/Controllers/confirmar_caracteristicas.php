@@ -408,8 +408,8 @@ $especie_id_url = (int)($_GET['especie_id'] ?? 0);
 try {
     $especies = buscarTodos(
         "SELECT id, nome_cientifico, status FROM especies_administrativo
-         WHERE status IN ('sem_dados','dados_internet')
-         ORDER BY CASE status WHEN 'dados_internet' THEN 1 WHEN 'sem_dados' THEN 2 END, nome_cientifico"
+         WHERE status = 'dados_internet'
+         ORDER BY nome_cientifico"
     );
 } catch (Exception $e) { $mensagem_erro = 'Erro ao conectar ao banco.'; }
 ob_end_clean();
@@ -699,24 +699,11 @@ ob_end_clean();
         <option value="" disabled style="color:red;"><?php echo htmlspecialchars($mensagem_erro); ?></option>
       <?php elseif (empty($especies)): ?>
         <option value="" disabled>Nenhuma espécie disponível para verificação.</option>
-      <?php else:
-        $com_dados = array_filter($especies, fn($e) => $e['status'] === 'dados_internet');
-        $sem_dados  = array_filter($especies, fn($e) => $e['status'] === 'sem_dados');
-        if ($com_dados): ?>
-          <optgroup label="⚡ Com dados da internet (verificar)">
-            <?php foreach ($com_dados as $e): ?>
-              <option value="<?php echo $e['id']; ?>" <?php if ($especie_id_url === (int)$e['id']) echo 'selected'; ?>><?php echo htmlspecialchars($e['nome_cientifico']); ?></option>
-            <?php endforeach; ?>
-          </optgroup>
-        <?php endif;
-        if ($sem_dados): ?>
-          <optgroup label="📋 Sem dados (preencher manualmente)">
-            <?php foreach ($sem_dados as $e): ?>
-              <option value="<?php echo $e['id']; ?>" <?php if ($especie_id_url === (int)$e['id']) echo 'selected'; ?>><?php echo htmlspecialchars($e['nome_cientifico']); ?></option>
-            <?php endforeach; ?>
-          </optgroup>
-        <?php endif;
-      endif; ?>
+      <?php else: ?>
+          <?php foreach ($especies as $e): ?>
+            <option value="<?php echo $e['id']; ?>" <?php if ($especie_id_url === (int)$e['id']) echo 'selected'; ?>><?php echo htmlspecialchars($e['nome_cientifico']); ?></option>
+          <?php endforeach; ?>
+      <?php endif; ?>
     </select>
     <div id="status-especie"></div>
     <div class="progress-wrap" id="progress-wrap" style="display:none">
@@ -838,7 +825,7 @@ ob_end_clean();
             <option>Lanceolada</option><option>Linear</option><option>Elíptica</option>
             <option>Ovada</option><option>Orbicular</option><option>Cordiforme</option>
             <option>Espatulada</option><option>Sagitada</option><option>Reniforme</option>
-            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Pinada</option><option>Lobada</option>
+            <option>Obovada</option><option>Trilobada</option><option>Palmada</option><option>Lobada</option>
           </select>
         </div>
         <div class="field-refs">
