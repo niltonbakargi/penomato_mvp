@@ -1624,6 +1624,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     preenchidos++;
                 });
 
+                // Re-acionar cascatas após preencher (tipo_folha → divisao → paridade)
+                ['tipo_folha', 'divisao_folha'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.dispatchEvent(new Event('change'));
+                });
+
                 // Revelar formulário
                 document.getElementById('form_wrapper').style.display = 'block';
                 document.getElementById('btn_manual').style.display = 'none';
