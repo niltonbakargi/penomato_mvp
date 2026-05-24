@@ -678,6 +678,11 @@ textarea:focus {
 }
 .art-refs li { margin-bottom: var(--esp-1); }
 
+.art-obs {
+  font-size: 0.88em;
+  color: var(--cinza-600);
+  font-style: italic;
+}
 
 /* ────────────────────────────────────────────────────────────
    13. UTILITÁRIOS

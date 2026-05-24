@@ -7,6 +7,9 @@
 
 require_once __DIR__ . '/autores_artigo.php';
 
+// Observações por campo — preenchido por regenerarArtigoEspecie antes de gerar
+$GLOBALS['_art_obs'] = $GLOBALS['_art_obs'] ?? [];
+
 // ── Vocabulário botânico ─────────────────────────────────────
 
 function _art_vocab(): array {
@@ -22,7 +25,7 @@ function _art_v(string $atrib, ?string $campo): ?string {
     return $v[$atrib][$campo] ?? null;
 }
 
-/** Resolve valor no vocabulário e retorna <strong>valor</strong><sup>[N]</sup> */
+/** Resolve valor no vocabulário e retorna <strong>valor</strong><sup>[N]</sup> (obs) */
 function _art_vr(string $atrib, ?string $campo, string $ref = ''): ?string {
     $valor = _art_v($atrib, $campo);
     if ($valor === null) return null;
@@ -32,6 +35,11 @@ function _art_vr(string $atrib, ?string $campo, string $ref = ''): ?string {
         $nums = array_unique(array_filter(array_map('intval', explode(',', $ref))));
         sort($nums);
         if ($nums) $out .= '<sup class="art-ref">[' . implode(',', $nums) . ']</sup>';
+    }
+    // Observação do campo (salva em especies_caracteristicas_obs)
+    $obs = trim($GLOBALS['_art_obs'][$atrib] ?? '');
+    if ($obs !== '') {
+        $out .= ' <em class="art-obs">(' . htmlspecialchars($obs) . ')</em>';
     }
     return $out;
 }
@@ -284,6 +292,14 @@ function regenerarArtigoEspecie(PDO $pdo, int $especie_id): void {
         $stmt = $pdo->prepare("SELECT * FROM especies_caracteristicas WHERE especie_id = ? LIMIT 1");
         $stmt->execute([$especie_id]);
         $c = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        // Carrega observações por campo e injeta no gerador via global
+        $stmt_obs = $pdo->prepare("SELECT campo, observacao FROM especies_caracteristicas_obs WHERE especie_id = ?");
+        $stmt_obs->execute([$especie_id]);
+        $GLOBALS['_art_obs'] = [];
+        foreach ($stmt_obs->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $GLOBALS['_art_obs'][$row['campo']] = $row['observacao'];
+        }
 
         $stmt = $pdo->prepare("
             SELECT parte_planta, caminho_imagem, autor_imagem, licenca, fonte_nome, fonte_url
