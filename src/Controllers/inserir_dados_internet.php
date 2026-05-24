@@ -793,8 +793,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                 <i class="fas fa-info-circle"></i>
                 <strong>Imagens já adicionadas:</strong>
                 <?php
-                $total_imagens = count($_SESSION['importacao_temporaria']['imagens'] ?? []);
-                echo $total_imagens > 0 ? "{$total_imagens} imagem(ns) na sessão" : "Nenhuma imagem ainda (volte para adicionar)";
+                $stmt_imgs = $pdo->prepare(
+                    "SELECT COUNT(*) FROM especies_imagens WHERE especie_id = ? AND tipo_imagem = 'provisoria'"
+                );
+                $stmt_imgs->execute([$especie_id]);
+                $total_imagens = (int)$stmt_imgs->fetchColumn();
+                echo $total_imagens > 0
+                    ? "{$total_imagens} imagem(ns) salva(s)"
+                    : "Nenhuma imagem ainda — <a href='upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "'>volte para adicionar</a>";
                 ?>
             </div>
 
