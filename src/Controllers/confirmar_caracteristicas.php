@@ -1674,12 +1674,7 @@ ob_end_clean();
     </div>
 
     <!-- ── SUBMIT ── -->
-    <div class="card submit-area" id="submit-area" style="display:flex;flex-direction:column;gap:10px;align-items:center">
-      <?php if ($modo_pagina === 'confirmar'): ?>
-      <button type="button" id="btn-aceitar-tudo" class="submit-btn" style="background:var(--cinza-600)">
-        ☑️ Aceitar tudo e confirmar
-      </button>
-      <?php endif; ?>
+    <div class="card submit-area" id="submit-area">
       <button type="submit" id="btn-confirmar" class="submit-btn"
         <?php if ($modo_pagina === 'confirmar') echo 'disabled style="opacity:0.6"'; ?>>
         <?php echo $modo_pagina === 'confirmar' ? '✅ Confirmar Dados' : '💾 Salvar Edição'; ?>
@@ -2479,24 +2474,6 @@ checkProgress();
 // ============================================================
 if (modoConfirmar) {
     document.body.classList.add('modo-confirmar');
-
-    // "Aceitar tudo": marca todos os campos visíveis como confirmados e submete
-    var btnAceitar = document.getElementById('btn-aceitar-tudo');
-    if (btnAceitar) {
-        btnAceitar.addEventListener('click', function () {
-            document.querySelectorAll('.field-row').forEach(function (row) {
-                if (row.style.display === 'none') return;
-                var btn = row.querySelector('.confirm-btn');
-                if (btn && !btn.classList.contains('confirmed')) {
-                    btn.classList.add('confirmed');
-                }
-            });
-            checkProgress();
-            setTimeout(function () {
-                document.getElementById('form-principal').submit();
-            }, 150);
-        });
-    }
 
     checkProgress();
 }
