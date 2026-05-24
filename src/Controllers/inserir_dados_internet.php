@@ -66,24 +66,24 @@ $opcoes_validas = [
     'numero_petalas'    => ['3 pétalas','4 pétalas','5 pétalas','6 pétalas','Muitas pétalas','Ausentes'],
     'disposicao_flores' => ['Solitária','Capítulo','Cacho','Corimbo','Espádice','Espiga','Panícula','Umbela'],
     'aroma'             => ['Ausente','Suave','Forte','Desagradável','Adocicada','Cítrica'],
-    'tamanho_flor'      => ['Muito pequena','Pequena','Média','Grande','Muito grande'],
+    'tamanho_flor'      => ['Pequena','Média'],
     'tipo_fruto'        => ['Aquênio','Baga','Cápsula','Drupa','Folículo','Legume','Pixídio','Sâmara','Síliqua','Cariopse','Hespéridio','Pepo'],
-    'tamanho_fruto'     => ['Minúsculo','Pequeno','Médio','Grande','Muito grande'],
-    'cor_fruto'         => ['Alaranjado','Amarelo','Avermelhado','Branco','Esverdeado','Marrom','Preto','Roxo','Verde','Vináceo'],
-    'textura_fruto'     => ['Lisa','Rugosa','Coriácea','Pubescente','Pilosa','Espinhosa','Cerosa','Tuberculada'],
-    'dispersao_fruto'   => ['Anemocórica','Autocórica','Hidrocórica','Zoocórica','Mirmecocórica','Ornitocórica'],
+    'tamanho_fruto'     => ['Pequeno','Médio','Grande'],
+    'cor_fruto'         => ['Verde','Amarelo','Vermelho','Roxo','Laranja','Marrom','Preto','Branco'],
+    'textura_fruto'     => ['Lisa','Rugosa','Coriácea','Peluda','Espinhosa','Cerosa'],
+    'dispersao_fruto'   => ['Zoocórica','Anemocórica','Hidrocórica','Autocórica'],
     'aroma_fruto'       => ['Ausente','Suave','Forte','Adocicado','Cítrico','Desagradável'],
     'tipo_semente'      => ['Alada','Carnosa','Dura','Oleaginosa','Plumosa','Ruminada','Arilada'],
-    'tamanho_semente'   => ['Minúscula','Muito pequena','Pequena','Média','Grande','Muito grande'],
-    'cor_semente'       => ['Amarela','Branca','Castanha','Cinza','Marrom','Preta','Vermelha','Alaranjada'],
-    'textura_semente'   => ['Lisa','Rugosa','Estriada','Pontuada','Foveolada','Reticulada','Tuberculada'],
-    'quantidade_sementes' => ['1','2–3','4–10','11–50','> 50'],
+    'tamanho_semente'   => ['Pequena','Média','Grande'],
+    'cor_semente'       => ['Preta','Marrom','Branca','Amarela','Verde'],
+    'textura_semente'   => ['Lisa','Rugosa','Estriada','Cerosa'],
+    'quantidade_sementes' => ['Uma','Poucas','Muitas'],
     'tipo_caule'        => ['Tronco','Estipe','Colmo','Liana','Haste','Escapo'],
-    'textura_caule'     => ['Lisa','Rugosa','Fissurada','Sulcada','Estriada','Escamosa','Suberosa','Aculeada','Cerosa'],
+    'textura_caule'     => ['Lisa','Rugosa','Sulcada','Fissurada','Estriada','Escamosa','Suberosa','Aculeada','Cerosa'],
     'cor_caule'         => ['Acinzentado','Alaranjado','Avermelhado','Esbranquiçado','Esverdeado','Marrom','Pardacento'],
     'forma_caule'       => ['Cilíndrico','Quadrangular','Triangular','Achatado','Alado'],
-    'modificacao_caule' => ['Cladódio','Estolão','Gavinha','Rizoma','Tubérculo','Bulbo','Sapopema'],
-    'ramificacao_caule' => ['Monopodial','Simpodial','Dicotômica','Pseudodicotômica'],
+    'modificacao_caule' => ['Estolão','Cladódio','Rizoma','Tubérculo','Espinhos'],
+    'ramificacao_caule' => ['Dicotômica','Monopodial','Simpodial'],
     'possui_espinhos'   => ['Sim','Não'],
     'possui_latex'      => ['Sim','Não'],
     'possui_seiva'      => ['Sim','Não'],
@@ -1162,8 +1162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_flor">Tamanho da Flor</label>
                         <select id="tamanho_flor" name="tamanho_flor">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Muito pequena</option><option>Pequena</option><option>Média</option>
-                            <option>Grande</option><option>Muito grande</option>
+                            <option>Pequena</option><option>Média</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1201,8 +1200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_fruto">Tamanho do Fruto</label>
                         <select id="tamanho_fruto" name="tamanho_fruto">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Minúsculo</option><option>Pequeno</option><option>Médio</option>
-                            <option>Grande</option><option>Muito grande</option>
+                            <option>Pequeno</option><option>Médio</option><option>Grande</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1218,9 +1216,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_fruto">Cor do Fruto</label>
                         <select id="cor_fruto" name="cor_fruto">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Alaranjado</option><option>Amarelo</option><option>Avermelhado</option>
-                            <option>Branco</option><option>Esverdeado</option><option>Marrom</option>
-                            <option>Preto</option><option>Roxo</option><option>Verde</option><option>Vináceo</option>
+                            <option>Verde</option><option>Amarelo</option><option>Vermelho</option>
+                            <option>Roxo</option><option>Laranja</option><option>Marrom</option>
+                            <option>Preto</option><option>Branco</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1237,8 +1235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <select id="textura_fruto" name="textura_fruto">
                             <option value="" disabled selected>Selecione…</option>
                             <option>Lisa</option><option>Rugosa</option><option>Coriácea</option>
-                            <option>Pubescente</option><option>Pilosa</option><option>Espinhosa</option>
-                            <option>Cerosa</option><option>Tuberculada</option>
+                            <option>Peluda</option><option>Espinhosa</option><option>Cerosa</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1254,8 +1251,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="dispersao_fruto">Tipo de Dispersão</label>
                         <select id="dispersao_fruto" name="dispersao_fruto">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Anemocórica</option><option>Autocórica</option><option>Hidrocórica</option>
-                            <option>Zoocórica</option><option>Mirmecocórica</option><option>Ornitocórica</option>
+                            <option>Zoocórica</option><option>Anemocórica</option><option>Hidrocórica</option>
+                            <option>Autocórica</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1308,8 +1305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="tamanho_semente">Tamanho da Semente</label>
                         <select id="tamanho_semente" name="tamanho_semente">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Minúscula</option><option>Muito pequena</option><option>Pequena</option>
-                            <option>Média</option><option>Grande</option><option>Muito grande</option>
+                            <option>Pequena</option><option>Média</option><option>Grande</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1325,9 +1321,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="cor_semente">Cor da Semente</label>
                         <select id="cor_semente" name="cor_semente">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Amarela</option><option>Branca</option><option>Castanha</option>
-                            <option>Cinza</option><option>Marrom</option><option>Preta</option>
-                            <option>Vermelha</option><option>Alaranjada</option>
+                            <option>Preta</option><option>Marrom</option><option>Branca</option>
+                            <option>Amarela</option><option>Verde</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1344,7 +1339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <select id="textura_semente" name="textura_semente">
                             <option value="" disabled selected>Selecione…</option>
                             <option>Lisa</option><option>Rugosa</option><option>Estriada</option>
-                            <option>Pontuada</option><option>Foveolada</option><option>Reticulada</option><option>Tuberculada</option>
+                            <option>Cerosa</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1360,8 +1355,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="quantidade_sementes">Quantidade de Sementes por Fruto</label>
                         <select id="quantidade_sementes" name="quantidade_sementes">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>1</option><option>2–3</option><option>4–10</option>
-                            <option>11–50</option><option>&gt; 50</option>
+                            <option>Uma</option><option>Poucas</option><option>Muitas</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1397,9 +1391,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="textura_caule">Textura do Caule</label>
                         <select id="textura_caule" name="textura_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Lisa</option><option>Rugosa</option><option>Fissurada</option>
-                            <option>Sulcada</option><option>Estriada</option><option>Escamosa</option>
-                            <option>Suberosa</option><option>Aculeada</option>
+                            <option>Lisa</option><option>Rugosa</option><option>Sulcada</option>
+                            <option>Fissurada</option><option>Estriada</option><option>Escamosa</option>
+                            <option>Suberosa</option><option>Aculeada</option><option>Cerosa</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1449,8 +1443,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="modificacao_caule">Modificações do Caule</label>
                         <select id="modificacao_caule" name="modificacao_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Cladódio</option><option>Estolão</option><option>Gavinha</option>
-                            <option>Rizoma</option><option>Tubérculo</option><option>Bulbo</option><option>Sapopema</option>
+                            <option>Estolão</option><option>Cladódio</option><option>Rizoma</option>
+                            <option>Tubérculo</option><option>Espinhos</option>
                         </select>
                     </div>
                     <div class="ref-col">
@@ -1466,8 +1460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="ramificacao_caule">Ramificação do Caule</label>
                         <select id="ramificacao_caule" name="ramificacao_caule">
                             <option value="" disabled selected>Selecione…</option>
-                            <option>Monopodial</option><option>Simpodial</option>
-                            <option>Dicotômica</option><option>Pseudodicotômica</option>
+                            <option>Dicotômica</option><option>Monopodial</option><option>Simpodial</option>
                         </select>
                     </div>
                     <div class="ref-col">
