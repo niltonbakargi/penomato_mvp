@@ -422,9 +422,9 @@ $mensagem_erro = '';
 $especie_id_url = (int)($_GET['especie_id'] ?? 0);
 try {
     $especies = buscarTodos(
-        "SELECT id, nome_cientifico, status FROM especies_administrativo
-         WHERE status = 'dados_internet'
-         ORDER BY nome_cientifico"
+        $modo_pagina === 'confirmar'
+            ? "SELECT id, nome_cientifico, status FROM especies_administrativo WHERE status = 'dados_internet' ORDER BY nome_cientifico"
+            : "SELECT id, nome_cientifico, status FROM especies_administrativo ORDER BY nome_cientifico"
     );
 } catch (Exception $e) { $mensagem_erro = 'Erro ao conectar ao banco.'; }
 ob_end_clean();
@@ -713,6 +713,9 @@ ob_end_clean();
 
 <form action="confirmar_caracteristicas.php" method="post" id="form-principal">
 <input type="hidden" name="modo_pagina" value="<?php echo htmlspecialchars($modo_pagina); ?>">
+<?php if ($especie_id_url): ?>
+<input type="hidden" name="especie_id" value="<?php echo $especie_id_url; ?>">
+<?php endif; ?>
 
   <!-- ── SELEÇÃO DE ESPÉCIE (oculto quando especie_id vem na URL) ── -->
   <div class="card" <?php if ($especie_id_url) echo 'style="display:none"'; ?>>
