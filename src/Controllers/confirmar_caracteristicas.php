@@ -471,27 +471,9 @@ ob_end_clean();
     .progress-fill { height: 100%; background: var(--cor-primaria); border-radius: 4px; transition: width 0.3s; width: 0%; }
     .progress-label { font-size: 0.82em; color: #666; white-space: nowrap; }
 
-    /* ── confirmação por seção (modo colaborador) ── */
-    .btn-sec-confirmar {
-      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.5);
-      color: #fff; border-radius: 20px; padding: 4px 14px;
-      font-size: 0.8em; font-weight: 600; cursor: pointer; white-space: nowrap;
-      transition: background 0.2s;
-    }
-    .btn-sec-confirmar:hover { background: rgba(255,255,255,0.3); }
-    .btn-sec-confirmar.confirmado { background: #22c55e; border-color: #22c55e; }
-    #confirmar-progress {
-      display: none; max-width: 900px; margin: 0 auto 12px;
-      background: #fff; border-radius: 10px; padding: 12px 18px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 0.9em; color: #555;
-    }
-    #confirmar-progress .prog-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 8px; }
-    #confirmar-progress .prog-fill { height: 100%; background: #22c55e; border-radius: 4px; transition: width 0.3s; width: 0%; }
-
     /* ── reference manager ── */
     .ref-manager { display: none; }
     .section-title {
-      display: flex; align-items: center; justify-content: space-between;
       background: var(--cor-primaria); color: #fff;
       padding: 9px 14px; margin: 0 0 14px; border-radius: 6px;
       font-size: 0.95em; font-weight: 600;
@@ -601,16 +583,17 @@ ob_end_clean();
 
     /* ── confirm button ── */
     .confirm-btn { display: none !important; }
-    .confirm-btn-UNUSED {
-      display: inline-flex; align-items: center; justify-content: center;
+    /* Modo colaborador: exibe botão de confirmação por campo */
+    body.modo-confirmar .confirm-btn {
+      display: inline-flex !important; align-items: center; justify-content: center;
       width: 34px; height: 34px; border-radius: 6px;
-      border: 2px solid #ccc; background: #f8f9fa; color: #ccc;
+      border: 2px solid #ccc; background: #f8f9fa; color: #aaa;
       font-size: 1em; font-weight: 700; cursor: pointer;
       transition: all 0.15s;
     }
-    .confirm-btn:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
-    .confirm-btn.confirmed { background: var(--cor-primaria); border-color: var(--cor-primaria); color: #fff; }
-    .confirm-btn.saving { background: #fff3cd; border-color: #ffc107; color: #856404; }
+    body.modo-confirmar .confirm-btn:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
+    body.modo-confirmar .confirm-btn.confirmed { background: #22c55e; border-color: #22c55e; color: #fff; }
+    body.modo-confirmar .confirm-btn.saving { background: #fff3cd; border-color: #ffc107; color: #856404; }
 
     /* ── IA result panel ── */
     .ia-result {
@@ -704,17 +687,11 @@ ob_end_clean();
 </div>
 
 <div class="sticky-save" id="sticky-save">
-  <button type="submit" form="form-principal" class="submit-btn" id="btn-sticky-submit">
+  <button type="submit" form="form-principal" class="submit-btn" id="btn-sticky-submit"
+    <?php if ($modo_pagina === 'confirmar') echo 'disabled style="opacity:0.6"'; ?>>
     <?php echo $modo_pagina === 'confirmar' ? '✅ Confirmar Dados' : '💾 Salvar Edição'; ?>
   </button>
 </div>
-
-<?php if ($modo_pagina === 'confirmar'): ?>
-<div id="confirmar-progress">
-  <strong>Progresso de confirmação:</strong> <span id="prog-texto">0 / 0 seções confirmadas</span>
-  <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
-</div>
-<?php endif; ?>
 
 <?php if (!empty($_SESSION['msg_sucesso'])): ?>
 <div id="modal-sucesso" style="position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999">
@@ -1697,13 +1674,14 @@ ob_end_clean();
     </div>
 
     <!-- ── SUBMIT ── -->
-    <div class="card submit-area" id="submit-area">
+    <div class="card submit-area" id="submit-area" style="display:flex;flex-direction:column;gap:10px;align-items:center">
       <?php if ($modo_pagina === 'confirmar'): ?>
-      <button type="button" id="btn-aceitar-tudo" class="submit-btn" style="background:var(--cinza-600);margin-bottom:10px">
+      <button type="button" id="btn-aceitar-tudo" class="submit-btn" style="background:var(--cinza-600)">
         ☑️ Aceitar tudo e confirmar
       </button>
       <?php endif; ?>
-      <button type="submit" id="btn-confirmar" class="submit-btn">
+      <button type="submit" id="btn-confirmar" class="submit-btn"
+        <?php if ($modo_pagina === 'confirmar') echo 'disabled style="opacity:0.6"'; ?>>
         <?php echo $modo_pagina === 'confirmar' ? '✅ Confirmar Dados' : '💾 Salvar Edição'; ?>
       </button>
     </div>
@@ -1721,6 +1699,7 @@ var _refs      = [];   // array 0-indexed de textos de referência
 var _especieId = 0;
 var _obs       = {};   // mapa campo → texto de observação
 var _saveRefTimer = null;
+var modoConfirmar = <?php echo json_encode($modo_pagina === 'confirmar'); ?>;
 
 // ============================================================
 // REFERÊNCIAS — gerenciamento
@@ -1880,9 +1859,36 @@ function handleConfirm(btn) {
 // PROGRESSO
 // ============================================================
 function checkProgress() {
-    // Botão sempre habilitado — confirmação campo a campo removida
-    var btn = document.getElementById('btn-confirmar');
-    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    var btnConf   = document.getElementById('btn-confirmar');
+    var btnSticky = document.getElementById('btn-sticky-submit');
+
+    if (!modoConfirmar) {
+        [btnConf, btnSticky].forEach(function(b) { if (b) { b.disabled = false; b.style.opacity = '1'; } });
+        return;
+    }
+
+    // Conta apenas campos em field-rows visíveis
+    var total = 0, confirmados = 0;
+    document.querySelectorAll('.field-row').forEach(function(row) {
+        if (row.style.display === 'none') return;
+        var btn = row.querySelector('.confirm-btn');
+        if (!btn) return;
+        total++;
+        if (btn.classList.contains('confirmed')) confirmados++;
+    });
+
+    // Atualiza barra de progresso existente
+    var fill  = document.getElementById('progress-fill');
+    var label = document.getElementById('progress-label');
+    if (fill)  fill.style.width = (total > 0 ? Math.round(confirmados / total * 100) : 0) + '%';
+    if (label) label.textContent = confirmados + ' / ' + total + ' confirmados';
+
+    var tudo = total > 0 && confirmados >= total;
+    [btnConf, btnSticky].forEach(function(b) {
+        if (!b) return;
+        b.disabled = !tudo;
+        b.style.opacity = tudo ? '1' : '0.6';
+    });
 }
 
 // ============================================================
@@ -2251,7 +2257,8 @@ function loadEspecieData(especieId) {
     document.getElementById('ref-manager').style.display = 'block';
     document.getElementById('form-sections').style.display = 'block';
     document.getElementById('progress-wrap').style.display = 'flex';
-    document.getElementById('card-busca-ia').style.display = 'block';
+    // Pesquisa completa só no modo gestor; modo confirmar usa pesquisa por campo
+    if (!modoConfirmar) document.getElementById('card-busca-ia').style.display = 'block';
     document.getElementById('sticky-save').style.display = 'flex';
     buildRefManager('');
     checkProgress();
@@ -2468,105 +2475,31 @@ checkProgress();
 })();
 
 // ============================================================
-// MODO CONFIRMAR: confirmação por seção
+// MODO CONFIRMAR: inicialização
 // ============================================================
-(function () {
-    var modoConfirmar = <?php echo json_encode($modo_pagina === 'confirmar'); ?>;
-    if (!modoConfirmar) return;
+if (modoConfirmar) {
+    document.body.classList.add('modo-confirmar');
 
-    var secoesConfirmadas = new Set();
-    var todasSecoes = [];
-
-    // Injeta botão de confirmação em cada section-title
-    document.querySelectorAll('.card .section-title').forEach(function (titulo, i) {
-        var id = 'secao-' + i;
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'btn-sec-confirmar';
-        btn.dataset.secaoId = id;
-        btn.textContent = '✓ Confirmar';
-        btn.addEventListener('click', function () { toggleSecao(id, btn); });
-        titulo.appendChild(btn);
-        todasSecoes.push({ id: id, btn: btn });
-    });
-
-    function toggleSecao(id, btn) {
-        if (secoesConfirmadas.has(id)) {
-            secoesConfirmadas.delete(id);
-            btn.classList.remove('confirmado');
-            btn.textContent = '✓ Confirmar';
-        } else {
-            secoesConfirmadas.add(id);
-            btn.classList.add('confirmado');
-            btn.textContent = '✓ Confirmado';
-        }
-        atualizarProgresso();
-    }
-
-    function confirmarTudo() {
-        todasSecoes.forEach(function (s) {
-            secoesConfirmadas.add(s.id);
-            s.btn.classList.add('confirmado');
-            s.btn.textContent = '✓ Confirmado';
-        });
-        atualizarProgresso();
-    }
-
-    function atualizarProgresso() {
-        var total = todasSecoes.length;
-        var conf  = secoesConfirmadas.size;
-        var pct   = total > 0 ? Math.round(conf / total * 100) : 0;
-
-        var progDiv  = document.getElementById('confirmar-progress');
-        var progTexto = document.getElementById('prog-texto');
-        var progFill  = document.getElementById('prog-fill');
-        var btnConf   = document.getElementById('btn-confirmar');
-        var btnSticky = document.getElementById('btn-sticky-submit');
-
-        if (progDiv) progDiv.style.display = 'block';
-        if (progTexto) progTexto.textContent = conf + ' / ' + total + ' seções confirmadas';
-        if (progFill) progFill.style.width = pct + '%';
-
-        var tudo = conf >= total;
-        if (btnConf) {
-            btnConf.disabled = !tudo;
-            btnConf.textContent = tudo
-                ? '✅ Confirmar Dados (' + conf + '/' + total + ')'
-                : '⏳ Confirme todas as seções (' + conf + '/' + total + ')';
-        }
-        if (btnSticky) {
-            btnSticky.disabled = !tudo;
-            btnSticky.textContent = tudo
-                ? '✅ Confirmar Dados'
-                : '⏳ ' + conf + '/' + total + ' confirmadas';
-        }
-    }
-
-    // Inicializa submit desabilitado
-    var btnConf   = document.getElementById('btn-confirmar');
-    var btnSticky = document.getElementById('btn-sticky-submit');
-    if (btnConf)   { btnConf.disabled = true; btnConf.textContent = '⏳ Confirme todas as seções (0/0)'; }
-    if (btnSticky) { btnSticky.disabled = true; }
-
-    // "Aceitar tudo" auto-confirma todas as seções E submete
+    // "Aceitar tudo": marca todos os campos visíveis como confirmados e submete
     var btnAceitar = document.getElementById('btn-aceitar-tudo');
     if (btnAceitar) {
         btnAceitar.addEventListener('click', function () {
-            confirmarTudo();
-            // Submete o formulário após um tick para o UI atualizar
+            document.querySelectorAll('.field-row').forEach(function (row) {
+                if (row.style.display === 'none') return;
+                var btn = row.querySelector('.confirm-btn');
+                if (btn && !btn.classList.contains('confirmed')) {
+                    btn.classList.add('confirmed');
+                }
+            });
+            checkProgress();
             setTimeout(function () {
                 document.getElementById('form-principal').submit();
-            }, 100);
+            }, 150);
         });
     }
 
-    // Quando form-sections fica visível (carregarEspecie), inicializa contagem
-    var obs = new MutationObserver(function () { atualizarProgresso(); });
-    var fs = document.getElementById('form-sections');
-    if (fs) obs.observe(fs, { attributes: true, attributeFilter: ['style'] });
-
-    atualizarProgresso();
-})();
+    checkProgress();
+}
 </script>
 </body>
 </html>
