@@ -761,7 +761,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
 
         <div class="paper-header">
             <h1><span>📄</span> PENOMATO • IMPORTAR DADOS</h1>
-            <div class="subtitle">PASSO 3: Preencha as características morfológicas manualmente ou use a pesquisa por IA abaixo</div>
+            <div class="subtitle">PASSO 3: Use a pesquisa por IA para preencher as características morfológicas</div>
         </div>
 
         <?php if (!empty($erro)): ?>
@@ -784,14 +784,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                 <button type="button" id="btn_pesquisar_ia" class="btn btn-primary">
                     🤖 Pesquisar com IA
                 </button>
-                <button type="button" id="btn_manual" class="btn btn-outline-secondary"
-                        onclick="document.getElementById('form_wrapper').style.display='block';this.style.display='none';document.getElementById('form_wrapper').scrollIntoView({behavior:'smooth'});">
-                    ✏️ Preencher manualmente
-                </button>
             </div>
             <div id="ia_status" style="display:none;" class="alert"></div>
 
-            <div id="form_wrapper" style="display:none;">
+            <div id="form_wrapper">
 
             <div class="alert alert-info" style="margin-bottom:20px;">
                 <i class="fas fa-info-circle"></i>
@@ -1610,10 +1606,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                 if (!resp.sucesso) {
                     statusDiv.style.display = 'block';
                     statusDiv.className = 'alert alert-warning';
-                    statusDiv.textContent = '⚠️ ' + resp.erro + ' — preencha o formulário manualmente abaixo.';
-                    document.getElementById('form_wrapper').style.display = 'block';
-                    document.getElementById('btn_manual').style.display = 'none';
-                    document.getElementById('form_wrapper').scrollIntoView({ behavior: 'smooth' });
+                    statusDiv.textContent = '⚠️ ' + resp.erro;
                     return;
                 }
 
@@ -1630,10 +1623,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     if (el) el.dispatchEvent(new Event('change'));
                 });
 
-                // Revelar formulário
-                document.getElementById('form_wrapper').style.display = 'block';
-                document.getElementById('btn_manual').style.display = 'none';
-
                 if (resp.campos_divergentes && resp.campos_divergentes.length > 0) {
                     abrirModalDivergentes(resp.campos_divergentes);
                 } else {
@@ -1648,10 +1637,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                 btnIA.textContent = '🤖 Pesquisar com IA';
                 statusDiv.style.display = 'block';
                 statusDiv.className = 'alert alert-warning';
-                statusDiv.textContent = '⚠️ Erro de rede: ' + err.message + ' — preencha o formulário manualmente abaixo.';
-                document.getElementById('form_wrapper').style.display = 'block';
-                document.getElementById('btn_manual').style.display = 'none';
-                document.getElementById('form_wrapper').scrollIntoView({ behavior: 'smooth' });
+                statusDiv.textContent = '⚠️ Erro de rede: ' + err.message;
             });
         });
     })();
