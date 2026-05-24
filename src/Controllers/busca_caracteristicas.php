@@ -773,7 +773,6 @@ ob_end_clean();
                             <option value="Dicotômica" <?php echo (isset($_POST['ramificacao_caule']) && $_POST['ramificacao_caule'] == 'Dicotômica') ? 'selected' : ''; ?>>Dicotômica</option>
                             <option value="Monopodial" <?php echo (isset($_POST['ramificacao_caule']) && $_POST['ramificacao_caule'] == 'Monopodial') ? 'selected' : ''; ?>>Monopodial</option>
                             <option value="Simpodial" <?php echo (isset($_POST['ramificacao_caule']) && $_POST['ramificacao_caule'] == 'Simpodial') ? 'selected' : ''; ?>>Simpodial</option>
-                            <option value="Pseudodicotômica" <?php echo (isset($_POST['ramificacao_caule']) && $_POST['ramificacao_caule'] == 'Pseudodicotômica') ? 'selected' : ''; ?>>Pseudodicotômica</option>
                         </select>
                     </div>
                     <div class="filtro-item">
@@ -784,9 +783,7 @@ ob_end_clean();
                             <option value="Cladódio" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Cladódio') ? 'selected' : ''; ?>>Cladódio</option>
                             <option value="Rizoma" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Rizoma') ? 'selected' : ''; ?>>Rizoma</option>
                             <option value="Tubérculo" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Tubérculo') ? 'selected' : ''; ?>>Tubérculo</option>
-                            <option value="Gavinha" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Gavinha') ? 'selected' : ''; ?>>Gavinha</option>
-                            <option value="Bulbo" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Bulbo') ? 'selected' : ''; ?>>Bulbo</option>
-                            <option value="Sapopema" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Sapopema') ? 'selected' : ''; ?>>Sapopema</option>
+                            <option value="Espinhos" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Espinhos') ? 'selected' : ''; ?>>Espinhos</option>
                         </select>
                     </div>
                 </div>

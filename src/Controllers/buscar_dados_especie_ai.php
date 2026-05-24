@@ -75,47 +75,9 @@ $model    = defined('AI_MODEL') ? AI_MODEL : null;
 
 // ============================================================
 // ENUMS VÁLIDOS DO SISTEMA (fonte da verdade)
-// Estes valores são os aceitos pelo formulário e pelo banco.
-// O prompt abaixo é gerado a partir desta mesma lista.
+// Valores aceitos pelo banco — fonte única: src/Config/enums_caracteristicas.php
 // ============================================================
-$opcoes_validas = [
-    'forma_folha'       => ['Lanceolada','Linear','Elíptica','Ovada','Orbicular','Cordiforme','Espatulada','Sagitada','Reniforme','Obovada','Trilobada','Palmada','Lobada'],
-    'filotaxia_folha'   => ['Alterna','Oposta Simples','Oposta Decussada','Verticilada','Dística','Espiralada'],
-    'tipo_folha'        => ['Simples','Composta'],
-    'divisao_folha'     => ['Trifoliada','Digitada','Pinnada','Bipinnada','Tripinnada','Tetrapinnada'],
-    'paridade_pinnacao' => ['Paripinnada','Imparipinnada'],
-    'tamanho_folha'     => ['Microfilas (< 2 cm)','Nanofilas (2–7 cm)','Mesofilas (7–20 cm)','Macrófilas (20–50 cm)','Megafilas (> 50 cm)'],
-    'textura_folha'     => ['Cartácea','Coriácea','Glabra','Membranácea','Pilosa','Pubescente','Rugosa','Suculenta','Tomentosa','Cerosa'],
-    'margem_folha'      => ['Crenada','Dentada','Inteira','Lobada','Ondulada','Serreada','Serrilhada','Partida'],
-    'venacao_folha'     => ['Curvinérvea','Dicotômica','Paralela','Peninérvea','Reticulada palmada','Reticulada pinada'],
-    'cor_flores'        => ['Alaranjada','Amarela','Avermelhada','Azul','Branca','Esverdeada','Lilás','Púrpura','Rósea','Roxa','Vermelha','Vinácea'],
-    'simetria_floral'   => ['Actinomorfa','Zigomorfa','Assimétrica'],
-    'numero_petalas'    => ['3 pétalas','4 pétalas','5 pétalas','6 pétalas','Muitas pétalas','Ausentes'],
-    'disposicao_flores' => ['Solitária','Capítulo','Cacho','Corimbo','Espádice','Espiga','Panícula','Umbela'],
-    'aroma'             => ['Ausente','Suave','Forte','Desagradável','Adocicada','Cítrica'],
-    'tamanho_flor'      => ['Muito pequena','Pequena','Média','Grande','Muito grande'],
-    'tipo_fruto'        => ['Aquênio','Baga','Cápsula','Drupa','Folículo','Legume','Pixídio','Sâmara','Síliqua','Cariopse','Hespéridio','Pepo'],
-    'tamanho_fruto'     => ['Minúsculo','Pequeno','Médio','Grande','Muito grande'],
-    'cor_fruto'         => ['Alaranjado','Amarelo','Avermelhado','Branco','Esverdeado','Marrom','Preto','Roxo','Verde','Vináceo'],
-    'textura_fruto'     => ['Lisa','Rugosa','Coriácea','Pubescente','Pilosa','Espinhosa','Cerosa','Tuberculada'],
-    'dispersao_fruto'   => ['Anemocórica','Autocórica','Hidrocórica','Zoocórica','Mirmecocórica','Ornitocórica'],
-    'aroma_fruto'       => ['Ausente','Suave','Forte','Adocicado','Cítrico','Desagradável'],
-    'tipo_semente'      => ['Alada','Carnosa','Dura','Oleaginosa','Plumosa','Ruminada','Arilada'],
-    'tamanho_semente'   => ['Minúscula','Muito pequena','Pequena','Média','Grande','Muito grande'],
-    'cor_semente'       => ['Amarela','Branca','Castanha','Cinza','Marrom','Preta','Vermelha','Alaranjada'],
-    'textura_semente'   => ['Lisa','Rugosa','Estriada','Pontuada','Foveolada','Reticulada','Tuberculada'],
-    'quantidade_sementes' => ['1','2–3','4–10','11–50','> 50'],
-    'tipo_caule'        => ['Tronco','Estipe','Colmo','Liana','Haste','Escapo'],
-    'textura_caule'     => ['Lisa','Rugosa','Fissurada','Sulcada','Estriada','Escamosa','Suberosa','Aculeada','Cerosa'],
-    'cor_caule'         => ['Acinzentado','Alaranjado','Avermelhado','Esbranquiçado','Esverdeado','Marrom','Pardacento'],
-    'forma_caule'       => ['Cilíndrico','Quadrangular','Triangular','Achatado','Alado'],
-    'modificacao_caule' => ['Cladódio','Estolão','Gavinha','Rizoma','Tubérculo','Bulbo','Sapopema'],
-    'ramificacao_caule' => ['Monopodial','Simpodial','Dicotômica','Pseudodicotômica'],
-    'possui_espinhos'   => ['Sim','Não'],
-    'possui_latex'      => ['Sim','Não'],
-    'possui_seiva'      => ['Sim','Não'],
-    'possui_resina'     => ['Sim','Não'],
-];
+$opcoes_validas = require_once __DIR__ . '/../Config/enums_caracteristicas.php';
 
 // Gera a string de opções para o prompt a partir do array acima
 $linhas_opcoes = '';

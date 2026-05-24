@@ -312,16 +312,13 @@ return [
         'Cladódio'  => 'modificado em cladódio',
         'Rizoma'    => 'com rizoma',
         'Tubérculo' => 'com tubérculo',
-        'Gavinha'   => 'com gavinhas',
-        'Bulbo'     => 'com bulbo',
-        'Sapopema'  => 'com sapopemas na base',
+        'Espinhos'  => 'com espinhos no caule',
     ],
 
     'ramificacao_caule' => [
-        'Dicotômica'       => 'com ramificação dicotômica',
-        'Monopodial'       => 'com ramificação monopodial',
-        'Simpodial'        => 'com ramificação simpodial',
-        'Pseudodicotômica' => 'com ramificação pseudodicotômica',
+        'Dicotômica'  => 'com ramificação dicotômica',
+        'Monopodial'  => 'com ramificação monopodial',
+        'Simpodial'   => 'com ramificação simpodial',
     ],
 
     // ═══════════════════════════════════════════════
