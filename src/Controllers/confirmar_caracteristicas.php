@@ -330,6 +330,9 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
 // ── Session + POST final ───────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) session_start();
 
+$modo_pagina = $_GET['modo'] ?? $_POST['modo_pagina'] ?? 'gestor';
+if (!in_array($modo_pagina, ['gestor', 'confirmar'], true)) $modo_pagina = 'gestor';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
     require_once __DIR__ . '/../../config/banco_de_dados.php';
     require_once __DIR__ . '/../helpers/gerador_artigo.php';
@@ -384,18 +387,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
         } else {
             inserir('especies_caracteristicas', $dados);
         }
-        // Não altera status — atualiza apenas data_ultima_atualizacao
-        $pdo->prepare("UPDATE especies_administrativo SET data_ultima_atualizacao = NOW() WHERE id = ?")
-            ->execute([$especie_id]);
+        if ($modo_pagina === 'confirmar') {
+            // Modo colaborador: avança status para descrita
+            $pdo->prepare("UPDATE especies_administrativo SET status = 'descrita', data_ultima_atualizacao = NOW() WHERE id = ? AND status = 'dados_internet'")
+                ->execute([$especie_id]);
+        } else {
+            // Modo gestor: não altera status
+            $pdo->prepare("UPDATE especies_administrativo SET data_ultima_atualizacao = NOW() WHERE id = ?")
+                ->execute([$especie_id]);
+        }
         confirmarTransacao();
         regenerarArtigoEspecie($pdo, $especie_id);
-        $_SESSION['msg_sucesso'] = 'Características salvas e artigo atualizado com sucesso!';
-        header("Location: confirmar_caracteristicas.php?especie_id={$especie_id}"); exit;
+        $_SESSION['msg_sucesso'] = $modo_pagina === 'confirmar'
+            ? 'Dados confirmados! A espécie avançou para revisão.'
+            : 'Características salvas e artigo atualizado com sucesso!';
+        $_SESSION['modo_sucesso'] = $modo_pagina;
+        $redir = $modo_pagina === 'confirmar'
+            ? "confirmar_caracteristicas.php?modo=confirmar"
+            : "confirmar_caracteristicas.php?especie_id={$especie_id}";
+        header("Location: {$redir}"); exit;
     } catch (Exception $e) {
         reverterTransacao();
         error_log('Erro confirmar_caracteristicas: ' . $e->getMessage());
         $_SESSION['msg_erro'] = 'Erro ao salvar. Tente novamente.';
-        header("Location: confirmar_caracteristicas.php?especie_id={$especie_id}"); exit;
+        header("Location: confirmar_caracteristicas.php?especie_id={$especie_id}&modo={$modo_pagina}"); exit;
     }
 }
 
@@ -456,9 +471,27 @@ ob_end_clean();
     .progress-fill { height: 100%; background: var(--cor-primaria); border-radius: 4px; transition: width 0.3s; width: 0%; }
     .progress-label { font-size: 0.82em; color: #666; white-space: nowrap; }
 
+    /* ── confirmação por seção (modo colaborador) ── */
+    .btn-sec-confirmar {
+      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.5);
+      color: #fff; border-radius: 20px; padding: 4px 14px;
+      font-size: 0.8em; font-weight: 600; cursor: pointer; white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-sec-confirmar:hover { background: rgba(255,255,255,0.3); }
+    .btn-sec-confirmar.confirmado { background: #22c55e; border-color: #22c55e; }
+    #confirmar-progress {
+      display: none; max-width: 900px; margin: 0 auto 12px;
+      background: #fff; border-radius: 10px; padding: 12px 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-size: 0.9em; color: #555;
+    }
+    #confirmar-progress .prog-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    #confirmar-progress .prog-fill { height: 100%; background: #22c55e; border-radius: 4px; transition: width 0.3s; width: 0%; }
+
     /* ── reference manager ── */
     .ref-manager { display: none; }
     .section-title {
+      display: flex; align-items: center; justify-content: space-between;
       background: var(--cor-primaria); color: #fff;
       padding: 9px 14px; margin: 0 0 14px; border-radius: 6px;
       font-size: 0.95em; font-weight: 600;
@@ -666,20 +699,33 @@ ob_end_clean();
 <body>
 
 <div class="page-header">
-  <h1>🔍 Confirmar Identificação de Espécie</h1>
-  <a class="back-link" href="/penomato_mvp/src/Views/entrar_colaborador.php">← Voltar ao painel</a>
+  <h1><?php echo $modo_pagina === 'confirmar' ? '✅ Confirmar Dados da Espécie' : '✏️ Editar Características da Espécie'; ?></h1>
+  <a class="back-link" href="<?php echo $modo_pagina === 'confirmar' ? '/penomato_mvp/src/Views/entrar_colaborador.php' : 'gestao_especies.php'; ?>">← Voltar ao painel</a>
 </div>
 
 <div class="sticky-save" id="sticky-save">
-  <button type="submit" form="form-principal" class="submit-btn">💾 Confirmar Edição</button>
+  <button type="submit" form="form-principal" class="submit-btn" id="btn-sticky-submit">
+    <?php echo $modo_pagina === 'confirmar' ? '✅ Confirmar Dados' : '💾 Salvar Edição'; ?>
+  </button>
 </div>
+
+<?php if ($modo_pagina === 'confirmar'): ?>
+<div id="confirmar-progress">
+  <strong>Progresso de confirmação:</strong> <span id="prog-texto">0 / 0 seções confirmadas</span>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+</div>
+<?php endif; ?>
 
 <?php if (!empty($_SESSION['msg_sucesso'])): ?>
 <div id="modal-sucesso" style="position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9999">
   <div style="background:#fff;border-radius:14px;padding:36px 32px;max-width:420px;width:90%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2)">
     <div style="font-size:2.5rem;margin-bottom:12px">✅</div>
     <p style="font-size:1.1rem;font-weight:600;color:#166534;margin:0 0 24px"><?php echo htmlspecialchars($_SESSION['msg_sucesso']); unset($_SESSION['msg_sucesso']); ?></p>
-    <a href="gestao_especies.php" style="display:inline-block;background:var(--cor-primaria);color:#fff;padding:11px 28px;border-radius:40px;text-decoration:none;font-weight:600;font-size:1rem">← Voltar à gestão</a>
+    <?php $modo_s = $_SESSION['modo_sucesso'] ?? 'gestor'; unset($_SESSION['modo_sucesso']); ?>
+    <a href="<?php echo $modo_s === 'confirmar' ? '/penomato_mvp/src/Views/entrar_colaborador.php' : 'gestao_especies.php'; ?>"
+       style="display:inline-block;background:var(--cor-primaria);color:#fff;padding:11px 28px;border-radius:40px;text-decoration:none;font-weight:600;font-size:1rem">
+      ← <?php echo $modo_s === 'confirmar' ? 'Voltar ao painel' : 'Voltar à gestão'; ?>
+    </a>
   </div>
 </div>
 <?php elseif (!empty($_SESSION['msg_erro'])): ?>
@@ -689,6 +735,7 @@ ob_end_clean();
 <?php endif; ?>
 
 <form action="confirmar_caracteristicas.php" method="post" id="form-principal">
+<input type="hidden" name="modo_pagina" value="<?php echo htmlspecialchars($modo_pagina); ?>">
 
   <!-- ── SELEÇÃO DE ESPÉCIE (oculto quando especie_id vem na URL) ── -->
   <div class="card" <?php if ($especie_id_url) echo 'style="display:none"'; ?>>
@@ -1650,9 +1697,14 @@ ob_end_clean();
     </div>
 
     <!-- ── SUBMIT ── -->
-    <div class="card submit-area">
+    <div class="card submit-area" id="submit-area">
+      <?php if ($modo_pagina === 'confirmar'): ?>
+      <button type="button" id="btn-aceitar-tudo" class="submit-btn" style="background:var(--cinza-600);margin-bottom:10px">
+        ☑️ Aceitar tudo e confirmar
+      </button>
+      <?php endif; ?>
       <button type="submit" id="btn-confirmar" class="submit-btn">
-        💾 Confirmar Edição
+        <?php echo $modo_pagina === 'confirmar' ? '✅ Confirmar Dados' : '💾 Salvar Edição'; ?>
       </button>
     </div>
 
@@ -2413,6 +2465,107 @@ checkProgress();
             statusDiv.textContent = '⚠️ Erro de rede: ' + err.message;
         });
     });
+})();
+
+// ============================================================
+// MODO CONFIRMAR: confirmação por seção
+// ============================================================
+(function () {
+    var modoConfirmar = <?php echo json_encode($modo_pagina === 'confirmar'); ?>;
+    if (!modoConfirmar) return;
+
+    var secoesConfirmadas = new Set();
+    var todasSecoes = [];
+
+    // Injeta botão de confirmação em cada section-title
+    document.querySelectorAll('.card .section-title').forEach(function (titulo, i) {
+        var id = 'secao-' + i;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-sec-confirmar';
+        btn.dataset.secaoId = id;
+        btn.textContent = '✓ Confirmar';
+        btn.addEventListener('click', function () { toggleSecao(id, btn); });
+        titulo.appendChild(btn);
+        todasSecoes.push({ id: id, btn: btn });
+    });
+
+    function toggleSecao(id, btn) {
+        if (secoesConfirmadas.has(id)) {
+            secoesConfirmadas.delete(id);
+            btn.classList.remove('confirmado');
+            btn.textContent = '✓ Confirmar';
+        } else {
+            secoesConfirmadas.add(id);
+            btn.classList.add('confirmado');
+            btn.textContent = '✓ Confirmado';
+        }
+        atualizarProgresso();
+    }
+
+    function confirmarTudo() {
+        todasSecoes.forEach(function (s) {
+            secoesConfirmadas.add(s.id);
+            s.btn.classList.add('confirmado');
+            s.btn.textContent = '✓ Confirmado';
+        });
+        atualizarProgresso();
+    }
+
+    function atualizarProgresso() {
+        var total = todasSecoes.length;
+        var conf  = secoesConfirmadas.size;
+        var pct   = total > 0 ? Math.round(conf / total * 100) : 0;
+
+        var progDiv  = document.getElementById('confirmar-progress');
+        var progTexto = document.getElementById('prog-texto');
+        var progFill  = document.getElementById('prog-fill');
+        var btnConf   = document.getElementById('btn-confirmar');
+        var btnSticky = document.getElementById('btn-sticky-submit');
+
+        if (progDiv) progDiv.style.display = 'block';
+        if (progTexto) progTexto.textContent = conf + ' / ' + total + ' seções confirmadas';
+        if (progFill) progFill.style.width = pct + '%';
+
+        var tudo = conf >= total;
+        if (btnConf) {
+            btnConf.disabled = !tudo;
+            btnConf.textContent = tudo
+                ? '✅ Confirmar Dados (' + conf + '/' + total + ')'
+                : '⏳ Confirme todas as seções (' + conf + '/' + total + ')';
+        }
+        if (btnSticky) {
+            btnSticky.disabled = !tudo;
+            btnSticky.textContent = tudo
+                ? '✅ Confirmar Dados'
+                : '⏳ ' + conf + '/' + total + ' confirmadas';
+        }
+    }
+
+    // Inicializa submit desabilitado
+    var btnConf   = document.getElementById('btn-confirmar');
+    var btnSticky = document.getElementById('btn-sticky-submit');
+    if (btnConf)   { btnConf.disabled = true; btnConf.textContent = '⏳ Confirme todas as seções (0/0)'; }
+    if (btnSticky) { btnSticky.disabled = true; }
+
+    // "Aceitar tudo" auto-confirma todas as seções E submete
+    var btnAceitar = document.getElementById('btn-aceitar-tudo');
+    if (btnAceitar) {
+        btnAceitar.addEventListener('click', function () {
+            confirmarTudo();
+            // Submete o formulário após um tick para o UI atualizar
+            setTimeout(function () {
+                document.getElementById('form-principal').submit();
+            }, 100);
+        });
+    }
+
+    // Quando form-sections fica visível (carregarEspecie), inicializa contagem
+    var obs = new MutationObserver(function () { atualizarProgresso(); });
+    var fs = document.getElementById('form-sections');
+    if (fs) obs.observe(fs, { attributes: true, attributeFilter: ['style'] });
+
+    atualizarProgresso();
 })();
 </script>
 </body>

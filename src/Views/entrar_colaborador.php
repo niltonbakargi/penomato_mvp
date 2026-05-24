@@ -42,7 +42,7 @@ $todos_botoes = [
         'icon'  => '✅',
         'label' => 'Confirmar Identificação',
         'desc'  => 'Verifique e confirme as informações vindas da internet antes de registrá-las.',
-        'link'  => '/penomato_mvp/src/Controllers/confirmar_caracteristicas.php',
+        'link'  => '/penomato_mvp/src/Controllers/confirmar_caracteristicas.php?modo=confirmar',
     ],
     'cadastrar_exemplar' => [
         'icon'  => '🌿',
