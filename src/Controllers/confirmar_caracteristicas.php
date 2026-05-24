@@ -397,7 +397,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
                 ->execute([$especie_id]);
         }
         confirmarTransacao();
-        regenerarArtigoEspecie($pdo, $especie_id);
+        // Artigo só é regenerado pelo gestor — colaborador apenas confirma dados
+        if ($modo_pagina === 'gestor') regenerarArtigoEspecie($pdo, $especie_id);
         $_SESSION['msg_sucesso'] = $modo_pagina === 'confirmar'
             ? 'Dados confirmados! A espécie avançou para revisão.'
             : 'Características salvas e artigo atualizado com sucesso!';
