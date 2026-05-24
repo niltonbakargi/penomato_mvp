@@ -169,7 +169,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
 
         .info-item .label {
             font-size: 0.85rem;
-            color: var(--cinza-500);
+            color: var(--cinza-600);
             text-transform: uppercase;
             margin-bottom: 5px;
         }
@@ -201,7 +201,7 @@ $data_importacao = !empty($especie['data_dados_internet'])
 
         .stat .label {
             font-size: 0.9rem;
-            color: var(--cinza-500);
+            color: var(--cinza-600);
         }
 
         .status-badge {
@@ -225,43 +225,21 @@ $data_importacao = !empty($especie['data_dados_internet'])
 
         .btn {
             padding: 15px 30px;
-            border: none;
             border-radius: 50px;
             font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: var(--transicao);
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 10px;
         }
 
-        .btn-primary {
-            background: var(--cor-primaria);
-            color: var(--branco);
-            box-shadow: 0 4px 10px rgba(11,94,66,0.3);
-        }
-
-        .btn-primary:hover {
-            background: var(--cor-primaria-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(11,94,66,0.4);
-        }
-
-        .btn-secondary {
-            background: var(--cinza-500);
-            color: var(--branco);
-        }
-
-        .btn-secondary:hover {
-            background: var(--cinza-600);
+        .btn-primary:hover, .btn-secondary:hover {
             transform: translateY(-2px);
         }
 
         .footer {
             text-align: center;
-            color: var(--cinza-500);
+            color: var(--cinza-600);
             font-size: 0.9rem;
             margin-top: 20px;
         }
