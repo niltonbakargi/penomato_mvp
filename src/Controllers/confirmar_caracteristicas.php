@@ -509,25 +509,51 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
     if ($inat_texto) $bloco_fontes .= "\n\n--- iNaturalist ---\n" . $inat_texto;
     if ($wiki_texto) $bloco_fontes .= "\n\n--- Wikipedia ---\n" . $wiki_texto;
 
-    $prompt = "Você é especialista em botânica sistemática.\n"
-        . "Espécie: {$nome}\nAtributo: \"{$label}\"\nValor informado: \"{$valor}\"\n"
-        . ($bloco_fontes ?: "\n(Nenhuma fonte externa disponível.)")
-        . $bloco_refs
-        . "\n\nAvalie o valor informado para cada fonte disponível (0=não menciona, 1-49=menciona com dúvida, 50-79=provável, 80-100=confirma claramente). "
-        . "Inclua sempre 'IA' com base no seu próprio conhecimento da literatura botânica.\n"
-        . "Calcule 'media' como média aritmética de todas as fontes com score > 0 (incluindo IA).\n"
-        . "Responda APENAS com JSON válido:\n"
-        . "{\n"
-        . "  \"scores\": {\"EOL\": 0, \"GBIF\": 0, \"iNaturalist\": 0, \"Wikipedia\": 0, \"IA\": 0},\n"
-        . "  \"media\": 0,\n"
-        . "  \"valido\": true,\n"
-        . "  \"valor_sugerido\": \"{$valor}\",\n"
-        . "  \"observacao\": \"justificativa breve\",\n"
-        . "  \"divergencia\": null,\n"
-        . "  \"ref_existente_idx\": null,\n"
-        . "  \"referencia\": \"AUTOR. Título. Local, Ano.\",\n"
-        . "  \"url\": \"\"\n"
-        . "}";
+    $modo_sugestao = ($valor === '');
+
+    if ($modo_sugestao) {
+        $prompt = "Você é especialista em botânica sistemática.\n"
+            . "Espécie: {$nome}\nAtributo: \"{$label}\"\n(Campo ainda sem valor — sugira o mais provável)\n"
+            . ($bloco_fontes ?: "\n(Nenhuma fonte externa disponível.)")
+            . $bloco_refs
+            . "\n\nCom base nas fontes acima e no seu próprio conhecimento botânico, identifique o valor mais provável para \"{$label}\" desta espécie. "
+            . "Avalie cada fonte disponível (0=não menciona, 1-49=menciona com dúvida, 50-79=provável, 80-100=confirma claramente). "
+            . "Inclua sempre 'IA' com base no seu próprio conhecimento da literatura botânica.\n"
+            . "Calcule 'media' como média aritmética de todas as fontes com score > 0 (incluindo IA).\n"
+            . "Em 'valor_sugerido' coloque o valor mais provável para o atributo. Em 'valido' use false para que a sugestão seja exibida.\n"
+            . "Responda APENAS com JSON válido:\n"
+            . "{\n"
+            . "  \"scores\": {\"EOL\": 0, \"GBIF\": 0, \"iNaturalist\": 0, \"Wikipedia\": 0, \"IA\": 0},\n"
+            . "  \"media\": 0,\n"
+            . "  \"valido\": false,\n"
+            . "  \"valor_sugerido\": \"valor mais provável aqui\",\n"
+            . "  \"observacao\": \"justificativa breve\",\n"
+            . "  \"divergencia\": null,\n"
+            . "  \"ref_existente_idx\": null,\n"
+            . "  \"referencia\": \"AUTOR. Título. Local, Ano.\",\n"
+            . "  \"url\": \"\"\n"
+            . "}";
+    } else {
+        $prompt = "Você é especialista em botânica sistemática.\n"
+            . "Espécie: {$nome}\nAtributo: \"{$label}\"\nValor informado: \"{$valor}\"\n"
+            . ($bloco_fontes ?: "\n(Nenhuma fonte externa disponível.)")
+            . $bloco_refs
+            . "\n\nAvalie o valor informado para cada fonte disponível (0=não menciona, 1-49=menciona com dúvida, 50-79=provável, 80-100=confirma claramente). "
+            . "Inclua sempre 'IA' com base no seu próprio conhecimento da literatura botânica.\n"
+            . "Calcule 'media' como média aritmética de todas as fontes com score > 0 (incluindo IA).\n"
+            . "Responda APENAS com JSON válido:\n"
+            . "{\n"
+            . "  \"scores\": {\"EOL\": 0, \"GBIF\": 0, \"iNaturalist\": 0, \"Wikipedia\": 0, \"IA\": 0},\n"
+            . "  \"media\": 0,\n"
+            . "  \"valido\": true,\n"
+            . "  \"valor_sugerido\": \"{$valor}\",\n"
+            . "  \"observacao\": \"justificativa breve\",\n"
+            . "  \"divergencia\": null,\n"
+            . "  \"ref_existente_idx\": null,\n"
+            . "  \"referencia\": \"AUTOR. Título. Local, Ano.\",\n"
+            . "  \"url\": \"\"\n"
+            . "}";
+    }
 
     // ── Chama a IA ──────────────────────────────────────────
     $provider = strtolower(AI_PROVIDER);
@@ -2505,7 +2531,6 @@ function searchRefCampo(campo) {
     if (!_especieId) { showToast('Selecione uma espécie primeiro.'); return; }
     var el = document.getElementById(campo);
     var valor = el ? el.value : '';
-    if (!valor) { showToast('Selecione um valor antes de buscar referência.'); return; }
 
     var btn = document.querySelector('.btn-buscar-ref[data-campo="' + campo + '"]');
     if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
@@ -2562,8 +2587,9 @@ function showRefResult(campo, res) {
         div.innerHTML = '<span class="ia-err">⚠️ ' + escHtml(res.erro) + '</span>'
             + '<button type="button" class="btn-fechar-result" onclick="this.parentElement.remove()">✕</button>';
     } else {
-        var icone = res.valido ? '✅' : '⚠️';
-        var texto = res.valido ? 'Valor confirmado' : 'Atenção — valor questionado';
+        var valorAtualCheck = document.getElementById(campo) ? document.getElementById(campo).value : '';
+        var icone = res.valido ? '✅' : (valorAtualCheck === '' ? '💡' : '⚠️');
+        var texto = res.valido ? 'Valor confirmado' : (valorAtualCheck === '' ? 'Sugestão da IA' : 'Atenção — valor questionado');
 
         // Barras de confiança por fonte
         var confHtml = '';
@@ -2597,10 +2623,9 @@ function showRefResult(campo, res) {
         }
 
         // Valor sugerido diferente do atual
-        var el = document.getElementById(campo);
-        var valorAtual = el ? el.value : '';
+        var valorAtual = valorAtualCheck;
         var sugestaoHtml = '';
-        if (res.valor_sugerido && res.valor_sugerido !== valorAtual && !res.valido) {
+        if (res.valor_sugerido && res.valor_sugerido !== valorAtual && (!res.valido || valorAtual === '')) {
             sugestaoHtml = '<div style="margin-bottom:6px;font-size:0.83em;background:#fff3cd;padding:5px 8px;border-radius:4px;">'
                 + '💡 Valor sugerido: <strong>' + escHtml(res.valor_sugerido) + '</strong>'
                 + ' <button type="button" style="margin-left:6px;font-size:0.85em;padding:1px 7px;border:1px solid #856404;border-radius:4px;background:#fff;cursor:pointer;" '
@@ -2902,6 +2927,7 @@ function dispararCascataFolha() {
 // ============================================================
 var _allCampos = [
     'nome_cientifico_completo','sinonimos','nome_popular','familia',
+    'forma_vida','origem','endemismo','biomas','estados_ocorrencia',
     'forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao',
     'tamanho_folha','textura_folha',
     'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
