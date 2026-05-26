@@ -331,9 +331,9 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
     exit;
 }
 
-// ── AJAX: buscar atributo via múltiplas fontes ─────────────
+// ── AJAX: buscar atributo via IA ────────────────────────────
 if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
-    @set_time_limit(120);
+    @set_time_limit(60);
     if (session_status() === PHP_SESSION_NONE) session_start();
     header('Content-Type: application/json; charset=utf-8');
     if (!isset($_SESSION['usuario_id'])) { echo json_encode(['sucesso' => false, 'erro' => 'Não autenticado.']); exit; }
@@ -343,6 +343,9 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
     $campo      = trim($_POST['campo'] ?? '');
     $valor      = trim($_POST['valor'] ?? '');
     $refs_json  = trim($_POST['referencias_existentes'] ?? '');
+
+    // Labels e opções válidas de cada campo
+    $ENUMS = require __DIR__ . '/../Config/enums_caracteristicas.php';
 
     $labels = [
         'nome_cientifico_completo' => 'Nome Científico Completo',
@@ -381,115 +384,16 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
     $nome = $stmt->fetchColumn();
     if (!$nome) { echo json_encode(['sucesso' => false, 'erro' => 'Espécie não encontrada.']); exit; }
 
-    $label   = $labels[$campo];
-    $nome_enc = rawurlencode($nome);
+    $label = $labels[$campo];
 
-    $opts = [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 10,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Penomato/1.0)',
-        CURLOPT_HTTPHEADER     => ['Accept: application/json'],
-    ];
-
-    // ── Round 1: buscas de IDs em paralelo ─────────────────
-    $mh = curl_multi_init();
-    $handles = [];
-
-    $handles['eol_search']  = curl_init('https://eol.org/api/search/1.0.json?q=' . $nome_enc . '&page=1&exact=true');
-    $handles['gbif_search'] = curl_init('https://api.gbif.org/v1/species?name=' . $nome_enc . '&limit=1');
-    $handles['inat_search'] = curl_init('https://api.inaturalist.org/v1/taxa?q=' . $nome_enc . '&per_page=1&rank=species');
-    // Wikipedia PT com fallback para nome científico
-    $wiki_title = str_replace(' ', '_', $nome);
-    $handles['wiki_pt'] = curl_init('https://pt.wikipedia.org/api/rest_v1/page/summary/' . rawurlencode($wiki_title));
-    $handles['wiki_en'] = curl_init('https://en.wikipedia.org/api/rest_v1/page/summary/' . rawurlencode($wiki_title));
-
-    foreach ($handles as $ch) { curl_setopt_array($ch, $opts); curl_multi_add_handle($mh, $ch); }
-    do { curl_multi_exec($mh, $running); curl_multi_select($mh); } while ($running > 0);
-
-    $r1 = [];
-    foreach ($handles as $k => $ch) { $r1[$k] = curl_multi_getcontent($ch); curl_multi_remove_handle($mh, $ch); }
-    curl_multi_close($mh);
-
-    // ── Round 2: busca conteúdo detalhado em paralelo ───────
-    $mh2   = curl_multi_init();
-    $hd2   = [];
-    $eol_url = ''; $eol_id = 0; $gbif_key = 0; $inat_id = 0;
-
-    $eol_data = json_decode($r1['eol_search'], true);
-    if (!empty($eol_data['results'][0]['id'])) {
-        $eol_id  = (int)$eol_data['results'][0]['id'];
-        $eol_url = 'https://eol.org/pages/' . $eol_id;
-        $hd2['eol_page'] = curl_init('https://eol.org/api/pages/1.0/' . $eol_id . '.json?details=true&subjects=overview,morphology&common_names=false&taxonomy=false');
+    // Bloco de opções válidas (se o campo tiver ENUM)
+    $bloco_opcoes = '';
+    if (!empty($ENUMS[$campo])) {
+        $bloco_opcoes = "\nOpções válidas: " . implode(', ', $ENUMS[$campo]) . "\n"
+            . "(O valor_sugerido DEVE ser exatamente uma dessas opções)";
     }
 
-    $gbif_data = json_decode($r1['gbif_search'], true);
-    if (!empty($gbif_data['results'][0]['key'])) {
-        $gbif_key = (int)$gbif_data['results'][0]['key'];
-        $hd2['gbif_desc'] = curl_init('https://api.gbif.org/v1/species/' . $gbif_key . '/descriptions');
-    }
-
-    $inat_data = json_decode($r1['inat_search'], true);
-    if (!empty($inat_data['results'][0]['id'])) {
-        $inat_id = (int)$inat_data['results'][0]['id'];
-        $hd2['inat_taxon'] = curl_init('https://api.inaturalist.org/v1/taxa/' . $inat_id);
-    }
-
-    $r2 = [];
-    if (!empty($hd2)) {
-        foreach ($hd2 as $ch) { curl_setopt_array($ch, $opts); curl_multi_add_handle($mh2, $ch); }
-        do { curl_multi_exec($mh2, $running); curl_multi_select($mh2); } while ($running > 0);
-        foreach ($hd2 as $k => $ch) { $r2[$k] = curl_multi_getcontent($ch); curl_multi_remove_handle($mh2, $ch); }
-    }
-    curl_multi_close($mh2);
-
-    // ── Extrai textos de cada fonte ─────────────────────────
-    // EOL
-    $eol_texto = '';
-    if (!empty($r2['eol_page'])) {
-        $pd = json_decode($r2['eol_page'], true);
-        foreach ($pd['taxonConcept']['dataObjects'] ?? [] as $obj) {
-            $t = strip_tags($obj['description'] ?? '');
-            if (mb_strlen($t) > 80) $eol_texto .= $t . "\n\n";
-            if (mb_strlen($eol_texto) > 2500) break;
-        }
-        $eol_texto = mb_substr(trim($eol_texto), 0, 2500);
-    }
-
-    // GBIF
-    $gbif_texto = '';
-    if (!empty($r2['gbif_desc'])) {
-        $dd = json_decode($r2['gbif_desc'], true);
-        foreach ($dd['results'] ?? [] as $d) {
-            $t = strip_tags($d['description'] ?? '');
-            if (mb_strlen($t) > 80) $gbif_texto .= $t . "\n\n";
-            if (mb_strlen($gbif_texto) > 2000) break;
-        }
-        $gbif_texto = mb_substr(trim($gbif_texto), 0, 2000);
-    }
-
-    // iNaturalist
-    $inat_texto = '';
-    if (!empty($r2['inat_taxon'])) {
-        $it = json_decode($r2['inat_taxon'], true);
-        $desc = $it['results'][0]['wikipedia_summary'] ?? $it['results'][0]['description'] ?? '';
-        $inat_texto = mb_substr(strip_tags($desc), 0, 2000);
-    }
-
-    // Wikipedia (PT preferido, EN fallback)
-    $wiki_texto = ''; $wiki_url = '';
-    foreach (['wiki_pt' => 'pt', 'wiki_en' => 'en'] as $key => $lang) {
-        if (empty($r1[$key])) continue;
-        $wd = json_decode($r1[$key], true);
-        if (!empty($wd['extract']) && mb_strlen($wd['extract']) > 100) {
-            $wiki_texto = mb_substr($wd['extract'], 0, 2500);
-            $wiki_url   = $wd['content_urls']['desktop']['page'] ?? '';
-            break;
-        }
-    }
-
-    // ── Referências existentes ──────────────────────────────
+    // Referências existentes
     $refs_existentes = [];
     if ($refs_json) { $d = json_decode($refs_json, true); if (is_array($d)) $refs_existentes = $d; }
     $bloco_refs = '';
@@ -502,53 +406,37 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
         $bloco_refs .= "\nSe uma delas já confirma o valor, use ref_existente_idx e deixe referencia/url vazios.";
     }
 
-    // ── Prompt com avaliação por fonte ──────────────────────
-    $bloco_fontes = '';
-    if ($eol_texto)  $bloco_fontes .= "\n\n--- EOL ---\n" . $eol_texto;
-    if ($gbif_texto) $bloco_fontes .= "\n\n--- GBIF ---\n" . $gbif_texto;
-    if ($inat_texto) $bloco_fontes .= "\n\n--- iNaturalist ---\n" . $inat_texto;
-    if ($wiki_texto) $bloco_fontes .= "\n\n--- Wikipedia ---\n" . $wiki_texto;
-
+    // Prompt
     $modo_sugestao = ($valor === '');
-
     if ($modo_sugestao) {
-        $prompt = "Você é especialista em botânica sistemática.\n"
-            . "Espécie: {$nome}\nAtributo: \"{$label}\"\n(Campo ainda sem valor — sugira o mais provável)\n"
-            . ($bloco_fontes ?: "\n(Nenhuma fonte externa disponível.)")
+        $prompt = "Você é especialista em botânica sistemática com amplo conhecimento da flora do Cerrado brasileiro.\n"
+            . "Espécie: {$nome}\nAtributo: \"{$label}\"\n{$bloco_opcoes}\n"
             . $bloco_refs
-            . "\n\nCom base nas fontes acima e no seu próprio conhecimento botânico, identifique o valor mais provável para \"{$label}\" desta espécie. "
-            . "Avalie cada fonte disponível (0=não menciona, 1-49=menciona com dúvida, 50-79=provável, 80-100=confirma claramente). "
-            . "Inclua sempre 'IA' com base no seu próprio conhecimento da literatura botânica.\n"
-            . "Calcule 'media' como média aritmética de todas as fontes com score > 0 (incluindo IA).\n"
-            . "Em 'valor_sugerido' coloque o valor mais provável para o atributo. Em 'valido' use false para que a sugestão seja exibida.\n"
+            . "\n\nCom base na literatura botânica (Flora do Brasil, REFLORA, Lorenzi, Rizzini, APG IV etc.), "
+            . "determine o valor mais provável para \"{$label}\" nesta espécie e forneça sua confiança (0-100) e referência bibliográfica.\n"
             . "Responda APENAS com JSON válido:\n"
             . "{\n"
-            . "  \"scores\": {\"EOL\": 0, \"GBIF\": 0, \"iNaturalist\": 0, \"Wikipedia\": 0, \"IA\": 0},\n"
-            . "  \"media\": 0,\n"
+            . "  \"confianca\": 0,\n"
             . "  \"valido\": false,\n"
-            . "  \"valor_sugerido\": \"valor mais provável aqui\",\n"
+            . "  \"valor_sugerido\": \"valor aqui\",\n"
             . "  \"observacao\": \"justificativa breve\",\n"
-            . "  \"divergencia\": null,\n"
             . "  \"ref_existente_idx\": null,\n"
             . "  \"referencia\": \"AUTOR. Título. Local, Ano.\",\n"
             . "  \"url\": \"\"\n"
             . "}";
     } else {
-        $prompt = "Você é especialista em botânica sistemática.\n"
-            . "Espécie: {$nome}\nAtributo: \"{$label}\"\nValor informado: \"{$valor}\"\n"
-            . ($bloco_fontes ?: "\n(Nenhuma fonte externa disponível.)")
+        $prompt = "Você é especialista em botânica sistemática com amplo conhecimento da flora do Cerrado brasileiro.\n"
+            . "Espécie: {$nome}\nAtributo: \"{$label}\"\nValor informado: \"{$valor}\"\n{$bloco_opcoes}\n"
             . $bloco_refs
-            . "\n\nAvalie o valor informado para cada fonte disponível (0=não menciona, 1-49=menciona com dúvida, 50-79=provável, 80-100=confirma claramente). "
-            . "Inclua sempre 'IA' com base no seu próprio conhecimento da literatura botânica.\n"
-            . "Calcule 'media' como média aritmética de todas as fontes com score > 0 (incluindo IA).\n"
+            . "\n\nCom base na literatura botânica (Flora do Brasil, REFLORA, Lorenzi, Rizzini, APG IV etc.), "
+            . "avalie se o valor informado é correto para esta espécie. Forneça confiança (0=incorreto, 50=incerto, 100=certamente correto), "
+            . "se correto coloque valido=true, caso contrário valido=false e sugira o valor correto em valor_sugerido.\n"
             . "Responda APENAS com JSON válido:\n"
             . "{\n"
-            . "  \"scores\": {\"EOL\": 0, \"GBIF\": 0, \"iNaturalist\": 0, \"Wikipedia\": 0, \"IA\": 0},\n"
-            . "  \"media\": 0,\n"
+            . "  \"confianca\": 0,\n"
             . "  \"valido\": true,\n"
             . "  \"valor_sugerido\": \"{$valor}\",\n"
             . "  \"observacao\": \"justificativa breve\",\n"
-            . "  \"divergencia\": null,\n"
             . "  \"ref_existente_idx\": null,\n"
             . "  \"referencia\": \"AUTOR. Título. Local, Ano.\",\n"
             . "  \"url\": \"\"\n"
@@ -562,39 +450,39 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
     $ia_texto = null; $erro_api = null;
 
     if ($provider === 'claude') {
-        $payload = json_encode(['model' => $model ?? 'claude-sonnet-4-6', 'max_tokens' => 700, 'temperature' => 0.2,
+        $payload = json_encode(['model' => $model ?? 'claude-sonnet-4-6', 'max_tokens' => 500, 'temperature' => 0.1,
             'messages' => [['role' => 'user', 'content' => $prompt]]]);
         $ch = curl_init('https://api.anthropic.com/v1/messages');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 55, CURLOPT_HTTPHEADER => ['Content-Type: application/json',
+            CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => ['Content-Type: application/json',
             'x-api-key: ' . $api_key, 'anthropic-version: 2023-06-01']]);
         $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
         if ($code !== 200) $erro_api = 'Claude HTTP ' . $code;
         else { $d = json_decode($res, true); $ia_texto = $d['content'][0]['text'] ?? null; }
     } elseif ($provider === 'openai') {
-        $payload = json_encode(['model' => $model ?? 'gpt-4o', 'max_tokens' => 700, 'temperature' => 0.2,
-            'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido.'], ['role' => 'user', 'content' => $prompt]]]);
+        $payload = json_encode(['model' => $model ?? 'gpt-4o', 'max_tokens' => 500, 'temperature' => 0.1,
+            'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido sem markdown.'], ['role' => 'user', 'content' => $prompt]]]);
         $ch = curl_init('https://api.openai.com/v1/chat/completions');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 55, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
+            CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
         $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
         if ($code !== 200) $erro_api = 'OpenAI HTTP ' . $code;
         else { $d = json_decode($res, true); $ia_texto = $d['choices'][0]['message']['content'] ?? null; }
     } elseif ($provider === 'gemini') {
         $m = $model ?? 'gemini-1.5-flash';
-        $payload = json_encode(['contents' => [['parts' => [['text' => $prompt]]]], 'generationConfig' => ['temperature' => 0.2, 'maxOutputTokens' => 700]]);
+        $payload = json_encode(['contents' => [['parts' => [['text' => $prompt]]]], 'generationConfig' => ['temperature' => 0.1, 'maxOutputTokens' => 500]]);
         $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/' . $m . ':generateContent?key=' . urlencode($api_key));
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 55, CURLOPT_HTTPHEADER => ['Content-Type: application/json']]);
+            CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => ['Content-Type: application/json']]);
         $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
         if ($code !== 200) $erro_api = 'Gemini HTTP ' . $code;
         else { $d = json_decode($res, true); $ia_texto = $d['candidates'][0]['content']['parts'][0]['text'] ?? null; }
     } elseif ($provider === 'deepseek') {
-        $payload = json_encode(['model' => $model ?: 'deepseek-chat', 'max_tokens' => 700, 'temperature' => 0.2,
-            'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido.'], ['role' => 'user', 'content' => $prompt]]], JSON_UNESCAPED_UNICODE);
+        $payload = json_encode(['model' => $model ?: 'deepseek-chat', 'max_tokens' => 500, 'temperature' => 0.1,
+            'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido sem markdown.'], ['role' => 'user', 'content' => $prompt]]], JSON_UNESCAPED_UNICODE);
         $ch = curl_init('https://api.deepseek.com/chat/completions');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 110, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_TIMEOUT => 60, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
         $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
         if ($code !== 200) $erro_api = 'DeepSeek HTTP ' . $code;
@@ -612,30 +500,19 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
         $ref_existente_idx = (int)$ia['ref_existente_idx'];
     }
 
-    // Scores por fonte — remove fontes sem texto (score 0 e sem conteúdo)
-    $scores_raw = $ia['scores'] ?? [];
-    $scores_final = [];
-    $fontes_com_texto = [
-        'EOL' => !empty($eol_texto), 'GBIF' => !empty($gbif_texto),
-        'iNaturalist' => !empty($inat_texto), 'Wikipedia' => !empty($wiki_texto), 'IA' => true,
-    ];
-    foreach ($fontes_com_texto as $fonte => $tem) {
-        $scores_final[$fonte] = ['score' => (int)($scores_raw[$fonte] ?? 0), 'disponivel' => $tem];
-    }
-
-    $url_final = $wiki_url ?: $eol_url ?: ($ia['url'] ?? '');
+    $confianca = max(0, min(100, (int)($ia['confianca'] ?? 0)));
 
     echo json_encode([
         'sucesso'           => true,
         'valido'            => (bool)($ia['valido'] ?? true),
-        'scores'            => $scores_final,
-        'media'             => (int)($ia['media'] ?? 0),
+        'scores'            => ['IA' => ['score' => $confianca, 'disponivel' => true]],
+        'media'             => $confianca,
         'valor_sugerido'    => $ia['valor_sugerido'] ?? $valor,
         'observacao'        => $ia['observacao'] ?? '',
-        'divergencia'       => $ia['divergencia'] ?? null,
+        'divergencia'       => null,
         'ref_existente_idx' => $ref_existente_idx,
         'referencia'        => $ia['referencia'] ?? '',
-        'url'               => $url_final,
+        'url'               => $ia['url'] ?? '',
     ]);
     exit;
 }
@@ -2591,35 +2468,18 @@ function showRefResult(campo, res) {
         var icone = res.valido ? '✅' : (valorAtualCheck === '' ? '💡' : '⚠️');
         var texto = res.valido ? 'Valor confirmado' : (valorAtualCheck === '' ? 'Sugestão da IA' : 'Atenção — valor questionado');
 
-        // Barras de confiança por fonte
+        // Barra de confiança da IA
         var confHtml = '';
-        if (res.scores) {
-            var ordemFontes = ['EOL','GBIF','iNaturalist','Wikipedia','IA'];
-            var linhas = '';
-            ordemFontes.forEach(function(fonte) {
-                var info = res.scores[fonte];
-                if (!info) return;
-                var sc = info.score || 0;
-                var disp = info.disponivel;
-                var cor = sc >= 75 ? '#2e7d32' : sc >= 50 ? '#f57c00' : '#c62828';
-                var label_sc = disp ? (sc + '%') : 'sem dados';
-                var barW = disp ? sc : 0;
-                linhas += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">'
-                    + '<span style="font-size:0.75em;width:82px;color:#444;flex-shrink:0;">' + escHtml(fonte) + '</span>'
-                    + '<div style="flex:1;height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden;">'
-                    + '<div style="width:' + barW + '%;height:100%;background:' + (disp ? cor : '#ccc') + ';border-radius:3px;transition:width 0.4s;"></div></div>'
-                    + '<span style="font-size:0.75em;width:52px;text-align:right;color:' + (disp ? cor : '#aaa') + ';font-weight:600;">' + label_sc + '</span>'
-                    + '</div>';
-            });
-            var media = res.media || 0;
+        var media = res.media || 0;
+        if (media > 0) {
             var mediaCor = media >= 75 ? '#2e7d32' : media >= 50 ? '#f57c00' : '#c62828';
-            linhas += '<div style="display:flex;align-items:center;gap:6px;margin-top:4px;padding-top:4px;border-top:1px solid #e0e0e0;">'
-                + '<span style="font-size:0.75em;width:82px;color:#222;font-weight:700;flex-shrink:0;">Média</span>'
+            confHtml = '<div style="background:#f8faf8;border:1px solid #e0e0e0;border-radius:6px;padding:8px 10px;margin-bottom:8px;">'
+                + '<div style="display:flex;align-items:center;gap:6px;">'
+                + '<span style="font-size:0.75em;width:82px;color:#444;flex-shrink:0;">Confiança IA</span>'
                 + '<div style="flex:1;height:7px;background:#e0e0e0;border-radius:3px;overflow:hidden;">'
-                + '<div style="width:' + media + '%;height:100%;background:' + mediaCor + ';border-radius:3px;"></div></div>'
+                + '<div style="width:' + media + '%;height:100%;background:' + mediaCor + ';border-radius:3px;transition:width 0.4s;"></div></div>'
                 + '<span style="font-size:0.75em;width:52px;text-align:right;color:' + mediaCor + ';font-weight:800;">' + media + '%</span>'
-                + '</div>';
-            confHtml = '<div style="background:#f8faf8;border:1px solid #e0e0e0;border-radius:6px;padding:8px 10px;margin-bottom:8px;">' + linhas + '</div>';
+                + '</div></div>';
         }
 
         // Valor sugerido diferente do atual
