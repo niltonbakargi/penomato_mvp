@@ -49,6 +49,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_campo') {
 
     $whitelist = [
         'nome_cientifico_completo','sinonimos','nome_popular','familia',
+        'forma_vida','origem','endemismo','biomas','estados_ocorrencia',
         'forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao',
         'tamanho_folha','textura_folha',
         'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
@@ -118,6 +119,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_obs') {
 
     $whitelist_obs = [
         'nome_cientifico_completo','sinonimos','nome_popular','familia',
+        'forma_vida','origem','endemismo','biomas','estados_ocorrencia',
         'forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao',
         'tamanho_folha','textura_folha',
         'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
@@ -170,6 +172,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
     $labels = [
         'nome_cientifico_completo' => 'Nome Científico Completo',
         'sinonimos' => 'Sinônimos', 'nome_popular' => 'Nome Popular', 'familia' => 'Família',
+        'forma_vida' => 'Forma de Vida', 'origem' => 'Origem', 'endemismo' => 'Endemismo',
+        'biomas' => 'Biomas de Ocorrência', 'estados_ocorrencia' => 'Estados de Ocorrência',
         'forma_folha' => 'Forma da Folha', 'filotaxia_folha' => 'Filotaxia da Folha',
         'tipo_folha' => 'Tipo de Folha', 'divisao_folha' => 'Divisão da Folha',
         'paridade_pinnacao' => 'Paridade da Pinação', 'tamanho_folha' => 'Tamanho da Folha',
@@ -327,6 +331,124 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
     exit;
 }
 
+// ── AJAX: buscar dados básicos no REFLORA ──────────────────
+if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    header('Content-Type: application/json; charset=utf-8');
+    if (!isset($_SESSION['usuario_id'])) { echo json_encode(['ok' => false, 'erro' => 'Não autenticado.']); exit; }
+
+    $nome_raw = trim($_POST['nome_cientifico'] ?? '');
+    if (!$nome_raw) { echo json_encode(['ok' => false, 'erro' => 'Nome científico não informado.']); exit; }
+
+    $url = 'https://servicos.jbrj.gov.br/v2/flora/taxon/' . rawurlencode($nome_raw);
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+    ]);
+    $body = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($code !== 200 || !$body) {
+        echo json_encode(['ok' => false, 'erro' => 'REFLORA indisponível (HTTP ' . $code . ').']); exit;
+    }
+
+    $data = json_decode($body, true);
+    if (!is_array($data) || empty($data)) {
+        echo json_encode(['ok' => false, 'erro' => 'Espécie não encontrada no REFLORA.']); exit;
+    }
+
+    $item   = $data[0];
+    $taxon  = $item['taxon'] ?? [];
+
+    // Nome científico completo
+    $nome_cientifico_completo = $taxon['scientificname'] ?? '';
+
+    // Família
+    $familia = $taxon['family'] ?? '';
+
+    // Nomes populares — deduplica, mantém apenas português
+    $vernaculares = $item['vernacular_name'] ?? [];
+    $nomes_vistos = [];
+    $nomes_populares = [];
+    foreach ($vernaculares as $v) {
+        $n = trim($v['vernacularname'] ?? '');
+        $n_lower = mb_strtolower($n);
+        if ($n && !in_array($n_lower, $nomes_vistos, true)) {
+            $nomes_vistos[]   = $n_lower;
+            $nomes_populares[] = $n;
+        }
+    }
+    $nome_popular = implode(', ', $nomes_populares);
+
+    // Sinônimos
+    $relacoes = $item['resource_relationship'] ?? [];
+    $sinonimos_arr = [];
+    foreach ($relacoes as $r) {
+        if (stripos($r['relationshipofresource'] ?? '', 'sin') !== false) {
+            $s = trim($r['scientificname'] ?? '');
+            if ($s) $sinonimos_arr[] = $s;
+        }
+    }
+    $sinonimos = implode(', ', $sinonimos_arr);
+
+    // Forma de vida
+    $specie_profile = $item['specie_profile'] ?? [];
+    $forma_vida = implode(', ', $specie_profile['lifeForm'] ?? []);
+
+    // Origem (establishmentmeans) — pega o mais frequente
+    $distribuition = $item['distribuition'] ?? [];
+    $origens = [];
+    $endemismo = '';
+    $biomas_set = [];
+    $estados_set = [];
+    foreach ($distribuition as $d) {
+        $means = $d['establishmentmeans'] ?? '';
+        if ($means) $origens[] = $means;
+        $obs = $d['occurrenceremarks'] ?? [];
+        if (!$endemismo && isset($obs['endemism'])) $endemismo = $obs['endemism'];
+        foreach ($obs['phytogeographicDomain'] ?? [] as $b) {
+            if (!in_array($b, $biomas_set, true)) $biomas_set[] = $b;
+        }
+        $uf = str_replace('BR-', '', $d['locationid'] ?? '');
+        if ($uf && !in_array($uf, $estados_set, true)) $estados_set[] = $uf;
+    }
+    // Mapeia establishmentmeans para português
+    $mapa_origem = ['NATIVA' => 'Nativa', 'EXÓTICA' => 'Exótica', 'NATURALIZADA' => 'Naturalizada', 'CULTIVADA' => 'Cultivada'];
+    $origem_raw = $origens ? array_values(array_unique($origens))[0] : '';
+    $origem = $mapa_origem[strtoupper($origem_raw)] ?? '';
+
+    // Mapeia endemismo
+    $mapa_end = ['Endêmica' => 'Endêmica', 'Não endemica' => 'Não endêmica', 'Não endêmica' => 'Não endêmica'];
+    $endemismo_norm = $mapa_end[$endemismo] ?? $endemismo;
+
+    sort($biomas_set);
+    sort($estados_set);
+    $biomas            = implode(', ', $biomas_set);
+    $estados_ocorrencia = implode(', ', $estados_set);
+
+    // URL de referência canônica
+    $taxon_id    = $taxon['taxonid'] ?? null;
+    $ref_url     = $taxon_id ? 'https://floradobrasil2020.jbrj.gov.br/FB' . $taxon_id : ($taxon['references'] ?? '');
+
+    echo json_encode([
+        'ok'                       => true,
+        'nome_cientifico_completo' => $nome_cientifico_completo,
+        'familia'                  => $familia,
+        'nome_popular'             => $nome_popular,
+        'sinonimos'                => $sinonimos,
+        'forma_vida'               => $forma_vida,
+        'origem'                   => $origem,
+        'endemismo'                => $endemismo_norm,
+        'biomas'                   => $biomas,
+        'estados_ocorrencia'       => $estados_ocorrencia,
+        'ref_url'                  => $ref_url,
+    ]);
+    exit;
+}
+
 // ── Session + POST final ───────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -346,6 +468,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
     $campos = [
         'nome_cientifico_completo','nome_cientifico_completo_ref','sinonimos','sinonimos_ref',
         'nome_popular','nome_popular_ref','familia','familia_ref',
+        'forma_vida','forma_vida_ref','origem','origem_ref',
+        'endemismo','endemismo_ref','biomas','biomas_ref',
+        'estados_ocorrencia','estados_ocorrencia_ref',
         'forma_folha','forma_folha_ref','filotaxia_folha','filotaxia_folha_ref',
         'tipo_folha','tipo_folha_ref','divisao_folha','divisao_folha_ref',
         'paridade_pinnacao','paridade_pinnacao_ref','tamanho_folha','tamanho_folha_ref',
@@ -765,7 +890,12 @@ ob_end_clean();
 
     <!-- ── IDENTIFICAÇÃO BÁSICA ── -->
     <div class="card">
-      <div class="section-title">📌 Identificação Básica</div>
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <span>📌 Identificação Básica</span>
+        <button type="button" id="btn-buscar-reflora" onclick="buscarReflora()" style="background:#fff;border:1.5px solid rgba(255,255,255,0.7);color:var(--cor-primaria);padding:4px 12px;border-radius:6px;font-size:0.82em;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;" title="Preencher Nome Científico, Sinônimos, Nome Popular e Família via REFLORA/Flora do Brasil 2020">
+          🌿 Buscar no REFLORA
+        </button>
+      </div>
 
       <div class="field-row" data-campo="nome_cientifico_completo">
         <div class="field-main">
@@ -836,6 +966,114 @@ ob_end_clean();
         </div>
         <div class="field-confirm">
           <button type="button" class="confirm-btn" data-campo="familia" title="Confirmar">✓</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ECOLOGIA / DISTRIBUIÇÃO ── -->
+    <div class="card">
+      <div class="section-title">🌍 Distribuição e Ecologia</div>
+
+      <div class="field-row" data-campo="forma_vida">
+        <div class="field-main">
+          <label for="forma_vida">Forma de Vida</label>
+          <select id="forma_vida" name="forma_vida">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Árvore</option><option>Arbusto</option><option>Subarbusto</option>
+            <option>Erva</option><option>Trepadeira</option><option>Palmeira</option>
+            <option>Bambu</option><option>Epífita</option><option>Hemiparasita</option>
+            <option>Parasita</option>
+          </select>
+        </div>
+        <div class="field-refs">
+          <label>Refs</label>
+          <div class="ref-badges-wrap">
+            <div class="ref-badges" id="badges_forma_vida"></div>
+            <button type="button" class="btn-buscar-ref" data-campo="forma_vida" title="Buscar referência via IA">🔍</button>
+          </div>
+          <input type="hidden" id="forma_vida_ref" name="forma_vida_ref">
+        </div>
+        <div class="field-confirm">
+          <button type="button" class="confirm-btn" data-campo="forma_vida" title="Confirmar">✓</button>
+        </div>
+      </div>
+
+      <div class="field-row" data-campo="origem">
+        <div class="field-main">
+          <label for="origem">Origem</label>
+          <select id="origem" name="origem">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Nativa</option><option>Exótica</option>
+            <option>Naturalizada</option><option>Cultivada</option>
+          </select>
+        </div>
+        <div class="field-refs">
+          <label>Refs</label>
+          <div class="ref-badges-wrap">
+            <div class="ref-badges" id="badges_origem"></div>
+            <button type="button" class="btn-buscar-ref" data-campo="origem" title="Buscar referência via IA">🔍</button>
+          </div>
+          <input type="hidden" id="origem_ref" name="origem_ref">
+        </div>
+        <div class="field-confirm">
+          <button type="button" class="confirm-btn" data-campo="origem" title="Confirmar">✓</button>
+        </div>
+      </div>
+
+      <div class="field-row" data-campo="endemismo">
+        <div class="field-main">
+          <label for="endemismo">Endemismo</label>
+          <select id="endemismo" name="endemismo">
+            <option value="" disabled selected>Selecione…</option>
+            <option>Endêmica</option><option>Não endêmica</option>
+          </select>
+        </div>
+        <div class="field-refs">
+          <label>Refs</label>
+          <div class="ref-badges-wrap">
+            <div class="ref-badges" id="badges_endemismo"></div>
+            <button type="button" class="btn-buscar-ref" data-campo="endemismo" title="Buscar referência via IA">🔍</button>
+          </div>
+          <input type="hidden" id="endemismo_ref" name="endemismo_ref">
+        </div>
+        <div class="field-confirm">
+          <button type="button" class="confirm-btn" data-campo="endemismo" title="Confirmar">✓</button>
+        </div>
+      </div>
+
+      <div class="field-row" data-campo="biomas">
+        <div class="field-main">
+          <label for="biomas">Biomas de Ocorrência <span class="subtext">(separados por vírgula)</span></label>
+          <input type="text" id="biomas" name="biomas" placeholder="Ex: Cerrado, Amazônia">
+        </div>
+        <div class="field-refs">
+          <label>Refs</label>
+          <div class="ref-badges-wrap">
+            <div class="ref-badges" id="badges_biomas"></div>
+            <button type="button" class="btn-buscar-ref" data-campo="biomas" title="Buscar referência via IA">🔍</button>
+          </div>
+          <input type="hidden" id="biomas_ref" name="biomas_ref">
+        </div>
+        <div class="field-confirm">
+          <button type="button" class="confirm-btn" data-campo="biomas" title="Confirmar">✓</button>
+        </div>
+      </div>
+
+      <div class="field-row" data-campo="estados_ocorrencia">
+        <div class="field-main">
+          <label for="estados_ocorrencia">Estados de Ocorrência <span class="subtext">(siglas separadas por vírgula)</span></label>
+          <input type="text" id="estados_ocorrencia" name="estados_ocorrencia" placeholder="Ex: GO, MS, MT, DF">
+        </div>
+        <div class="field-refs">
+          <label>Refs</label>
+          <div class="ref-badges-wrap">
+            <div class="ref-badges" id="badges_estados_ocorrencia"></div>
+            <button type="button" class="btn-buscar-ref" data-campo="estados_ocorrencia" title="Buscar referência via IA">🔍</button>
+          </div>
+          <input type="hidden" id="estados_ocorrencia_ref" name="estados_ocorrencia_ref">
+        </div>
+        <div class="field-confirm">
+          <button type="button" class="confirm-btn" data-campo="estados_ocorrencia" title="Confirmar">✓</button>
         </div>
       </div>
     </div>
@@ -1766,6 +2004,90 @@ function autoSaveRefs() {
             body: new URLSearchParams({ acao: 'salvar_referencias', especie_id: _especieId, referencias: getRefsText() })
         });
     }, 800);
+}
+
+// ============================================================
+// BUSCAR NO REFLORA
+// ============================================================
+function buscarReflora() {
+    if (!_especieId) { showToast('Selecione uma espécie primeiro.'); return; }
+
+    var sel = document.getElementById('especie_id');
+    var nomeCientifico = sel ? sel.options[sel.selectedIndex].text.trim() : '';
+    // Remove sufixo de status entre parênteses, se houver
+    nomeCientifico = nomeCientifico.replace(/\s*\(.*\)$/, '').trim();
+    if (!nomeCientifico) { showToast('Nome científico não encontrado.'); return; }
+
+    var btn = document.getElementById('btn-buscar-reflora');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Buscando…'; }
+
+    fetch('confirmar_caracteristicas.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ acao: 'buscar_reflora', nome_cientifico: nomeCientifico })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+        if (btn) { btn.disabled = false; btn.textContent = '🌿 Buscar no REFLORA'; }
+        if (!res.ok) { showToast('REFLORA: ' + (res.erro || 'Erro desconhecido.')); return; }
+
+        // Adiciona referência REFLORA na lista (se ainda não existir)
+        var refUrl  = res.ref_url || '';
+        var refIdx  = null;
+        if (refUrl) {
+            var existing = _refs.findIndex(function(r) { return r.trim() === refUrl.trim(); });
+            if (existing >= 0) {
+                refIdx = existing + 1;
+            } else {
+                _refs.push(refUrl);
+                refIdx = _refs.length;
+                renderRefList();
+                autoSaveRefs();
+            }
+        }
+
+        // Preenche cada campo e vincula à referência
+        var campos = ['nome_cientifico_completo','familia','nome_popular','sinonimos',
+                      'forma_vida','origem','endemismo','biomas','estados_ocorrencia'];
+        campos.forEach(function(campo) {
+            var valor = res[campo] || '';
+            if (!valor) return;
+
+            var el = document.getElementById(campo);
+            if (!el) return;
+            // Para selects: só preenche se o valor existe nas opções
+            if (el.tagName === 'SELECT') {
+                var found = false;
+                for (var i = 0; i < el.options.length; i++) {
+                    if (el.options[i].value === valor || el.options[i].text === valor) {
+                        el.value = el.options[i].value || valor;
+                        found = true; break;
+                    }
+                }
+                if (!found) return;
+            } else {
+                el.value = valor;
+            }
+
+            if (refIdx) {
+                var refEl = document.getElementById(campo + '_ref');
+                if (refEl) {
+                    var parts = refEl.value
+                        ? refEl.value.split(',').map(function(n) { return n.trim(); }).filter(function(n) { return n && /^\d+$/.test(n); })
+                        : [];
+                    if (parts.indexOf(String(refIdx)) === -1) parts.push(String(refIdx));
+                    refEl.value = parts.join(',');
+                    buildBadges(campo, refEl.value);
+                }
+            }
+        });
+
+        showToast('REFLORA: dados preenchidos com sucesso!');
+    })
+    .catch(function() {
+        if (btn) { btn.disabled = false; btn.textContent = '🌿 Buscar no REFLORA'; }
+        showToast('Erro ao conectar com o REFLORA.');
+    });
 }
 
 // ============================================================

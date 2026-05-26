@@ -101,4 +101,12 @@ return [
     'possui_seiva'    => ['Sim','Não'],
     'possui_resina'   => ['Sim','Não'],
 
+    // ── ECOLOGIA / DISTRIBUIÇÃO ───────────────────────────────────────────
+    'forma_vida' => [
+        'Árvore','Arbusto','Subarbusto','Erva','Trepadeira',
+        'Palmeira','Bambu','Epífita','Hemiparasita','Parasita',
+    ],
+    'origem'    => ['Nativa','Exótica','Naturalizada','Cultivada'],
+    'endemismo' => ['Endêmica','Não endêmica'],
+
 ];
