@@ -331,6 +331,239 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
     exit;
 }
 
+// ── AJAX: buscar atributo via múltiplas fontes ─────────────
+if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
+    @set_time_limit(120);
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    header('Content-Type: application/json; charset=utf-8');
+    if (!isset($_SESSION['usuario_id'])) { echo json_encode(['sucesso' => false, 'erro' => 'Não autenticado.']); exit; }
+    require_once __DIR__ . '/../../config/banco_de_dados.php';
+
+    $especie_id = (int)($_POST['especie_id'] ?? 0);
+    $campo      = trim($_POST['campo'] ?? '');
+    $valor      = trim($_POST['valor'] ?? '');
+    $refs_json  = trim($_POST['referencias_existentes'] ?? '');
+
+    $labels = [
+        'nome_cientifico_completo' => 'Nome Científico Completo',
+        'sinonimos' => 'Sinônimos', 'nome_popular' => 'Nome Popular', 'familia' => 'Família',
+        'forma_vida' => 'Forma de Vida', 'origem' => 'Origem', 'endemismo' => 'Endemismo',
+        'biomas' => 'Biomas de Ocorrência', 'estados_ocorrencia' => 'Estados de Ocorrência',
+        'forma_folha' => 'Forma da Folha', 'filotaxia_folha' => 'Filotaxia da Folha',
+        'tipo_folha' => 'Tipo de Folha', 'divisao_folha' => 'Divisão da Folha',
+        'paridade_pinnacao' => 'Paridade da Pinação', 'tamanho_folha' => 'Tamanho da Folha',
+        'textura_folha' => 'Textura da Folha', 'margem_folha' => 'Margem da Folha',
+        'venacao_folha' => 'Venação da Folha', 'cor_flores' => 'Cor das Flores',
+        'simetria_floral' => 'Simetria Floral', 'numero_petalas' => 'Número de Pétalas',
+        'disposicao_flores' => 'Disposição das Flores', 'aroma' => 'Aroma das Flores',
+        'tamanho_flor' => 'Tamanho da Flor', 'tipo_fruto' => 'Tipo de Fruto',
+        'tamanho_fruto' => 'Tamanho do Fruto', 'cor_fruto' => 'Cor do Fruto',
+        'textura_fruto' => 'Textura do Fruto', 'dispersao_fruto' => 'Dispersão do Fruto',
+        'aroma_fruto' => 'Aroma do Fruto', 'tipo_semente' => 'Tipo de Semente',
+        'tamanho_semente' => 'Tamanho da Semente', 'cor_semente' => 'Cor da Semente',
+        'textura_semente' => 'Textura da Semente', 'quantidade_sementes' => 'Quantidade de Sementes',
+        'tipo_caule' => 'Tipo de Caule', 'textura_caule' => 'Textura do Caule',
+        'cor_caule' => 'Cor do Caule', 'forma_caule' => 'Forma do Caule',
+        'modificacao_caule' => 'Modificação do Caule', 'ramificacao_caule' => 'Ramificação do Caule',
+        'possui_espinhos' => 'Possui Espinhos', 'possui_latex' => 'Possui Látex',
+        'possui_seiva' => 'Possui Seiva', 'possui_resina' => 'Possui Resina',
+    ];
+
+    if (!$especie_id || !isset($labels[$campo])) {
+        echo json_encode(['sucesso' => false, 'erro' => 'Parâmetros inválidos.']); exit;
+    }
+    if (!defined('AI_PROVIDER') || !defined('AI_API_KEY') || AI_API_KEY === '') {
+        echo json_encode(['sucesso' => false, 'erro' => 'API de IA não configurada.']); exit;
+    }
+
+    $stmt = $pdo->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ?");
+    $stmt->execute([$especie_id]);
+    $nome = $stmt->fetchColumn();
+    if (!$nome) { echo json_encode(['sucesso' => false, 'erro' => 'Espécie não encontrada.']); exit; }
+
+    $label = $labels[$campo];
+
+    // ── Busca paralela: EOL + GBIF ─────────────────────────
+    $opts = [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Penomato/1.0)',
+        CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+    ];
+
+    $mh = curl_multi_init();
+
+    $ch_eol = curl_init('https://eol.org/api/search/1.0.json?q=' . rawurlencode($nome) . '&page=1&exact=true');
+    curl_setopt_array($ch_eol, $opts);
+
+    $ch_gbif = curl_init('https://api.gbif.org/v1/species?name=' . rawurlencode($nome) . '&limit=1');
+    curl_setopt_array($ch_gbif, $opts);
+
+    curl_multi_add_handle($mh, $ch_eol);
+    curl_multi_add_handle($mh, $ch_gbif);
+
+    do { curl_multi_exec($mh, $running); curl_multi_select($mh); } while ($running > 0);
+
+    $eol_raw  = curl_multi_getcontent($ch_eol);
+    $gbif_raw = curl_multi_getcontent($ch_gbif);
+
+    curl_multi_remove_handle($mh, $ch_eol);
+    curl_multi_remove_handle($mh, $ch_gbif);
+    curl_multi_close($mh);
+
+    // ── EOL: busca descrição morfológica da espécie ─────────
+    $eol_texto = '';
+    $eol_url   = '';
+    $eol_data  = json_decode($eol_raw, true);
+    if (!empty($eol_data['results'][0]['id'])) {
+        $eol_id  = (int)$eol_data['results'][0]['id'];
+        $eol_url = 'https://eol.org/pages/' . $eol_id;
+        $ch_page = curl_init('https://eol.org/api/pages/1.0/' . $eol_id . '.json?details=true&subjects=overview,morphology&common_names=false&taxonomy=false');
+        curl_setopt_array($ch_page, $opts);
+        $page_raw = curl_exec($ch_page);
+        curl_close($ch_page);
+        $page_data = json_decode($page_raw, true);
+        foreach ($page_data['taxonConcept']['dataObjects'] ?? [] as $obj) {
+            $txt = strip_tags($obj['description'] ?? '');
+            if (mb_strlen($txt) > 80) { $eol_texto .= $txt . "\n\n"; }
+            if (mb_strlen($eol_texto) > 3000) break;
+        }
+        $eol_texto = mb_substr(trim($eol_texto), 0, 3000);
+    }
+
+    // ── GBIF: pega descrição se disponível ──────────────────
+    $gbif_texto = '';
+    $gbif_data  = json_decode($gbif_raw, true);
+    if (!empty($gbif_data['results'][0]['key'])) {
+        $gbif_key = $gbif_data['results'][0]['key'];
+        $ch_desc  = curl_init('https://api.gbif.org/v1/species/' . $gbif_key . '/descriptions');
+        curl_setopt_array($ch_desc, $opts);
+        $desc_raw = curl_exec($ch_desc);
+        curl_close($ch_desc);
+        $desc_data = json_decode($desc_raw, true);
+        foreach ($desc_data['results'] ?? [] as $d) {
+            $txt = strip_tags($d['description'] ?? '');
+            if (mb_strlen($txt) > 80) { $gbif_texto .= $txt . "\n\n"; }
+            if (mb_strlen($gbif_texto) > 2000) break;
+        }
+        $gbif_texto = mb_substr(trim($gbif_texto), 0, 2000);
+    }
+
+    // ── Monta referências existentes ────────────────────────
+    $refs_existentes = [];
+    if ($refs_json) { $d = json_decode($refs_json, true); if (is_array($d)) $refs_existentes = $d; }
+    $bloco_refs = '';
+    if (!empty($refs_existentes)) {
+        $bloco_refs = "\n\nReferências já cadastradas:\n";
+        foreach ($refs_existentes as $r) {
+            $idx = (int)($r['idx'] ?? 0); $texto = trim($r['texto'] ?? '');
+            if ($idx > 0 && $texto) $bloco_refs .= "[{$idx}] {$texto}\n";
+        }
+        $bloco_refs .= "\nSe uma delas já confirma o valor, use ref_existente_idx e deixe referencia/url vazios.";
+    }
+
+    // ── Monta fontes externas para o prompt ─────────────────
+    $bloco_fontes = '';
+    if ($eol_texto)  $bloco_fontes .= "\n\n--- EOL (Encyclopedia of Life) ---\n" . $eol_texto;
+    if ($gbif_texto) $bloco_fontes .= "\n\n--- GBIF (Global Biodiversity Information Facility) ---\n" . $gbif_texto;
+    $fontes_usadas = array_filter(['EOL' => !empty($eol_texto), 'GBIF' => !empty($gbif_texto), 'IA' => true]);
+
+    // ── Prompt de síntese ───────────────────────────────────
+    $prompt = "Você é um especialista em botânica sistemática.\n"
+        . "Espécie: {$nome}\nAtributo: \"{$label}\"\nValor informado: \"{$valor}\"\n"
+        . ($bloco_fontes ?: "\n(Nenhuma fonte externa disponível — use seu conhecimento da literatura botânica.)")
+        . $bloco_refs
+        . "\n\nCom base nas fontes acima e no seu conhecimento, avalie o valor informado e responda APENAS com JSON válido:\n"
+        . "{\n"
+        . "  \"valido\": true/false,\n"
+        . "  \"confianca\": 0-100,\n"
+        . "  \"valor_sugerido\": \"valor correto ou igual ao informado se estiver certo\",\n"
+        . "  \"observacao\": \"justificativa breve em português\",\n"
+        . "  \"divergencia\": \"null ou descrição se as fontes divergirem\",\n"
+        . "  \"ref_existente_idx\": null,\n"
+        . "  \"referencia\": \"AUTOR. Título. Local, Ano.\",\n"
+        . "  \"url\": \"URL da melhor fonte ou vazio\"\n"
+        . "}";
+
+    // ── Chama a IA ──────────────────────────────────────────
+    $provider = strtolower(AI_PROVIDER);
+    $api_key  = AI_API_KEY;
+    $model    = defined('AI_MODEL') ? AI_MODEL : null;
+    $texto    = null; $erro_api = null;
+
+    if ($provider === 'claude') {
+        $payload = json_encode(['model' => $model ?? 'claude-sonnet-4-6', 'max_tokens' => 600, 'temperature' => 0.2,
+            'messages' => [['role' => 'user', 'content' => $prompt]]]);
+        $ch = curl_init('https://api.anthropic.com/v1/messages');
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 55, CURLOPT_HTTPHEADER => ['Content-Type: application/json',
+            'x-api-key: ' . $api_key, 'anthropic-version: 2023-06-01']]);
+        $r = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) $erro_api = 'Claude HTTP ' . $code;
+        else { $d = json_decode($r, true); $texto = $d['content'][0]['text'] ?? null; }
+    } elseif ($provider === 'openai') {
+        $payload = json_encode(['model' => $model ?? 'gpt-4o', 'max_tokens' => 600, 'temperature' => 0.2,
+            'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido.'], ['role' => 'user', 'content' => $prompt]]]);
+        $ch = curl_init('https://api.openai.com/v1/chat/completions');
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 55, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
+        $r = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) $erro_api = 'OpenAI HTTP ' . $code;
+        else { $d = json_decode($r, true); $texto = $d['choices'][0]['message']['content'] ?? null; }
+    } elseif ($provider === 'gemini') {
+        $m = $model ?? 'gemini-1.5-flash';
+        $payload = json_encode(['contents' => [['parts' => [['text' => $prompt]]]], 'generationConfig' => ['temperature' => 0.2, 'maxOutputTokens' => 600]]);
+        $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/' . $m . ':generateContent?key=' . urlencode($api_key));
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 55, CURLOPT_HTTPHEADER => ['Content-Type: application/json']]);
+        $r = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) $erro_api = 'Gemini HTTP ' . $code;
+        else { $d = json_decode($r, true); $texto = $d['candidates'][0]['content']['parts'][0]['text'] ?? null; }
+    } elseif ($provider === 'deepseek') {
+        $payload = json_encode(['model' => $model ?: 'deepseek-chat', 'max_tokens' => 600, 'temperature' => 0.2,
+            'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido.'], ['role' => 'user', 'content' => $prompt]]], JSON_UNESCAPED_UNICODE);
+        $ch = curl_init('https://api.deepseek.com/chat/completions');
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 110, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
+        $r = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) $erro_api = 'DeepSeek HTTP ' . $code;
+        else { $d = json_decode($r, true); $texto = $d['choices'][0]['message']['content'] ?? null; }
+    } else {
+        $erro_api = 'Provider não suportado.';
+    }
+
+    if ($erro_api || !$texto) { echo json_encode(['sucesso' => false, 'erro' => $erro_api ?? 'Sem resposta da IA.']); exit; }
+
+    $jl = trim(preg_replace(['/^```(?:json)?\s*/i', '/\s*```$/'], '', trim($texto)));
+    $ia = json_decode($jl, true);
+    if (json_last_error() !== JSON_ERROR_NONE) { echo json_encode(['sucesso' => false, 'erro' => 'JSON inválido da IA.']); exit; }
+
+    $ref_existente_idx = null;
+    if (isset($ia['ref_existente_idx']) && is_numeric($ia['ref_existente_idx']) && (int)$ia['ref_existente_idx'] > 0) {
+        $ref_existente_idx = (int)$ia['ref_existente_idx'];
+    }
+
+    // URL preferida: EOL se disponível, senão URL da IA
+    $url_final = $eol_url ?: ($ia['url'] ?? '');
+
+    echo json_encode([
+        'sucesso'           => true,
+        'valido'            => (bool)($ia['valido'] ?? true),
+        'confianca'         => (int)($ia['confianca'] ?? 0),
+        'valor_sugerido'    => $ia['valor_sugerido'] ?? $valor,
+        'observacao'        => $ia['observacao'] ?? '',
+        'divergencia'       => $ia['divergencia'] ?? null,
+        'fontes'            => array_keys($fontes_usadas),
+        'ref_existente_idx' => $ref_existente_idx,
+        'referencia'        => $ia['referencia'] ?? '',
+        'url'               => $url_final,
+        'eol_url'           => $eol_url,
+    ]);
+    exit;
+}
+
 // ── AJAX: buscar dados básicos no REFLORA ──────────────────
 if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
     if (session_status() === PHP_SESSION_NONE) session_start();
@@ -2249,6 +2482,8 @@ function searchRefCampo(campo) {
         if (divisaoFolhaEl && divisaoFolhaEl.value) params.divisao_folha = divisaoFolhaEl.value;
     }
 
+    params.acao = 'buscar_atributo_multi';
+
     fetch('confirmar_caracteristicas.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -2279,6 +2514,39 @@ function showRefResult(campo, res) {
     } else {
         var icone = res.valido ? '✅' : '⚠️';
         var texto = res.valido ? 'Valor confirmado' : 'Atenção — valor questionado';
+
+        // Barra de confiança
+        var confHtml = '';
+        if (res.confianca !== undefined) {
+            var conf = parseInt(res.confianca) || 0;
+            var confCor = conf >= 75 ? '#2e7d32' : conf >= 50 ? '#f57c00' : '#c62828';
+            var fontesStr = (res.fontes && res.fontes.length) ? res.fontes.join(' · ') : 'IA';
+            confHtml = '<div style="margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+                + '<span style="font-size:0.8em;color:#555;">Fontes: <strong>' + escHtml(fontesStr) + '</strong></span>'
+                + '<span style="font-size:0.8em;font-weight:700;color:' + confCor + ';">' + conf + '% confiança</span>'
+                + '<div style="flex:1;min-width:80px;height:5px;background:#e0e0e0;border-radius:3px;overflow:hidden;">'
+                + '<div style="width:' + conf + '%;height:100%;background:' + confCor + ';border-radius:3px;"></div></div>'
+                + '</div>';
+        }
+
+        // Valor sugerido diferente do atual
+        var el = document.getElementById(campo);
+        var valorAtual = el ? el.value : '';
+        var sugestaoHtml = '';
+        if (res.valor_sugerido && res.valor_sugerido !== valorAtual && !res.valido) {
+            sugestaoHtml = '<div style="margin-bottom:6px;font-size:0.83em;background:#fff3cd;padding:5px 8px;border-radius:4px;">'
+                + '💡 Valor sugerido: <strong>' + escHtml(res.valor_sugerido) + '</strong>'
+                + ' <button type="button" style="margin-left:6px;font-size:0.85em;padding:1px 7px;border:1px solid #856404;border-radius:4px;background:#fff;cursor:pointer;" '
+                + 'onclick="usarValorSugerido(\'' + campo + '\',\'' + escAttr(res.valor_sugerido) + '\',this)">↩ Usar</button>'
+                + '</div>';
+        }
+
+        // Divergência
+        var divHtml = '';
+        if (res.divergencia && res.divergencia !== 'null') {
+            divHtml = '<div style="font-size:0.8em;color:#856404;margin-bottom:4px;">⚡ ' + escHtml(res.divergencia) + '</div>';
+        }
+
         var acoesHtml;
         if (res.ref_existente_idx) {
             acoesHtml = '<div class="ia-ref-texto">Referência [' + res.ref_existente_idx + '] já confirma este valor.</div>'
@@ -2297,16 +2565,35 @@ function showRefResult(campo, res) {
                 + '<button type="button" class="btn-rejeitar-ref" onclick="this.closest(\'.ia-result\').remove()">✖ Rejeitar</button>'
                 + '</div>';
         }
+
         div.innerHTML = '<button type="button" class="btn-fechar-result" onclick="this.parentElement.remove()">✕</button>'
             + '<div class="ia-validacao ' + (res.valido ? 'ok' : 'warn') + '">' + icone + ' <strong>' + texto + '</strong>'
             + (res.observacao ? ' — ' + escHtml(res.observacao) : '') + '</div>'
-            + acoesHtml;
+            + confHtml + divHtml + sugestaoHtml + acoesHtml;
         div.dataset.referencia  = res.referencia  || '';
         div.dataset.url         = res.url         || '';
         div.dataset.observacao  = res.observacao  || '';
     }
 
     fieldRow.after(div);
+}
+
+function usarValorSugerido(campo, valor, btn) {
+    var el = document.getElementById(campo);
+    if (!el) return;
+    if (el.tagName === 'SELECT') {
+        for (var i = 0; i < el.options.length; i++) {
+            if (el.options[i].text === valor || el.options[i].value === valor) {
+                el.value = el.options[i].value || valor; break;
+            }
+        }
+    } else {
+        el.value = valor;
+    }
+    var panel = btn.closest('.ia-result');
+    if (panel) panel.querySelector('.ia-validacao') && (panel.querySelector('.ia-validacao').innerHTML = '✅ <strong>Valor atualizado</strong>');
+    btn.closest('div').remove();
+    showToast('Valor atualizado para "' + valor + '".');
 }
 
 function _autoConfirmarCampo(campo, panel) {
