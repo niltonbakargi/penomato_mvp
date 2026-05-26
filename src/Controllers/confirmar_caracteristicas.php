@@ -1096,7 +1096,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_nome_cientifico_completo"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="nome_cientifico_completo" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="nome_cientifico_completo_ref" name="nome_cientifico_completo_ref">
         </div>
@@ -1114,7 +1113,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_sinonimos"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="sinonimos" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="sinonimos_ref" name="sinonimos_ref">
         </div>
@@ -1132,7 +1130,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_nome_popular"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="nome_popular" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="nome_popular_ref" name="nome_popular_ref">
         </div>
@@ -1150,7 +1147,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_familia"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="familia" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="familia_ref" name="familia_ref">
         </div>
@@ -1179,7 +1175,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_forma_vida"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="forma_vida" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="forma_vida_ref" name="forma_vida_ref">
         </div>
@@ -1201,7 +1196,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_origem"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="origem" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="origem_ref" name="origem_ref">
         </div>
@@ -1222,7 +1216,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_endemismo"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="endemismo" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="endemismo_ref" name="endemismo_ref">
         </div>
@@ -1240,7 +1233,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_biomas"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="biomas" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="biomas_ref" name="biomas_ref">
         </div>
@@ -1258,7 +1250,6 @@ ob_end_clean();
           <label>Refs</label>
           <div class="ref-badges-wrap">
             <div class="ref-badges" id="badges_estados_ocorrencia"></div>
-            <button type="button" class="btn-buscar-ref" data-campo="estados_ocorrencia" title="Buscar referência via IA">🔍</button>
           </div>
           <input type="hidden" id="estados_ocorrencia_ref" name="estados_ocorrencia_ref">
         </div>
