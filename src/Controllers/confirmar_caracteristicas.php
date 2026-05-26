@@ -344,7 +344,11 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_TIMEOUT        => 20,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Penomato/1.0)',
         CURLOPT_HTTPHEADER     => ['Accept: application/json'],
     ]);
     $body = curl_exec($ch);
