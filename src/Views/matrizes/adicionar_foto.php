@@ -24,7 +24,7 @@ if (!$matriz) {
 
 $nome_exibir = $matriz['especie_nome_popular'] ?: ($matriz['especie_nome'] ?: 'Espécie não identificada');
 $titulo_pagina = "Adicionar Foto — Matriz {$matriz['codigo']}";
-$partes = ['folha', 'flor', 'fruto', 'casca', 'semente'];
+$partes = ['folha', 'flor', 'fruto', 'caule', 'semente'];
 
 include __DIR__ . '/../includes/cabecalho.php';
 ?>

@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `matrizes` (
 CREATE TABLE IF NOT EXISTS `matrizes_fotos` (
   `id`           INT(11)      NOT NULL AUTO_INCREMENT,
   `matriz_id`    INT(11)      NOT NULL,
-  `parte`        ENUM('folha','flor','fruto','casca','semente') NOT NULL,
+  `parte`        ENUM('folha','flor','fruto','caule','semente') NOT NULL,
   `caminho_foto` VARCHAR(500) NOT NULL,
   `enviada_por`  INT(11)      NOT NULL,
   `data_envio`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,

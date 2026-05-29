@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $matriz_id = intval($_POST['matriz_id'] ?? 0);
 $parte     = $_POST['parte'] ?? '';
-$partes_validas = ['folha', 'flor', 'fruto', 'casca', 'semente'];
+$partes_validas = ['folha', 'flor', 'fruto', 'caule', 'semente'];
 
 if (!$matriz_id || !in_array($parte, $partes_validas)) {
     setMensagem('erro', 'Dados inválidos.');
