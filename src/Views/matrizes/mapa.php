@@ -405,44 +405,25 @@ const DADOS = <?php echo json_encode(array_map(function($m) {
 let mapa = null;
 let marcadores = [];
 
-/* estilos do marcador de foto — injetados via JS para evitar conflito com Leaflet */
-(function () {
-    var s = document.createElement('style');
-    s.textContent = `
-        .mk-foto {
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            border: 3px solid #0b5e42;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
-            background: #e8f5e9;
-            object-fit: cover;
-            display: block;
-            cursor: pointer;
-        }
-        .mk-foto-wrap {
-            width: 44px; height: 44px;
-            position: relative;
-        }
-        .mk-foto-wrap::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top: 8px solid #0b5e42;
-        }
-    `;
-    document.head.appendChild(s);
-}());
-
-function criarIcone(foto) {
+function criarIcone() {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">'
+        + '<ellipse cx="18" cy="20" rx="16" ry="16" fill="#0b5e42" opacity="0.15"/>'
+        + '<circle cx="18" cy="18" r="16" fill="#0b5e42"/>'
+        + '<circle cx="18" cy="18" r="14" fill="#1a7a58"/>'
+        /* copa */
+        + '<polygon points="18,4 27,17 9,17" fill="#d4f0e4"/>'
+        + '<polygon points="18,9 25,20 11,20" fill="#d4f0e4"/>'
+        /* tronco */
+        + '<rect x="16" y="19" width="4" height="5" rx="1" fill="#d4f0e4"/>'
+        /* ponteiro */
+        + '<polygon points="18,46 12,32 24,32" fill="#0b5e42"/>'
+        + '</svg>';
     return L.divIcon({
         className: '',
-        html: '<div class="mk-foto-wrap"><img class="mk-foto" src="/penomato_mvp/' + foto + '" onerror="this.src=\'/penomato_mvp/assets/imagens/arvore-placeholder.png\'"></div>',
-        iconSize:   [44, 52],
-        iconAnchor: [22, 52],
-        popupAnchor:[0, -54],
+        html: svg,
+        iconSize:   [36, 46],
+        iconAnchor: [18, 46],
+        popupAnchor:[0, -48],
     });
 }
 
@@ -491,7 +472,7 @@ function abrirMapaTodas() {
 
     const bounds = [];
     alvo.forEach(function(d) {
-        const mk = L.marker([d.lat, d.lon], { icon: criarIcone(d.foto) }).bindPopup(popupHTML(d));
+        const mk = L.marker([d.lat, d.lon], { icon: criarIcone() }).bindPopup(popupHTML(d));
         mk.addTo(mapa);
         marcadores.push(mk);
         bounds.push([d.lat, d.lon]);
@@ -509,7 +490,7 @@ function abrirMapaUnico(id, lat, lon, nome, codigo, foto) {
     limparMarcadores();
 
     const d = DADOS.find(function(x) { return x.id === id; }) || { id, nome, lat, lon, foto, codigo, cient: '', data: '' };
-    const mk = L.marker([lat, lon], { icon: criarIcone(d.foto) }).bindPopup(popupHTML(d));
+    const mk = L.marker([lat, lon], { icon: criarIcone() }).bindPopup(popupHTML(d));
     mk.addTo(mapa);
     marcadores.push(mk);
 
