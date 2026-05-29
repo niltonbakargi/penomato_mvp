@@ -255,6 +255,10 @@
             <span class="icon">💾</span>
             Backup
         </div>
+        <div class="action-btn danger" onclick="window.location.href='/penomato_mvp/src/Views/matrizes/gerenciar_matrizes.php'">
+            <span class="icon">🌳</span>
+            Gerenciar Matrizes
+        </div>
     </div>
 
     <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
