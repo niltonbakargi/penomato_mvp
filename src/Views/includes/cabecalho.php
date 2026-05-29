@@ -420,6 +420,13 @@ function menuAtivo($url, $pagina_atual) {
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/matrizes/index.php', $pagina_atual); ?>"
+                       href="/penomato_mvp/src/Views/matrizes/index.php">
+                        <i class="fas fa-tree"></i> Matrizes
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/publico/sobre.php', $pagina_atual); ?>"
                        href="/penomato_mvp/src/Views/publico/sobre.php">
                         <i class="fas fa-info-circle"></i> Sobre

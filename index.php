@@ -358,6 +358,20 @@ $url_painel = ($tipo === 'gestor')
                         </span>
                     </a>
 
+                    <!-- Card Banco de Matrizes -->
+                    <a href="/penomato_mvp/src/Views/matrizes/index.php" class="search-card" style="background:#f0fdf6; border-color:#a7d7bf; margin-top:-16px">
+                        <div class="search-icon" style="color:#1a7a5a">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div class="search-title">BANCO DE MATRIZES</div>
+                        <div class="search-desc">
+                            Mapeie e encontre árvores nativas do Cerrado para coleta de sementes e material propagativo
+                        </div>
+                        <span class="btn-search" style="background:#1a7a5a">
+                            <i class="fas fa-map-marked-alt me-2"></i>Acessar Mapa
+                        </span>
+                    </a>
+
                     <!-- Card REFLORA -->
                     <a href="/penomato_mvp/src/Views/publico/flora_cerrado.php" class="search-card reflora-card">
                         <div class="search-icon">
