@@ -153,9 +153,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['login_time']          = time();
 
             // ------------------------------------------------
-            // REDIRECIONAR BASEADO NO TIPO DE USUÁRIO
+            // REDIRECIONAR — usa redirect se informado, senão painel padrão
             // ------------------------------------------------
-            if ($usuario['categoria'] === 'gestor') {
+            if (!empty($redirect)) {
+                header('Location: ' . $redirect);
+            } elseif ($usuario['categoria'] === 'gestor') {
                 header('Location: ' . APP_BASE . '/src/Controllers/controlador_gestor.php');
             } else {
                 header('Location: ' . APP_BASE . '/src/Views/entrar_colaborador.php');

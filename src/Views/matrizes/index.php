@@ -196,6 +196,11 @@ include __DIR__ . '/../includes/cabecalho.php';
 
 <div class="botoes-modulo">
 
+    <?php
+        $url_atual = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
+                   . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $url_login_matrizes = '/penomato_mvp/src/Views/auth/login.php?redirect=' . urlencode($url_atual);
+    ?>
     <?php if (estaLogado()): ?>
         <a href="/penomato_mvp/src/Views/matrizes/registrar.php" class="btn-modulo btn-nova-matriz">
             <div class="icone-btn"><i class="fas fa-plus"></i></div>
@@ -205,7 +210,7 @@ include __DIR__ . '/../includes/cabecalho.php';
             </div>
         </a>
     <?php else: ?>
-        <a href="/penomato_mvp/src/Views/auth/login.php" class="btn-modulo btn-nova-matriz">
+        <a href="<?php echo htmlspecialchars($url_login_matrizes); ?>" class="btn-modulo btn-nova-matriz">
             <div class="icone-btn"><i class="fas fa-plus"></i></div>
             <div class="texto-btn">
                 <strong>Nova Matriz</strong>
@@ -225,7 +230,7 @@ include __DIR__ . '/../includes/cabecalho.php';
     <?php if (!estaLogado()): ?>
     <div class="aviso-login mt-2">
         <i class="fas fa-info-circle"></i>
-        Para registrar matrizes, <a href="/penomato_mvp/src/Views/auth/login.php" class="fw-bold">faça login</a> ou <a href="/penomato_mvp/src/Views/auth/cadastro.php" class="fw-bold">crie uma conta</a>.
+        Para registrar matrizes, <a href="<?php echo htmlspecialchars($url_login_matrizes); ?>" class="fw-bold">faça login</a> ou <a href="/penomato_mvp/src/Views/auth/cadastro.php" class="fw-bold">crie uma conta</a>.
     </div>
     <?php endif; ?>
 
