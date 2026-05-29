@@ -405,6 +405,47 @@ const DADOS = <?php echo json_encode(array_map(function($m) {
 let mapa = null;
 let marcadores = [];
 
+/* estilos do marcador de foto — injetados via JS para evitar conflito com Leaflet */
+(function () {
+    var s = document.createElement('style');
+    s.textContent = `
+        .mk-foto {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: 3px solid #0b5e42;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+            background: #e8f5e9;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        }
+        .mk-foto-wrap {
+            width: 44px; height: 44px;
+            position: relative;
+        }
+        .mk-foto-wrap::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top: 8px solid #0b5e42;
+        }
+    `;
+    document.head.appendChild(s);
+}());
+
+function criarIcone(foto) {
+    return L.divIcon({
+        className: '',
+        html: '<div class="mk-foto-wrap"><img class="mk-foto" src="/penomato_mvp/' + foto + '" onerror="this.src=\'/penomato_mvp/assets/imagens/arvore-placeholder.png\'"></div>',
+        iconSize:   [44, 52],
+        iconAnchor: [22, 52],
+        popupAnchor:[0, -54],
+    });
+}
+
 function iniciarMapa() {
     if (mapa) return;
     mapa = L.map('mapa-div');
@@ -450,7 +491,7 @@ function abrirMapaTodas() {
 
     const bounds = [];
     alvo.forEach(function(d) {
-        const mk = L.marker([d.lat, d.lon]).bindPopup(popupHTML(d));
+        const mk = L.marker([d.lat, d.lon], { icon: criarIcone(d.foto) }).bindPopup(popupHTML(d));
         mk.addTo(mapa);
         marcadores.push(mk);
         bounds.push([d.lat, d.lon]);
@@ -468,7 +509,7 @@ function abrirMapaUnico(id, lat, lon, nome, codigo, foto) {
     limparMarcadores();
 
     const d = DADOS.find(function(x) { return x.id === id; }) || { id, nome, lat, lon, foto, codigo, cient: '', data: '' };
-    const mk = L.marker([lat, lon]).bindPopup(popupHTML(d));
+    const mk = L.marker([lat, lon], { icon: criarIcone(d.foto) }).bindPopup(popupHTML(d));
     mk.addTo(mapa);
     marcadores.push(mk);
 
