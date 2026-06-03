@@ -286,7 +286,7 @@ try {
     // ================================================
     // REDIRECIONAR PARA PÁGINA DE SUCESSO
     // ================================================
-    header("Location: ../Views/sucesso_importacao.php?especie_id=" . $especie_id . "&imagens=" . $imagens_salvas);
+    header("Location: ../Views/entrar_colaborador.php?modal=dados_internet&especie_id=" . $especie_id);
     exit;
     
 } catch (Exception $e) {

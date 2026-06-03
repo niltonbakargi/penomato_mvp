@@ -29,6 +29,27 @@ $qtd_revisada->execute([$usuario_id]);
 $total_revisada = $qtd_revisada->fetchColumn();
 
 // ================================================
+// ESTADO DO MODAL DADOS DA INTERNET
+// ================================================
+$modal_aberto     = isset($_GET['modal']) && $_GET['modal'] === 'dados_internet';
+$modal_especie_id = (int)($_GET['especie_id'] ?? 0);
+
+$especie_modal    = null;
+$tem_imagens      = false;
+$tem_morfologicos = false;
+
+if ($modal_especie_id > 0) {
+    $stmt_modal = $pdo->prepare("SELECT nome_cientifico, status FROM especies_administrativo WHERE id = ?");
+    $stmt_modal->execute([$modal_especie_id]);
+    $especie_modal = $stmt_modal->fetch();
+    if ($especie_modal) {
+        $status_modal     = $especie_modal['status'];
+        $tem_imagens      = in_array($status_modal, ['dados_internet', 'descrita', 'registrada', 'publicada']);
+        $tem_morfologicos = in_array($status_modal, ['descrita', 'registrada', 'publicada']);
+    }
+}
+
+// ================================================
 // MAPA DE BOTÕES
 // ================================================
 $todos_botoes = [
@@ -274,9 +295,19 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
             font-weight: var(--peso-semi);
             margin-bottom: var(--esp-2);
         }
-        .modal-dados p {
+        .modal-subtitulo {
             font-size: var(--texto-sm);
             color: var(--cinza-500);
+            margin-bottom: var(--esp-6);
+        }
+        .modal-especie-nome {
+            font-size: var(--texto-sm);
+            color: var(--cor-primaria);
+            font-weight: var(--peso-semi);
+            font-style: italic;
+            background: var(--verde-50);
+            border-radius: var(--raio-md);
+            padding: var(--esp-2) var(--esp-4);
             margin-bottom: var(--esp-6);
         }
 
@@ -297,12 +328,34 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
             font-size: var(--texto-sm);
             transition: var(--transicao);
             display: block;
+            position: relative;
         }
         .sub-card:hover {
             background: var(--cor-primaria);
             color: var(--branco);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(11,94,66,0.2);
+        }
+        .sub-card.bloqueado {
+            border-color: var(--cinza-300);
+            color: var(--cinza-400);
+            cursor: not-allowed;
+            background: var(--cinza-100);
+        }
+        .sub-card.bloqueado:hover {
+            background: var(--cinza-100);
+            color: var(--cinza-400);
+            transform: none;
+            box-shadow: none;
+        }
+        .sub-card.concluido {
+            border-color: var(--sucesso-cor);
+            background: var(--verde-50);
+            color: var(--sucesso-cor);
+        }
+        .sub-card.concluido:hover {
+            background: var(--sucesso-cor);
+            color: var(--branco);
         }
         .sub-card .icon {
             font-size: var(--texto-2xl);
@@ -315,6 +368,53 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
             opacity: 0.7;
             margin-top: var(--esp-1);
             line-height: 1.35;
+        }
+        .badge-check {
+            position: absolute;
+            top: var(--esp-2);
+            right: var(--esp-2);
+            font-size: var(--texto-sm);
+            line-height: 1;
+        }
+        .badge-lock {
+            position: absolute;
+            top: var(--esp-2);
+            right: var(--esp-2);
+            font-size: var(--texto-sm);
+            color: var(--cinza-400);
+            line-height: 1;
+        }
+
+        /* ── Banner de conclusão ── */
+        .modal-concluido {
+            margin-top: var(--esp-5);
+            background: var(--verde-50);
+            border: 2px solid var(--sucesso-cor);
+            border-radius: var(--raio-lg);
+            padding: var(--esp-5);
+            text-align: center;
+        }
+        .modal-concluido .concluido-icon { font-size: var(--texto-3xl); }
+        .modal-concluido .concluido-text {
+            font-size: var(--texto-sm);
+            color: var(--sucesso-cor);
+            font-weight: var(--peso-semi);
+            margin: var(--esp-2) 0 var(--esp-4);
+        }
+        .btn-salvar-dados {
+            display: inline-block;
+            background: var(--sucesso-cor);
+            color: var(--branco);
+            padding: var(--esp-3) var(--esp-8);
+            border-radius: var(--raio-full);
+            font-weight: var(--peso-semi);
+            font-size: var(--texto-sm);
+            text-decoration: none;
+            transition: var(--transicao);
+        }
+        .btn-salvar-dados:hover {
+            background: var(--cor-primaria);
+            transform: translateY(-1px);
         }
 
         .btn-fechar-modal {
@@ -409,20 +509,68 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
     <div class="modal-overlay" id="modalDadosInternet">
         <div class="modal-dados">
             <h2>🌐 Dados da Internet</h2>
-            <p>Escolha o que deseja inserir para esta espécie.</p>
+
+            <?php if ($especie_modal): ?>
+                <p class="modal-especie-nome">
+                    📌 <?php echo htmlspecialchars($especie_modal['nome_cientifico']); ?>
+                </p>
+            <?php else: ?>
+                <p class="modal-subtitulo">Escolha o que deseja inserir para esta espécie.</p>
+            <?php endif; ?>
 
             <div class="sub-cards">
-                <a href="/penomato_mvp/src/Views/escolher_especie.php" class="sub-card">
+
+                <!-- Card Imagens: sempre disponível -->
+                <a href="/penomato_mvp/src/Views/escolher_especie.php"
+                   class="sub-card<?php echo $tem_imagens ? ' concluido' : ''; ?>">
+                    <?php if ($tem_imagens): ?>
+                        <span class="badge-check">✅</span>
+                    <?php endif; ?>
                     <span class="icon">🖼️</span>
                     Imagens
                     <div class="desc">Importe e organize fotos da espécie via internet.</div>
                 </a>
-                <a href="/penomato_mvp/src/Controllers/confirmar_caracteristicas.php?modo=confirmar" class="sub-card">
+
+                <!-- Card Dados Morfológicos: bloqueado até ter imagens -->
+                <?php
+                $link_morf = '/penomato_mvp/src/Controllers/confirmar_caracteristicas.php?modo=confirmar';
+                if ($modal_especie_id > 0 && $tem_imagens) {
+                    $link_morf .= '&especie_id=' . $modal_especie_id;
+                }
+                $morf_bloqueado = !$tem_imagens;
+                $morf_classes   = 'sub-card' . ($tem_morfologicos ? ' concluido' : ($morf_bloqueado ? ' bloqueado' : ''));
+                ?>
+                <a href="<?php echo $morf_bloqueado ? '#' : $link_morf; ?>"
+                   class="<?php echo $morf_classes; ?>"
+                   <?php echo $morf_bloqueado ? 'onclick="return false;" title="Insira as imagens primeiro"' : ''; ?>>
+                    <?php if ($tem_morfologicos): ?>
+                        <span class="badge-check">✅</span>
+                    <?php elseif ($morf_bloqueado): ?>
+                        <span class="badge-lock">🔒</span>
+                    <?php endif; ?>
                     <span class="icon">📋</span>
                     Dados Morfológicos
-                    <div class="desc">Insira características botânicas com base em fontes científicas.</div>
+                    <div class="desc">
+                        <?php if ($morf_bloqueado): ?>
+                            Disponível após inserir as imagens.
+                        <?php else: ?>
+                            Insira características botânicas com base em fontes científicas.
+                        <?php endif; ?>
+                    </div>
+                </a>
+
+            </div>
+
+            <?php if ($tem_morfologicos): ?>
+            <!-- Ambos concluídos -->
+            <div class="modal-concluido">
+                <div class="concluido-icon">🎉</div>
+                <div class="concluido-text">Dados completos! Tudo salvo com sucesso.</div>
+                <a href="/penomato_mvp/src/Views/entrar_colaborador.php" class="btn-salvar-dados">
+                    Concluir
                 </a>
             </div>
+            <?php endif; ?>
 
             <button class="btn-fechar-modal"
                     onclick="document.getElementById('modalDadosInternet').classList.remove('aberto')">
@@ -432,6 +580,11 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
     </div>
 
     <script>
+    // Auto-abrir modal quando redirecionado de volta ao painel
+    <?php if ($modal_aberto): ?>
+    document.getElementById('modalDadosInternet').classList.add('aberto');
+    <?php endif; ?>
+
     // Fechar modal clicando fora
     document.getElementById('modalDadosInternet').addEventListener('click', function(e) {
         if (e.target === this) this.classList.remove('aberto');
