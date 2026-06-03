@@ -718,7 +718,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['acao'])) {
             : 'Características salvas e artigo atualizado com sucesso!';
         $_SESSION['modo_sucesso'] = $modo_pagina;
         $redir = $modo_pagina === 'confirmar'
-            ? "../Views/entrar_colaborador.php?modal=dados_internet&especie_id={$especie_id}"
+            ? "confirmar_caracteristicas.php?modo=confirmar"
             : "confirmar_caracteristicas.php?especie_id={$especie_id}";
         header("Location: {$redir}"); exit;
     } catch (Exception $e) {
