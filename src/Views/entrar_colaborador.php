@@ -35,14 +35,8 @@ $todos_botoes = [
     'dados_internet' => [
         'icon'  => '🌐',
         'label' => 'Dados da Internet',
-        'desc'  => 'Importe dados científicos via JSON (Flora do Brasil, Lorenzi, etc.)',
-        'link'  => '/penomato_mvp/src/Views/escolher_especie.php',
-    ],
-    'confirmar' => [
-        'icon'  => '✅',
-        'label' => 'Confirmar Identificação',
-        'desc'  => 'Verifique e confirme as informações vindas da internet antes de registrá-las.',
-        'link'  => '/penomato_mvp/src/Controllers/confirmar_caracteristicas.php?modo=confirmar',
+        'desc'  => 'Insira imagens ou dados morfológicos via internet.',
+        'modal' => true,
     ],
     'cadastrar_exemplar' => [
         'icon'  => '🌿',
@@ -90,10 +84,10 @@ $todos_botoes = [
 
 // Permissões por subtipo
 $permissoes = [
-    'identificador' => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'sugestoes', 'minhas_acoes'],
-    'dev'           => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'dev_tools', 'sugestoes', 'minhas_acoes'],
-    'especialista'  => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes', 'minhas_acoes'],
-    'gestor'        => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes', 'minhas_acoes'],
+    'identificador' => ['dados_internet', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'sugestoes', 'minhas_acoes'],
+    'dev'           => ['dados_internet', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'dev_tools', 'sugestoes', 'minhas_acoes'],
+    'especialista'  => ['dados_internet', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes', 'minhas_acoes'],
+    'gestor'        => ['dados_internet', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes', 'minhas_acoes'],
 ];
 
 // Gestor (por categoria ou subtipo) acessa tudo
@@ -101,7 +95,7 @@ $tipo_usuario = $_SESSION['usuario_tipo'] ?? '';
 if ($tipo_usuario === 'gestor' || $subtipo === 'gestor') {
     $chaves_visiveis = array_keys($todos_botoes);
 } else {
-    $chaves_visiveis = $permissoes[$subtipo] ?? ['dados_internet', 'confirmar', 'registrar_imagens'];
+    $chaves_visiveis = $permissoes[$subtipo] ?? ['dados_internet', 'registrar_imagens'];
 }
 
 // Labels de exibição dos subtipos
@@ -253,9 +247,94 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
         }
         .btn-sair:hover { color: var(--perigo-cor); }
 
+        /* ── Modal Dados da Internet ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: var(--esp-5);
+        }
+        .modal-overlay.aberto { display: flex; }
+
+        .modal-dados {
+            background: var(--branco);
+            border-radius: var(--raio-lg);
+            box-shadow: var(--sombra-lg);
+            width: 100%;
+            max-width: 480px;
+            padding: var(--esp-8);
+        }
+        .modal-dados h2 {
+            color: var(--cor-primaria);
+            font-size: var(--texto-lg);
+            font-weight: var(--peso-semi);
+            margin-bottom: var(--esp-2);
+        }
+        .modal-dados p {
+            font-size: var(--texto-sm);
+            color: var(--cinza-500);
+            margin-bottom: var(--esp-6);
+        }
+
+        .sub-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--esp-4);
+        }
+        .sub-card {
+            background: var(--cinza-50);
+            border: 2px solid var(--cor-primaria);
+            border-radius: var(--raio-lg);
+            padding: var(--esp-6) var(--esp-4);
+            text-align: center;
+            text-decoration: none;
+            color: var(--cor-primaria);
+            font-weight: var(--peso-semi);
+            font-size: var(--texto-sm);
+            transition: var(--transicao);
+            display: block;
+        }
+        .sub-card:hover {
+            background: var(--cor-primaria);
+            color: var(--branco);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(11,94,66,0.2);
+        }
+        .sub-card .icon {
+            font-size: var(--texto-2xl);
+            display: block;
+            margin-bottom: var(--esp-2);
+        }
+        .sub-card .desc {
+            font-size: var(--texto-xs);
+            font-weight: var(--peso-normal);
+            opacity: 0.7;
+            margin-top: var(--esp-1);
+            line-height: 1.35;
+        }
+
+        .btn-fechar-modal {
+            display: block;
+            margin-top: var(--esp-5);
+            text-align: center;
+            background: none;
+            border: none;
+            color: var(--cinza-400);
+            font-size: var(--texto-sm);
+            cursor: pointer;
+            text-decoration: underline;
+            width: 100%;
+        }
+        .btn-fechar-modal:hover { color: var(--perigo-cor); }
+
         @media (max-width: 480px) {
             .btn-grid { grid-template-columns: 1fr; }
             .stats-bar { flex-wrap: wrap; }
+            .sub-cards { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -297,7 +376,17 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
         <?php foreach ($chaves_visiveis as $chave):
             $b = $todos_botoes[$chave];
             $breve = !empty($b['breve']);
+            $modal = !empty($b['modal']);
         ?>
+        <?php if ($modal): ?>
+        <button type="button"
+                class="action-btn"
+                onclick="document.getElementById('modalDadosInternet').classList.add('aberto')">
+            <span class="icon"><?php echo $b['icon']; ?></span>
+            <?php echo htmlspecialchars($b['label']); ?>
+            <div class="desc"><?php echo htmlspecialchars($b['desc']); ?></div>
+        </button>
+        <?php else: ?>
         <a href="<?php echo $breve ? '#' : $b['link']; ?>"
            class="action-btn<?php echo $breve ? ' em-breve' : ''; ?>"
            <?php echo $breve ? 'onclick="return false;"' : ''; ?>>
@@ -308,12 +397,46 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
             <?php echo htmlspecialchars($b['label']); ?>
             <div class="desc"><?php echo htmlspecialchars($b['desc']); ?></div>
         </a>
+        <?php endif; ?>
         <?php endforeach; ?>
     </div>
 
     <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
         🚪 Sair
     </button>
+
+    <!-- ── Modal: Dados da Internet ── -->
+    <div class="modal-overlay" id="modalDadosInternet">
+        <div class="modal-dados">
+            <h2>🌐 Dados da Internet</h2>
+            <p>Escolha o que deseja inserir para esta espécie.</p>
+
+            <div class="sub-cards">
+                <a href="/penomato_mvp/src/Views/escolher_especie.php" class="sub-card">
+                    <span class="icon">🖼️</span>
+                    Imagens
+                    <div class="desc">Importe e organize fotos da espécie via internet.</div>
+                </a>
+                <a href="/penomato_mvp/src/Controllers/confirmar_caracteristicas.php?modo=confirmar" class="sub-card">
+                    <span class="icon">📋</span>
+                    Dados Morfológicos
+                    <div class="desc">Insira características botânicas com base em fontes científicas.</div>
+                </a>
+            </div>
+
+            <button class="btn-fechar-modal"
+                    onclick="document.getElementById('modalDadosInternet').classList.remove('aberto')">
+                Cancelar
+            </button>
+        </div>
+    </div>
+
+    <script>
+    // Fechar modal clicando fora
+    document.getElementById('modalDadosInternet').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('aberto');
+    });
+    </script>
 
 </body>
 </html>
