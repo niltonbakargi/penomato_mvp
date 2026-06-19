@@ -373,6 +373,12 @@ include __DIR__ . '/../includes/cabecalho.php';
             <!-- Input oculto para leitura de EXIF -->
             <input type="file" id="input-exif-imagem" accept="image/*" style="display:none">
 
+            <!-- Painel de diagnóstico EXIF (temporário) -->
+            <div id="exif-debug" style="display:none;margin-top:12px;background:#1e1e1e;border-radius:10px;padding:12px">
+                <p style="color:#aaa;font-size:0.75rem;margin:0 0 6px">Diagnóstico EXIF (temporário):</p>
+                <pre style="color:#7ec8a0;font-size:0.72rem;margin:0;white-space:pre-wrap;word-break:break-all"></pre>
+            </div>
+
             <!-- Mapa picker -->
             <div id="mapa-picker-wrap" style="display:none">
                 <div id="mapa-picker"></div>
@@ -661,10 +667,22 @@ function lerGPSdaImagem(file) {
     });
 }
 
+// ── Painel de diagnóstico visível (temporário) ────────────────
+var _dbg = [];
+function dbg(msg) { _dbg.push(msg); }
+function mostrarDiagnostico() {
+    var el = document.getElementById('exif-debug');
+    if (!el) return;
+    el.style.display = 'block';
+    el.querySelector('pre').textContent = _dbg.join('\n');
+}
+
 function parseJpegGPS(buffer) {
+    _dbg = [];
     var view = new DataView(buffer);
     var sig = view.getUint16(0, false);
-    console.log('[EXIF] assinatura do arquivo: 0x' + sig.toString(16), sig === 0xFFD8 ? '(JPEG ✓)' : '(NÃO é JPEG ✗)');
+    dbg('Arquivo: ' + buffer.byteLength + ' bytes');
+    dbg('Assinatura: 0x' + sig.toString(16).toUpperCase() + (sig === 0xFFD8 ? ' ✓ JPEG' : ' ✗ NÃO é JPEG'));
     if (sig !== 0xFFD8) return null;
 
     var offset = 2;
@@ -676,22 +694,23 @@ function parseJpegGPS(buffer) {
         if (marker === 0xFFE1) {
             var exifSig = view.getUint32(offset + 4, false);
             var nullPad = view.getUint16(offset + 8, false);
-            console.log('[EXIF] APP1 em offset=' + offset + ' exifSig=0x' + exifSig.toString(16) + ' nullPad=0x' + nullPad.toString(16));
+            dbg('APP1 @ ' + offset + ' sig=0x' + exifSig.toString(16).toUpperCase() + ' pad=0x' + nullPad.toString(16));
             if (exifSig === 0x45786966 && nullPad === 0x0000) {
-                console.log('[EXIF] cabeçalho Exif encontrado → tiffBase=' + (offset + 10));
+                dbg('Exif encontrado → tiffBase=' + (offset + 10));
                 return parseTiffGPS(buffer, offset + 10);
             }
         }
         offset += 2 + segLen;
     }
-    console.log('[EXIF] segmento APP1/Exif NÃO encontrado');
+    dbg('APP1/Exif NÃO encontrado');
     return null;
 }
 
 function parseTiffGPS(buffer, tiffBase) {
     var view = new DataView(buffer);
     var magic = view.getUint16(tiffBase, false);
-    console.log('[EXIF] magic TIFF: 0x' + magic.toString(16), magic === 0x4949 ? '(II=LE)' : magic === 0x4D4D ? '(MM=BE)' : '(inválido)');
+    var leStr = magic === 0x4949 ? 'II (LE)' : magic === 0x4D4D ? 'MM (BE)' : 'INVÁLIDO';
+    dbg('TIFF magic: 0x' + magic.toString(16).toUpperCase() + ' = ' + leStr);
     if (magic !== 0x4949 && magic !== 0x4D4D) return null;
     var le = magic === 0x4949;
 
@@ -700,45 +719,51 @@ function parseTiffGPS(buffer, tiffBase) {
 
     var ifd0   = tiffBase + u32(tiffBase + 4);
     var nEntry = u16(ifd0);
-    console.log('[EXIF] IFD0 offset=' + ifd0 + ' entradas=' + nEntry);
+    dbg('IFD0 @ ' + ifd0 + '  entradas=' + nEntry);
     var gpsOff = null;
 
     for (var i = 0; i < nEntry; i++) {
         var e = ifd0 + 2 + i * 12;
-        var t = u16(e);
-        if (t === 0x8825) { gpsOff = tiffBase + u32(e + 8); break; }
+        if (u16(e) === 0x8825) { gpsOff = tiffBase + u32(e + 8); break; }
     }
-    console.log('[EXIF] GPS IFD offset=' + gpsOff);
+    dbg('GPS IFD @ ' + gpsOff + (gpsOff ? '' : '  ← NÃO ENCONTRADO'));
     if (!gpsOff) return null;
 
     var nGps = u16(gpsOff);
-    console.log('[EXIF] entradas GPS=' + nGps);
+    dbg('Entradas GPS: ' + nGps);
     var lat = null, lon = null, latRef = 'N', lonRef = 'E';
 
     for (var j = 0; j < nGps; j++) {
-        var g = gpsOff + 2 + j * 12;
+        var g   = gpsOff + 2 + j * 12;
         var tag = u16(g);
-        var type = u16(g + 2);
-        var count = u32(g + 4);
         var valOff = u32(g + 8);
-        console.log('[EXIF] GPS tag=0x' + tag.toString(16) + ' type=' + type + ' count=' + count + ' valOff=' + valOff);
-        if (tag === 0x01) { latRef = String.fromCharCode(view.getUint8(g + 8)); console.log('[EXIF] latRef=' + latRef); }
-        else if (tag === 0x03) { lonRef = String.fromCharCode(view.getUint8(g + 8)); console.log('[EXIF] lonRef=' + lonRef); }
-        else if (tag === 0x02) {
+
+        if (tag === 0x01) {
+            latRef = String.fromCharCode(view.getUint8(g + 8));
+            dbg('LatRef = ' + latRef);
+        } else if (tag === 0x03) {
+            lonRef = String.fromCharCode(view.getUint8(g + 8));
+            dbg('LonRef = ' + lonRef);
+        } else if (tag === 0x02) {
             var latOff = tiffBase + valOff;
-            console.log('[EXIF] lat data @ ' + latOff + ':', view.getUint32(latOff,le),'/',view.getUint32(latOff+4,le), '|', view.getUint32(latOff+8,le),'/',view.getUint32(latOff+12,le), '|', view.getUint32(latOff+16,le),'/',view.getUint32(latOff+20,le));
+            var r0n = view.getUint32(latOff,    le), r0d = view.getUint32(latOff+4,  le);
+            var r1n = view.getUint32(latOff+8,  le), r1d = view.getUint32(latOff+12, le);
+            var r2n = view.getUint32(latOff+16, le), r2d = view.getUint32(latOff+20, le);
+            dbg('Lat racionais: ' + r0n+'/'+r0d + '  ' + r1n+'/'+r1d + '  ' + r2n+'/'+r2d);
             lat = rationalDeg(view, latOff, le);
-            console.log('[EXIF] lat=' + lat);
-        }
-        else if (tag === 0x04) {
+            dbg('Lat = ' + lat);
+        } else if (tag === 0x04) {
             var lonOff = tiffBase + valOff;
-            console.log('[EXIF] lon data @ ' + lonOff + ':', view.getUint32(lonOff,le),'/',view.getUint32(lonOff+4,le), '|', view.getUint32(lonOff+8,le),'/',view.getUint32(lonOff+12,le), '|', view.getUint32(lonOff+16,le),'/',view.getUint32(lonOff+20,le));
+            var s0n = view.getUint32(lonOff,    le), s0d = view.getUint32(lonOff+4,  le);
+            var s1n = view.getUint32(lonOff+8,  le), s1d = view.getUint32(lonOff+12, le);
+            var s2n = view.getUint32(lonOff+16, le), s2d = view.getUint32(lonOff+20, le);
+            dbg('Lon racionais: ' + s0n+'/'+s0d + '  ' + s1n+'/'+s1d + '  ' + s2n+'/'+s2d);
             lon = rationalDeg(view, lonOff, le);
-            console.log('[EXIF] lon=' + lon);
+            dbg('Lon = ' + lon);
         }
     }
 
-    console.log('[EXIF] resultado final: lat=' + lat + ' latRef=' + latRef + ' lon=' + lon + ' lonRef=' + lonRef);
+    dbg('Resultado: lat=' + lat + ' (' + latRef + ')  lon=' + lon + ' (' + lonRef + ')');
     if (lat === null || lon === null) return null;
     return {
         latitude:  latRef === 'S' ? -lat : lat,
@@ -770,6 +795,7 @@ document.getElementById('input-exif-imagem').addEventListener('change', function
     btnImagem.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Lendo...';
 
     lerGPSdaImagem(file).then(function (gps) {
+        mostrarDiagnostico();
         btnImagem.innerHTML = '<i class="fas fa-camera"></i> Imagem';
         if (gps) {
             definirLocalizacao(gps.latitude, gps.longitude, 'EXIF da foto');
