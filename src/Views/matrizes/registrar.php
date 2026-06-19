@@ -465,7 +465,6 @@ include __DIR__ . '/../includes/cabecalho.php';
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/exifr@7/dist/lite.umd.js"></script>
 
 <script>
 // ── Preview de foto — cada input tem seu listener ─────────────
@@ -648,35 +647,117 @@ function ativarModo(modo) {
     return false;
 }
 
-// ── Botão Imagem: abre seletor e lê EXIF ─────────────────────
+// ── Parser EXIF/GPS puro — sem dependência de CDN ────────────
+// Lê o binário JPEG e extrai latitude/longitude do segmento GPS IFD.
+function lerGPSdaImagem(file) {
+    return new Promise(function (resolve) {
+        var reader = new FileReader();
+        reader.onerror = function () { resolve(null); };
+        reader.onload  = function (e) {
+            try { resolve(parseJpegGPS(e.target.result)); }
+            catch (_) { resolve(null); }
+        };
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function parseJpegGPS(buffer) {
+    var view = new DataView(buffer);
+    if (view.getUint16(0, false) !== 0xFFD8) return null; // não é JPEG
+
+    var offset = 2;
+    while (offset < buffer.byteLength - 2) {
+        if (view.getUint8(offset) !== 0xFF) break;
+        var marker = view.getUint16(offset, false);
+        var segLen  = view.getUint16(offset + 2, false);
+
+        if (marker === 0xFFE1) { // APP1 = EXIF
+            // "Exif\0\0" nos primeiros 6 bytes do segmento
+            if (view.getUint32(offset + 4, false) === 0x45786966 &&
+                view.getUint16(offset + 8, false) === 0x0000) {
+                return parseTiffGPS(buffer, offset + 10);
+            }
+        }
+        offset += 2 + segLen;
+    }
+    return null;
+}
+
+function parseTiffGPS(buffer, tiffBase) {
+    var view = new DataView(buffer);
+    var magic = view.getUint16(tiffBase, false);
+    if (magic !== 0x4949 && magic !== 0x4D4D) return null;
+    var le = magic === 0x4949; // little-endian?
+
+    function u16(o) { return view.getUint16(o, le); }
+    function u32(o) { return view.getUint32(o, le); }
+
+    // IFD0
+    var ifd0   = tiffBase + u32(tiffBase + 4);
+    var nEntry = u16(ifd0);
+    var gpsOff = null;
+
+    for (var i = 0; i < nEntry; i++) {
+        var e = ifd0 + 2 + i * 12;
+        if (u16(e) === 0x8825) { gpsOff = tiffBase + u32(e + 8); break; }
+    }
+    if (!gpsOff) return null;
+
+    var nGps = u16(gpsOff);
+    var lat = null, lon = null, latRef = 'N', lonRef = 'E';
+
+    for (var j = 0; j < nGps; j++) {
+        var g = gpsOff + 2 + j * 12;
+        var tag = u16(g);
+        if (tag === 0x01) { latRef = String.fromCharCode(view.getUint8(g + 8)); }
+        else if (tag === 0x03) { lonRef = String.fromCharCode(view.getUint8(g + 8)); }
+        else if (tag === 0x02) { lat = rationalDeg(view, tiffBase + u32(g + 8), le); }
+        else if (tag === 0x04) { lon = rationalDeg(view, tiffBase + u32(g + 8), le); }
+    }
+
+    if (lat === null || lon === null) return null;
+    return {
+        latitude:  latRef === 'S' ? -lat : lat,
+        longitude: lonRef === 'W' ? -lon : lon
+    };
+}
+
+function rationalDeg(view, off, le) {
+    function rat(o) {
+        var n = view.getUint32(o,     le);
+        var d = view.getUint32(o + 4, le);
+        return d ? n / d : 0;
+    }
+    return rat(off) + rat(off + 8) / 60 + rat(off + 16) / 3600;
+}
+
+// ── Botão Imagem: abre seletor e lê GPS do binário ───────────
 document.getElementById('btn-usar-imagem').addEventListener('click', function () {
     ativarModo('imagem');
     document.getElementById('input-exif-imagem').click();
 });
 
-document.getElementById('input-exif-imagem').addEventListener('change', async function () {
+document.getElementById('input-exif-imagem').addEventListener('change', function () {
     var file = this.files && this.files[0];
     if (!file) return;
 
     var btnImagem = document.getElementById('btn-usar-imagem');
+    var status    = document.getElementById('gps-status');
     btnImagem.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Lendo...';
 
-    try {
-        var gps = await exifr.gps(file);
-        if (gps && gps.latitude && gps.longitude) {
-            definirLocalizacao(gps.latitude, gps.longitude, 'EXIF da foto');
-            btnImagem.innerHTML = '<i class="fas fa-camera"></i> Imagem';
-        } else {
-            btnImagem.innerHTML = '<i class="fas fa-camera"></i> Imagem';
-            var status = document.getElementById('gps-status');
-            status.className = 'gps-status erro';
-            status.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span>Esta foto não tem GPS nos metadados. Tente outra ou use outra opção.</span>';
-            document.getElementById('btn-usar-imagem').classList.remove('ativo');
-        }
-    } catch (e) {
+    lerGPSdaImagem(file).then(function (gps) {
         btnImagem.innerHTML = '<i class="fas fa-camera"></i> Imagem';
-        document.getElementById('btn-usar-imagem').classList.remove('ativo');
-    }
+        if (gps) {
+            definirLocalizacao(gps.latitude, gps.longitude, 'EXIF da foto');
+        } else {
+            btnImagem.classList.remove('ativo');
+            status.className = 'gps-status erro';
+            status.innerHTML = '<i class="fas fa-exclamation-circle"></i> '
+                + '<span>GPS não encontrado nos metadados. '
+                + 'Verifique se a câmera tinha localização ativa.</span>';
+        }
+    });
+
     this.value = ''; // permite reselecionar a mesma imagem
 });
 
