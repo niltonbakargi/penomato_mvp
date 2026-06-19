@@ -177,14 +177,63 @@ include __DIR__ . '/../includes/cabecalho.php';
     .gps-status.capturado  { background: var(--sucesso-fundo);color: var(--sucesso-texto); }
     .gps-status.erro       { background: var(--perigo-fundo); color: var(--perigo-texto); }
 
-    .btn-gps {
-        background: var(--cor-primaria); color: white;
-        border: none; padding: 12px 20px; border-radius: 10px;
-        font-weight: 600; width: 100%;
-        display: flex; align-items: center; justify-content: center; gap: 10px;
-        cursor: pointer; transition: background 0.2s; font-size: 0.95rem;
+    /* ── opções de localização ── */
+    .opcoes-loc {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 4px;
     }
-    .btn-gps:hover { background: var(--cor-primaria-hover); }
+
+    .btn-loc {
+        background: var(--cinza-100);
+        color: var(--cinza-600);
+        border: 2px solid var(--cinza-200);
+        border-radius: 10px;
+        padding: 12px 6px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    .btn-loc i { font-size: 1.15rem; }
+
+    .btn-loc:hover {
+        border-color: var(--cor-primaria);
+        color: var(--cor-primaria);
+        background: var(--verde-50);
+    }
+
+    .btn-loc.ativo {
+        border-color: var(--cor-primaria);
+        background: var(--verde-100);
+        color: var(--cor-primaria);
+    }
+
+    /* ── mapa picker ── */
+    #mapa-picker-wrap {
+        margin-top: 12px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px solid var(--cinza-200);
+    }
+
+    #mapa-picker { height: 260px; }
+
+    .mapa-picker-dica {
+        background: var(--cinza-50);
+        padding: 7px 12px;
+        font-size: 0.76rem;
+        color: var(--cinza-500);
+        text-align: center;
+    }
 
     /* ── autocomplete ── */
     .autocomplete-wrap { position: relative; }
@@ -300,24 +349,35 @@ include __DIR__ . '/../includes/cabecalho.php';
 
             <div class="gps-status aguardando" id="gps-status">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>GPS ainda não capturado</span>
+                <span>Localização não definida</span>
             </div>
-
-            <button type="button" class="btn-gps" id="btn-captar-gps">
-                <i class="fas fa-crosshairs"></i> Captar Minha Localização
-            </button>
 
             <input type="hidden" id="latitude"  name="latitude">
             <input type="hidden" id="longitude" name="longitude">
 
-            <div class="text-center mt-2">
-                <a style="font-size:0.82rem;color:var(--cinza-400);cursor:pointer;text-decoration:underline"
-                   onclick="toggleManual()">
-                    Inserir coordenadas manualmente
-                </a>
+            <div class="opcoes-loc">
+                <button type="button" class="btn-loc" id="btn-usar-gps">
+                    <i class="fas fa-crosshairs"></i> GPS do Celular
+                </button>
+                <button type="button" class="btn-loc" id="btn-usar-mapa">
+                    <i class="fas fa-map-marked-alt"></i> Apontar no Mapa
+                </button>
+                <button type="button" class="btn-loc" id="btn-usar-manual">
+                    <i class="fas fa-keyboard"></i> Manual
+                </button>
             </div>
 
-            <div id="campos-manuais" style="display:none" class="row g-2 mt-1">
+            <!-- Mapa picker -->
+            <div id="mapa-picker-wrap" style="display:none">
+                <div id="mapa-picker"></div>
+                <div class="mapa-picker-dica">
+                    <i class="fas fa-hand-pointer me-1"></i>
+                    Toque ou clique no mapa para marcar a árvore. O marcador é arrastável.
+                </div>
+            </div>
+
+            <!-- Campos manuais -->
+            <div id="campos-manuais" style="display:none" class="row g-2 mt-2">
                 <div class="col-6">
                     <label class="form-label">Latitude</label>
                     <input type="number" step="0.00000001" class="form-control"
@@ -397,6 +457,10 @@ include __DIR__ . '/../includes/cabecalho.php';
 
 </div>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exifr@7/dist/lite.umd.js"></script>
+
 <script>
 // ── Preview de foto — cada input tem seu listener ─────────────
 <?php foreach (array_keys($partes_fotos) as $parte): ?>
@@ -427,39 +491,110 @@ include __DIR__ . '/../includes/cabecalho.php';
 }());
 <?php endforeach; ?>
 
-// ── GPS ──────────────────────────────────────────────────────
-document.getElementById('btn-captar-gps').addEventListener('click', function () {
-    const status = document.getElementById('gps-status');
+// ── Localização: estado central ───────────────────────────────
+var mapaPickerInstance = null;
+var mapaPickerMarker   = null;
+
+function definirLocalizacao(lat, lon, fonte) {
+    lat = parseFloat(lat).toFixed(8);
+    lon = parseFloat(lon).toFixed(8);
+    document.getElementById('latitude').value  = lat;
+    document.getElementById('longitude').value = lon;
+
+    var icones = {
+        'GPS do celular': 'fa-crosshairs',
+        'EXIF da foto':   'fa-camera',
+        'mapa':           'fa-map-marked-alt',
+        'manual':         'fa-keyboard',
+    };
+    var icone = icones[fonte] || 'fa-check-circle';
+
+    var status = document.getElementById('gps-status');
+    status.className = 'gps-status capturado';
+    status.innerHTML = '<i class="fas ' + icone + '"></i> <span>' +
+        parseFloat(lat).toFixed(6) + ', ' + parseFloat(lon).toFixed(6) +
+        ' <small style="opacity:.7">(' + fonte + ')</small></span>';
+
+    // Sincroniza marcador do mapa se estiver aberto
+    if (mapaPickerInstance && mapaPickerMarker) {
+        mapaPickerMarker.setLatLng([parseFloat(lat), parseFloat(lon)]);
+    }
+}
+
+// ── GPS do celular ────────────────────────────────────────────
+document.getElementById('btn-usar-gps').addEventListener('click', function () {
+    ativarModo('gps');
+    var status = document.getElementById('gps-status');
     status.className = 'gps-status aguardando';
     status.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> <span>Captando localização...</span>';
 
     if (!navigator.geolocation) {
         status.className = 'gps-status erro';
-        status.innerHTML = '<i class="fas fa-times-circle"></i> <span>GPS não disponível.</span>';
+        status.innerHTML = '<i class="fas fa-times-circle"></i> <span>GPS não disponível neste dispositivo.</span>';
         return;
     }
 
     navigator.geolocation.getCurrentPosition(
         function (pos) {
-            const lat = pos.coords.latitude.toFixed(8);
-            const lon = pos.coords.longitude.toFixed(8);
-            document.getElementById('latitude').value  = lat;
-            document.getElementById('longitude').value = lon;
-            status.className = 'gps-status capturado';
-            status.innerHTML = '<i class="fas fa-check-circle"></i> <span>Localização capturada: ' + lat + ', ' + lon + '</span>';
+            definirLocalizacao(pos.coords.latitude, pos.coords.longitude, 'GPS do celular');
         },
         function () {
             status.className = 'gps-status erro';
-            status.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span>Não foi possível capturar. Use o modo manual.</span>';
+            status.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span>Não foi possível capturar. Tente outra opção.</span>';
         },
         { enableHighAccuracy: true, timeout: 12000 }
     );
 });
 
-function toggleManual() {
-    var div = document.getElementById('campos-manuais');
-    div.style.display = div.style.display === 'none' ? 'flex' : 'none';
-}
+// ── Mapa picker ───────────────────────────────────────────────
+document.getElementById('btn-usar-mapa').addEventListener('click', function () {
+    var aberto = ativarModo('mapa');
+    if (!aberto) return;
+
+    if (!mapaPickerInstance) {
+        // Cerrado como centro padrão; usa coordenada existente se houver
+        var latI = parseFloat(document.getElementById('latitude').value)  || -15.7801;
+        var lonI = parseFloat(document.getElementById('longitude').value) || -47.9292;
+
+        mapaPickerInstance = L.map('mapa-picker').setView([latI, lonI], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(mapaPickerInstance);
+
+        // Marcador inicial se já há coordenada
+        if (document.getElementById('latitude').value) {
+            mapaPickerMarker = L.marker([latI, lonI], { draggable: true })
+                .addTo(mapaPickerInstance);
+            mapaPickerMarker.on('dragend', function () {
+                var p = mapaPickerMarker.getLatLng();
+                definirLocalizacao(p.lat, p.lng, 'mapa');
+            });
+        }
+
+        // Clique no mapa → posiciona / move marcador
+        mapaPickerInstance.on('click', function (e) {
+            if (mapaPickerMarker) {
+                mapaPickerMarker.setLatLng(e.latlng);
+            } else {
+                mapaPickerMarker = L.marker(e.latlng, { draggable: true })
+                    .addTo(mapaPickerInstance);
+                mapaPickerMarker.on('dragend', function () {
+                    var p = mapaPickerMarker.getLatLng();
+                    definirLocalizacao(p.lat, p.lng, 'mapa');
+                });
+            }
+            definirLocalizacao(e.latlng.lat, e.latlng.lng, 'mapa');
+        });
+    }
+
+    // Leaflet precisa recalcular tamanho após elemento ficar visível
+    setTimeout(function () { mapaPickerInstance.invalidateSize(); }, 50);
+});
+
+// ── Manual ────────────────────────────────────────────────────
+document.getElementById('btn-usar-manual').addEventListener('click', function () {
+    ativarModo('manual');
+});
 
 document.getElementById('lat-manual').addEventListener('input', sincronizarManual);
 document.getElementById('lon-manual').addEventListener('input', sincronizarManual);
@@ -468,12 +603,51 @@ function sincronizarManual() {
     var lat = document.getElementById('lat-manual').value;
     var lon = document.getElementById('lon-manual').value;
     if (!lat || !lon) return;
-    document.getElementById('latitude').value  = lat;
-    document.getElementById('longitude').value = lon;
-    var status = document.getElementById('gps-status');
-    status.className = 'gps-status capturado';
-    status.innerHTML = '<i class="fas fa-check-circle"></i> <span>Coordenadas manuais: ' + lat + ', ' + lon + '</span>';
+    definirLocalizacao(lat, lon, 'manual');
 }
+
+// ── Gerencia modos (toggle) ───────────────────────────────────
+function ativarModo(modo) {
+    var mapWrap   = document.getElementById('mapa-picker-wrap');
+    var manualDiv = document.getElementById('campos-manuais');
+    var btnGps    = document.getElementById('btn-usar-gps');
+    var btnMapa   = document.getElementById('btn-usar-mapa');
+    var btnManual = document.getElementById('btn-usar-manual');
+
+    var jaAtivo = (modo === 'gps'    && btnGps.classList.contains('ativo'))
+               || (modo === 'mapa'   && btnMapa.classList.contains('ativo'))
+               || (modo === 'manual' && btnManual.classList.contains('ativo'));
+
+    [btnGps, btnMapa, btnManual].forEach(function (b) { b.classList.remove('ativo'); });
+    mapWrap.style.display   = 'none';
+    manualDiv.style.display = 'none';
+
+    if (jaAtivo) return false; // segundo clique fecha
+
+    if (modo === 'gps') {
+        btnGps.classList.add('ativo');
+    } else if (modo === 'mapa') {
+        btnMapa.classList.add('ativo');
+        mapWrap.style.display = 'block';
+        return true;
+    } else if (modo === 'manual') {
+        btnManual.classList.add('ativo');
+        manualDiv.style.display = 'flex';
+    }
+    return false;
+}
+
+// ── EXIF GPS extraído da foto geral ──────────────────────────
+document.getElementById('foto_geral').addEventListener('change', async function () {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    try {
+        var gps = await exifr.gps(file);
+        if (gps && gps.latitude && gps.longitude) {
+            definirLocalizacao(gps.latitude, gps.longitude, 'EXIF da foto');
+        }
+    } catch (e) { /* sem dados EXIF — ignora */ }
+});
 
 // ── Nome popular → científico ─────────────────────────────────
 document.getElementById('select-popular').addEventListener('change', function () {
