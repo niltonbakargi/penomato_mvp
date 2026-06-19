@@ -370,8 +370,8 @@ include __DIR__ . '/../includes/cabecalho.php';
                 </button>
             </div>
 
-            <!-- Input oculto para leitura de EXIF -->
-            <input type="file" id="input-exif-imagem" accept="image/*" style="display:none">
+            <!-- Input oculto para leitura de EXIF — capture abre câmera direto, evita galeria remover GPS -->
+            <input type="file" id="input-exif-imagem" accept="image/*" capture="environment" style="display:none">
 
 
             <!-- Mapa picker -->
