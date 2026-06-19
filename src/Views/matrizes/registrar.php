@@ -663,7 +663,9 @@ function lerGPSdaImagem(file) {
 
 function parseJpegGPS(buffer) {
     var view = new DataView(buffer);
-    if (view.getUint16(0, false) !== 0xFFD8) return null; // não é JPEG
+    var sig = view.getUint16(0, false);
+    console.log('[EXIF] assinatura do arquivo: 0x' + sig.toString(16), sig === 0xFFD8 ? '(JPEG ✓)' : '(NÃO é JPEG ✗)');
+    if (sig !== 0xFFD8) return null;
 
     var offset = 2;
     while (offset < buffer.byteLength - 2) {
@@ -671,50 +673,72 @@ function parseJpegGPS(buffer) {
         var marker = view.getUint16(offset, false);
         var segLen  = view.getUint16(offset + 2, false);
 
-        if (marker === 0xFFE1) { // APP1 = EXIF
-            // "Exif\0\0" nos primeiros 6 bytes do segmento
-            if (view.getUint32(offset + 4, false) === 0x45786966 &&
-                view.getUint16(offset + 8, false) === 0x0000) {
+        if (marker === 0xFFE1) {
+            var exifSig = view.getUint32(offset + 4, false);
+            var nullPad = view.getUint16(offset + 8, false);
+            console.log('[EXIF] APP1 em offset=' + offset + ' exifSig=0x' + exifSig.toString(16) + ' nullPad=0x' + nullPad.toString(16));
+            if (exifSig === 0x45786966 && nullPad === 0x0000) {
+                console.log('[EXIF] cabeçalho Exif encontrado → tiffBase=' + (offset + 10));
                 return parseTiffGPS(buffer, offset + 10);
             }
         }
         offset += 2 + segLen;
     }
+    console.log('[EXIF] segmento APP1/Exif NÃO encontrado');
     return null;
 }
 
 function parseTiffGPS(buffer, tiffBase) {
     var view = new DataView(buffer);
     var magic = view.getUint16(tiffBase, false);
+    console.log('[EXIF] magic TIFF: 0x' + magic.toString(16), magic === 0x4949 ? '(II=LE)' : magic === 0x4D4D ? '(MM=BE)' : '(inválido)');
     if (magic !== 0x4949 && magic !== 0x4D4D) return null;
-    var le = magic === 0x4949; // little-endian?
+    var le = magic === 0x4949;
 
     function u16(o) { return view.getUint16(o, le); }
     function u32(o) { return view.getUint32(o, le); }
 
-    // IFD0
     var ifd0   = tiffBase + u32(tiffBase + 4);
     var nEntry = u16(ifd0);
+    console.log('[EXIF] IFD0 offset=' + ifd0 + ' entradas=' + nEntry);
     var gpsOff = null;
 
     for (var i = 0; i < nEntry; i++) {
         var e = ifd0 + 2 + i * 12;
-        if (u16(e) === 0x8825) { gpsOff = tiffBase + u32(e + 8); break; }
+        var t = u16(e);
+        if (t === 0x8825) { gpsOff = tiffBase + u32(e + 8); break; }
     }
+    console.log('[EXIF] GPS IFD offset=' + gpsOff);
     if (!gpsOff) return null;
 
     var nGps = u16(gpsOff);
+    console.log('[EXIF] entradas GPS=' + nGps);
     var lat = null, lon = null, latRef = 'N', lonRef = 'E';
 
     for (var j = 0; j < nGps; j++) {
         var g = gpsOff + 2 + j * 12;
         var tag = u16(g);
-        if (tag === 0x01) { latRef = String.fromCharCode(view.getUint8(g + 8)); }
-        else if (tag === 0x03) { lonRef = String.fromCharCode(view.getUint8(g + 8)); }
-        else if (tag === 0x02) { lat = rationalDeg(view, tiffBase + u32(g + 8), le); }
-        else if (tag === 0x04) { lon = rationalDeg(view, tiffBase + u32(g + 8), le); }
+        var type = u16(g + 2);
+        var count = u32(g + 4);
+        var valOff = u32(g + 8);
+        console.log('[EXIF] GPS tag=0x' + tag.toString(16) + ' type=' + type + ' count=' + count + ' valOff=' + valOff);
+        if (tag === 0x01) { latRef = String.fromCharCode(view.getUint8(g + 8)); console.log('[EXIF] latRef=' + latRef); }
+        else if (tag === 0x03) { lonRef = String.fromCharCode(view.getUint8(g + 8)); console.log('[EXIF] lonRef=' + lonRef); }
+        else if (tag === 0x02) {
+            var latOff = tiffBase + valOff;
+            console.log('[EXIF] lat data @ ' + latOff + ':', view.getUint32(latOff,le),'/',view.getUint32(latOff+4,le), '|', view.getUint32(latOff+8,le),'/',view.getUint32(latOff+12,le), '|', view.getUint32(latOff+16,le),'/',view.getUint32(latOff+20,le));
+            lat = rationalDeg(view, latOff, le);
+            console.log('[EXIF] lat=' + lat);
+        }
+        else if (tag === 0x04) {
+            var lonOff = tiffBase + valOff;
+            console.log('[EXIF] lon data @ ' + lonOff + ':', view.getUint32(lonOff,le),'/',view.getUint32(lonOff+4,le), '|', view.getUint32(lonOff+8,le),'/',view.getUint32(lonOff+12,le), '|', view.getUint32(lonOff+16,le),'/',view.getUint32(lonOff+20,le));
+            lon = rationalDeg(view, lonOff, le);
+            console.log('[EXIF] lon=' + lon);
+        }
     }
 
+    console.log('[EXIF] resultado final: lat=' + lat + ' latRef=' + latRef + ' lon=' + lon + ' lonRef=' + lonRef);
     if (lat === null || lon === null) return null;
     return {
         latitude:  latRef === 'S' ? -lat : lat,
