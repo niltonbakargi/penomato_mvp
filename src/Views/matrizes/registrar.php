@@ -180,7 +180,7 @@ include __DIR__ . '/../includes/cabecalho.php';
     /* ── opções de localização ── */
     .opcoes-loc {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
         margin-bottom: 4px;
     }
@@ -362,10 +362,16 @@ include __DIR__ . '/../includes/cabecalho.php';
                 <button type="button" class="btn-loc" id="btn-usar-mapa">
                     <i class="fas fa-map-marked-alt"></i> Apontar no Mapa
                 </button>
+                <button type="button" class="btn-loc" id="btn-usar-imagem">
+                    <i class="fas fa-camera"></i> Imagem
+                </button>
                 <button type="button" class="btn-loc" id="btn-usar-manual">
                     <i class="fas fa-keyboard"></i> Manual
                 </button>
             </div>
+
+            <!-- Input oculto para leitura de EXIF -->
+            <input type="file" id="input-exif-imagem" accept="image/*" style="display:none">
 
             <!-- Mapa picker -->
             <div id="mapa-picker-wrap" style="display:none">
@@ -612,17 +618,20 @@ function ativarModo(modo) {
     var manualDiv = document.getElementById('campos-manuais');
     var btnGps    = document.getElementById('btn-usar-gps');
     var btnMapa   = document.getElementById('btn-usar-mapa');
+    var btnImagem = document.getElementById('btn-usar-imagem');
     var btnManual = document.getElementById('btn-usar-manual');
+    var todosBtn  = [btnGps, btnMapa, btnImagem, btnManual];
 
     var jaAtivo = (modo === 'gps'    && btnGps.classList.contains('ativo'))
                || (modo === 'mapa'   && btnMapa.classList.contains('ativo'))
+               || (modo === 'imagem' && btnImagem.classList.contains('ativo'))
                || (modo === 'manual' && btnManual.classList.contains('ativo'));
 
-    [btnGps, btnMapa, btnManual].forEach(function (b) { b.classList.remove('ativo'); });
+    todosBtn.forEach(function (b) { b.classList.remove('ativo'); });
     mapWrap.style.display   = 'none';
     manualDiv.style.display = 'none';
 
-    if (jaAtivo) return false; // segundo clique fecha
+    if (jaAtivo) return false;
 
     if (modo === 'gps') {
         btnGps.classList.add('ativo');
@@ -630,6 +639,8 @@ function ativarModo(modo) {
         btnMapa.classList.add('ativo');
         mapWrap.style.display = 'block';
         return true;
+    } else if (modo === 'imagem') {
+        btnImagem.classList.add('ativo');
     } else if (modo === 'manual') {
         btnManual.classList.add('ativo');
         manualDiv.style.display = 'flex';
@@ -637,16 +648,36 @@ function ativarModo(modo) {
     return false;
 }
 
-// ── EXIF GPS extraído da foto geral ──────────────────────────
-document.getElementById('foto_geral').addEventListener('change', async function () {
+// ── Botão Imagem: abre seletor e lê EXIF ─────────────────────
+document.getElementById('btn-usar-imagem').addEventListener('click', function () {
+    ativarModo('imagem');
+    document.getElementById('input-exif-imagem').click();
+});
+
+document.getElementById('input-exif-imagem').addEventListener('change', async function () {
     var file = this.files && this.files[0];
     if (!file) return;
+
+    var btnImagem = document.getElementById('btn-usar-imagem');
+    btnImagem.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Lendo...';
+
     try {
         var gps = await exifr.gps(file);
         if (gps && gps.latitude && gps.longitude) {
             definirLocalizacao(gps.latitude, gps.longitude, 'EXIF da foto');
+            btnImagem.innerHTML = '<i class="fas fa-camera"></i> Imagem';
+        } else {
+            btnImagem.innerHTML = '<i class="fas fa-camera"></i> Imagem';
+            var status = document.getElementById('gps-status');
+            status.className = 'gps-status erro';
+            status.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span>Esta foto não tem GPS nos metadados. Tente outra ou use outra opção.</span>';
+            document.getElementById('btn-usar-imagem').classList.remove('ativo');
         }
-    } catch (e) { /* sem dados EXIF — ignora */ }
+    } catch (e) {
+        btnImagem.innerHTML = '<i class="fas fa-camera"></i> Imagem';
+        document.getElementById('btn-usar-imagem').classList.remove('ativo');
+    }
+    this.value = ''; // permite reselecionar a mesma imagem
 });
 
 // ── Nome popular → científico ─────────────────────────────────
