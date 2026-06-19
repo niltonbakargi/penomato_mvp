@@ -677,6 +677,15 @@ function mostrarDiagnostico() {
     el.querySelector('pre').textContent = _dbg.join('\n');
 }
 
+function hexDump(view, offset, len) {
+    var out = '';
+    for (var i = 0; i < len; i++) {
+        var b = view.getUint8(offset + i).toString(16).toUpperCase().padStart(2,'0');
+        out += b + (i % 4 === 3 ? ' | ' : ' ');
+    }
+    return out;
+}
+
 function parseJpegGPS(buffer) {
     _dbg = [];
     var view = new DataView(buffer);
@@ -748,6 +757,7 @@ function parseTiffGPS(buffer, tiffBase) {
         } else if (tag === 0x02) {
             var latOff = tiffBase + valOff;
             dbg('latOff = tiffBase(' + tiffBase + ') + valOff(' + valOff + ') = ' + latOff);
+            dbg('HEX@latOff: ' + hexDump(view, latOff, 24));
             var r0n = view.getUint32(latOff,    le), r0d = view.getUint32(latOff+4,  le);
             var r1n = view.getUint32(latOff+8,  le), r1d = view.getUint32(latOff+12, le);
             var r2n = view.getUint32(latOff+16, le), r2d = view.getUint32(latOff+20, le);
