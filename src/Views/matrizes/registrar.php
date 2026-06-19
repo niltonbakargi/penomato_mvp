@@ -738,14 +738,16 @@ function parseTiffGPS(buffer, tiffBase) {
         var tag = u16(g);
         var valOff = u32(g + 8);
 
+        dbg('  tag=0x' + tag.toString(16) + ' valOff=' + valOff + ' byte@g+8=0x' + view.getUint8(g+8).toString(16));
         if (tag === 0x01) {
             latRef = String.fromCharCode(view.getUint8(g + 8));
-            dbg('LatRef = ' + latRef);
+            dbg('LatRef = [' + latRef + '] (byte=' + view.getUint8(g+8) + ')');
         } else if (tag === 0x03) {
             lonRef = String.fromCharCode(view.getUint8(g + 8));
-            dbg('LonRef = ' + lonRef);
+            dbg('LonRef = [' + lonRef + '] (byte=' + view.getUint8(g+8) + ')');
         } else if (tag === 0x02) {
             var latOff = tiffBase + valOff;
+            dbg('latOff = tiffBase(' + tiffBase + ') + valOff(' + valOff + ') = ' + latOff);
             var r0n = view.getUint32(latOff,    le), r0d = view.getUint32(latOff+4,  le);
             var r1n = view.getUint32(latOff+8,  le), r1d = view.getUint32(latOff+12, le);
             var r2n = view.getUint32(latOff+16, le), r2d = view.getUint32(latOff+20, le);
@@ -754,6 +756,7 @@ function parseTiffGPS(buffer, tiffBase) {
             dbg('Lat = ' + lat);
         } else if (tag === 0x04) {
             var lonOff = tiffBase + valOff;
+            dbg('lonOff = tiffBase(' + tiffBase + ') + valOff(' + valOff + ') = ' + lonOff);
             var s0n = view.getUint32(lonOff,    le), s0d = view.getUint32(lonOff+4,  le);
             var s1n = view.getUint32(lonOff+8,  le), s1d = view.getUint32(lonOff+12, le);
             var s2n = view.getUint32(lonOff+16, le), s2d = view.getUint32(lonOff+20, le);
