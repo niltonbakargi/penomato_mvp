@@ -20,7 +20,7 @@ $matriz_id = intval($_POST['matriz_id'] ?? 0);
 $texto     = trim($_POST['texto'] ?? '');
 
 if (!$matriz_id || empty($texto)) {
-    setMensagem('erro', 'Comentário inválido.');
+    mensagemErro('Comentário inválido.');
     header("Location: /penomato_mvp/src/Views/matrizes/ficha.php?id={$matriz_id}");
     exit;
 }
@@ -38,6 +38,6 @@ inserir('matrizes_comentarios', [
     'texto'      => $texto,
 ]);
 
-setMensagem('sucesso', 'Comentário enviado.');
+mensagemSucesso('Comentário enviado.');
 header("Location: /penomato_mvp/src/Views/matrizes/ficha.php?id={$matriz_id}");
 exit;

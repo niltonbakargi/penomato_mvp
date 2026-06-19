@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remover_id'])) {
             $_SESSION['usuario_id'], $id, $motivo, $_SERVER['REMOTE_ADDR'] ?? ''
         ));
 
-        setMensagem('sucesso', "Matriz removida do mapa com sucesso.");
+        mensagemSucesso("Matriz removida do mapa com sucesso.");
     }
 
     header('Location: /penomato_mvp/src/Views/matrizes/gerenciar_matrizes.php');

@@ -24,14 +24,14 @@ $lat = $_POST['latitude']  ?? '';
 $lon = $_POST['longitude'] ?? '';
 
 if (empty($lat) || empty($lon)) {
-    setMensagem('erro', 'As coordenadas GPS são obrigatórias.');
+    mensagemErro('As coordenadas GPS são obrigatórias.');
     header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
     exit;
 }
 
 // ── Valida foto geral ─────────────────────────────────────────
 if (!isset($_FILES['foto_geral']) || $_FILES['foto_geral']['error'] !== UPLOAD_ERR_OK) {
-    setMensagem('erro', 'A foto da árvore inteira é obrigatória.');
+    mensagemErro('A foto da árvore inteira é obrigatória.');
     header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
     exit;
 }
@@ -61,7 +61,7 @@ $dir_geral = __DIR__ . '/../../../uploads/matrizes/';
 $nome_geral = salvarFoto($_FILES['foto_geral'], $dir_geral);
 
 if (!$nome_geral) {
-    setMensagem('erro', 'Erro ao salvar a foto. Verifique o formato (JPG/PNG) e tamanho (máx. 10 MB).');
+    mensagemErro('Erro ao salvar a foto. Verifique o formato (JPG/PNG) e tamanho (máx. 10 MB).');
     header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
     exit;
 }
@@ -98,7 +98,7 @@ $id = inserir('matrizes', [
 ]);
 
 if (!$id) {
-    setMensagem('erro', 'Erro ao registrar a matriz. Tente novamente.');
+    mensagemErro('Erro ao registrar a matriz. Tente novamente.');
     header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
     exit;
 }
@@ -122,6 +122,6 @@ foreach ($partes_opcionais as $parte) {
     ]);
 }
 
-setMensagem('sucesso', "Matriz <strong>{$codigo}</strong> registrada com sucesso!");
+mensagemSucesso("Matriz <strong>{$codigo}</strong> registrada com sucesso!");
 header("Location: /penomato_mvp/src/Views/matrizes/ficha.php?id={$id}");
 exit;
