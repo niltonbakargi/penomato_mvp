@@ -1170,6 +1170,7 @@ ob_end_clean();
             <option>Bambu</option><option>Epífita</option><option>Hemiparasita</option>
             <option>Parasita</option>
           </select>
+          <button type="button" class="btn-buscar-ref" data-campo="forma_vida" title="Buscar referência via IA">🔍</button>
         </div>
         <div class="field-refs">
           <label>Refs</label>
@@ -1191,6 +1192,7 @@ ob_end_clean();
             <option>Nativa</option><option>Exótica</option>
             <option>Naturalizada</option><option>Cultivada</option>
           </select>
+          <button type="button" class="btn-buscar-ref" data-campo="origem" title="Buscar referência via IA">🔍</button>
         </div>
         <div class="field-refs">
           <label>Refs</label>
@@ -1211,6 +1213,7 @@ ob_end_clean();
             <option value="" disabled selected>Selecione…</option>
             <option>Endêmica</option><option>Não endêmica</option>
           </select>
+          <button type="button" class="btn-buscar-ref" data-campo="endemismo" title="Buscar referência via IA">🔍</button>
         </div>
         <div class="field-refs">
           <label>Refs</label>
@@ -1228,6 +1231,7 @@ ob_end_clean();
         <div class="field-main">
           <label for="biomas">Biomas de Ocorrência <span class="subtext">(separados por vírgula)</span></label>
           <input type="text" id="biomas" name="biomas" placeholder="Ex: Cerrado, Amazônia">
+          <button type="button" class="btn-buscar-ref" data-campo="biomas" title="Buscar referência via IA">🔍</button>
         </div>
         <div class="field-refs">
           <label>Refs</label>
@@ -1245,6 +1249,7 @@ ob_end_clean();
         <div class="field-main">
           <label for="estados_ocorrencia">Estados de Ocorrência <span class="subtext">(siglas separadas por vírgula)</span></label>
           <input type="text" id="estados_ocorrencia" name="estados_ocorrencia" placeholder="Ex: GO, MS, MT, DF">
+          <button type="button" class="btn-buscar-ref" data-campo="estados_ocorrencia" title="Buscar referência via IA">🔍</button>
         </div>
         <div class="field-refs">
           <label>Refs</label>
