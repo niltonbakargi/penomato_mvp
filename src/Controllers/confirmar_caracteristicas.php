@@ -2236,13 +2236,16 @@ function buscarReflora() {
 
             var el = document.getElementById(campo);
             if (!el) return;
-            // Para selects: só preenche se o valor existe nas opções
+            // Para selects: tenta cada parte do valor (ex: "Árvore, Liana" → tenta "Árvore")
             if (el.tagName === 'SELECT') {
                 var found = false;
-                for (var i = 0; i < el.options.length; i++) {
-                    if (el.options[i].value === valor || el.options[i].text === valor) {
-                        el.value = el.options[i].value || valor;
-                        found = true; break;
+                var partes = valor.split(',').map(function(v) { return v.trim(); });
+                for (var p = 0; p < partes.length && !found; p++) {
+                    for (var i = 0; i < el.options.length; i++) {
+                        if (el.options[i].value === partes[p] || el.options[i].text === partes[p]) {
+                            el.value = el.options[i].value || partes[p];
+                            found = true; break;
+                        }
                     }
                 }
                 if (!found) return;
@@ -2263,7 +2266,20 @@ function buscarReflora() {
             }
         });
 
-        showToast('REFLORA: dados preenchidos com sucesso!');
+        // Campos de distribuição ausentes no REFLORA → fallback IA
+        var distCampos = ['forma_vida','origem','endemismo','biomas','estados_ocorrencia'];
+        var vazios = distCampos.filter(function(c) {
+            var el = document.getElementById(c);
+            return el && !el.value;
+        });
+        if (vazios.length > 0) {
+            showToast('REFLORA: ' + vazios.length + ' campo(s) sem dado — buscando via IA…');
+            vazios.forEach(function(c, i) {
+                setTimeout(function() { searchRefCampo(c); }, i * 900);
+            });
+        } else {
+            showToast('REFLORA: dados preenchidos com sucesso!');
+        }
     })
     .catch(function() {
         if (btn) { btn.disabled = false; btn.textContent = '🌿 Buscar no REFLORA'; }
