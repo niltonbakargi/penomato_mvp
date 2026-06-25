@@ -639,6 +639,112 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
     exit;
 }
 
+// ── AJAX: buscar distribuição via IA (todos os campos de uma vez) ──────────
+if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_distribuicao_ia') {
+    @set_time_limit(60);
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    header('Content-Type: application/json; charset=utf-8');
+    if (!isset($_SESSION['usuario_id'])) { echo json_encode(['ok' => false, 'erro' => 'Não autenticado.']); exit; }
+    if (!defined('AI_PROVIDER') || !defined('AI_API_KEY') || AI_API_KEY === '') {
+        echo json_encode(['ok' => false, 'erro' => 'API de IA não configurada.']); exit;
+    }
+
+    $especie_id = (int)($_POST['especie_id'] ?? 0);
+    if (!$especie_id) { echo json_encode(['ok' => false, 'erro' => 'Espécie não informada.']); exit; }
+
+    require_once __DIR__ . '/../../config/banco_de_dados.php';
+    $stmt = $pdo->prepare("SELECT nome_cientifico FROM especies_administrativo WHERE id = ?");
+    $stmt->execute([$especie_id]);
+    $nome = $stmt->fetchColumn();
+    if (!$nome) { echo json_encode(['ok' => false, 'erro' => 'Espécie não encontrada.']); exit; }
+
+    $prompt = "Você é especialista em botânica sistemática com amplo conhecimento da flora brasileira.\n"
+        . "Espécie: {$nome}\n\n"
+        . "Com base na Flora do Brasil 2020 (REFLORA/JBRJ), Lorenzi e literatura botânica confiável, "
+        . "preencha os campos de distribuição e ecologia desta espécie.\n\n"
+        . "Campos e opções válidas:\n"
+        . "- forma_vida: exatamente uma de [Árvore, Arbusto, Subarbusto, Erva, Trepadeira, Palmeira, Bambu, Epífita, Hemiparasita, Parasita]\n"
+        . "- origem: exatamente uma de [Nativa, Exótica, Naturalizada, Cultivada]\n"
+        . "- endemismo: exatamente uma de [Endêmica, Não endêmica]\n"
+        . "- biomas: lista separada por vírgula dos biomas onde ocorre (ex: Cerrado, Amazônia, Caatinga, Mata Atlântica, Pantanal, Pampa)\n"
+        . "- estados_ocorrencia: lista de siglas de estados brasileiros separadas por vírgula (ex: GO, MT, MS, DF)\n"
+        . "- referencia: referência bibliográfica principal no formato AUTOR. Título. Local, Ano.\n"
+        . "- confianca: sua confiança geral nas informações (0-100)\n\n"
+        . "Responda APENAS com JSON válido:\n"
+        . "{\n"
+        . "  \"forma_vida\": \"\",\n"
+        . "  \"origem\": \"\",\n"
+        . "  \"endemismo\": \"\",\n"
+        . "  \"biomas\": \"\",\n"
+        . "  \"estados_ocorrencia\": \"\",\n"
+        . "  \"referencia\": \"\",\n"
+        . "  \"confianca\": 0\n"
+        . "}";
+
+    $provider = strtolower(AI_PROVIDER);
+    $api_key  = AI_API_KEY;
+    $model    = defined('AI_MODEL') ? AI_MODEL : null;
+    $ia_texto = null; $erro_api = null;
+
+    if ($provider === 'claude') {
+        $payload = json_encode(['model' => $model ?? 'claude-sonnet-4-6', 'max_tokens' => 600, 'temperature' => 0.1,
+            'messages' => [['role' => 'user', 'content' => $prompt]]]);
+        $ch = curl_init('https://api.anthropic.com/v1/messages');
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => ['Content-Type: application/json',
+            'x-api-key: ' . $api_key, 'anthropic-version: 2023-06-01']]);
+        $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) $erro_api = 'Claude HTTP ' . $code;
+        else { $d = json_decode($res, true); $ia_texto = $d['content'][0]['text'] ?? null; }
+    } elseif ($provider === 'openai') {
+        $payload = json_encode(['model' => $model ?? 'gpt-4o', 'max_tokens' => 600, 'temperature' => 0.1,
+            'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido sem markdown.'], ['role' => 'user', 'content' => $prompt]]]);
+        $ch = curl_init('https://api.openai.com/v1/chat/completions');
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
+        $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) $erro_api = 'OpenAI HTTP ' . $code;
+        else { $d = json_decode($res, true); $ia_texto = $d['choices'][0]['message']['content'] ?? null; }
+    } elseif ($provider === 'gemini') {
+        $m = $model ?? 'gemini-1.5-flash';
+        $payload = json_encode(['contents' => [['parts' => [['text' => $prompt]]]], 'generationConfig' => ['temperature' => 0.1, 'maxOutputTokens' => 600]]);
+        $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/' . $m . ':generateContent?key=' . urlencode($api_key));
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => ['Content-Type: application/json']]);
+        $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) $erro_api = 'Gemini HTTP ' . $code;
+        else { $d = json_decode($res, true); $ia_texto = $d['candidates'][0]['content']['parts'][0]['text'] ?? null; }
+    } elseif ($provider === 'deepseek') {
+        $payload = json_encode(['model' => $model ?: 'deepseek-chat', 'max_tokens' => 600, 'temperature' => 0.1,
+            'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido sem markdown.'], ['role' => 'user', 'content' => $prompt]]], JSON_UNESCAPED_UNICODE);
+        $ch = curl_init('https://api.deepseek.com/chat/completions');
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_TIMEOUT => 60, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
+        $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+        if ($code !== 200) $erro_api = 'DeepSeek HTTP ' . $code;
+        else { $d = json_decode($res, true); $ia_texto = $d['choices'][0]['message']['content'] ?? null; }
+    } else { $erro_api = 'Provider não suportado.'; }
+
+    if ($erro_api || !$ia_texto) { echo json_encode(['ok' => false, 'erro' => $erro_api ?? 'Sem resposta da IA.']); exit; }
+
+    $jl = trim(preg_replace(['/^```(?:json)?\s*/i', '/\s*```$/'], '', trim($ia_texto)));
+    $ia = json_decode($jl, true);
+    if (json_last_error() !== JSON_ERROR_NONE) { echo json_encode(['ok' => false, 'erro' => 'JSON inválido da IA.']); exit; }
+
+    echo json_encode([
+        'ok'                 => true,
+        'forma_vida'         => trim($ia['forma_vida']         ?? ''),
+        'origem'             => trim($ia['origem']             ?? ''),
+        'endemismo'          => trim($ia['endemismo']          ?? ''),
+        'biomas'             => trim($ia['biomas']             ?? ''),
+        'estados_ocorrencia' => trim($ia['estados_ocorrencia'] ?? ''),
+        'referencia'         => trim($ia['referencia']         ?? ''),
+        'confianca'          => (int)($ia['confianca']         ?? 0),
+    ]);
+    exit;
+}
+
 // ── Session + POST final ───────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -2271,17 +2377,15 @@ function buscarReflora() {
             }
         });
 
-        // Campos de distribuição ausentes no REFLORA → fallback IA
+        // Campos de distribuição ausentes no REFLORA → fallback IA (única chamada)
         var distCampos = ['forma_vida','origem','endemismo','biomas','estados_ocorrencia'];
         var vazios = distCampos.filter(function(c) {
             var el = document.getElementById(c);
             return el && !el.value;
         });
         if (vazios.length > 0) {
-            showToast('REFLORA: ' + vazios.length + ' campo(s) sem dado — buscando via IA…');
-            vazios.forEach(function(c, i) {
-                setTimeout(function() { searchRefCampo(c); }, i * 900);
-            });
+            showToast('REFLORA: distribuição incompleta — buscando via IA…');
+            buscarDistribuicaoIA();
         } else {
             showToast('REFLORA: dados preenchidos com sucesso!');
         }
@@ -2290,6 +2394,68 @@ function buscarReflora() {
         if (btn) { btn.disabled = false; btn.textContent = '🌿 Buscar no REFLORA'; }
         showToast('Erro ao conectar com o REFLORA.');
     });
+}
+
+// ============================================================
+// BUSCAR DISTRIBUIÇÃO VIA IA (chamada única para todos os campos)
+// ============================================================
+function buscarDistribuicaoIA() {
+    if (!_especieId) return;
+    fetch('confirmar_caracteristicas.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ acao: 'buscar_distribuicao_ia', especie_id: _especieId })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+        if (!res.ok) { showToast('IA distribuição: ' + (res.erro || 'Erro desconhecido')); return; }
+
+        var campos = ['forma_vida','origem','endemismo','biomas','estados_ocorrencia'];
+        var preenchidos = 0;
+
+        // Adiciona referência IA à lista de refs (se vier) e pega o índice
+        var refIdx = null;
+        if (res.referencia) {
+            var jaExiste = _refs.findIndex(function(r) { return r.trim() === res.referencia.trim(); });
+            if (jaExiste >= 0) {
+                refIdx = jaExiste + 1;
+            } else {
+                _refs.push(res.referencia);
+                refIdx = _refs.length;
+                renderRefList();
+                autoSaveRefs();
+            }
+        }
+
+        campos.forEach(function(campo) {
+            var el  = document.getElementById(campo);
+            var val = res[campo] || '';
+            if (!el || !val || el.value) return; // só preenche se vazio
+
+            if (el.tagName === 'SELECT') {
+                for (var i = 0; i < el.options.length; i++) {
+                    if (el.options[i].value === val || el.options[i].text === val) {
+                        el.value = el.options[i].value || val; break;
+                    }
+                }
+            } else {
+                el.value = val;
+            }
+
+            if (refIdx) {
+                var refEl = document.getElementById(campo + '_ref');
+                if (refEl) { refEl.value = String(refIdx); buildBadges(campo, refEl.value); }
+            }
+            preenchidos++;
+        });
+
+        if (preenchidos > 0) {
+            showToast('IA preencheu ' + preenchidos + ' campo(s) de distribuição (conf. ' + (res.confianca || 0) + '%). Verifique os valores.');
+        } else {
+            showToast('IA não encontrou dados de distribuição para esta espécie.');
+        }
+    })
+    .catch(function() { showToast('Erro ao buscar distribuição via IA.'); });
 }
 
 // ============================================================
