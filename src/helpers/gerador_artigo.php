@@ -187,6 +187,55 @@ function _art_sup_refs(array $c, array $campos): string {
     return '<sup class="art-ref">[' . implode(',', array_keys($nums)) . ']</sup>';
 }
 
+/** Converte string de refs "1,2,3" em <sup class="art-ref">[1,2,3]</sup> */
+function _art_ref_sup(string $ref): string {
+    $ref = trim($ref);
+    if ($ref === '') return '';
+    $nums = array_unique(array_filter(array_map('intval', explode(',', $ref))));
+    sort($nums);
+    return $nums ? '<sup class="art-ref">[' . implode(',', $nums) . ']</sup>' : '';
+}
+
+// ── Distribuição e Ecologia ───────────────────────────────────
+
+function _art_distribuicao(array $c): ?string {
+    $forma_vida  = trim($c['forma_vida']             ?? '');
+    $fv_ref      = trim($c['forma_vida_ref']         ?? '');
+    $origem      = trim($c['origem']                 ?? '');
+    $ori_ref     = trim($c['origem_ref']             ?? '');
+    $endemismo   = trim($c['endemismo']              ?? '');
+    $end_ref     = trim($c['endemismo_ref']          ?? '');
+    $biomas      = trim($c['biomas']                 ?? '');
+    $bio_ref     = trim($c['biomas_ref']             ?? '');
+    $estados     = trim($c['estados_ocorrencia']     ?? '');
+    $est_ref     = trim($c['estados_ocorrencia_ref'] ?? '');
+
+    if (!$forma_vida && !$origem && !$endemismo && !$biomas && !$estados) return null;
+
+    $h = fn($s) => htmlspecialchars((string)$s);
+    $partes = [];
+
+    // "Palmeira, nativa, não endêmica."
+    $atributos = array_filter([
+        $forma_vida ? '<strong>' . $h($forma_vida) . '</strong>' . _art_ref_sup($fv_ref)  : null,
+        $origem     ? '<strong>' . $h($origem)     . '</strong>' . _art_ref_sup($ori_ref) : null,
+        $endemismo  ? '<strong>' . $h($endemismo)  . '</strong>' . _art_ref_sup($end_ref) : null,
+    ]);
+    if ($atributos) {
+        $partes[] = implode(', ', $atributos) . '.';
+    }
+
+    if ($biomas) {
+        $partes[] = 'Ocorre nos biomas <strong>' . $h($biomas) . '</strong>' . _art_ref_sup($bio_ref) . '.';
+    }
+
+    if ($estados) {
+        $partes[] = 'Registrada nos estados <strong>' . $h($estados) . '</strong>' . _art_ref_sup($est_ref) . '.';
+    }
+
+    return $partes ? implode(' ', $partes) : null;
+}
+
 // ── Gerador principal ────────────────────────────────────────
 
 function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs, PDO $pdo): string {
@@ -233,6 +282,13 @@ function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs, PDO $pdo): s
         _art_outros($c),
     ]) as $paragrafo) {
         echo '<p class="art-paragrafo">' . $paragrafo . '</p>';
+    }
+
+    // ── Distribuição e Ecologia
+    $dist = _art_distribuicao($c);
+    if ($dist) {
+        echo '<h3 class="art-secao">Distribuição e Ecologia</h3>';
+        echo '<p class="art-paragrafo">' . $dist . '</p>';
     }
 
     // ── Prancha fotográfica
