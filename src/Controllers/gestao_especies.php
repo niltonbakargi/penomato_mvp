@@ -223,7 +223,7 @@ $colaboradores = $pdo->query("
 
     <div class="header">
         <h1>🌿 Gestão de Espécies</h1>
-        <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar ao painel</a>
+        <a href="<?php echo APP_BASE; ?>/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar ao painel</a>
     </div>
 
     <!-- Filtros por status -->
