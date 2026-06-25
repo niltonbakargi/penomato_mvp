@@ -1736,6 +1736,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
     var _nomeCientifico = '<?php echo addslashes($nome_cientifico); ?>';
     var _especieIdInt   = <?php echo (int)$especie_id; ?>;
 
+    // Adiciona texto à lista de referências e retorna o número (1-based)
+    function adicionarReferencia(texto) {
+        if (!texto) return null;
+        var ta = document.getElementById('referencias');
+        if (!ta) return null;
+        var linhas = ta.value ? ta.value.split('\n').filter(function(l) { return l.trim(); }) : [];
+        // Verifica se já existe
+        for (var i = 0; i < linhas.length; i++) {
+            if (linhas[i].indexOf(texto) !== -1) {
+                var m = linhas[i].match(/^(\d+)\./);
+                return m ? parseInt(m[1]) : (i + 1);
+            }
+        }
+        var proximo = linhas.length + 1;
+        linhas.push(proximo + '. ' + texto);
+        ta.value = linhas.join('\n');
+        return proximo;
+    }
+
+    function atribuirRef(campo, numRef) {
+        if (!numRef) return;
+        var refEl = document.getElementById(campo + '_ref');
+        if (refEl && !refEl.value) refEl.value = String(numRef);
+    }
+
     function buscarDistribuicaoIA() {
         fetch('confirmar_caracteristicas.php', {
             method: 'POST',
@@ -1745,15 +1770,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         .then(function(r) { return r.json(); })
         .then(function(res) {
             if (!res.ok) { mostrarStatus('⚠️ IA distribuição: ' + (res.erro || 'Erro'), 'warning'); return; }
+            var numRef = res.referencia ? adicionarReferencia(res.referencia) : null;
             var campos = ['forma_vida','origem','endemismo','biomas','estados_ocorrencia'];
             var preenchidos = 0;
             campos.forEach(function(c) {
                 if (res[c] && !document.getElementById(c).value) {
                     preencherCampo(c, res[c]);
-                    if (res.referencia) {
-                        var refEl = document.getElementById(c + '_ref');
-                        if (refEl && !refEl.value) refEl.value = res.referencia;
-                    }
+                    atribuirRef(c, numRef);
                     preenchidos++;
                 }
             });
@@ -1797,6 +1820,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     return;
                 }
 
+                // Adiciona URL do REFLORA na lista de referências
+                var numRef = res.ref_url ? adicionarReferencia(res.ref_url) : null;
+
                 // Preenche campos taxonômicos e de distribuição
                 var campos = ['nome_cientifico_completo','familia','nome_popular','sinonimos',
                               'forma_vida','origem','endemismo','biomas','estados_ocorrencia'];
@@ -1807,10 +1833,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     var el = document.getElementById(campo);
                     if (!el || el.value) return; // não sobrescreve
                     preencherCampo(campo, valor);
-                    if (res.ref_url) {
-                        var refEl = document.getElementById(campo + '_ref');
-                        if (refEl && !refEl.value) refEl.value = res.ref_url;
-                    }
+                    atribuirRef(campo, numRef);
                     preenchidos++;
                 });
 
@@ -1822,7 +1845,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                     mostrarStatus('REFLORA: distribuição incompleta — buscando via IA…', 'warning');
                     buscarDistribuicaoIA();
                 } else {
-                    mostrarStatus('✅ REFLORA: ' + preenchidos + ' campo(s) preenchido(s)!', 'success');
+                    mostrarStatus('✅ REFLORA: ' + preenchidos + ' campo(s) preenchido(s)! Referência [' + numRef + '] adicionada.', 'success');
                 }
             })
             .catch(function() {
