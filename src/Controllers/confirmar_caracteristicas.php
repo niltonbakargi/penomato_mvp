@@ -2321,7 +2321,7 @@ function buscarReflora() {
     .then(function(r) { return r.json(); })
     .then(function(res) {
         if (btn) { btn.disabled = false; btn.textContent = '🌿 Buscar no REFLORA'; }
-        if (!res.ok) { showToast('REFLORA: ' + (res.erro || 'Erro desconhecido.')); return; }
+        if (!res.ok) { showToast('REFLORA indisponível — buscando distribuição via IA…'); buscarDistribuicaoIA(); return; }
 
         // Adiciona referência REFLORA na lista (se ainda não existir)
         var refUrl  = res.ref_url || '';
@@ -2392,7 +2392,8 @@ function buscarReflora() {
     })
     .catch(function() {
         if (btn) { btn.disabled = false; btn.textContent = '🌿 Buscar no REFLORA'; }
-        showToast('Erro ao conectar com o REFLORA.');
+        showToast('REFLORA indisponível — buscando distribuição via IA…');
+        buscarDistribuicaoIA();
     });
 }
 
