@@ -781,6 +781,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
         <div class="paper-card">
 
             <div class="ia-toolbar">
+                <button type="button" id="btn_buscar_reflora" class="btn btn-secondary">
+                    🌿 Buscar no REFLORA
+                </button>
                 <button type="button" id="btn_pesquisar_ia" class="btn btn-primary">
                     🤖 Pesquisar com IA
                 </button>
@@ -859,6 +862,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                         <label for="familia_ref">Referência</label>
                         <div class="ref-wrapper">
                             <input type="text" id="familia_ref" name="familia_ref" placeholder="URL ou nº">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── DISTRIBUIÇÃO E ECOLOGIA ── -->
+                <div class="section-title">🌍 Distribuição e Ecologia</div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="forma_vida">Forma de Vida</label>
+                        <select id="forma_vida" name="forma_vida">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Árvore</option><option>Arbusto</option><option>Subarbusto</option>
+                            <option>Erva</option><option>Trepadeira</option><option>Palmeira</option>
+                            <option>Bambu</option><option>Epífita</option><option>Hemiparasita</option><option>Parasita</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="forma_vida_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="forma_vida_ref" name="forma_vida_ref" placeholder="URL ou nº">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="origem">Origem</label>
+                        <select id="origem" name="origem">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Nativa</option><option>Exótica</option><option>Naturalizada</option><option>Cultivada</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="origem_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="origem_ref" name="origem_ref" placeholder="URL ou nº">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="endemismo">Endemismo</label>
+                        <select id="endemismo" name="endemismo">
+                            <option value="" disabled selected>Selecione…</option>
+                            <option>Endêmica</option><option>Não endêmica</option>
+                        </select>
+                    </div>
+                    <div class="ref-col">
+                        <label for="endemismo_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="endemismo_ref" name="endemismo_ref" placeholder="URL ou nº">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="biomas">Biomas de Ocorrência <span class="subtext">(separados por vírgula)</span></label>
+                        <input type="text" id="biomas" name="biomas" placeholder="Ex: Cerrado, Amazônia">
+                    </div>
+                    <div class="ref-col">
+                        <label for="biomas_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="biomas_ref" name="biomas_ref" placeholder="URL ou nº">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="main-input">
+                        <label for="estados_ocorrencia">Estados de Ocorrência <span class="subtext">(siglas separadas por vírgula)</span></label>
+                        <input type="text" id="estados_ocorrencia" name="estados_ocorrencia" placeholder="Ex: GO, MS, MT, DF">
+                    </div>
+                    <div class="ref-col">
+                        <label for="estados_ocorrencia_ref">Referência</label>
+                        <div class="ref-wrapper">
+                            <input type="text" id="estados_ocorrencia_ref" name="estados_ocorrencia_ref" placeholder="URL ou nº">
                         </div>
                     </div>
                 </div>
@@ -1644,6 +1726,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
                 statusDiv.style.display = 'block';
                 statusDiv.className = 'alert alert-warning';
                 statusDiv.textContent = '⚠️ Erro de rede: ' + err.message;
+            });
+        });
+    })();
+
+    // ================================================
+    // REFLORA + FALLBACK IA DE DISTRIBUIÇÃO
+    // ================================================
+    var _nomeCientifico = '<?php echo addslashes($nome_cientifico); ?>';
+    var _especieIdInt   = <?php echo (int)$especie_id; ?>;
+
+    function buscarDistribuicaoIA() {
+        fetch('confirmar_caracteristicas.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ acao: 'buscar_distribuicao_ia', especie_id: _especieIdInt })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (!res.ok) { mostrarStatus('⚠️ IA distribuição: ' + (res.erro || 'Erro'), 'warning'); return; }
+            var campos = ['forma_vida','origem','endemismo','biomas','estados_ocorrencia'];
+            var preenchidos = 0;
+            campos.forEach(function(c) {
+                if (res[c] && !document.getElementById(c).value) {
+                    preencherCampo(c, res[c]);
+                    if (res.referencia) {
+                        var refEl = document.getElementById(c + '_ref');
+                        if (refEl && !refEl.value) refEl.value = res.referencia;
+                    }
+                    preenchidos++;
+                }
+            });
+            if (preenchidos > 0)
+                mostrarStatus('🌿 Distribuição preenchida via IA (' + (res.confianca || 0) + '% confiança). Verifique os valores.', 'success');
+            else
+                mostrarStatus('⚠️ IA não encontrou dados de distribuição.', 'warning');
+        })
+        .catch(function() { mostrarStatus('⚠️ Erro ao buscar distribuição via IA.', 'warning'); });
+    }
+
+    function mostrarStatus(msg, tipo) {
+        var s = document.getElementById('ia_status');
+        if (!s) return;
+        s.style.display = 'block';
+        s.className = 'alert alert-' + (tipo === 'success' ? 'success' : 'warning');
+        s.textContent = msg;
+    }
+
+    (function() {
+        var btn = document.getElementById('btn_buscar_reflora');
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+            btn.disabled = true;
+            btn.textContent = '⏳ Buscando…';
+            mostrarStatus('', 'info');
+
+            fetch('confirmar_caracteristicas.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ acao: 'buscar_reflora', nome_cientifico: _nomeCientifico })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                btn.disabled = false;
+                btn.textContent = '🌿 Buscar no REFLORA';
+
+                if (!res.ok) {
+                    mostrarStatus('REFLORA indisponível — buscando distribuição via IA…', 'warning');
+                    buscarDistribuicaoIA();
+                    return;
+                }
+
+                // Preenche campos taxonômicos e de distribuição
+                var campos = ['nome_cientifico_completo','familia','nome_popular','sinonimos',
+                              'forma_vida','origem','endemismo','biomas','estados_ocorrencia'];
+                var preenchidos = 0;
+                campos.forEach(function(campo) {
+                    var valor = res[campo] || '';
+                    if (!valor) return;
+                    var el = document.getElementById(campo);
+                    if (!el || el.value) return; // não sobrescreve
+                    preencherCampo(campo, valor);
+                    if (res.ref_url) {
+                        var refEl = document.getElementById(campo + '_ref');
+                        if (refEl && !refEl.value) refEl.value = res.ref_url;
+                    }
+                    preenchidos++;
+                });
+
+                // Campos de distribuição ainda vazios → fallback IA
+                var distVazios = ['forma_vida','origem','endemismo','biomas','estados_ocorrencia']
+                    .filter(function(c) { var el = document.getElementById(c); return el && !el.value; });
+
+                if (distVazios.length > 0) {
+                    mostrarStatus('REFLORA: distribuição incompleta — buscando via IA…', 'warning');
+                    buscarDistribuicaoIA();
+                } else {
+                    mostrarStatus('✅ REFLORA: ' + preenchidos + ' campo(s) preenchido(s)!', 'success');
+                }
+            })
+            .catch(function() {
+                btn.disabled = false;
+                btn.textContent = '🌿 Buscar no REFLORA';
+                mostrarStatus('REFLORA indisponível — buscando distribuição via IA…', 'warning');
+                buscarDistribuicaoIA();
             });
         });
     })();
