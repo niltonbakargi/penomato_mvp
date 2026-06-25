@@ -66,7 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
     $todos_campos = [
         'nome_cientifico_completo', 'nome_cientifico_completo_ref',
         'sinonimos', 'sinonimos_ref', 'nome_popular', 'nome_popular_ref',
-        'familia', 'familia_ref', 'forma_folha', 'forma_folha_ref',
+        'familia', 'familia_ref',
+        'forma_vida', 'forma_vida_ref', 'origem', 'origem_ref',
+        'endemismo', 'endemismo_ref', 'biomas', 'biomas_ref',
+        'estados_ocorrencia', 'estados_ocorrencia_ref',
+        'forma_folha', 'forma_folha_ref',
         'filotaxia_folha', 'filotaxia_folha_ref', 'tipo_folha', 'tipo_folha_ref',
         'divisao_folha', 'divisao_folha_ref', 'paridade_pinnacao', 'paridade_pinnacao_ref',
         'tamanho_folha', 'tamanho_folha_ref', 'textura_folha', 'textura_folha_ref',
