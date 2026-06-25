@@ -123,16 +123,17 @@ $colaboradores = $pdo->query("
         }
         .header h1 { font-size: 1.3em; font-weight: 600; }
         .btn-voltar {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
             color: white;
-            border: none;
+            border: 1px solid rgba(255,255,255,0.6);
             padding: 8px 18px;
             border-radius: 20px;
             cursor: pointer;
             text-decoration: none;
             font-size: 0.88em;
+            font-weight: 600;
         }
-        .btn-voltar:hover { background: rgba(255,255,255,0.35); }
+        .btn-voltar:hover { background: rgba(255,255,255,0.28); color: white; text-decoration: none; }
 
         /* Stats */
         .stats-bar {
