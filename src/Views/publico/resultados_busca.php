@@ -136,25 +136,39 @@ $j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             box-shadow: 0 6px 28px rgba(0,0,0,.25);
         }
 
+        /* placeholder inicial (antes de clicar em parte) */
+        .carr-placeholder {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 12px; color: #444; font-size: .95rem; text-align: center;
+            padding: 40px 20px; min-height: 200px;
+        }
+        .carr-placeholder i { font-size: 2.8rem; color: #2a6648; opacity: .5; }
+        .carr-placeholder p { margin: 0; }
+
         .carr-stage {
             position: relative;
-            height: 380px;
+            min-height: 200px;
             display: flex; align-items: center; justify-content: center;
             background: #111;
         }
 
-        #carr-img {
-            max-width: 100%; max-height: 100%;
-            object-fit: contain;
-            display: block;
-            transition: opacity .25s;
+        /* grade com todas as imagens da espécie */
+        .carr-grade {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            padding: 10px; justify-content: center; align-items: flex-start;
+            width: 100%; box-sizing: border-box;
         }
-        #carr-img.trocando { opacity: 0; }
+        .carr-grade img {
+            height: 220px; width: auto; max-width: 100%;
+            object-fit: cover; border-radius: 4px;
+            flex: 1 1 180px; max-height: 260px;
+        }
 
         .carr-vazio {
             display: none;
             flex-direction: column; align-items: center; justify-content: center;
-            gap: 12px; color: #555; font-size: .95rem; text-align: center; padding: 20px;
+            gap: 12px; color: #555; font-size: .95rem; text-align: center;
+            padding: 40px 20px;
         }
         .carr-vazio i { font-size: 2.5rem; color: #333; }
 
@@ -170,18 +184,7 @@ $j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
         .carr-nav.prev { left: 14px; }
         .carr-nav.next { right: 14px; }
         .carr-nav:disabled { opacity: .25; cursor: default; }
-
-        /* sub-nav de imagens (quando espécie tem >1 foto) */
-        .carr-sub-nav {
-            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 6px; z-index: 2;
-        }
-        .carr-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: rgba(255,255,255,.35); border: none; cursor: pointer; padding: 0;
-            transition: background .2s;
-        }
-        .carr-dot.ativo { background: white; }
+        .carr-nav[style*="none"] { display: none !important; }
 
         .carr-rodape {
             padding: 12px 20px 14px;
@@ -293,41 +296,40 @@ $j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
     </div>
 <?php else: ?>
 
+    <!-- ── Botões de parte ───────────────────────── -->
+    <div class="partes">
+        <button class="parte-btn" data-parte="folha"   onclick="setParte(this)">🍃 Folha</button>
+        <button class="parte-btn" data-parte="flor"    onclick="setParte(this)">🌸 Flor</button>
+        <button class="parte-btn" data-parte="fruto"   onclick="setParte(this)">🍎 Fruto</button>
+        <button class="parte-btn" data-parte="caule"   onclick="setParte(this)">🌿 Caule</button>
+        <button class="parte-btn" data-parte="semente" onclick="setParte(this)">🌱 Semente</button>
+    </div>
+
     <!-- ── Carrossel ─────────────────────────────── -->
-    <div class="carrossel">
-        <div class="carr-stage">
-            <button class="carr-nav prev" id="btn-prev" onclick="navEsp(-1)">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
-
-            <img id="carr-img" src="" alt="">
-
-            <div class="carr-vazio" id="carr-vazio">
-                <i class="fa-regular fa-image"></i>
-                Nenhuma imagem disponível para esta parte
+    <div class="carrossel" id="carrossel">
+        <div class="carr-stage" id="carr-stage">
+            <!-- placeholder inicial -->
+            <div class="carr-placeholder" id="carr-placeholder">
+                <i class="fa-solid fa-seedling"></i>
+                <p>Selecione uma parte da planta acima<br>para visualizar as imagens</p>
             </div>
 
-            <div class="carr-sub-nav" id="carr-dots"></div>
-
-            <button class="carr-nav next" id="btn-next" onclick="navEsp(1)">
+            <!-- grade de imagens (oculta até selecionar parte) -->
+            <button class="carr-nav prev" id="btn-prev" onclick="navEsp(-1)" style="display:none">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="carr-grade" id="carr-grade" style="display:none"></div>
+            <div class="carr-vazio" id="carr-vazio"></div>
+            <button class="carr-nav next" id="btn-next" onclick="navEsp(1)" style="display:none">
                 <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
 
-        <div class="carr-rodape">
+        <div class="carr-rodape" id="carr-rodape" style="display:none">
             <span class="carr-nome" id="carr-nome"></span>
             <a class="carr-link" id="carr-link" href="#">Ver ficha completa →</a>
             <span class="carr-contador" id="carr-contador"></span>
         </div>
-    </div>
-
-    <!-- ── Botões de parte ───────────────────────── -->
-    <div class="partes">
-        <button class="parte-btn ativo" data-parte="folha"   onclick="setParte(this)">🍃 Folha</button>
-        <button class="parte-btn"       data-parte="flor"    onclick="setParte(this)">🌸 Flor</button>
-        <button class="parte-btn"       data-parte="fruto"   onclick="setParte(this)">🍎 Fruto</button>
-        <button class="parte-btn"       data-parte="caule"   onclick="setParte(this)">🌿 Caule</button>
-        <button class="parte-btn"       data-parte="semente" onclick="setParte(this)">🌱 Semente</button>
     </div>
 
     <!-- ── Lista de espécies ─────────────────────── -->
@@ -356,18 +358,16 @@ $j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
 </div>
 
 <script>
-const SLIDES    = <?= $j_slides ?>;
-const BASE      = '<?= APP_BASE ?>';
-let parteAtual  = 'folha';
-let idxEsp      = 0;   // índice na lista de espécies com imagens para a parte
-let idxImg      = 0;   // índice da imagem dentro da espécie
+const SLIDES   = <?= $j_slides ?>;
+const BASE     = '<?= APP_BASE ?>';
+let parteAtual = null;
+let idxEsp     = 0;
 
 function setParte(btn) {
     document.querySelectorAll('.parte-btn').forEach(b => b.classList.remove('ativo'));
     btn.classList.add('ativo');
     parteAtual = btn.dataset.parte;
     idxEsp = 0;
-    idxImg = 0;
     renderCarr();
 }
 
@@ -375,74 +375,65 @@ function navEsp(dir) {
     const lista = SLIDES[parteAtual] || [];
     if (!lista.length) return;
     idxEsp = (idxEsp + dir + lista.length) % lista.length;
-    idxImg = 0;
-    renderCarr();
-}
-
-function navImg(i) {
-    idxImg = i;
     renderCarr();
 }
 
 function renderCarr() {
-    const lista    = SLIDES[parteAtual] || [];
-    const img      = document.getElementById('carr-img');
-    const vazio    = document.getElementById('carr-vazio');
-    const nome     = document.getElementById('carr-nome');
-    const contador = document.getElementById('carr-contador');
-    const link     = document.getElementById('carr-link');
-    const dots     = document.getElementById('carr-dots');
-    const btnPrev  = document.getElementById('btn-prev');
-    const btnNext  = document.getElementById('btn-next');
+    const placeholder = document.getElementById('carr-placeholder');
+    const grade       = document.getElementById('carr-grade');
+    const vazio       = document.getElementById('carr-vazio');
+    const rodape      = document.getElementById('carr-rodape');
+    const nome        = document.getElementById('carr-nome');
+    const contador    = document.getElementById('carr-contador');
+    const link        = document.getElementById('carr-link');
+    const btnPrev     = document.getElementById('btn-prev');
+    const btnNext     = document.getElementById('btn-next');
 
-    if (!lista.length) {
-        img.style.display   = 'none';
-        vazio.style.display = 'flex';
-        nome.textContent    = '';
-        contador.textContent = '';
-        link.style.display  = 'none';
-        dots.innerHTML      = '';
-        btnPrev.disabled    = true;
-        btnNext.disabled    = true;
+    // Nenhuma parte selecionada ainda
+    if (!parteAtual) {
+        placeholder.style.display = 'flex';
+        grade.style.display       = 'none';
+        vazio.style.display       = 'none';
+        rodape.style.display      = 'none';
+        btnPrev.style.display     = 'none';
+        btnNext.style.display     = 'none';
         return;
     }
 
-    const esp  = lista[idxEsp];
-    const imgs = esp.imgs;
-    if (idxImg >= imgs.length) idxImg = 0;
+    const lista = SLIDES[parteAtual] || [];
+    placeholder.style.display = 'none';
 
-    // Troca suave
-    img.classList.add('trocando');
-    setTimeout(() => {
-        img.src = imgs[idxImg];
-        img.classList.remove('trocando');
-    }, 130);
-
-    img.style.display   = 'block';
-    vazio.style.display = 'none';
-    img.alt             = esp.nome;
-    nome.textContent    = esp.nome;
-    contador.textContent = (idxEsp + 1) + ' / ' + lista.length;
-    link.href           = BASE + '/src/Views/publico/especie_detalhes.php?id=' + esp.id;
-    link.style.display  = '';
-
-    btnPrev.disabled = lista.length <= 1;
-    btnNext.disabled = lista.length <= 1;
-
-    // Dots de sub-imagem
-    dots.innerHTML = '';
-    if (imgs.length > 1) {
-        imgs.forEach((_, i) => {
-            const d = document.createElement('button');
-            d.className = 'carr-dot' + (i === idxImg ? ' ativo' : '');
-            d.onclick   = () => navImg(i);
-            dots.appendChild(d);
-        });
+    if (!lista.length) {
+        grade.style.display   = 'none';
+        vazio.style.display   = 'flex';
+        vazio.innerHTML       = '<i class="fa-regular fa-image" style="font-size:2rem;color:#333;margin-bottom:8px"></i>Nenhuma imagem disponível para esta parte';
+        rodape.style.display  = 'none';
+        btnPrev.style.display = 'none';
+        btnNext.style.display = 'none';
+        return;
     }
-}
 
-// Inicia
-renderCarr();
+    const esp = lista[idxEsp];
+
+    // Monta grade com todas as imagens da espécie
+    grade.innerHTML = '';
+    esp.imgs.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = esp.nome;
+        grade.appendChild(img);
+    });
+
+    grade.style.display   = 'flex';
+    vazio.style.display   = 'none';
+    rodape.style.display  = 'flex';
+    btnPrev.style.display = lista.length > 1 ? 'flex' : 'none';
+    btnNext.style.display = lista.length > 1 ? 'flex' : 'none';
+
+    nome.textContent     = esp.nome;
+    contador.textContent = (idxEsp + 1) + ' / ' + lista.length;
+    link.href            = BASE + '/src/Views/publico/especie_detalhes.php?id=' + esp.id;
+}
 </script>
 </body>
 </html>
