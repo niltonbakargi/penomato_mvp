@@ -6,8 +6,10 @@
 session_start();
 require_once __DIR__ . '/../../../config/banco_de_dados.php';
 
-// Apenas aceita POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+// Aceita POST (busca por filtros) ou GET ?id=X (espécie individual)
+$modo_id = isset($_GET['id']) && is_numeric($_GET['id']);
+
+if (!$modo_id && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . APP_BASE . '/src/Views/publico/busca_caracteristicas.php');
     exit;
 }
@@ -16,35 +18,39 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // MONTAR WHERE DINAMICAMENTE
 // ================================================
 
-$campos_like = ['nome_cientifico_completo', 'nome_popular', 'familia'];
-$todos_campos = [
-    'nome_cientifico_completo', 'nome_popular', 'familia',
-    'forma_folha', 'filotaxia_folha', 'tipo_folha', 'divisao_folha', 'paridade_pinnacao',
-    'tamanho_folha', 'textura_folha', 'margem_folha', 'venacao_folha',
-    'cor_flores', 'simetria_floral', 'numero_petalas', 'tamanho_flor', 'disposicao_flores', 'aroma',
-    'tipo_fruto', 'tamanho_fruto', 'cor_fruto', 'textura_fruto', 'dispersao_fruto', 'aroma_fruto',
-    'tipo_semente', 'tamanho_semente', 'cor_semente', 'textura_semente', 'quantidade_sementes',
-    'tipo_caule', 'textura_caule', 'cor_caule', 'forma_caule', 'modificacao_caule',
-    'ramificacao_caule', 'possui_espinhos', 'possui_latex'
-];
+if ($modo_id) {
+    $where_sql  = 'WHERE e.id = ?';
+    $parametros = [(int)$_GET['id']];
+} else {
+    $campos_like = ['nome_cientifico_completo', 'nome_popular', 'familia'];
+    $todos_campos = [
+        'nome_cientifico_completo', 'nome_popular', 'familia',
+        'forma_folha', 'filotaxia_folha', 'tipo_folha', 'divisao_folha', 'paridade_pinnacao',
+        'tamanho_folha', 'textura_folha', 'margem_folha', 'venacao_folha',
+        'cor_flores', 'simetria_floral', 'numero_petalas', 'tamanho_flor', 'disposicao_flores', 'aroma',
+        'tipo_fruto', 'tamanho_fruto', 'cor_fruto', 'textura_fruto', 'dispersao_fruto', 'aroma_fruto',
+        'tipo_semente', 'tamanho_semente', 'cor_semente', 'textura_semente', 'quantidade_sementes',
+        'tipo_caule', 'textura_caule', 'cor_caule', 'forma_caule', 'modificacao_caule',
+        'ramificacao_caule', 'possui_espinhos', 'possui_latex'
+    ];
 
-// Mostrar todas as espécies com ao menos dados_internet
-$condicoes = ["e.status != 'sem_dados'"];
-$parametros = [];
+    $condicoes  = ["e.status != 'sem_dados'"];
+    $parametros = [];
 
-foreach ($todos_campos as $campo) {
-    $val = isset($_POST[$campo]) ? trim($_POST[$campo]) : '';
-    if ($val === '' || $val === 'todos') continue;
-    if (in_array($campo, $campos_like)) {
-        $condicoes[] = "c.$campo LIKE ?";
-        $parametros[] = '%' . $val . '%';
-    } else {
-        $condicoes[] = "c.$campo = ?";
-        $parametros[] = $val;
+    foreach ($todos_campos as $campo) {
+        $val = isset($_POST[$campo]) ? trim($_POST[$campo]) : '';
+        if ($val === '' || $val === 'todos') continue;
+        if (in_array($campo, $campos_like)) {
+            $condicoes[] = "c.$campo LIKE ?";
+            $parametros[] = '%' . $val . '%';
+        } else {
+            $condicoes[] = "c.$campo = ?";
+            $parametros[] = $val;
+        }
     }
-}
 
-$where_sql = 'WHERE ' . implode(' AND ', $condicoes);
+    $where_sql = 'WHERE ' . implode(' AND ', $condicoes);
+}
 
 // ================================================
 // QUERY PRINCIPAL — espécies com características

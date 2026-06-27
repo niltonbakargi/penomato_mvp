@@ -497,7 +497,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="/penomato_mvp/src/Views/publico/especie_detalhes.php" class="form-busca">
+        <form method="POST" action="/penomato_mvp/src/Views/publico/resultados_busca.php" class="form-busca">
 
             <!-- Barra sticky de ação -->
             <div class="barra-sticky">
