@@ -147,22 +147,18 @@ $j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
 
         .carr-stage {
             position: relative;
-            min-height: 200px;
+            height: 360px;
             display: flex; align-items: center; justify-content: center;
             background: #111;
         }
 
-        /* grade com todas as imagens da espécie */
-        .carr-grade {
-            display: flex; flex-wrap: wrap; gap: 6px;
-            padding: 10px; justify-content: center; align-items: flex-start;
-            width: 100%; box-sizing: border-box;
+        /* imagem única */
+        #carr-img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain; display: block;
+            transition: opacity .2s;
         }
-        .carr-grade img {
-            height: 220px; width: auto; max-width: 100%;
-            object-fit: cover; border-radius: 4px;
-            flex: 1 1 180px; max-height: 260px;
-        }
+        #carr-img.trocando { opacity: 0; }
 
         .carr-vazio {
             display: none;
@@ -314,13 +310,12 @@ $j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
                 <p>Selecione uma parte da planta acima<br>para visualizar as imagens</p>
             </div>
 
-            <!-- grade de imagens (oculta até selecionar parte) -->
-            <button class="carr-nav prev" id="btn-prev" onclick="navEsp(-1)" style="display:none">
+            <button class="carr-nav prev" id="btn-prev" onclick="navImg(-1)" style="display:none">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <div class="carr-grade" id="carr-grade" style="display:none"></div>
+            <img id="carr-img" src="" alt="" style="display:none">
             <div class="carr-vazio" id="carr-vazio"></div>
-            <button class="carr-nav next" id="btn-next" onclick="navEsp(1)" style="display:none">
+            <button class="carr-nav next" id="btn-next" onclick="navImg(1)" style="display:none">
                 <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
@@ -361,26 +356,53 @@ $j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
 const SLIDES   = <?= $j_slides ?>;
 const BASE     = '<?= APP_BASE ?>';
 let parteAtual = null;
-let idxEsp     = 0;
+let idxEsp     = 0;   // espécie atual
+let idxImg     = 0;   // imagem dentro da espécie atual
+
+// Total de imagens de todas as espécies para a parte
+function totalImgs(lista) {
+    return lista.reduce((s, e) => s + e.imgs.length, 0);
+}
+
+// Posição global (1-based) da imagem atual
+function posGlobal(lista) {
+    let pos = 0;
+    for (let i = 0; i < idxEsp; i++) pos += lista[i].imgs.length;
+    return pos + idxImg + 1;
+}
 
 function setParte(btn) {
     document.querySelectorAll('.parte-btn').forEach(b => b.classList.remove('ativo'));
     btn.classList.add('ativo');
     parteAtual = btn.dataset.parte;
     idxEsp = 0;
+    idxImg = 0;
     renderCarr();
 }
 
-function navEsp(dir) {
+function navImg(dir) {
     const lista = SLIDES[parteAtual] || [];
     if (!lista.length) return;
-    idxEsp = (idxEsp + dir + lista.length) % lista.length;
+
+    idxImg += dir;
+
+    // Passou do fim das imagens da espécie → próxima espécie
+    if (idxImg >= lista[idxEsp].imgs.length) {
+        idxEsp = (idxEsp + 1) % lista.length;
+        idxImg = 0;
+    }
+    // Voltou antes do início → espécie anterior, última imagem
+    else if (idxImg < 0) {
+        idxEsp = (idxEsp - 1 + lista.length) % lista.length;
+        idxImg = lista[idxEsp].imgs.length - 1;
+    }
+
     renderCarr();
 }
 
 function renderCarr() {
     const placeholder = document.getElementById('carr-placeholder');
-    const grade       = document.getElementById('carr-grade');
+    const carrImg     = document.getElementById('carr-img');
     const vazio       = document.getElementById('carr-vazio');
     const rodape      = document.getElementById('carr-rodape');
     const nome        = document.getElementById('carr-nome');
@@ -389,10 +411,9 @@ function renderCarr() {
     const btnPrev     = document.getElementById('btn-prev');
     const btnNext     = document.getElementById('btn-next');
 
-    // Nenhuma parte selecionada ainda
     if (!parteAtual) {
         placeholder.style.display = 'flex';
-        grade.style.display       = 'none';
+        carrImg.style.display     = 'none';
         vazio.style.display       = 'none';
         rodape.style.display      = 'none';
         btnPrev.style.display     = 'none';
@@ -404,7 +425,7 @@ function renderCarr() {
     placeholder.style.display = 'none';
 
     if (!lista.length) {
-        grade.style.display   = 'none';
+        carrImg.style.display = 'none';
         vazio.style.display   = 'flex';
         vazio.innerHTML       = '<i class="fa-regular fa-image" style="font-size:2rem;color:#333;margin-bottom:8px"></i>Nenhuma imagem disponível para esta parte';
         rodape.style.display  = 'none';
@@ -413,25 +434,26 @@ function renderCarr() {
         return;
     }
 
-    const esp = lista[idxEsp];
+    const esp  = lista[idxEsp];
+    const url  = esp.imgs[idxImg];
+    const tot  = totalImgs(lista);
 
-    // Monta grade com todas as imagens da espécie
-    grade.innerHTML = '';
-    esp.imgs.forEach(url => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = esp.nome;
-        grade.appendChild(img);
-    });
+    // Troca suave
+    carrImg.classList.add('trocando');
+    setTimeout(() => {
+        carrImg.src = url;
+        carrImg.alt = esp.nome;
+        carrImg.classList.remove('trocando');
+    }, 120);
 
-    grade.style.display   = 'flex';
+    carrImg.style.display = 'block';
     vazio.style.display   = 'none';
     rodape.style.display  = 'flex';
-    btnPrev.style.display = lista.length > 1 ? 'flex' : 'none';
-    btnNext.style.display = lista.length > 1 ? 'flex' : 'none';
+    btnPrev.style.display = tot > 1 ? 'flex' : 'none';
+    btnNext.style.display = tot > 1 ? 'flex' : 'none';
 
     nome.textContent     = esp.nome;
-    contador.textContent = (idxEsp + 1) + ' / ' + lista.length;
+    contador.textContent = posGlobal(lista) + ' / ' + tot;
     link.href            = BASE + '/src/Views/publico/especie_detalhes.php?id=' + esp.id;
 }
 </script>
