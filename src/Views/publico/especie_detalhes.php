@@ -366,7 +366,18 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             font-family: 'Playfair Display', serif;
             font-size: 1.1rem; font-style: italic;
             color: var(--cor-primaria); margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
         }
+        .btn-falar {
+            background: none; border: none; cursor: pointer;
+            color: var(--cor-primaria); opacity: 0.55;
+            font-size: 0.85rem; padding: 2px 4px;
+            transition: opacity .2s;
+            flex-shrink: 0;
+        }
+        .btn-falar:hover { opacity: 1; }
+        .btn-falar.falando { opacity: 1; color: #e07b00; animation: pulsar .6s infinite alternate; }
+        @keyframes pulsar { from { opacity: .6; } to { opacity: 1; } }
         .ficha-status {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 3px 12px; border-radius: 20px;
@@ -1551,7 +1562,12 @@ foreach ($especies as $esp):
         <?php if ($esp['nome_popular']): ?>
         <div class="ficha-popular"><?= htmlspecialchars(strtoupper($esp['nome_popular'])) ?></div>
         <?php endif; ?>
-        <div class="ficha-cientifico"><?= htmlspecialchars($esp['nome']) ?></div>
+        <div class="ficha-cientifico">
+            <?= htmlspecialchars($esp['nome']) ?>
+            <button class="btn-falar" onclick="falarNome(this)" data-nome="<?= htmlspecialchars($esp['nome']) ?>" title="Ouvir pronúncia" aria-label="Ouvir pronúncia do nome científico">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+        </div>
         <div class="ficha-meta-linha">
             <?php if ($esp['status'] && $esp['status'] !== 'sem_dados'): ?>
             <span class="ficha-status <?= $st_cls ?>"><?= htmlspecialchars($st_lbl) ?></span>
@@ -1658,6 +1674,18 @@ function fecharLightbox(e) {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') fecharLightbox(null);
 });
+
+function falarNome(btn) {
+    if (!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const nome = btn.dataset.nome;
+    const u = new SpeechSynthesisUtterance(nome);
+    u.lang = 'it-IT';
+    u.rate = 0.82;
+    btn.classList.add('falando');
+    u.onend = u.onerror = () => btn.classList.remove('falando');
+    speechSynthesis.speak(u);
+}
 </script>
 </body>
 </html>
