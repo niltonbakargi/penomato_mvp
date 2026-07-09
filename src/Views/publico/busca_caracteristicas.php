@@ -243,18 +243,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
         .secao h2 {
             font-size: var(--texto-xl);
             color: var(--cor-primaria);
-            margin-bottom: var(--esp-5);
+            margin-bottom: 0;
             font-weight: var(--peso-medio);
             display: flex;
             align-items: center;
             gap: var(--esp-2);
+            cursor: pointer;
+            user-select: none;
         }
+        .secao h2::after {
+            content: '›';
+            font-size: 1.5em;
+            line-height: 1;
+            color: var(--cinza-300);
+            transition: transform 0.2s ease;
+            display: inline-block;
+            margin-left: auto;
+            padding-left: var(--esp-4);
+        }
+        .secao.aberta h2 { margin-bottom: var(--esp-5); }
+        .secao.aberta h2::after { transform: rotate(90deg); }
 
         .grid-filtros {
-            display: grid;
+            display: none;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: var(--esp-5);
         }
+        .secao.aberta .grid-filtros { display: grid; }
 
         .filtro-item { display: flex; flex-direction: column; }
 
@@ -1008,6 +1023,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
     </div>
     
 <script>
+    // ── ACCORDION ────────────────────────────────────────────────
+    document.querySelectorAll('.secao h2').forEach(function (h2) {
+        h2.addEventListener('click', function () {
+            this.closest('.secao').classList.toggle('aberta');
+        });
+    });
+
     // ── CASCATA tipo_folha → divisao → paridade ──────────────────
     (function () {
         var divPinadas = ['Pinnada','Bipinnada','Tripinnada'];
