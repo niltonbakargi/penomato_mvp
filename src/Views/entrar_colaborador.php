@@ -51,10 +51,11 @@ $todos_botoes = [
         'link'  => '/penomato_mvp/src/Views/cadastrar_exemplar.php',
     ],
     'registrar_imagens' => [
-        'icon'  => '📷',
-        'label' => 'Registrar Imagens',
-        'desc'  => 'Envie exsicatas digitais e fotos de habitat para o acervo científico.',
-        'link'  => '/penomato_mvp/src/Views/enviar_imagem.php',
+        'icon'    => '📷',
+        'label'   => 'Adicionar Imagens',
+        'desc'    => 'Envie imagens da internet ou exsicatas de campo para o acervo científico.',
+        'link'    => '#',
+        'onclick' => 'abrirSubMenuImagens()',
     ],
     'contestar' => [
         'icon'  => '⚠️',
@@ -298,9 +299,18 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
             $b = $todos_botoes[$chave];
             $breve = !empty($b['breve']);
         ?>
-        <a href="<?php echo $breve ? '#' : $b['link']; ?>"
+        <?php
+            $href    = $breve ? '#' : $b['link'];
+            $onclick = '';
+            if ($breve) {
+                $onclick = 'onclick="return false;"';
+            } elseif (!empty($b['onclick'])) {
+                $onclick = 'onclick="' . htmlspecialchars($b['onclick']) . '; return false;"';
+            }
+        ?>
+        <a href="<?php echo $href; ?>"
            class="action-btn<?php echo $breve ? ' em-breve' : ''; ?>"
-           <?php echo $breve ? 'onclick="return false;"' : ''; ?>>
+           <?php echo $onclick; ?>>
             <?php if ($breve): ?>
                 <span class="badge-breve">Em breve</span>
             <?php endif; ?>
@@ -314,6 +324,86 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
     <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
         🚪 Sair
     </button>
+
+<!-- ══ Overlay sub-menu Adicionar Imagens ══ -->
+<div id="overlay-imagens" style="
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.5); z-index:9999;
+    align-items:center; justify-content:center;">
+    <div style="
+        background:var(--branco); border-radius:var(--raio-lg);
+        padding:var(--esp-8) var(--esp-6); width:100%; max-width:480px;
+        margin:var(--esp-5); box-shadow:0 20px 50px rgba(0,0,0,.25);
+        position:relative;">
+
+        <button onclick="fecharSubMenuImagens()" style="
+            position:absolute; top:var(--esp-3); right:var(--esp-4);
+            background:none; border:none; font-size:1.4rem;
+            color:var(--cinza-400); cursor:pointer; line-height:1;"
+            aria-label="Fechar">&times;</button>
+
+        <h2 style="
+            font-size:var(--texto-base); font-weight:var(--peso-semi);
+            color:var(--cor-primaria); margin-bottom:var(--esp-2);">
+            📷 Adicionar Imagens
+        </h2>
+        <p style="font-size:var(--texto-xs); color:var(--cinza-400); margin-bottom:var(--esp-6);">
+            Escolha o tipo de imagem que deseja enviar ao acervo.
+        </p>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--esp-4);">
+
+            <a href="/penomato_mvp/src/Views/adicionar_imagens_internet.php"
+               style="
+                border:2px solid var(--cor-primaria); border-radius:var(--raio-lg);
+                padding:var(--esp-6) var(--esp-4); text-align:center;
+                text-decoration:none; color:var(--cor-primaria);
+                font-weight:var(--peso-semi); font-size:var(--texto-sm);
+                transition:var(--transicao); display:block;"
+               onmouseover="this.style.background='var(--cor-primaria)';this.style.color='var(--branco)'"
+               onmouseout="this.style.background='';this.style.color='var(--cor-primaria)'">
+                <span style="font-size:var(--texto-2xl); display:block; margin-bottom:var(--esp-2);">🌐</span>
+                Imagens da Internet
+                <div style="font-size:var(--texto-xs); font-weight:400; opacity:.7; margin-top:var(--esp-1); line-height:1.35;">
+                    Adicione imagens com fonte, URL e licença.
+                </div>
+            </a>
+
+            <a href="/penomato_mvp/src/Views/enviar_imagem.php"
+               style="
+                border:2px solid var(--cor-primaria); border-radius:var(--raio-lg);
+                padding:var(--esp-6) var(--esp-4); text-align:center;
+                text-decoration:none; color:var(--cor-primaria);
+                font-weight:var(--peso-semi); font-size:var(--texto-sm);
+                transition:var(--transicao); display:block;"
+               onmouseover="this.style.background='var(--cor-primaria)';this.style.color='var(--branco)'"
+               onmouseout="this.style.background='';this.style.color='var(--cor-primaria)'">
+                <span style="font-size:var(--texto-2xl); display:block; margin-bottom:var(--esp-2);">🌿</span>
+                Registrar Exsicatas
+                <div style="font-size:var(--texto-xs); font-weight:400; opacity:.7; margin-top:var(--esp-1); line-height:1.35;">
+                    Fotos de campo por partes do exemplar.
+                </div>
+            </a>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirSubMenuImagens() {
+    const o = document.getElementById('overlay-imagens');
+    o.style.display = 'flex';
+}
+function fecharSubMenuImagens() {
+    document.getElementById('overlay-imagens').style.display = 'none';
+}
+document.getElementById('overlay-imagens').addEventListener('click', function(e) {
+    if (e.target === this) fecharSubMenuImagens();
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') fecharSubMenuImagens();
+});
+</script>
 
 </body>
 </html>
