@@ -140,7 +140,8 @@ function buildPrancha(array $imagens_por_parte, array $partes_label): string
         if (empty($imagens_por_parte[$parte])) continue;
         $imgs = $imagens_por_parte[$parte];
 
-        // Cabeçalho da parte
+        // Cada parte começa numa nova página com título no topo
+        $html .= '<div class="parte-pagina">';
         $html .= '<table class="parte-header"><tr>';
         $html .= '<td class="parte-header-linha"></td>';
         $html .= '<td class="parte-header-nome">' . htmlspecialchars(strtoupper($label)) . '</td>';
@@ -173,6 +174,7 @@ function buildPrancha(array $imagens_por_parte, array $partes_label): string
             $html .= '</tr>';
         }
         $html .= '</tbody></table>';
+        $html .= '</div>'; // /parte-pagina
     }
 
     $html .= '</div>';
@@ -308,24 +310,29 @@ body {
     margin: 8pt 0 0 0;
 }
 
+/* Nova página por parte da planta */
+.parte-pagina {
+    page-break-before: always;
+}
+
 /* Cabeçalho de cada parte (linha ━━ NOME ━━) */
 .parte-header {
     width: 100%;
     border-collapse: collapse;
-    margin: 18pt 0 10pt 0;
+    margin: 0 0 18pt 0;
 }
 
 .parte-header-linha {
-    border-top: 1px solid #0b5e42;
-    width: 38%;
+    border-top: 2px solid #0b5e42;
+    width: 35%;
 }
 
 .parte-header-nome {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 8.5pt; font-weight: bold;
-    letter-spacing: 3px; color: #0b5e42;
+    font-size: 14pt; font-weight: bold;
+    letter-spacing: 5px; color: #0b5e42;
     text-align: center;
-    padding: 0 10pt;
+    padding: 0 14pt;
     white-space: nowrap;
 }
 
