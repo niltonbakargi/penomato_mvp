@@ -5,6 +5,7 @@
 
 session_start();
 require_once __DIR__ . '/../../../config/banco_de_dados.php';
+require_once __DIR__ . '/../../helpers/autores_artigo.php';
 
 // Aceita POST (busca por filtros) ou GET ?id=X (espécie individual)
 $modo_id = isset($_GET['id']) && is_numeric($_GET['id']);
@@ -439,11 +440,12 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         }
 
         /* Artigo dentro da ficha: tipografia limpa, sem títulos duplos */
-        .ficha-artigo-texto { overflow-y: auto; max-height: 600px; }
         .ficha-artigo-texto .art-titulo,
         .ficha-artigo-texto .art-familia,
         .ficha-artigo-texto .art-sinonimos,
-        .ficha-artigo-texto .art-nomes    { display: none; } /* já estão no cabeçalho da ficha */
+        .ficha-artigo-texto .art-nomes,
+        .ficha-artigo-texto .art-autores,
+        .ficha-artigo-texto style       { display: none; }
         .ficha-artigo-texto .art-secao {
             font-family: 'Playfair Display', serif;
             font-size: 1rem; font-weight: 700; font-style: italic;
@@ -457,10 +459,37 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             color: #2c2c2c; text-align: justify;
             text-indent: 1.2em; margin-bottom: 0;
         }
-        .ficha-artigo-texto .art-galeria,
-        .ficha-artigo-texto .art-refs,
-        .ficha-artigo-texto .art-autores,
-        .ficha-artigo-texto style       { display: none; }
+        /* Galeria de imagens do artigo */
+        .ficha-artigo-texto .art-galeria {
+            display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0;
+        }
+        .ficha-artigo-texto .art-figura {
+            text-align: center;
+        }
+        .ficha-artigo-texto .art-figura img {
+            max-width: 180px; max-height: 130px;
+            border-radius: 6px; border: 1px solid #e2d5c6;
+            object-fit: cover; display: block; margin: 0 auto;
+        }
+        .ficha-artigo-texto .art-figura figcaption,
+        .ficha-artigo-texto .art-figura-titulo {
+            font-size: .72rem; color: #7a6a56; margin-top: 4px;
+            font-style: italic; max-width: 180px; line-height: 1.3;
+        }
+        /* Referências */
+        .ficha-artigo-texto .art-refs {
+            font-size: .82rem; line-height: 1.6;
+            padding-left: 18px; color: #3a3a3a;
+        }
+        .ficha-artigo-texto .art-refs li { margin-bottom: 5px; }
+        .ficha-artigo-texto .art-ref { font-size: .72rem; color: var(--cor-primaria); vertical-align: super; }
+        /* Links clicáveis das referências (adicionados via JS) */
+        .sup-link {
+            color: var(--cor-primaria); text-decoration: none;
+            font-weight: 700; font-size: .75em; vertical-align: super;
+            border-bottom: 1px dotted var(--cor-primaria);
+        }
+        .sup-link:hover { color: var(--cor-primaria-hover); }
 
         /* ── GALERIA: linha por parte ── */
         .ficha-imgs {
@@ -514,6 +543,42 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
         .art-st-aprovado:hover { background: #0e7490; }
         .art-st-publicado  { background: var(--cor-primaria); }
         .art-st-publicado:hover { background: var(--cor-primaria-hover); }
+
+        /* ── CRÉDITOS ── */
+        .ficha-creditos {
+            padding: 20px 32px;
+            border-top: 1px solid #e5ddd4;
+            background: #faf8f5;
+        }
+        .creditos-titulo {
+            font-size: .68rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .1em;
+            color: #94a3b8; margin-bottom: 12px;
+            padding-bottom: 8px; border-bottom: 1px solid #e5ddd4;
+        }
+        .creditos-pessoas {
+            display: flex; flex-wrap: wrap; gap: 10px 24px; margin-bottom: 14px;
+        }
+        .credito-pessoa { display: flex; align-items: center; gap: 6px; }
+        .credito-pessoa-nome { font-size: .875rem; font-weight: 600; color: #1e293b; }
+        .credito-pessoa-nums { display: flex; gap: 3px; }
+        .credito-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--cor-primaria); color: white;
+            font-size: .62rem; font-weight: 700; cursor: default;
+        }
+        .creditos-legenda {
+            border-top: 1px solid #ede8e0; padding-top: 10px;
+            display: flex; flex-wrap: wrap; gap: 6px 20px;
+        }
+        .legenda-item { display: flex; align-items: center; gap: 5px; font-size: .75rem; color: #64748b; }
+        .legenda-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: #e2e8f0; color: #475569;
+            font-size: .6rem; font-weight: 700; flex-shrink: 0;
+        }
 
         /* ── LIGHTBOX ── */
         .lightbox {
@@ -1544,8 +1609,40 @@ $status_label = [
     'sem_dados'      => 'Sem dados',
 ];
 
+$legenda_acoes = [
+    1 => 'Adicionou dados da internet',
+    2 => 'Confirmou os dados morfológicos',
+    3 => 'Registrou as imagens',
+    4 => 'Fez a revisão científica',
+    5 => 'Publicou',
+];
+$papel_para_num = [
+    'Compilação de dados'   => 1,
+    'Validação morfológica' => 2,
+    'Coleta de campo'       => 3,
+    'Revisão científica'    => 4,
+    'Gestão editorial'      => 5,
+];
+
 foreach ($especies as $esp):
     $espId   = $esp['id'];
+
+    // Autores com papéis para seção de créditos
+    $autores_credito = montarAutoresArtigo($pdo, $espId);
+    $acoes_usadas = [];
+    foreach ($autores_credito as &$ac) {
+        $nums = [];
+        foreach ($ac['papeis'] as $papel) {
+            foreach ($papel_para_num as $chave => $num) {
+                if (str_starts_with($papel, $chave)) { $nums[] = $num; break; }
+            }
+        }
+        sort($nums);
+        $ac['numeros'] = $nums;
+        foreach ($nums as $n) $acoes_usadas[$n] = true;
+    }
+    unset($ac);
+    ksort($acoes_usadas);
     $imgs_esp = $imagens[$espId] ?? [];
 
     // Foto principal: habito primeiro, senão qualquer parte disponível
@@ -1603,11 +1700,7 @@ foreach ($especies as $esp):
         <!-- Texto do artigo -->
         <div class="ficha-attrs ficha-artigo-texto">
         <?php if (!empty($esp['artigo_html'])):
-            $html_ficha = $esp['artigo_html'];
-            $html_ficha = str_replace('<h3 class="art-secao">Prancha Fotográfica</h3>', '', $html_ficha);
-            $html_ficha = str_replace('<h3 class="art-secao">Referências</h3>', '', $html_ficha);
-            $html_ficha = preg_replace('/<sup class="art-ref">\[[\d,]+\]<\/sup>/', '', $html_ficha);
-            echo $html_ficha;
+            echo $esp['artigo_html'];
         else: ?>
             <p class="ficha-sem-attrs">Artigo ainda não gerado para esta espécie.</p>
         <?php endif; ?>
@@ -1649,6 +1742,40 @@ foreach ($especies as $esp):
         </div>
 
     </div><!-- /ficha-corpo -->
+
+    <!-- Créditos -->
+    <?php if ($autores_credito): ?>
+    <div class="ficha-creditos">
+        <div class="creditos-titulo"><i class="fas fa-users"></i> Contribuições</div>
+        <div class="creditos-pessoas">
+            <?php foreach ($autores_credito as $a): ?>
+            <div class="credito-pessoa">
+                <span class="credito-pessoa-nome"><?= htmlspecialchars($a['nome']) ?></span>
+                <?php if ($a['numeros']): ?>
+                <span class="credito-pessoa-nums">
+                    <?php foreach ($a['numeros'] as $n): ?>
+                    <span class="credito-num" title="<?= htmlspecialchars($legenda_acoes[$n]) ?>"><?= $n ?></span>
+                    <?php endforeach; ?>
+                </span>
+                <?php endif; ?>
+            </div>
+            <?php endforeach; ?>
+            <div class="credito-pessoa">
+                <span class="credito-pessoa-nome" style="color:#94a3b8;">Penomato — UFMS / UEMS</span>
+            </div>
+        </div>
+        <?php if ($acoes_usadas): ?>
+        <div class="creditos-legenda">
+            <?php foreach ($acoes_usadas as $n => $_): ?>
+            <div class="legenda-item">
+                <span class="legenda-num"><?= $n ?></span>
+                <span><?= htmlspecialchars($legenda_acoes[$n]) ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
 
     <!-- Rodapé -->
     <div class="ficha-rodape">
@@ -1702,6 +1829,28 @@ function falarNome(btn) {
     u.onend = u.onerror = () => btn.classList.remove('falando');
     speechSynthesis.speak(u);
 }
+
+// Referências clicáveis (âncoras para a lista de referências)
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.ficha-artigo-texto .art-refs li').forEach(function (li, i) {
+        li.id = 'ref-' + (i + 1);
+        li.style.scrollMarginTop = '70px';
+        li.innerHTML = li.innerHTML.replace(
+            /(https?:\/\/[^\s<"]+)/g,
+            '<a href="$1" target="_blank" rel="noopener" style="color:var(--cor-primaria);word-break:break-all;">$1</a>'
+        );
+    });
+    document.querySelectorAll('.ficha-artigo-texto sup.art-ref').forEach(function (sup) {
+        var texto = sup.textContent.trim().replace(/[\[\]]/g, '');
+        var numeros = texto.split(',').map(function (n) { return n.trim(); });
+        sup.innerHTML = numeros.map(function (n) {
+            var ref = document.getElementById('ref-' + n);
+            return ref
+                ? '<a href="#ref-' + n + '" class="sup-link" title="Ver referência ' + n + '">[' + n + ']</a>'
+                : '[' + n + ']';
+        }).join(',');
+    });
+});
 </script>
 </body>
 </html>
