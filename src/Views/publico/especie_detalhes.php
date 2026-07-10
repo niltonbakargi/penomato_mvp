@@ -492,16 +492,30 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             text-transform: uppercase; letter-spacing: .12em;
             color: #a0876a; margin-bottom: 5px;
         }
-        .galeria-thumbs { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+        .galeria-thumbs { display: flex; flex-wrap: nowrap; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; align-items: flex-start; }
+        .thumb-wrap { flex-shrink: 0; width: 140px; display: flex; flex-direction: column; gap: 5px; }
         .thumb {
             width: 140px; height: 110px; border-radius: 8px;
             overflow: hidden; cursor: zoom-in;
             border: 2px solid transparent;
             transition: border-color .15s, transform .15s;
-            flex-shrink: 0;
         }
         .thumb:hover { border-color: var(--cor-primaria); transform: scale(1.03); }
         .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .thumb-caption {
+            font-size: .68rem; line-height: 1.3; color: #7a6a56;
+            text-align: center; padding: 0 2px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .thumb-caption a {
+            color: var(--cor-primaria); text-decoration: underline;
+            text-underline-offset: 2px; font-weight: 600;
+        }
+        .thumb-caption a:hover { color: var(--cor-primaria-hover); }
+        .thumb-licenca {
+            display: block; font-size: .62rem; color: #a0876a;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
 
         /* ── RODAPÉ DA FICHA ── */
         .ficha-rodape {
@@ -1710,13 +1724,29 @@ foreach ($especies as $esp):
                     <div class="galeria-thumbs">
                     <?php foreach (array_slice($imgs_esp[$parte], 0, 5) as $img):
                         $cred_parts = [];
-                        if ($img['autor'])  $cred_parts[] = addslashes($img['autor']);
-                        if ($img['fonte'])  $cred_parts[] = addslashes($img['fonte']);
+                        if ($img['autor'])   $cred_parts[] = addslashes($img['autor']);
+                        if ($img['fonte'])   $cred_parts[] = addslashes($img['fonte']);
                         if ($img['licenca']) $cred_parts[] = '(' . addslashes($img['licenca']) . ')';
-                        $cred_str = implode(' · ', $cred_parts);
+                        $cred_str    = implode(' · ', $cred_parts);
+                        $fonte_url_js = addslashes($img['fonte_url'] ?? '');
+                        $caption_txt  = htmlspecialchars($img['autor'] ?: ($img['fonte'] ?: ''));
                     ?>
-                        <div class="thumb" onclick="abrirLightbox('<?= addslashes($img['url']) ?>', '<?= $cred_str ?>')">
-                            <img src="<?= htmlspecialchars($img['url']) ?>" alt="<?= htmlspecialchars($parte_label) ?>" loading="lazy">
+                        <div class="thumb-wrap">
+                            <div class="thumb" onclick="abrirLightbox('<?= addslashes($img['url']) ?>', '<?= $cred_str ?>', '<?= $fonte_url_js ?>')">
+                                <img src="<?= htmlspecialchars($img['url']) ?>" alt="<?= htmlspecialchars($parte_label) ?>" loading="lazy">
+                            </div>
+                            <?php if ($caption_txt): ?>
+                            <div class="thumb-caption">
+                                <?php if (!empty($img['fonte_url'])): ?>
+                                <a href="<?= htmlspecialchars($img['fonte_url']) ?>" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Ver fonte da imagem"><?= $caption_txt ?></a>
+                                <?php else: ?>
+                                <span><?= $caption_txt ?></span>
+                                <?php endif; ?>
+                                <?php if ($img['licenca']): ?>
+                                <span class="thumb-licenca"><?= htmlspecialchars($img['licenca']) ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                     </div>
@@ -1787,9 +1817,16 @@ foreach ($especies as $esp):
 </div><!-- /paginas -->
 
 <script>
-function abrirLightbox(url, credito) {
+function abrirLightbox(url, credito, fonteUrl) {
     document.getElementById('lightbox-img').src = url;
-    document.getElementById('lightbox-credito').textContent = credito || '';
+    var lc = document.getElementById('lightbox-credito');
+    if (fonteUrl) {
+        lc.innerHTML = '<a href="' + fonteUrl + '" target="_blank" rel="noopener" style="color:#93c5fd;text-decoration:underline;text-underline-offset:3px;">'
+            + (credito || fonteUrl)
+            + ' <i class="fas fa-arrow-up-right-from-square" style="font-size:.75em;"></i></a>';
+    } else {
+        lc.textContent = credito || '';
+    }
     document.getElementById('lightbox').classList.add('ativo');
     document.body.style.overflow = 'hidden';
 }
