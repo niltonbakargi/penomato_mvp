@@ -618,8 +618,11 @@ $ast_info = $artigo_status_info[$artigo['artigo_status']] ?? $artigo_status_info
 
     <!-- Ações -->
     <div class="acoes">
-        <button class="btn-acao btn-imprimir" onclick="window.print()">
-            <i class="fas fa-print"></i> Imprimir / PDF
+        <a href="<?= APP_BASE ?>/src/Views/publico/gerar_pdf.php?id=<?= $especie_id ?>" target="_blank" class="btn-acao btn-imprimir">
+            <i class="fas fa-file-pdf"></i> Baixar PDF
+        </a>
+        <button class="btn-acao btn-busca" onclick="window.print()" style="cursor:pointer;border:none;">
+            <i class="fas fa-print"></i> Imprimir
         </button>
         <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php" class="btn-acao btn-busca">
             <i class="fas fa-search"></i> Nova busca

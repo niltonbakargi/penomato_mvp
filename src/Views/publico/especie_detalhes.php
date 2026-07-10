@@ -1662,8 +1662,8 @@ foreach ($especies as $esp):
         $ast = $artigo_status_label[$esp['artigo_status']] ?? null;
         ?>
         <?php if (!empty($esp['artigo_html']) && $ast): ?>
-        <a href="<?= APP_BASE ?>/src/Views/publico/artigo.php?id=<?= $espId ?>" class="btn-artigo-completo <?= $ast['cls'] ?>">
-            <i class="fas <?= $ast['icon'] ?>"></i> Ver artigo — <?= $ast['label'] ?>
+        <a href="<?= APP_BASE ?>/src/Views/publico/gerar_pdf.php?id=<?= $espId ?>" target="_blank" class="btn-artigo-completo <?= $ast['cls'] ?>">
+            <i class="fas fa-file-pdf"></i> Ver PDF — <?= $ast['label'] ?>
         </a>
         <?php else: ?>
         <span class="btn-sem-artigo">Artigo ainda não gerado</span>
