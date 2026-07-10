@@ -478,7 +478,7 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             text-transform: uppercase; letter-spacing: .12em;
             color: #a0876a; margin-bottom: 5px;
         }
-        .galeria-thumbs { display: flex; flex-wrap: nowrap; gap: 8px; }
+        .galeria-thumbs { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
         .thumb {
             width: 140px; height: 110px; border-radius: 8px;
             overflow: hidden; cursor: zoom-in;
@@ -544,6 +544,16 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             .ficha-cab, .ficha-attrs, .ficha-imgs { padding-left: 16px; padding-right: 16px; }
             .ficha-popular { font-size: 1.4rem; }
             .thumb { width: 100px; height: 80px; }
+            .ficha-rodape { flex-wrap: wrap; justify-content: center; padding: 12px 16px; }
+            .paginas { padding: 16px 10px 60px; gap: 32px; }
+        }
+        @media (max-width: 420px) {
+            .ficha-popular { font-size: 1.2rem; }
+            .header-logo { font-size: 1rem; }
+            .header-count { display: none; }
+            .btn-voltar { padding: 6px 12px; font-size: .8rem; }
+            .ficha-cab { padding-top: 16px; padding-bottom: 12px; }
+            .thumb { width: 80px; height: 66px; }
         }
 
         /* ── HEADER ── */

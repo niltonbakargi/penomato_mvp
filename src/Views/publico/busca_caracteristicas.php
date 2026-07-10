@@ -266,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
 
         .grid-filtros {
             display: none;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
             gap: var(--esp-5);
         }
         .secao.aberta .grid-filtros { display: grid; }
@@ -526,7 +526,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
             </div>
 
             <!-- Busca por nome -->
-            <div class="secao">
+            <div class="secao aberta">
                 <h2>📌 Nome da Espécie</h2>
                 <div class="grid-filtros">
                     <div class="filtro-item">

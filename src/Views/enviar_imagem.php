@@ -328,6 +328,18 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
         /* Chip do exemplar no modal */
         .exemplar-chip { background:#fff8e6; border:1px solid #f59e0b; border-radius:8px; padding:8px 14px; margin-bottom:16px; font-size:.85rem; color:#92400e; display:flex; align-items:center; gap:8px; }
         .exemplar-chip strong { font-family:'Courier New',monospace; font-size:1rem; letter-spacing:1px; }
+
+        /* ── Mobile ── */
+        @media (max-width: 600px) {
+            body { padding: var(--esp-3) var(--esp-3); }
+            .cabecalho { padding: 16px 18px; }
+            .cabecalho h1 { font-size: 1.3rem; }
+            .card-principal { padding: 18px 16px; }
+            .seletor-row .fg { min-width: 100%; }
+            .exemplares-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .partes-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .parte-card { padding: 14px 8px; }
+        }
     </style>
 </head>
 <body>

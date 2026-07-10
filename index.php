@@ -316,12 +316,18 @@ $url_painel = ($tipo === 'gestor')
         }
 
         @media (max-width: 576px) {
-            .home-body { padding: 30px 20px; }
-            .home-header { padding: 30px 20px; }
-            .home-header h1 { font-size: 2rem; }
-            .search-card { padding: 30px 20px; }
-            .auth-buttons { flex-direction: column; }
-            .btn-auth { width: 100%; }
+            .home-body { padding: 24px 16px; }
+            .home-header { padding: 24px 16px; }
+            .home-header h1 { font-size: 1.8rem; }
+            .home-header p { font-size: .95rem; }
+            .logo-icon { width: 80px; height: 80px; font-size: 3.2rem; margin-bottom: 14px; }
+            .search-card { padding: 24px 18px; margin-bottom: 20px; }
+            .search-icon { font-size: 3rem; margin-bottom: 12px; }
+            .search-title { font-size: 1.3rem; margin-bottom: 8px; }
+            .search-desc { font-size: .9rem; margin-bottom: 16px; }
+            .btn-search { padding: 12px 32px; font-size: .95rem; }
+            .auth-buttons { flex-direction: column; gap: 10px; }
+            .btn-auth { width: 100%; min-width: unset; }
         }
     </style>
 </head>

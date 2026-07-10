@@ -262,10 +262,19 @@ $j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
         .sem-resultado i { font-size: 2.5rem; color: #ddd; margin-bottom: 16px; display: block; }
 
         @media (max-width: 560px) {
-            .carr-stage { height: 240px; }
+            .carr-stage { height: 220px; }
             .item-familia { display: none; }
-            .topo { padding: 12px 16px; }
-            .wrapper { padding: 16px 12px 60px; }
+            .topo { padding: 10px 12px; gap: 8px; }
+            .topo-titulo { font-size: .85rem; }
+            .wrapper { padding: 14px 10px 60px; }
+            .partes { gap: 6px; }
+            .parte-btn { padding: 7px 13px; font-size: .82rem; }
+            .carr-rodape { padding: 10px 14px 12px; gap: 8px; }
+        }
+        @media (max-width: 400px) {
+            .topo-titulo { display: none; }
+            .carr-stage { height: 190px; }
+            .parte-btn { padding: 6px 11px; font-size: .78rem; }
         }
     </style>
 </head>
@@ -359,6 +368,17 @@ let parteAtual = null;
 let idxEsp     = 0;   // espécie atual
 let idxImg     = 0;   // imagem dentro da espécie atual
 
+// Auto-seleciona a primeira parte que tem imagens ao carregar
+document.addEventListener('DOMContentLoaded', function() {
+    const ordem = ['folha', 'flor', 'fruto', 'caule', 'semente'];
+    for (const p of ordem) {
+        if (SLIDES[p] && SLIDES[p].length > 0) {
+            const btn = document.querySelector('[data-parte="' + p + '"]');
+            if (btn) { setParte(btn); break; }
+        }
+    }
+});
+
 // Total de imagens de todas as espécies para a parte
 function totalImgs(lista) {
     return lista.reduce((s, e) => s + e.imgs.length, 0);
@@ -398,6 +418,19 @@ function navImg(dir) {
     }
 
     renderCarr();
+}
+
+// ── Touch swipe no carrossel ─────────────────────────────────
+let _txStart = 0;
+const carrStage = document.getElementById('carr-stage');
+if (carrStage) {
+    carrStage.addEventListener('touchstart', function(e) {
+        _txStart = e.touches[0].clientX;
+    }, { passive: true });
+    carrStage.addEventListener('touchend', function(e) {
+        const diff = _txStart - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) navImg(diff > 0 ? 1 : -1);
+    }, { passive: true });
 }
 
 function renderCarr() {

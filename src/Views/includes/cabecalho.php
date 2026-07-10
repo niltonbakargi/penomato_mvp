@@ -386,7 +386,7 @@ function menuAtivo($url, $pagina_atual) {
 <!-- NAVBAR PRINCIPAL -->
 <!-- ============================================================ -->
 
-<nav class="navbar navbar-expand-lg navbar-penomato" id="mainNavbar">
+<nav class="navbar navbar-expand-lg navbar-dark navbar-penomato" id="mainNavbar">
     <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand" href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php">

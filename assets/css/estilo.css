@@ -25,7 +25,9 @@
   /* Neutros */
   --cinza-900: #1a2634;
   --cinza-800: #2c3e50;
+  --cinza-700: #334155;
   --cinza-600: #475569;
+  --cinza-500: #64748b;
   --cinza-400: #94a3b8;
   --cinza-300: #cbd5e1;
   --cinza-200: #e2e8f0;
@@ -79,6 +81,7 @@
   --texto-xl:   1.4rem;    /*  ~22px   */
   --texto-2xl:  1.75rem;   /*  ~28px   */
   --texto-3xl:  2.2rem;    /*  ~35px   */
+  --texto-4xl:  3rem;      /*   48px   */
 
   --peso-normal:   400;
   --peso-medio:    500;
@@ -99,6 +102,7 @@
   --esp-8:  32px;
   --esp-10: 40px;
   --esp-12: 48px;
+  --esp-14: 56px;
   --esp-16: 64px;
 
   /* ── Bordas ── */
@@ -106,6 +110,7 @@
   --raio-md:   10px;
   --raio-lg:   16px;
   --raio-xl:   24px;
+  --raio-2xl:  36px;
   --raio-pill: 999px;
 
   /* ── Sombras ── */
