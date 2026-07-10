@@ -72,20 +72,21 @@ $texto_html = preg_replace_callback(
     $artigo['texto_html']
 );
 
-// 2. Converter galeria flex → tabela 3 colunas (DOMPDF não suporta flex)
+// 2. Converter galeria flex → tabela 2 colunas (DOMPDF não suporta flex)
 $texto_html = preg_replace_callback(
     '/<div class="art-galeria">(.*?)<\/div>/s',
     function ($m) {
         preg_match_all('/<figure class="art-figura">(.*?)<\/figure>/s', $m[1], $figs);
         if (empty($figs[0])) return $m[0];
-        $rows = array_chunk($figs[0], 3);
+        $rows = array_chunk($figs[0], 2);
         $tbl = '<table class="galeria-table"><tbody>';
         foreach ($rows as $row) {
             $tbl .= '<tr>';
             foreach ($row as $fig) {
                 $tbl .= '<td class="galeria-cell">' . $fig . '</td>';
             }
-            for ($i = count($row); $i < 3; $i++) {
+            // preenche célula vazia se número ímpar
+            if (count($row) < 2) {
                 $tbl .= '<td class="galeria-cell"></td>';
             }
             $tbl .= '</tr>';
@@ -262,18 +263,19 @@ body {
     vertical-align: super;
 }
 
-/* ══ GALERIA FOTOGRÁFICA (tabela) ════════════ */
+/* ══ GALERIA FOTOGRÁFICA (tabela 2 colunas) ══ */
 .galeria-table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 8pt 6pt;
-    margin: 10pt 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 12pt 0;
 }
 
 .galeria-cell {
-    width: 33%;
+    width: 50%;
     text-align: center;
     vertical-align: top;
+    padding: 6pt 10pt;
 }
 
 .art-figura {
@@ -282,8 +284,8 @@ body {
 }
 
 .art-figura img {
-    max-width: 130px;
-    max-height: 100px;
+    max-width: 220px;
+    max-height: 170px;
     border: 1px solid #ccc;
     display: block;
     margin: 0 auto;
@@ -293,9 +295,9 @@ body {
 .art-figura-titulo {
     font-size: 7.5pt;
     color: #555;
-    margin-top: 3pt;
+    margin-top: 4pt;
     font-style: italic;
-    line-height: 1.3;
+    line-height: 1.4;
     text-align: center;
     font-family: 'Times New Roman', Times, serif;
 }
