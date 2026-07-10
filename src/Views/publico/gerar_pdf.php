@@ -136,12 +136,14 @@ function buildPrancha(array $imagens_por_parte, array $partes_label): string
     $html .= '<hr class="prancha-linha">';
     $html .= '</div>';
 
+    $primeira_parte = true;
     foreach ($partes_label as $parte => $label) {
         if (empty($imagens_por_parte[$parte])) continue;
         $imgs = $imagens_por_parte[$parte];
 
-        // Cada parte começa numa nova página com título no topo
-        $html .= '<div class="parte-pagina">';
+        // Primeira parte fica na mesma página do cabeçalho "Prancha Fotográfica"
+        $html .= $primeira_parte ? '<div>' : '<div class="parte-pagina">';
+        $primeira_parte = false;
         $html .= '<table class="parte-header"><tr>';
         $html .= '<td class="parte-header-linha"></td>';
         $html .= '<td class="parte-header-nome">' . htmlspecialchars(strtoupper($label)) . '</td>';
