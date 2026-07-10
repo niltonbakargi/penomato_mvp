@@ -459,23 +459,8 @@ $j_exemplares = json_encode($exemplares, JSON_UNESCAPED_UNICODE);
             color: #2c2c2c; text-align: justify;
             text-indent: 1.2em; margin-bottom: 0;
         }
-        /* Galeria de imagens do artigo */
-        .ficha-artigo-texto .art-galeria {
-            display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0;
-        }
-        .ficha-artigo-texto .art-figura {
-            text-align: center;
-        }
-        .ficha-artigo-texto .art-figura img {
-            max-width: 180px; max-height: 130px;
-            border-radius: 6px; border: 1px solid #e2d5c6;
-            object-fit: cover; display: block; margin: 0 auto;
-        }
-        .ficha-artigo-texto .art-figura figcaption,
-        .ficha-artigo-texto .art-figura-titulo {
-            font-size: .72rem; color: #7a6a56; margin-top: 4px;
-            font-style: italic; max-width: 180px; line-height: 1.3;
-        }
+        /* Galeria de imagens do artigo — oculta (exibida na galeria de thumbs abaixo) */
+        .ficha-artigo-texto .art-galeria { display: none; }
         /* Referências */
         .ficha-artigo-texto .art-refs {
             font-size: .82rem; line-height: 1.6;
@@ -1700,7 +1685,7 @@ foreach ($especies as $esp):
         <!-- Texto do artigo -->
         <div class="ficha-attrs ficha-artigo-texto">
         <?php if (!empty($esp['artigo_html'])):
-            echo $esp['artigo_html'];
+            echo str_replace('<h3 class="art-secao">Prancha Fotográfica</h3>', '', $esp['artigo_html']);
         else: ?>
             <p class="ficha-sem-attrs">Artigo ainda não gerado para esta espécie.</p>
         <?php endif; ?>
