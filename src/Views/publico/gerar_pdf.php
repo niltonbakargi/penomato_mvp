@@ -275,7 +275,7 @@ body {
     width: 50%;
     text-align: center;
     vertical-align: top;
-    padding: 6pt 10pt;
+    padding: 6pt 3pt;
 }
 
 .art-figura {
@@ -284,7 +284,7 @@ body {
 }
 
 .art-figura img {
-    max-width: 220px;
+    max-width: 260px;
     max-height: 170px;
     border: 1px solid #ccc;
     display: block;
