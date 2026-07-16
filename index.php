@@ -4,11 +4,32 @@
  */
 
 require_once __DIR__ . '/config/app.php';
+require_once __DIR__ . '/config/banco_de_dados.php';
 require_once __DIR__ . '/src/Controllers/auth/verificar_acesso.php';
 
 $logado      = sessaoValida();
 $tipo        = getTipoUsuario();      // 'visitante' se não logado
 $nome        = getNomeUsuario();      // 'Visitante' se não logado
+
+// Estatísticas para exibir no cabeçalho
+try {
+    $stat_especies      = (int)$pdo->query("SELECT COUNT(*) FROM especies_administrativo")->fetchColumn();
+    $stat_imagens_web   = (int)$pdo->query("SELECT COUNT(*) FROM especies_imagens WHERE origem = 'internet'")->fetchColumn();
+    $stat_colaboradores = (int)$pdo->query("SELECT COUNT(*) FROM usuarios WHERE categoria != 'visitante' AND ativo = 1")->fetchColumn();
+
+    $artigos_rows = $pdo->query(
+        "SELECT status, COUNT(*) as total FROM artigos GROUP BY status ORDER BY FIELD(status,'rascunho','em_revisao','aprovado','publicado')"
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+    $stat_artigos = [];
+    foreach ($artigos_rows as $row) {
+        $stat_artigos[$row['status']] = (int)$row['total'];
+    }
+    $stat_artigos_total = array_sum($stat_artigos);
+} catch (Exception $e) {
+    $stat_especies = $stat_imagens_web = $stat_colaboradores = $stat_artigos_total = 0;
+    $stat_artigos  = [];
+}
 
 // Painel destino baseado no tipo
 $url_painel = ($tipo === 'gestor')
@@ -85,6 +106,68 @@ $url_painel = ($tipo === 'gestor')
             display: inline-block;
             padding: 5px 20px;
             border-radius: 40px;
+        }
+
+        /* Faixa de estatísticas */
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 20px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 3px;
+        }
+
+        .stat-sep {
+            width: 1px;
+            background: rgba(255,255,255,0.25);
+            align-self: stretch;
+            margin: 4px 0;
+        }
+
+        .artigos-status {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 14px;
+        }
+
+        .artigo-badge {
+            font-size: 0.78rem;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.15);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 576px) {
+            .stat-sep { display: none; }
+            .stat-item { min-width: 80px; }
+            .stat-number { font-size: 1.6rem; }
         }
 
         .home-body {
@@ -345,6 +428,49 @@ $url_painel = ($tipo === 'gestor')
                     <h1>Penomato</h1>
                     <p>Plataforma colaborativa para documentação botânica com validação científica</p>
                     <div class="badge-bioma">🌳 Bioma: Cerrado (MVP)</div>
+
+                    <!-- Estatísticas da plataforma -->
+                    <div class="stats-bar">
+                        <div class="stat-item">
+                            <span class="stat-number"><?= number_format($stat_especies, 0, ',', '.') ?></span>
+                            <span class="stat-label">Espécies cadastradas</span>
+                        </div>
+                        <div class="stat-sep"></div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= number_format($stat_imagens_web, 0, ',', '.') ?></span>
+                            <span class="stat-label">Imagens da internet</span>
+                        </div>
+                        <div class="stat-sep"></div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= number_format($stat_artigos_total, 0, ',', '.') ?></span>
+                            <span class="stat-label">Artigos</span>
+                        </div>
+                        <div class="stat-sep"></div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= number_format($stat_colaboradores, 0, ',', '.') ?></span>
+                            <span class="stat-label">Colaboradores</span>
+                        </div>
+                    </div>
+
+                    <?php if (!empty($stat_artigos)): ?>
+                    <?php
+                        $labels_artigo = [
+                            'rascunho'   => 'Rascunho',
+                            'em_revisao' => 'Em revisão',
+                            'aprovado'   => 'Aprovado',
+                            'publicado'  => 'Publicado',
+                        ];
+                    ?>
+                    <div class="artigos-status">
+                        <?php foreach ($labels_artigo as $key => $label): ?>
+                            <?php if (!empty($stat_artigos[$key])): ?>
+                            <span class="artigo-badge">
+                                <?= $label ?>: <?= $stat_artigos[$key] ?>
+                            </span>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Corpo -->
