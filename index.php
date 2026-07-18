@@ -13,22 +13,53 @@ $nome        = getNomeUsuario();      // 'Visitante' se não logado
 
 // Estatísticas para exibir no cabeçalho
 try {
-    $stat_especies      = (int)$pdo->query("SELECT COUNT(*) FROM especies_administrativo")->fetchColumn();
-    $stat_imagens_web   = (int)$pdo->query("SELECT COUNT(*) FROM especies_imagens WHERE origem = 'internet'")->fetchColumn();
-    $stat_colaboradores = (int)$pdo->query("SELECT COUNT(*) FROM usuarios WHERE categoria != 'visitante' AND ativo = 1")->fetchColumn();
-
-    $artigos_rows = $pdo->query(
-        "SELECT status, COUNT(*) as total FROM artigos GROUP BY status ORDER BY FIELD(status,'rascunho','em_revisao','aprovado','publicado')"
+    // --- Espécies ---
+    $esp_rows = $pdo->query(
+        "SELECT status, COUNT(*) as total FROM especies_administrativo GROUP BY status"
     )->fetchAll(PDO::FETCH_ASSOC);
+    $stat_esp = [];
+    foreach ($esp_rows as $r) $stat_esp[$r['status']] = (int)$r['total'];
+    $stat_esp_total       = array_sum($stat_esp);
+    $stat_esp_sem_dados   = $stat_esp['sem_dados']      ?? 0;
+    $stat_esp_internet    = $stat_esp['dados_internet'] ?? 0;
+    $stat_esp_confirmada  = $stat_esp['descrita']       ?? 0;
+    $stat_esp_registrada  = $stat_esp['registrada']     ?? 0;
+    $stat_esp_publicada   = $stat_esp['publicado']      ?? 0;
 
-    $stat_artigos = [];
-    foreach ($artigos_rows as $row) {
-        $stat_artigos[$row['status']] = (int)$row['total'];
-    }
-    $stat_artigos_total = array_sum($stat_artigos);
+    // --- Imagens ---
+    $img_rows = $pdo->query(
+        "SELECT origem, COUNT(*) as total FROM especies_imagens GROUP BY origem"
+    )->fetchAll(PDO::FETCH_ASSOC);
+    $stat_img = [];
+    foreach ($img_rows as $r) $stat_img[$r['origem']] = (int)$r['total'];
+    $stat_img_internet  = $stat_img['internet'] ?? 0;
+    $stat_img_campo     = $stat_img['campo']    ?? 0;
+
+    // --- Artigos ---
+    $art_rows = $pdo->query(
+        "SELECT status, COUNT(*) as total FROM artigos GROUP BY status"
+    )->fetchAll(PDO::FETCH_ASSOC);
+    $stat_art = [];
+    foreach ($art_rows as $r) $stat_art[$r['status']] = (int)$r['total'];
+    $stat_art_rascunho  = $stat_art['rascunho']  ?? 0;
+    $stat_art_revisado  = $stat_art['revisado']  ?? 0;
+    $stat_art_publicado = $stat_art['publicado'] ?? 0;
+
+    // --- Colaboradores ---
+    $col_rows = $pdo->query(
+        "SELECT COALESCE(NULLIF(subtipo_colaborador,''), categoria) as tipo, COUNT(*) as total
+         FROM usuarios WHERE categoria != 'visitante' AND ativo = 1
+         GROUP BY tipo"
+    )->fetchAll(PDO::FETCH_ASSOC);
+    $stat_col = [];
+    foreach ($col_rows as $r) $stat_col[$r['tipo']] = (int)$r['total'];
+
 } catch (Exception $e) {
-    $stat_especies = $stat_imagens_web = $stat_colaboradores = $stat_artigos_total = 0;
-    $stat_artigos  = [];
+    $stat_esp_total = $stat_esp_sem_dados = $stat_esp_internet = 0;
+    $stat_esp_confirmada = $stat_esp_registrada = $stat_esp_publicada = 0;
+    $stat_img_internet = $stat_img_campo = 0;
+    $stat_art_rascunho = $stat_art_revisado = $stat_art_publicado = 0;
+    $stat_col = [];
 }
 
 // Painel destino baseado no tipo
@@ -108,66 +139,67 @@ $url_painel = ($tipo === 'gestor')
             border-radius: 40px;
         }
 
-        /* Faixa de estatísticas */
-        .stats-bar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px 20px;
+        /* Grade de estatísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
             margin-top: 24px;
             padding-top: 20px;
             border-top: 1px solid rgba(255,255,255,0.2);
+            text-align: left;
         }
 
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 100px;
+        .stat-col {
+            padding: 0 18px;
+            border-right: 1px solid rgba(255,255,255,0.18);
         }
+        .stat-col:first-child { padding-left: 0; }
+        .stat-col:last-child  { border-right: none; padding-right: 0; }
 
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 0.78rem;
-            opacity: 0.8;
+        .stat-col-title {
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 3px;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
-        .stat-sep {
-            width: 1px;
-            background: rgba(255,255,255,0.25);
-            align-self: stretch;
-            margin: 4px 0;
-        }
-
-        .artigos-status {
+        .stat-row {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 14px;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            font-size: 0.82rem;
         }
+        .stat-row:last-child { border-bottom: none; }
 
-        .artigo-badge {
-            font-size: 0.78rem;
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            background: rgba(255,255,255,0.15);
+        .stat-row-label { opacity: 0.82; }
+
+        .stat-row-num {
+            font-weight: 700;
+            font-size: 0.92rem;
             white-space: nowrap;
         }
 
-        @media (max-width: 576px) {
-            .stat-sep { display: none; }
-            .stat-item { min-width: 80px; }
-            .stat-number { font-size: 1.6rem; }
+        .stat-row.destaque .stat-row-label,
+        .stat-row.destaque .stat-row-num {
+            opacity: 1;
+            font-size: 0.88rem;
+        }
+        .stat-row.destaque .stat-row-num { font-size: 1rem; }
+
+        @media (max-width: 700px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 0; }
+            .stat-col { border-right: none; padding: 0 10px; }
+            .stat-col:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.18); }
+        }
+        @media (max-width: 400px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-col:nth-child(odd) { border-right: none; }
         }
 
         .home-body {
@@ -430,47 +462,88 @@ $url_painel = ($tipo === 'gestor')
                     <div class="badge-bioma">🌳 Bioma: Cerrado (MVP)</div>
 
                     <!-- Estatísticas da plataforma -->
-                    <div class="stats-bar">
-                        <div class="stat-item">
-                            <span class="stat-number"><?= number_format($stat_especies, 0, ',', '.') ?></span>
-                            <span class="stat-label">Espécies cadastradas</span>
-                        </div>
-                        <div class="stat-sep"></div>
-                        <div class="stat-item">
-                            <span class="stat-number"><?= number_format($stat_imagens_web, 0, ',', '.') ?></span>
-                            <span class="stat-label">Imagens da internet</span>
-                        </div>
-                        <div class="stat-sep"></div>
-                        <div class="stat-item">
-                            <span class="stat-number"><?= number_format($stat_artigos_total, 0, ',', '.') ?></span>
-                            <span class="stat-label">Artigos</span>
-                        </div>
-                        <div class="stat-sep"></div>
-                        <div class="stat-item">
-                            <span class="stat-number"><?= number_format($stat_colaboradores, 0, ',', '.') ?></span>
-                            <span class="stat-label">Colaboradores</span>
-                        </div>
-                    </div>
+                    <div class="stats-grid">
 
-                    <?php if (!empty($stat_artigos)): ?>
-                    <?php
-                        $labels_artigo = [
-                            'rascunho'   => 'Rascunho',
-                            'em_revisao' => 'Em revisão',
-                            'aprovado'   => 'Aprovado',
-                            'publicado'  => 'Publicado',
-                        ];
-                    ?>
-                    <div class="artigos-status">
-                        <?php foreach ($labels_artigo as $key => $label): ?>
-                            <?php if (!empty($stat_artigos[$key])): ?>
-                            <span class="artigo-badge">
-                                <?= $label ?>: <?= $stat_artigos[$key] ?>
-                            </span>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
+                        <!-- Espécies -->
+                        <div class="stat-col">
+                            <div class="stat-col-title">Espécies</div>
+                            <div class="stat-row destaque">
+                                <span class="stat-row-label">Cadastradas</span>
+                                <span class="stat-row-num"><?= number_format($stat_esp_total, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Sem dados</span>
+                                <span class="stat-row-num"><?= number_format($stat_esp_sem_dados, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Dados da internet</span>
+                                <span class="stat-row-num"><?= number_format($stat_esp_internet, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Confirmadas</span>
+                                <span class="stat-row-num"><?= number_format($stat_esp_confirmada, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Registradas</span>
+                                <span class="stat-row-num"><?= number_format($stat_esp_registrada, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Publicadas</span>
+                                <span class="stat-row-num"><?= number_format($stat_esp_publicada, 0, ',', '.') ?></span>
+                            </div>
+                        </div>
+
+                        <!-- Imagens -->
+                        <div class="stat-col">
+                            <div class="stat-col-title">Imagens</div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Da internet</span>
+                                <span class="stat-row-num"><?= number_format($stat_img_internet, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Exsicatas próprias</span>
+                                <span class="stat-row-num"><?= number_format($stat_img_campo, 0, ',', '.') ?></span>
+                            </div>
+                        </div>
+
+                        <!-- Artigos -->
+                        <div class="stat-col">
+                            <div class="stat-col-title">Artigos</div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Rascunho</span>
+                                <span class="stat-row-num"><?= number_format($stat_art_rascunho, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Revisado</span>
+                                <span class="stat-row-num"><?= number_format($stat_art_revisado, 0, ',', '.') ?></span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Publicado</span>
+                                <span class="stat-row-num"><?= number_format($stat_art_publicado, 0, ',', '.') ?></span>
+                            </div>
+                        </div>
+
+                        <!-- Colaboradores -->
+                        <div class="stat-col">
+                            <div class="stat-col-title">Colaboradores</div>
+                            <?php
+                            $labels_col = [
+                                'identificador' => 'Identificador',
+                                'especialista'  => 'Especialista',
+                                'gestor'        => 'Gestor',
+                                'dev'           => 'Dev',
+                            ];
+                            foreach ($labels_col as $key => $label):
+                                $n = $stat_col[$key] ?? 0;
+                            ?>
+                            <div class="stat-row">
+                                <span class="stat-row-label"><?= $label ?></span>
+                                <span class="stat-row-num"><?= number_format($n, 0, ',', '.') ?></span>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+
                     </div>
-                    <?php endif; ?>
                 </div>
 
                 <!-- Corpo -->
