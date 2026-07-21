@@ -1676,7 +1676,7 @@ foreach ($especies as $esp):
         <?php endif; ?>
         <div class="ficha-cientifico">
             <?= htmlspecialchars($esp['nome']) ?>
-            <button class="btn-falar" onclick="falarNome(this)" data-nome="<?= htmlspecialchars($esp['nome']) ?>" title="Ouvir pronúncia" aria-label="Ouvir pronúncia do nome científico">
+            <button class="btn-falar" onclick="falarNome(this)" data-nome="<?= htmlspecialchars(implode(' ', array_slice(explode(' ', $esp['nome']), 0, 2))) ?>" title="Ouvir pronúncia" aria-label="Ouvir pronúncia do nome científico">
                 <i class="fa-solid fa-volume-high"></i>
             </button>
         </div>
