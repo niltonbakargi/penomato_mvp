@@ -151,6 +151,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
         .btn-select { background-color: var(--cor-primaria); color: var(--branco); border: none; padding: var(--esp-2) var(--esp-6); border-radius: var(--raio-full); font-weight: var(--peso-semi); cursor: pointer; transition: var(--transicao); display: flex; align-items: center; gap: var(--esp-2); }
         .btn-select:hover { background-color: var(--cor-primaria-hover); transform: translateY(-2px); box-shadow: var(--sombra-md); }
 
+        .btn-falar { background: none; border: none; cursor: pointer; color: var(--cor-primaria); opacity: 0.55; font-size: 0.85rem; padding: 2px 4px; transition: opacity .2s; flex-shrink: 0; }
+        .btn-falar:hover { opacity: 1; }
+        .btn-falar.falando { opacity: 1; color: #e07b00; animation: pulsar .6s infinite alternate; }
+        @keyframes pulsar { from { opacity: .6; } to { opacity: 1; } }
+
         .empty-state { text-align: center; padding: var(--esp-16) var(--esp-5); background-color: var(--cinza-50); border-radius: var(--raio-lg); border: 2px dashed var(--cinza-200); }
         .empty-state i { font-size: var(--texto-4xl); color: var(--cinza-400); margin-bottom: var(--esp-5); }
         .empty-state h3 { font-size: var(--texto-2xl); color: var(--cinza-600); margin-bottom: var(--esp-2); }
@@ -267,7 +272,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
                     <?php foreach ($especies as $especie): ?>
                         <div class="especie-card" data-nome="<?php echo strtolower(htmlspecialchars($especie['nome_cientifico'])); ?>">
                             <div class="especie-info">
-                                <h3><?php echo htmlspecialchars($especie['nome_cientifico']); ?></h3>
+                                <h3>
+                                    <?php echo htmlspecialchars($especie['nome_cientifico']); ?>
+                                    <button class="btn-falar" onclick="falarNome(this)" data-nome="<?php echo htmlspecialchars($especie['nome_cientifico']); ?>" title="Ouvir pronúncia" aria-label="Ouvir pronúncia do nome científico">
+                                        <i class="fa-solid fa-volume-high"></i>
+                                    </button>
+                                </h3>
                                 <p>
                                     <i class="fas fa-leaf"></i>
                                     <span class="status-badge">SEM DADOS</span>
@@ -440,6 +450,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
     document.getElementById('modalOrientador').addEventListener('click', function(e) {
         if (e.target === this) fecharModal();
     });
+
+    // ── Pronúncia do nome científico ──────────────────
+    function falarNome(btn) {
+        if (!window.speechSynthesis) return;
+        speechSynthesis.cancel();
+        const nome = btn.dataset.nome;
+        const u = new SpeechSynthesisUtterance(nome);
+        u.lang = 'it-IT';
+        u.rate = 0.82;
+        btn.classList.add('falando');
+        u.onend = u.onerror = () => btn.classList.remove('falando');
+        speechSynthesis.speak(u);
+    }
     </script>
 </body>
 </html>
