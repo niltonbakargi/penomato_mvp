@@ -530,7 +530,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
 
     // Busca principal na flora_brasil_plantas
     $stmt = $pdo->prepare("
-        SELECT nome_cientifico, autor, familia, origem, endemica,
+        SELECT id, nome_cientifico, autor, familia, origem, endemica,
                formas_vida, distr_uf, dom_fitogeografico, nomes_vernaculares
         FROM flora_brasil_plantas
         WHERE nome_cientifico = :nome COLLATE utf8mb4_unicode_ci
@@ -570,9 +570,15 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
                     'naturalizada' => 'Naturalizada', 'cultivada' => 'Cultivada'];
     $origem = $mapa_origem[mb_strtolower(trim($row['origem'] ?? ''))] ?? ($row['origem'] ?? '');
 
-    // Endemismo
-    $mapa_end = ['sim' => 'Endêmica', 'não' => 'Não endêmica', 'nao' => 'Não endêmica'];
-    $endemismo = $mapa_end[mb_strtolower(trim($row['endemica'] ?? ''))] ?? ($row['endemica'] ?? '');
+    // Endemismo — valores como "é endêmica do Brasil" / "não é endêmica do Brasil"
+    $endemica_raw = mb_strtolower(trim($row['endemica'] ?? ''));
+    if (strpos($endemica_raw, 'não') !== false || strpos($endemica_raw, 'nao') !== false) {
+        $endemismo = 'Não endêmica';
+    } elseif (strpos($endemica_raw, 'end') !== false) {
+        $endemismo = 'Endêmica';
+    } else {
+        $endemismo = $row['endemica'] ?? '';
+    }
 
     // Biomas (dom_fitogeografico já é lista separada por vírgula ou ponto-e-vírgula)
     $biomas_raw = $row['dom_fitogeografico'] ?? '';
@@ -586,8 +592,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
     sort($ufs_arr);
     $estados_ocorrencia = implode(', ', $ufs_arr);
 
-    // URL de referência canônica do Flora do Brasil
-    $ref_url = 'https://floradobrasil2020.jbrj.gov.br/reflora/listaBrasil/ConsultaPublicaUC/BemVindoConsultaPublicaConsultar.do?searchString=' . rawurlencode($nome_raw);
+    // URL de referência canônica do Flora do Brasil (o id da tabela é o taxonid do JBRJ)
+    $ref_url = 'https://floradobrasil2020.jbrj.gov.br/FB' . $row['id'];
 
     echo json_encode([
         'ok'                       => true,
