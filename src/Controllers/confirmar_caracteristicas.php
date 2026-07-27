@@ -537,12 +537,18 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
         CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Penomato/1.0)',
         CURLOPT_HTTPHEADER     => ['Accept: application/json'],
     ]);
-    $body = curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $body      = curl_exec($ch);
+    $code      = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_erro = curl_error($ch);
+    $url_final = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
     curl_close($ch);
 
     if ($code !== 200 || !$body) {
-        echo json_encode(['ok' => false, 'erro' => 'REFLORA indisponível (HTTP ' . $code . ').']); exit;
+        echo json_encode([
+            'ok'        => false,
+            'erro'      => 'REFLORA indisponível (HTTP ' . $code . ').',
+            '_debug'    => ['curl_erro' => $curl_erro, 'url' => $url_final, 'body_preview' => substr($body ?: '', 0, 300)],
+        ]); exit;
     }
 
     $data = json_decode($body, true);
