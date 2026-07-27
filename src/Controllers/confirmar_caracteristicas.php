@@ -517,7 +517,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
     exit;
 }
 
-// ── AJAX: buscar dados básicos no REFLORA ──────────────────
+// ── AJAX: buscar dados básicos no banco local (flora_brasil_plantas) ──────────────────
 if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
     if (session_status() === PHP_SESSION_NONE) session_start();
     header('Content-Type: application/json; charset=utf-8');
@@ -526,108 +526,68 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
     $nome_raw = trim($_POST['nome_cientifico'] ?? '');
     if (!$nome_raw) { echo json_encode(['ok' => false, 'erro' => 'Nome científico não informado.']); exit; }
 
-    $url = 'https://servicos.jbrj.gov.br/v2/flora/taxon/' . rawurlencode($nome_raw);
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 20,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible; Penomato/1.0)',
-        CURLOPT_HTTPHEADER     => ['Accept: application/json'],
-    ]);
-    $body      = curl_exec($ch);
-    $code      = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_erro = curl_error($ch);
-    $url_final = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-    curl_close($ch);
+    require_once __DIR__ . '/../../config/banco_de_dados.php';
 
-    if ($code !== 200 || !$body) {
-        echo json_encode([
-            'ok'        => false,
-            'erro'      => 'REFLORA indisponível (HTTP ' . $code . ').',
-            '_debug'    => ['curl_erro' => $curl_erro, 'url' => $url_final, 'body_preview' => substr($body ?: '', 0, 300)],
-        ]); exit;
+    // Busca principal na flora_brasil_plantas
+    $stmt = $pdo->prepare("
+        SELECT nome_cientifico, autor, familia, origem, endemica,
+               formas_vida, distr_uf, dom_fitogeografico, nomes_vernaculares
+        FROM flora_brasil_plantas
+        WHERE nome_cientifico = :nome COLLATE utf8mb4_unicode_ci
+        LIMIT 1
+    ");
+    $stmt->execute([':nome' => $nome_raw]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        echo json_encode(['ok' => false, 'erro' => 'Espécie não encontrada no banco local (Flora do Brasil).']); exit;
     }
 
-    $data = json_decode($body, true);
-    if (!is_array($data) || empty($data)) {
-        echo json_encode(['ok' => false, 'erro' => 'Espécie não encontrada no REFLORA.']); exit;
-    }
-
-    $item   = $data[0];
-    $taxon  = $item['taxon'] ?? [];
-
-    // Nome científico completo
-    $nome_cientifico_completo = $taxon['scientificname'] ?? '';
+    // Nome científico completo (nome + autor)
+    $nome_cientifico_completo = trim($row['nome_cientifico'] . ' ' . $row['autor']);
 
     // Família
-    $familia = $taxon['family'] ?? '';
+    $familia = $row['familia'] ?? '';
 
-    // Nomes populares — deduplica, mantém apenas português
-    $vernaculares = $item['vernacular_name'] ?? [];
-    $nomes_vistos = [];
-    $nomes_populares = [];
-    foreach ($vernaculares as $v) {
-        $n = trim($v['vernacularname'] ?? '');
-        $n_lower = mb_strtolower($n);
-        if ($n && !in_array($n_lower, $nomes_vistos, true)) {
-            $nomes_vistos[]   = $n_lower;
-            $nomes_populares[] = $n;
-        }
-    }
-    $nome_popular = implode(', ', $nomes_populares);
+    // Nomes populares
+    $nome_popular = $row['nomes_vernaculares'] ?? '';
 
-    // Sinônimos
-    $relacoes = $item['resource_relationship'] ?? [];
-    $sinonimos_arr = [];
-    foreach ($relacoes as $r) {
-        if (stripos($r['relationshipofresource'] ?? '', 'sin') !== false) {
-            $s = trim($r['scientificname'] ?? '');
-            if ($s) $sinonimos_arr[] = $s;
-        }
-    }
+    // Sinônimos da tabela flora_brasil_sinonimos
+    $stmt_sin = $pdo->prepare("
+        SELECT sinonimo FROM flora_brasil_sinonimos
+        WHERE nome_aceito = :nome COLLATE utf8mb4_unicode_ci
+        ORDER BY sinonimo
+    ");
+    $stmt_sin->execute([':nome' => $nome_raw]);
+    $sinonimos_arr = $stmt_sin->fetchAll(PDO::FETCH_COLUMN);
     $sinonimos = implode(', ', $sinonimos_arr);
 
     // Forma de vida
-    $specie_profile = $item['specie_profile'] ?? [];
-    $forma_vida = implode(', ', $specie_profile['lifeForm'] ?? []);
+    $forma_vida = $row['formas_vida'] ?? '';
 
-    // Origem (establishmentmeans) — pega o mais frequente
-    $distribuition = $item['distribuition'] ?? [];
-    $origens = [];
-    $endemismo = '';
-    $biomas_set = [];
-    $estados_set = [];
-    foreach ($distribuition as $d) {
-        $means = $d['establishmentmeans'] ?? '';
-        if ($means) $origens[] = $means;
-        $obs = $d['occurrenceremarks'] ?? [];
-        if (!$endemismo && isset($obs['endemism'])) $endemismo = $obs['endemism'];
-        foreach ($obs['phytogeographicDomain'] ?? [] as $b) {
-            if (!in_array($b, $biomas_set, true)) $biomas_set[] = $b;
-        }
-        $uf = str_replace('BR-', '', $d['locationid'] ?? '');
-        if ($uf && !in_array($uf, $estados_set, true)) $estados_set[] = $uf;
-    }
-    // Mapeia establishmentmeans para português
-    $mapa_origem = ['NATIVA' => 'Nativa', 'EXÓTICA' => 'Exótica', 'NATURALIZADA' => 'Naturalizada', 'CULTIVADA' => 'Cultivada'];
-    $origem_raw = $origens ? array_values(array_unique($origens))[0] : '';
-    $origem = $mapa_origem[strtoupper($origem_raw)] ?? '';
+    // Origem — normaliza capitalização
+    $mapa_origem = ['nativa' => 'Nativa', 'exótica' => 'Exótica', 'exotica' => 'Exótica',
+                    'naturalizada' => 'Naturalizada', 'cultivada' => 'Cultivada'];
+    $origem = $mapa_origem[mb_strtolower(trim($row['origem'] ?? ''))] ?? ($row['origem'] ?? '');
 
-    // Mapeia endemismo
-    $mapa_end = ['Endêmica' => 'Endêmica', 'Não endemica' => 'Não endêmica', 'Não endêmica' => 'Não endêmica'];
-    $endemismo_norm = $mapa_end[$endemismo] ?? $endemismo;
+    // Endemismo
+    $mapa_end = ['sim' => 'Endêmica', 'não' => 'Não endêmica', 'nao' => 'Não endêmica'];
+    $endemismo = $mapa_end[mb_strtolower(trim($row['endemica'] ?? ''))] ?? ($row['endemica'] ?? '');
 
-    sort($biomas_set);
-    sort($estados_set);
-    $biomas            = implode(', ', $biomas_set);
-    $estados_ocorrencia = implode(', ', $estados_set);
+    // Biomas (dom_fitogeografico já é lista separada por vírgula ou ponto-e-vírgula)
+    $biomas_raw = $row['dom_fitogeografico'] ?? '';
+    $biomas_arr = array_filter(array_map('trim', preg_split('/[;,]+/', $biomas_raw)));
+    sort($biomas_arr);
+    $biomas = implode(', ', $biomas_arr);
 
-    // URL de referência canônica
-    $taxon_id    = $taxon['taxonid'] ?? null;
-    $ref_url     = $taxon_id ? 'https://floradobrasil2020.jbrj.gov.br/FB' . $taxon_id : ($taxon['references'] ?? '');
+    // Estados (distr_uf já é lista de siglas)
+    $ufs_raw = $row['distr_uf'] ?? '';
+    $ufs_arr = array_filter(array_map('trim', preg_split('/[;,\s]+/', $ufs_raw)));
+    sort($ufs_arr);
+    $estados_ocorrencia = implode(', ', $ufs_arr);
+
+    // URL de referência canônica do Flora do Brasil
+    $ref_url = 'https://floradobrasil2020.jbrj.gov.br/reflora/listaBrasil/ConsultaPublicaUC/BemVindoConsultaPublicaConsultar.do?searchString=' . rawurlencode($nome_raw);
 
     echo json_encode([
         'ok'                       => true,
@@ -637,7 +597,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_reflora') {
         'sinonimos'                => $sinonimos,
         'forma_vida'               => $forma_vida,
         'origem'                   => $origem,
-        'endemismo'                => $endemismo_norm,
+        'endemismo'                => $endemismo,
         'biomas'                   => $biomas,
         'estados_ocorrencia'       => $estados_ocorrencia,
         'ref_url'                  => $ref_url,
