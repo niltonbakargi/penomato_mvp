@@ -1747,7 +1747,7 @@ fim_post_inserir:
     // ================================================
     // REFLORA + FALLBACK IA DE DISTRIBUIÇÃO
     // ================================================
-    var _nomeCientifico = '<?php echo addslashes($nome_cientifico); ?>';
+    var _nomeCientifico = <?php echo json_encode($nome_cientifico, JSON_HEX_TAG); ?>;
     var _especieIdInt   = <?php echo (int)$especie_id; ?>;
 
     // Adiciona texto à lista de referências e retorna o número (1-based)
