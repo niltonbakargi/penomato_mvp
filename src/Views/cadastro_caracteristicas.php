@@ -32,13 +32,23 @@ require_once __DIR__ . '/../../config/banco_de_dados.php';
 $mensagem_erro = '';
 
 // ================================================
+// CSRF
+// ================================================
+if (empty($_SESSION['csrf_cadastro_caract'])) {
+    $_SESSION['csrf_cadastro_caract'] = bin2hex(random_bytes(32));
+}
+
+// ================================================
 // PROCESSAR FORMULÁRIO
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    if (empty($_POST['especie_id'])) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_cadastro_caract'] ?? '', $csrf)) {
+        $mensagem_erro = 'Requisição inválida. Tente novamente.';
+    } elseif (empty($_POST['especie_id'])) {
         $mensagem_erro = "Selecione uma espécie para cadastrar as características.";
     } else {
+        $_SESSION['csrf_cadastro_caract'] = bin2hex(random_bytes(32));
 
         $especie_id = (int)$_POST['especie_id'];
 

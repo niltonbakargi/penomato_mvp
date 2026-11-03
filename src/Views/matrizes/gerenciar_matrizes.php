@@ -11,8 +11,21 @@ if (!estaLogado() || getTipoUsuario() !== 'gestor') {
     exit;
 }
 
+// ── Gera token CSRF ───────────────────────────────────────────
+if (empty($_SESSION['csrf_remover_matriz'])) {
+    $_SESSION['csrf_remover_matriz'] = bin2hex(random_bytes(32));
+}
+
 // ── Processa remoção ──────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remover_id'])) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_remover_matriz'] ?? '', $csrf)) {
+        mensagemErro('Requisição inválida. Tente novamente.');
+        header('Location: ' . APP_BASE . '/src/Views/matrizes/gerenciar_matrizes.php');
+        exit;
+    }
+    $_SESSION['csrf_remover_matriz'] = bin2hex(random_bytes(32));
+
     $id     = intval($_POST['remover_id']);
     $motivo = trim($_POST['motivo'] ?? '');
 
@@ -282,6 +295,7 @@ include __DIR__ . '/../includes/cabecalho.php';
         <p>Esta matriz será removida do mapa. Os dados ficam registrados no banco para auditoria.</p>
 
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_remover_matriz'], ENT_QUOTES); ?>">
             <input type="hidden" name="remover_id" id="modal-id">
             <textarea name="motivo" rows="2"
                       placeholder="Motivo da remoção (opcional)..."></textarea>

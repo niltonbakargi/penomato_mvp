@@ -120,7 +120,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_campo') {
             ->execute([$especie_id]);
         echo json_encode(['ok' => true]);
     } catch (Exception $e) {
-        echo json_encode(['ok' => false, 'erro' => $e->getMessage()]);
+        error_log('[confirmar_caracteristicas] salvar_campo: ' . $e->getMessage());
+        echo json_encode(['ok' => false, 'erro' => 'Erro ao salvar. Tente novamente.']);
     }
     exit;
 }
@@ -181,7 +182,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_obs') {
         }
         echo json_encode(['ok' => true]);
     } catch (Exception $e) {
-        echo json_encode(['ok' => false, 'erro' => $e->getMessage()]);
+        error_log('[confirmar_caracteristicas] salvar_obs: ' . $e->getMessage());
+        echo json_encode(['ok' => false, 'erro' => 'Erro ao salvar observação.']);
     }
     exit;
 }

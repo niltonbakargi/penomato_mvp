@@ -17,7 +17,17 @@ $erro    = '';
 // ================================================
 // PROCESSAR ENVIO
 // ================================================
+if (empty($_SESSION['csrf_sugestao'])) {
+    $_SESSION['csrf_sugestao'] = bin2hex(random_bytes(32));
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enviar_sugestao'])) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_sugestao'] ?? '', $csrf)) {
+        $erro = 'Requisição inválida. Tente novamente.';
+    } else {
+    $_SESSION['csrf_sugestao'] = bin2hex(random_bytes(32));
+
     $assunto   = trim($_POST['assunto']   ?? '');
     $categoria = trim($_POST['categoria'] ?? '');
     $descricao = trim($_POST['descricao'] ?? '');
@@ -33,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enviar_sugestao'])) {
         $stmt->execute([$usuario_id, $assunto, $categoria, $descricao]);
         $sucesso = 'Sugestão enviada com sucesso! A equipe vai analisar em breve.';
     }
+    } // fim else csrf válido
 }
 
 // ================================================
@@ -268,6 +279,7 @@ $labels_status = [
     <div class="card">
         <h2><i class="fas fa-lightbulb"></i> Nova Sugestão</h2>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_sugestao'], ENT_QUOTES); ?>">
 
             <div class="campo">
                 <label>Categoria</label>

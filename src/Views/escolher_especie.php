@@ -45,9 +45,22 @@ $especies = $pdo->query(
 $total_especies = count($especies);
 
 // ================================================
+// CSRF
+// ================================================
+if (empty($_SESSION['csrf_escolher_especie'])) {
+    $_SESSION['csrf_escolher_especie'] = bin2hex(random_bytes(32));
+}
+
+// ================================================
 // PROCESSAR SELEÇÃO DA ESPÉCIE
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_escolher_especie'] ?? '', $csrf)) {
+        $erro = 'Requisição inválida. Tente novamente.';
+        goto fim_post;
+    }
+    $_SESSION['csrf_escolher_especie'] = bin2hex(random_bytes(32));
 
     $especie_id   = (int)$_POST['especie_id'];
     $orientador_id = (int)($_POST['orientador_id'] ?? 0); // 0 = sem orientação
@@ -90,6 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
     } else {
         $erro = "Espécie inválida ou não está disponível para importação.";
     }
+    fim_post:
 }
 ?>
 <!DOCTYPE html>
@@ -310,6 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['especie_id'])) {
                 <div class="especie-alvo" id="modalEspecieNome"></div>
 
                 <form method="POST" action="" id="formOrientador">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_escolher_especie'], ENT_QUOTES); ?>">
                     <input type="hidden" name="especie_id" id="modalEspecieId">
                     <input type="hidden" name="orientador_id" id="inputOrientadorId" value="0">
 
