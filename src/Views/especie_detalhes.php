@@ -1012,7 +1012,7 @@ ob_end_clean();
     </div>
     
     <script>
-        document.title = '<?php echo $especie ? addslashes($especie["nome_cientifico"]) : "Espécie não encontrada"; ?> - Penomato';
+        document.title = <?php echo json_encode(($especie ? $especie["nome_cientifico"] : "Espécie não encontrada") . " - Penomato"); ?>;
     </script>
 </body>
 </html>

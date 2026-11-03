@@ -1724,15 +1724,17 @@ foreach ($especies as $esp):
                     <div class="galeria-thumbs">
                     <?php foreach (array_slice($imgs_esp[$parte], 0, 5) as $img):
                         $cred_parts = [];
-                        if ($img['autor'])   $cred_parts[] = addslashes($img['autor']);
-                        if ($img['fonte'])   $cred_parts[] = addslashes($img['fonte']);
-                        if ($img['licenca']) $cred_parts[] = '(' . addslashes($img['licenca']) . ')';
+                        if ($img['autor'])   $cred_parts[] = $img['autor'];
+                        if ($img['fonte'])   $cred_parts[] = $img['fonte'];
+                        if ($img['licenca']) $cred_parts[] = '(' . $img['licenca'] . ')';
                         $cred_str    = implode(' · ', $cred_parts);
-                        $fonte_url_js = addslashes($img['fonte_url'] ?? '');
-                        $caption_txt  = htmlspecialchars($img['autor'] ?: ($img['fonte'] ?: ''));
+                        $caption_txt = htmlspecialchars($img['autor'] ?: ($img['fonte'] ?: ''));
+                        $js_url      = json_encode($img['url']           ?? '');
+                        $js_cred     = json_encode($cred_str);
+                        $js_fonte    = json_encode($img['fonte_url']     ?? '');
                     ?>
                         <div class="thumb-wrap">
-                            <div class="thumb" onclick="abrirLightbox('<?= addslashes($img['url']) ?>', '<?= $cred_str ?>', '<?= $fonte_url_js ?>')">
+                            <div class="thumb" onclick="abrirLightbox(<?= $js_url ?>, <?= $js_cred ?>, <?= $js_fonte ?>)">
                                 <img src="<?= htmlspecialchars($img['url']) ?>" alt="<?= htmlspecialchars($parte_label) ?>" loading="lazy">
                             </div>
                             <?php if ($caption_txt): ?>
