@@ -24,10 +24,23 @@ $msg = null;
 // Diretório raiz de uploads — usado para verificação de path traversal
 $_raiz_uploads = realpath(__DIR__ . '/../../uploads');
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_gerenciar_especie'])) {
+    $_SESSION['csrf_gerenciar_especie'] = bin2hex(random_bytes(32));
+}
+
 // ================================================
 // PROCESSAR AÇÕES POST
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_gerenciar_especie'] ?? '', $csrf)) {
+        mensagemErro('Requisição inválida. Tente novamente.');
+        header("Location: gerenciar_especie.php?id=$especie_id");
+        exit;
+    }
+    $_SESSION['csrf_gerenciar_especie'] = bin2hex(random_bytes(32));
+
     $acao = $_POST['acao'] ?? '';
 
     // ── Mudar status ──────────────────────────────
@@ -519,6 +532,7 @@ $campos_display = [
         </div>
         <div class="secao-body">
             <form method="POST" class="status-form">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_especie'], ENT_QUOTES) ?>">
                 <input type="hidden" name="especie_id" value="<?= $especie_id ?>">
                 <input type="hidden" name="acao" value="mudar_status">
                 <select name="novo_status">
@@ -543,6 +557,7 @@ $campos_display = [
                     ✏️ Editar
                 </a>
                 <form method="POST" onsubmit="return confirm('Excluir todos os dados morfológicos e o artigo? O status voltará para sem_dados.');">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_especie'], ENT_QUOTES) ?>">
                     <input type="hidden" name="especie_id" value="<?= $especie_id ?>">
                     <input type="hidden" name="acao" value="excluir_dados">
                     <button type="submit" class="btn btn-perigo">🗑 Excluir dados</button>
@@ -601,6 +616,7 @@ $campos_display = [
             <div class="secao-titulo">🖼 Imagens (<?= count($imagens) ?>)</div>
             <?php if ($imagens): ?>
             <form method="POST" onsubmit="return confirm('Excluir TODAS as imagens desta espécie?');">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_especie'], ENT_QUOTES) ?>">
                 <input type="hidden" name="especie_id" value="<?= $especie_id ?>">
                 <input type="hidden" name="acao" value="excluir_imagens">
                 <button type="submit" class="btn btn-perigo">🗑 Excluir todas</button>
@@ -618,6 +634,7 @@ $campos_display = [
                              alt="<?= htmlspecialchars($img['parte_planta']) ?>"
                              onerror="this.src='<?= APP_BASE ?>/assets/img/placeholder.png'">
                         <form method="POST" onsubmit="return confirm('Remover esta imagem?');" style="position:absolute;top:6px;right:6px;">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_especie'], ENT_QUOTES) ?>">
                             <input type="hidden" name="especie_id" value="<?= $especie_id ?>">
                             <input type="hidden" name="acao" value="excluir_imagem">
                             <input type="hidden" name="imagem_id" value="<?= $img['id'] ?>">
@@ -645,6 +662,7 @@ $campos_display = [
             <?php if ($pode_reverter): ?>
             <div>
                 <form method="POST" onsubmit="return confirm('Reverter para o status anterior: «<?= htmlspecialchars($pode_reverter) ?>»?');">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_especie'], ENT_QUOTES) ?>">
                     <input type="hidden" name="especie_id" value="<?= $especie_id ?>">
                     <input type="hidden" name="acao" value="reverter_status">
                     <button type="submit" class="btn btn-aviso">↩ Reverter status → «<?= $status_labels[$pode_reverter] ?? $pode_reverter ?>»</button>
@@ -661,6 +679,7 @@ $campos_display = [
             <!-- Excluir tudo -->
             <div>
                 <form method="POST" onsubmit="return confirm('ATENÇÃO: isso apagará permanentemente a espécie, todos os dados, imagens e histórico. Confirma?');">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_especie'], ENT_QUOTES) ?>">
                     <input type="hidden" name="especie_id" value="<?= $especie_id ?>">
                     <input type="hidden" name="acao" value="excluir_tudo">
                     <button type="submit" class="btn btn-perigo">💥 Excluir espécie completa</button>

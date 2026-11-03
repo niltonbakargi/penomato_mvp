@@ -15,10 +15,22 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'gestor') {
 $gestor_id = (int)$_SESSION['usuario_id'];
 $msg = [];
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_gerenciar_membros'])) {
+    $_SESSION['csrf_gerenciar_membros'] = bin2hex(random_bytes(32));
+}
+
 // ================================================
 // POST: ACEITAR MEMBRO
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aceitar_membro'])) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_gerenciar_membros'] ?? '', $csrf)) {
+        $msg[] = ['tipo' => 'err', 'texto' => 'Requisição inválida. Tente novamente.'];
+        goto fim_post_membros;
+    }
+    $_SESSION['csrf_gerenciar_membros'] = bin2hex(random_bytes(32));
+
     $membro_id = (int)($_POST['membro_aceitar_id'] ?? 0);
     $motivacao = trim($_POST['motivacao_aceitar'] ?? '');
     $categoria = trim($_POST['categoria_aceitar'] ?? 'colaborador');
@@ -61,6 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aceitar_membro'])) {
 // POST: EXCLUIR MEMBRO
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_membro'])) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_gerenciar_membros'] ?? '', $csrf)) {
+        $msg[] = ['tipo' => 'err', 'texto' => 'Requisição inválida. Tente novamente.'];
+        goto fim_post_membros;
+    }
+    $_SESSION['csrf_gerenciar_membros'] = bin2hex(random_bytes(32));
+
     $membro_id = (int)($_POST['membro_excluir_id'] ?? 0);
     $motivacao = trim($_POST['motivacao_excluir'] ?? '');
 
@@ -97,6 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluir_membro'])) {
 // ================================================
 // BUSCAR DADOS
 // ================================================
+fim_post_membros:
 try {
     $membros_pendentes = $pdo->query("
         SELECT id, nome, email, categoria, data_cadastro
@@ -335,6 +355,7 @@ try {
                 </div>
                 <div class="form-inline" id="aceitar-<?= $p['id'] ?>">
                     <form method="POST" action="<?= APP_BASE ?>/src/Controllers/gerenciar_membros.php">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_membros'], ENT_QUOTES) ?>">
                         <input type="hidden" name="membro_aceitar_id" value="<?= $p['id'] ?>">
                         <label>Categoria</label>
                         <select name="categoria_aceitar">
@@ -390,6 +411,7 @@ try {
                 <div class="form-inline" id="excluir-<?= $u['id'] ?>">
                     <form method="POST" action="<?= APP_BASE ?>/src/Controllers/gerenciar_membros.php"
                           onsubmit="return confirm('Remover <?= htmlspecialchars(addslashes($u['nome'])) ?> permanentemente?')">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_membros'], ENT_QUOTES) ?>">
                         <input type="hidden" name="membro_excluir_id" value="<?= $u['id'] ?>">
                         <label>Motivo da remoção (opcional)</label>
                         <textarea name="motivacao_excluir" placeholder="Ex: inatividade, violação de conduta..."></textarea>
