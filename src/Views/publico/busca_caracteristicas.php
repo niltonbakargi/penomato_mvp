@@ -174,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar'])) {
         $where_info = montarWhere($dados_busca);
         $total_encontrado = contarEspecies($pdo, $where_info);
         
-        if ($total_encontrado > 0 && isset($_POST['mostrar_lista'])) {
+        if ($total_encontrado > 0) {
             $especies_encontradas = buscarEspecies($pdo, $where_info, $pagina_atual, 100);
         }
     } catch (Exception $e) {
