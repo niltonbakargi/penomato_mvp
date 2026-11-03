@@ -11,12 +11,12 @@ Todas as alterações foram commitadas e publicadas no branch `main`.
 |---|---|---|
 | Segurança (controle de acesso) | 4 | 10 |
 | Segurança (validação de entrada) | 4 | 6 |
-| Segurança (tokens e criptografia) | 4 | 26 |
+| Segurança (tokens e criptografia) | 5 | 31 |
 | Correções de bugs funcionais | 3 | 6 |
 | Refatoração e limpeza | 5 | 80+ |
 | Banco de dados (análise + correções) | 2 | 3 |
 | Consistência de ENUMs | 1 | 2 |
-| **Total** | **23** | **~135** |
+| **Total** | **24** | **~140** |
 
 ---
 
@@ -348,6 +348,23 @@ Padrão aplicado em todos: geração com `bin2hex(random_bytes(32))`, validaçã
 
 ---
 
+### 24. `031ac08` — security: CSRF em controlador_painel_revisor e 4 views dependentes
+
+**Arquivos:** `controlador_painel_revisor.php`, `artigo_revisao.php`, `artigos_fila.php`, `gestao_artigos_gestor.php`, `entrada_revisor.php`
+
+Token de sessão: `csrf_painel_revisor`
+
+| Ação | Origem | Tipo |
+|---|---|---|
+| `aprovar` / `contestar` | `artigo_revisao.php` | form HTML |
+| `publicar` | `artigos_fila.php` | form HTML |
+| `publicar` | `gestao_artigos_gestor.php` | form HTML |
+| `iniciar` | `entrada_revisor.php` | fetch AJAX |
+
+Para o AJAX: token gerado no PHP, exposto como `const CSRF_TOKEN` em JS (dentro do `<script>`), enviado no body do fetch. O controlador valida e rotaciona o token após uso.
+
+---
+
 ### 23. `193df32` — security: CSRF em 9 controllers MEDIUM + correções XSS/output encoding
 
 **Arquivos:** 17 arquivos (ver Mapa abaixo)
@@ -440,13 +457,13 @@ if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) { ... }
 | `processar_upload_exsicata.php` | security (CSRF csrf_upload_exsicata) |
 | `processar_revisao_exemplar.php` | security (role revisor/gestor + CSRF csrf_revisao_exemplar) |
 | `gerenciar_membros.php` | security (CSRF csrf_gerenciar_membros) |
-| `controlador_painel_revisor.php` | security (role revisor/gestor) |
+| `controlador_painel_revisor.php` | security (role revisor/gestor + CSRF csrf_painel_revisor) |
 | `relatorio_colaboradores.php` | security (role gestor) |
 | `monitoramento.php` | security (role gestor) |
 | `backup_painel.php` | security (token BACKUP_SECRET) |
 | `controlador_gestor.php` | bugfix (stats hardcoded → zeros) |
 | `buscar_dados_especie_ai.php` | security (SSL DeepSeek) |
-| `artigos_fila.php` | refactor (APP_BASE) |
+| `artigos_fila.php` | refactor (APP_BASE) + security (CSRF csrf_painel_revisor) |
 | `busca_caracteristicas.php` | removido (deprecado) |
 | `gerar_artigo.php` | removido (deprecado) |
 | `salvar_atribuicoes.php` | security (SSRF — validação de URL) |
@@ -503,7 +520,8 @@ if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) { ... }
 | `src/Views/cadastrar_exemplar.php` | security (CSRF csrf_cadastro_exemplar) |
 | `src/Views/enviar_imagem.php` | security (CSRF csrf_upload_exsicata) |
 | `src/Views/revisor/revisar_exemplar.php` | security (CSRF csrf_revisao_exemplar) |
-| `src/Views/artigo_revisao.php` | security (XSS — escapar campos _ref) |
+| `src/Views/entrada_revisor.php` | security (CSRF csrf_painel_revisor via JS) |
+| `src/Views/artigo_revisao.php` | security (XSS — escapar campos _ref + CSRF csrf_painel_revisor) |
 | `src/Views/auth/solicitar_alteracao_email.php` | security (ENT_QUOTES no token CSRF) |
 | `src/Views/includes/cabecalho.php` | security (XSS — escapar breadcrumb url/nome) |
 | `src/Views/usuario/alterar_senha.php` | security (XSS — escapar IP de acesso) |
@@ -516,9 +534,7 @@ Os itens abaixo foram identificados durante a sessão mas não corrigidos (por s
 
 1. **`confirmar_caracteristicas.php` — ownership de edição** — qualquer colaborador autenticado pode editar características de qualquer espécie sem cheque de ownership. Comportamento colaborativo intencional, mas sem rastreio de quem editou o quê por espécie atribuída.
 
-2. **CSRF em requisições AJAX** — As ações AJAX de `confirmar_caracteristicas.php` (`salvar_campo`, `salvar_obs`, etc.) e o endpoint `iniciar` em `controlador_painel_revisor.php` (fetch POST de `entrada_revisor.php`) não verificam CSRF. Mitigação parcial via `SameSite=Lax`. CSRF em AJAX exige meta-tag com token ou header `X-CSRF-Token` no frontend.
-
-3. **`controlador_painel_revisor.php` — CSRF nos formulários HTML** — Forms que postam para este controller existem em `artigo_revisao.php`, `artigos_fila.php` e `gestao_artigos_gestor.php` (ação "publicar"). CSRF não foi adicionado por envolver 3 views distintas; requer token compartilhado ou por-ação.
+2. **CSRF em requisições AJAX** — As ações AJAX de `confirmar_caracteristicas.php` (`salvar_campo`, `salvar_obs`, `salvar_referencias`, `buscar_ref_campo`, `buscar_atributo_multi`) não verificam CSRF. O endpoint `iniciar` de `controlador_painel_revisor.php` foi corrigido (commit 24). Mitigação parcial via `SameSite=Lax`. CSRF completo em `confirmar_caracteristicas.php` exige meta-tag com token ou header `X-CSRF-Token` no frontend.
 
 4. **CSP (Content-Security-Policy)** — não adicionado. Requer levantamento de todos os CDNs, scripts inline e estilos usados no projeto antes de implementar sem quebrar páginas.
 
