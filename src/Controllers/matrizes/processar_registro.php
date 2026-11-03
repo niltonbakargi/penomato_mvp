@@ -60,7 +60,7 @@ function salvarFoto(array $arquivo, string $dir): string|false {
 
     if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-    $ext      = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION)) ?: 'jpg';
+    $ext      = ['image/jpeg' => 'jpg', 'image/jpg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'][$tipo] ?? 'jpg';
     $nome     = uniqid('mt_') . '.' . $ext;
     $destino  = $dir . $nome;
 

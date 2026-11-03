@@ -65,7 +65,7 @@ if (!is_dir($dir_upload)) {
     mkdir($dir_upload, 0755, true);
 }
 
-$ext = strtolower(pathinfo($foto['name'], PATHINFO_EXTENSION)) ?: 'jpg';
+$ext = ['image/jpeg' => 'jpg', 'image/jpg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'][$tipo_real] ?? 'jpg';
 $nome_arquivo = uniqid("mt{$matriz_id}_{$parte}_") . '.' . $ext;
 
 if (!move_uploaded_file($foto['tmp_name'], $dir_upload . $nome_arquivo)) {

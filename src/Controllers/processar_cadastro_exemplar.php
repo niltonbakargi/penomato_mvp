@@ -134,7 +134,7 @@ if (!empty($_FILES['foto_identificacao']['name']) &&
     $pasta = dirname(dirname(__DIR__)) . '/uploads/exemplares/' . $especie_id . '/';
     if (!file_exists($pasta)) mkdir($pasta, 0755, true);
 
-    $ext          = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
+    $ext          = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/jpg' => 'jpg'][$mime] ?? 'jpg';
     $nome_arquivo = 'identificacao_' . date('Ymd_His') . '_' . rand(100, 999) . '.' . $ext;
     $caminho_disk = $pasta . $nome_arquivo;
     $caminho_foto = 'uploads/exemplares/' . $especie_id . '/' . $nome_arquivo;

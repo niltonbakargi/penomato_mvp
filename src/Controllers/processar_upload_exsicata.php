@@ -128,7 +128,7 @@ if (!file_exists($pasta)) {
     mkdir($pasta, 0755, true);
 }
 
-$ext           = strtolower(pathinfo($arquivo['name'], PATHINFO_EXTENSION));
+$ext           = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/jpg' => 'jpg'][$mime] ?? 'jpg';
 $nome_arquivo  = $parte_planta . '_' . date('Ymd_His') . '_' . rand(100, 999) . '.' . $ext;
 $caminho_disco = $pasta . $nome_arquivo;
 $caminho_rel   = 'uploads/exsicatas/' . $especie_id . '/' . $nome_arquivo;
