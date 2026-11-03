@@ -1,8 +1,8 @@
 <?php
 // ============================================================
 // LIMPAR IMPORTAÇÃO — apaga imagens do banco e do disco
-// para a espécie informada, permitindo recomeçar do zero.
-// Recebe especie_id via POST e redireciona para escolher_especie.
+// para a espécie da sessão ativa, permitindo recomeçar do zero.
+// especie_id lido exclusivamente da sessão (nunca do POST).
 // ============================================================
 session_start();
 
@@ -18,12 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$especie_id = (int) ($_POST['especie_id'] ?? 0);
-
-// Fallback: tentar pegar da sessão temporária
-if ($especie_id <= 0 && isset($_SESSION['importacao_temporaria']['especie_id'])) {
-    $especie_id = (int) $_SESSION['importacao_temporaria']['especie_id'];
+// Especie_id exclusivamente da sessão — nunca do POST (evita que qualquer usuário apague dados alheios)
+if (!isset($_SESSION['importacao_temporaria']['especie_id']) ||
+    (int)($_SESSION['importacao_temporaria']['usuario_id'] ?? 0) !== (int)$_SESSION['usuario_id']
+) {
+    $_SESSION['erro_importacao'] = 'Sessão de importação inválida.';
+    header('Location: ../Views/escolher_especie.php');
+    exit;
 }
+$especie_id = (int)$_SESSION['importacao_temporaria']['especie_id'];
 
 if ($especie_id <= 0) {
     $_SESSION['erro_importacao'] = 'Espécie inválida para limpar.';
