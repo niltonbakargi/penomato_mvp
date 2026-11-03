@@ -540,6 +540,36 @@ Os itens abaixo foram identificados durante a sessão mas não corrigidos (por s
 
 5. **Colações mistas no banco** — `general_ci` vs `unicode_ci` em tabelas diferentes. Documentado em `analise_banco_producao_2026-11-03.md`; requer janela de manutenção para migração.
 
+### 25. `b941eab` — security: CSRF em 5 forms MEDIUM + XSS em flash messages (round 10)
+
+**Arquivos:** `cabecalho.php`, `controlador_gestor.php`, `entrada_gestor.php`, `matrizes/registrar.php`, `matrizes/processar_registro.php`, `adicionar_imagens_internet.php`, `processar_adicionar_imagem_internet.php`, `inserir_dados_internet.php`
+
+| Arquivo(s) | Token de sessão | Issue |
+|---|---|---|
+| `controlador_gestor.php` + `entrada_gestor.php` | `csrf_gestor_inserir` | M1: form de inserção de espécie |
+| `matrizes/registrar.php` + `processar_registro.php` | `csrf_registrar_matriz` | M2: form de registro de matriz |
+| `adicionar_imagens_internet.php` + `processar_adicionar_imagem_internet.php` | `csrf_adicionar_imagem` | M3: form de upload de imagem |
+| `inserir_dados_internet.php` | `csrf_inserir_dados` | M4: form de inserção de dados (com `goto`) |
+| `cabecalho.php` | — | M5: flash messages sem `htmlspecialchars()` — XSS via `$_SESSION['mensagem_*']` |
+
+Adicionalmente: `processar_registro.php` — removida tag `<strong>` de mensagem flash para evitar HTML injetado.
+
+---
+
+### 26. `5af2176` — security: corrigir 5 issues LOW de round 10
+
+**Arquivos:** `excluir_conta_controlador.php`, `editar_perfil.php`, `recuperar_senha.php`, `recuperar_senha_controlador.php`, `redefinir_senha.php`, `redefinir_senha_controlador.php`, `admin_regenerar_artigos.php`, `regenerar_artigos.php`
+
+| Arquivo(s) | Issue | Correção |
+|---|---|---|
+| `excluir_conta_controlador.php` | L1: comparação `!==` em CSRF | `hash_equals()` |
+| `editar_perfil.php` | L2: token CSRF sem `ENT_QUOTES` | `htmlspecialchars(..., ENT_QUOTES)` |
+| `recuperar_senha.php` + `recuperar_senha_controlador.php` | L3: sem CSRF | Adicionado `csrf_recuperar_senha` |
+| `redefinir_senha.php` + `redefinir_senha_controlador.php` | L4: sem CSRF (baixo risco — mitigado pelo URL token) | Adicionado `csrf_redefinir_senha` |
+| `admin_regenerar_artigos.php` + `regenerar_artigos.php` | L5: execução em massa ao simples GET | Guard `?confirmar=sim` obrigatório |
+
+---
+
 ## Ações Necessárias no Servidor
 
 Estas configurações precisam ser feitas manualmente — não estão no código:
