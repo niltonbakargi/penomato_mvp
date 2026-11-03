@@ -3,6 +3,55 @@
 // confirmar_caracteristicas.php
 // ============================================================
 
+// ── Labels de exibição dos campos (compartilhado por todas as ações de IA) ──
+$_cc_labels = [
+    'nome_cientifico_completo' => 'Nome Científico Completo',
+    'sinonimos'        => 'Sinônimos',
+    'nome_popular'     => 'Nome Popular',
+    'familia'          => 'Família',
+    'forma_vida'       => 'Forma de Vida',
+    'origem'           => 'Origem',
+    'endemismo'        => 'Endemismo',
+    'biomas'           => 'Biomas de Ocorrência',
+    'estados_ocorrencia' => 'Estados de Ocorrência',
+    'forma_folha'      => 'Forma da Folha',
+    'filotaxia_folha'  => 'Filotaxia da Folha',
+    'tipo_folha'       => 'Tipo de Folha',
+    'divisao_folha'    => 'Divisão da Folha',
+    'paridade_pinnacao'=> 'Paridade da Pinação',
+    'tamanho_folha'    => 'Tamanho da Folha',
+    'textura_folha'    => 'Textura da Folha',
+    'margem_folha'     => 'Margem da Folha',
+    'venacao_folha'    => 'Venação da Folha',
+    'cor_flores'       => 'Cor das Flores',
+    'simetria_floral'  => 'Simetria Floral',
+    'numero_petalas'   => 'Número de Pétalas',
+    'disposicao_flores'=> 'Disposição das Flores',
+    'aroma'            => 'Aroma das Flores',
+    'tamanho_flor'     => 'Tamanho da Flor',
+    'tipo_fruto'       => 'Tipo de Fruto',
+    'tamanho_fruto'    => 'Tamanho do Fruto',
+    'cor_fruto'        => 'Cor do Fruto',
+    'textura_fruto'    => 'Textura do Fruto',
+    'dispersao_fruto'  => 'Dispersão do Fruto',
+    'aroma_fruto'      => 'Aroma do Fruto',
+    'tipo_semente'     => 'Tipo de Semente',
+    'tamanho_semente'  => 'Tamanho da Semente',
+    'cor_semente'      => 'Cor da Semente',
+    'textura_semente'  => 'Textura da Semente',
+    'quantidade_sementes' => 'Quantidade de Sementes por Fruto',
+    'tipo_caule'       => 'Tipo de Caule',
+    'textura_caule'    => 'Textura do Caule',
+    'cor_caule'        => 'Cor do Caule',
+    'forma_caule'      => 'Forma do Caule',
+    'modificacao_caule'=> 'Modificação do Caule',
+    'ramificacao_caule'=> 'Ramificação do Caule',
+    'possui_espinhos'  => 'Possui Espinhos',
+    'possui_latex'     => 'Possui Látex',
+    'possui_seiva'     => 'Possui Seiva',
+    'possui_resina'    => 'Possui Resina',
+];
+
 // ── AJAX: dados da espécie ──────────────────────────────────
 if (isset($_GET['acao']) && $_GET['acao'] === 'dados') {
     if (session_status() === PHP_SESSION_NONE) session_start();
@@ -47,18 +96,11 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_campo') {
     $ref         = trim($_POST['ref'] ?? '');
     $referencias = trim($_POST['referencias'] ?? '');
 
-    $whitelist = [
-        'nome_cientifico_completo','sinonimos','nome_popular','familia',
-        'forma_vida','origem','endemismo','biomas','estados_ocorrencia',
-        'forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao',
-        'tamanho_folha','textura_folha',
-        'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
-        'disposicao_flores','aroma','tamanho_flor','tipo_fruto','tamanho_fruto',
-        'cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto','tipo_semente',
-        'tamanho_semente','cor_semente','textura_semente','quantidade_sementes',
-        'tipo_caule','textura_caule','cor_caule','forma_caule','modificacao_caule',
-        'ramificacao_caule','possui_espinhos','possui_latex','possui_seiva','possui_resina',
-    ];
+    // Campos aceitos: ENUMs da fonte de verdade + campos texto-livre
+    $whitelist = array_merge(
+        array_keys(require __DIR__ . '/../Config/enums_caracteristicas.php'),
+        ['nome_cientifico_completo', 'sinonimos', 'nome_popular', 'familia', 'biomas', 'estados_ocorrencia']
+    );
 
     if (!$especie_id || !in_array($campo, $whitelist, true)) {
         echo json_encode(['ok' => false, 'erro' => 'Campo inválido.']); exit;
@@ -162,31 +204,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
         if (is_array($decoded)) $refs_existentes = $decoded;
     }
 
-    $labels = [
-        'nome_cientifico_completo' => 'Nome Científico Completo',
-        'sinonimos' => 'Sinônimos', 'nome_popular' => 'Nome Popular', 'familia' => 'Família',
-        'forma_vida' => 'Forma de Vida', 'origem' => 'Origem', 'endemismo' => 'Endemismo',
-        'biomas' => 'Biomas de Ocorrência', 'estados_ocorrencia' => 'Estados de Ocorrência',
-        'forma_folha' => 'Forma da Folha', 'filotaxia_folha' => 'Filotaxia da Folha',
-        'tipo_folha' => 'Tipo de Folha', 'divisao_folha' => 'Divisão da Folha',
-        'paridade_pinnacao' => 'Paridade da Pinação', 'tamanho_folha' => 'Tamanho da Folha',
-        'textura_folha' => 'Textura da Folha', 'margem_folha' => 'Margem da Folha',
-        'venacao_folha' => 'Venação da Folha', 'cor_flores' => 'Cor das Flores',
-        'simetria_floral' => 'Simetria Floral', 'numero_petalas' => 'Número de Pétalas',
-        'disposicao_flores' => 'Disposição das Flores', 'aroma' => 'Aroma das Flores',
-        'tamanho_flor' => 'Tamanho da Flor', 'tipo_fruto' => 'Tipo de Fruto',
-        'tamanho_fruto' => 'Tamanho do Fruto', 'cor_fruto' => 'Cor do Fruto',
-        'textura_fruto' => 'Textura do Fruto', 'dispersao_fruto' => 'Dispersão do Fruto',
-        'aroma_fruto' => 'Aroma do Fruto', 'tipo_semente' => 'Tipo de Semente',
-        'tamanho_semente' => 'Tamanho da Semente', 'cor_semente' => 'Cor da Semente',
-        'textura_semente' => 'Textura da Semente',
-        'quantidade_sementes' => 'Quantidade de Sementes por Fruto',
-        'tipo_caule' => 'Tipo de Caule', 'textura_caule' => 'Textura do Caule',
-        'cor_caule' => 'Cor do Caule', 'forma_caule' => 'Forma do Caule',
-        'modificacao_caule' => 'Modificação do Caule', 'ramificacao_caule' => 'Ramificação do Caule',
-        'possui_espinhos' => 'Possui Espinhos', 'possui_latex' => 'Possui Látex',
-        'possui_seiva' => 'Possui Seiva', 'possui_resina' => 'Possui Resina',
-    ];
+    $labels = $_cc_labels;
 
     if (!$especie_id || !isset($labels[$campo])) {
         echo json_encode(['sucesso' => false, 'erro' => 'Parâmetros inválidos.']); exit;
@@ -338,32 +356,8 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
     $refs_json  = trim($_POST['referencias_existentes'] ?? '');
 
     // Labels e opções válidas de cada campo
-    $ENUMS = require __DIR__ . '/../Config/enums_caracteristicas.php';
-
-    $labels = [
-        'nome_cientifico_completo' => 'Nome Científico Completo',
-        'sinonimos' => 'Sinônimos', 'nome_popular' => 'Nome Popular', 'familia' => 'Família',
-        'forma_vida' => 'Forma de Vida', 'origem' => 'Origem', 'endemismo' => 'Endemismo',
-        'biomas' => 'Biomas de Ocorrência', 'estados_ocorrencia' => 'Estados de Ocorrência',
-        'forma_folha' => 'Forma da Folha', 'filotaxia_folha' => 'Filotaxia da Folha',
-        'tipo_folha' => 'Tipo de Folha', 'divisao_folha' => 'Divisão da Folha',
-        'paridade_pinnacao' => 'Paridade da Pinação', 'tamanho_folha' => 'Tamanho da Folha',
-        'textura_folha' => 'Textura da Folha', 'margem_folha' => 'Margem da Folha',
-        'venacao_folha' => 'Venação da Folha', 'cor_flores' => 'Cor das Flores',
-        'simetria_floral' => 'Simetria Floral', 'numero_petalas' => 'Número de Pétalas',
-        'disposicao_flores' => 'Disposição das Flores', 'aroma' => 'Aroma das Flores',
-        'tamanho_flor' => 'Tamanho da Flor', 'tipo_fruto' => 'Tipo de Fruto',
-        'tamanho_fruto' => 'Tamanho do Fruto', 'cor_fruto' => 'Cor do Fruto',
-        'textura_fruto' => 'Textura do Fruto', 'dispersao_fruto' => 'Dispersão do Fruto',
-        'aroma_fruto' => 'Aroma do Fruto', 'tipo_semente' => 'Tipo de Semente',
-        'tamanho_semente' => 'Tamanho da Semente', 'cor_semente' => 'Cor da Semente',
-        'textura_semente' => 'Textura da Semente', 'quantidade_sementes' => 'Quantidade de Sementes',
-        'tipo_caule' => 'Tipo de Caule', 'textura_caule' => 'Textura do Caule',
-        'cor_caule' => 'Cor do Caule', 'forma_caule' => 'Forma do Caule',
-        'modificacao_caule' => 'Modificação do Caule', 'ramificacao_caule' => 'Ramificação do Caule',
-        'possui_espinhos' => 'Possui Espinhos', 'possui_latex' => 'Possui Látex',
-        'possui_seiva' => 'Possui Seiva', 'possui_resina' => 'Possui Resina',
-    ];
+    $ENUMS  = require __DIR__ . '/../Config/enums_caracteristicas.php';
+    $labels = $_cc_labels;
 
     if (!$especie_id || !isset($labels[$campo])) {
         echo json_encode(['sucesso' => false, 'erro' => 'Parâmetros inválidos.']); exit;

@@ -160,6 +160,7 @@ return [
     'tamanho_flor' => [
         'Pequena' => 'de pequeno porte',
         'Média'   => 'de porte médio',
+        'Grande'  => 'de grande porte',
     ],
 
     // ═══════════════════════════════════════════════
@@ -312,7 +313,10 @@ return [
         'Cladódio'  => 'modificado em cladódio',
         'Rizoma'    => 'com rizoma',
         'Tubérculo' => 'com tubérculo',
-        'Espinhos'  => 'com espinhos no caule',
+        'Gavinha'   => 'com gavinhas',
+        'Bulbo'     => 'com bulbo',
+        'Sapopema'  => 'com sapopemas',
+        'Nenhuma'   => null,
     ],
 
     'ramificacao_caule' => [

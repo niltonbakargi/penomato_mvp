@@ -61,7 +61,7 @@ return [
         'Solitária','Capítulo','Cacho','Corimbo','Espádice','Espiga','Panícula','Umbela',
     ],
     'aroma' => ['Ausente','Suave','Forte','Desagradável','Adocicada','Cítrica'],
-    'tamanho_flor' => ['Pequena','Média'],
+    'tamanho_flor' => ['Pequena','Média','Grande'],
 
     // ── FRUTO ─────────────────────────────────────────────────────────────
     'tipo_fruto' => [
@@ -92,7 +92,7 @@ return [
         'Esbranquiçado','Esverdeado','Pardacento',
     ],
     'forma_caule' => ['Cilíndrico','Quadrangular','Triangular','Achatado','Alado'],
-    'modificacao_caule' => ['Estolão','Cladódio','Rizoma','Tubérculo','Espinhos'],
+    'modificacao_caule' => ['Estolão','Cladódio','Rizoma','Tubérculo','Gavinha','Bulbo','Sapopema','Nenhuma'],
     'ramificacao_caule' => ['Dicotômica','Monopodial','Simpodial'],
 
     // ── GERAIS ────────────────────────────────────────────────────────────
