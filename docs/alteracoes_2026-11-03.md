@@ -11,12 +11,12 @@ Todas as alterações foram commitadas e publicadas no branch `main`.
 |---|---|---|
 | Segurança (controle de acesso) | 4 | 10 |
 | Segurança (validação de entrada) | 4 | 6 |
-| Segurança (tokens e criptografia) | 2 | 4 |
+| Segurança (tokens e criptografia) | 3 | 9 |
 | Correções de bugs funcionais | 3 | 6 |
 | Refatoração e limpeza | 5 | 80+ |
 | Banco de dados (análise + correções) | 2 | 3 |
 | Consistência de ENUMs | 1 | 2 |
-| **Total** | **21** | **~111** |
+| **Total** | **22** | **~117** |
 
 ---
 
@@ -321,6 +321,33 @@ Auditoria de consistência entre DB, `enums_caracteristicas.php` e `busca_caract
 
 ---
 
+### 22. `82ca96d` — fix: proteção CSRF em 4 formulários, exposição de exceções e headers HTTP
+
+**Arquivos:** `config/app.php`, `src/Controllers/confirmar_caracteristicas.php`, `src/Views/cadastro_caracteristicas.php`, `src/Views/escolher_especie.php`, `src/Views/matrizes/gerenciar_matrizes.php`, `src/Views/sugestoes.php`
+
+**a) CSRF adicionado em 4 formulários POST sem proteção**
+
+| Arquivo | Token de sessão | Observação |
+|---|---|---|
+| `sugestoes.php` | `csrf_sugestao` | Formulário de envio de sugestão |
+| `gerenciar_matrizes.php` | `csrf_remover_matriz` | Formulário de remoção de matriz (soft delete) |
+| `cadastro_caracteristicas.php` | `csrf_cadastro_caract` | Controlador sem form próprio — proteção server-side |
+| `escolher_especie.php` | `csrf_escolher_especie` | Formulário modal de seleção de espécie/orientador |
+
+Padrão aplicado em todos: geração com `bin2hex(random_bytes(32))`, validação com `hash_equals()`, rotação após uso bem-sucedido, `htmlspecialchars(..., ENT_QUOTES)` no hidden input.
+
+**b) `confirmar_caracteristicas.php` — mensagens de exceção expostas ao cliente**
+- `catch (Exception $e) { echo json_encode(['erro' => $e->getMessage()]); }` nas ações `salvar_campo` e `salvar_obs` revelavam detalhes do banco ao navegador
+- Corrigido: mensagem de erro genérica para o cliente + `error_log` preserva o detalhe para diagnóstico do servidor
+
+**c) `config/app.php` — headers HTTP de segurança globais**
+- Adicionados em todas as respostas (antes do output):
+  - `X-Frame-Options: SAMEORIGIN` — previne clickjacking
+  - `X-Content-Type-Options: nosniff` — previne MIME sniffing
+  - `Referrer-Policy: strict-origin-when-cross-origin` — limita dados no Referer
+
+---
+
 ### 21. `975cd6f` + `0832e46` — fix: SSRF, controlador legado e GPS
 **Arquivos:** `src/Controllers/salvar_atribuicoes.php`, `src/Controllers/upload_imagem_controlador.php`, `src/Controllers/matrizes/processar_registro.php`
 
@@ -364,7 +391,7 @@ if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) { ... }
 ### Controllers
 | Arquivo | Tipo de alteração |
 |---|---|
-| `confirmar_caracteristicas.php` | refactor + security (whitelist, require_once, SSL) |
+| `confirmar_caracteristicas.php` | refactor + security (whitelist, require_once, SSL, exceções) |
 | `processar_upload_imagem.php` | security (whitelist parte_planta, display_errors) |
 | `processar_adicionar_imagem_internet.php` | security (whitelist parte_planta) |
 | `processar_upload_temporario.php` | security (error_reporting) |
@@ -407,6 +434,7 @@ if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) { ... }
 | `src/Config/enums_caracteristicas.php` | bugfix (ENUMs tamanho_flor, modificacao_caule) |
 | `src/Config/vocabulario_botanico.php` | sync (novos valores ENUM → PT-BR) |
 | `config/dev_local.example.php` | docs (BACKUP_SECRET) |
+| `config/app.php` | security (X-Frame-Options, X-Content-Type-Options, Referrer-Policy) |
 
 ### Raiz / Infra
 | Arquivo | Tipo de alteração |
@@ -428,6 +456,10 @@ if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) { ... }
 | Arquivo | Tipo de alteração |
 |---|---|
 | `src/Views/publico/busca_caracteristicas.php` | bugfix (6 selects com ENUMs errados corrigidos) |
+| `src/Views/sugestoes.php` | security (CSRF csrf_sugestao) |
+| `src/Views/escolher_especie.php` | security (CSRF csrf_escolher_especie) |
+| `src/Views/cadastro_caracteristicas.php` | security (CSRF csrf_cadastro_caract) |
+| `src/Views/matrizes/gerenciar_matrizes.php` | security (CSRF csrf_remover_matriz) |
 
 ---
 
@@ -435,7 +467,13 @@ if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) { ... }
 
 Os itens abaixo foram identificados durante a sessão mas não corrigidos (por serem de design intencional ou exigirem decisão do time):
 
-1. **`confirmar_caracteristicas.php` `salvar_campo`/`salvar_obs`** — qualquer colaborador autenticado pode editar características de qualquer espécie sem cheque de ownership. Comportamento colaborativo intencional, mas sem rastreio de quem editou o quê por espécie atribuída.
+1. **`confirmar_caracteristicas.php` — ownership de edição** — qualquer colaborador autenticado pode editar características de qualquer espécie sem cheque de ownership. Comportamento colaborativo intencional, mas sem rastreio de quem editou o quê por espécie atribuída.
+
+2. **`confirmar_caracteristicas.php` — AJAX sem CSRF token** — As ações AJAX (`salvar_campo`, `salvar_obs`, `salvar_referencias`, `buscar_ref_campo`, `buscar_atributo_multi`) não verificam CSRF. Mitigação parcial via `SameSite=Lax` nos cookies de sessão. CSRF completo em AJAX exigiria um meta-tag com token ou header customizado no frontend.
+
+3. **CSP (Content-Security-Policy)** — não adicionado. Requer levantamento de todos os CDNs, scripts inline e estilos usados no projeto antes de implementar sem quebrar páginas.
+
+4. **Colações mistas no banco** — `general_ci` vs `unicode_ci` em tabelas diferentes. Documentado em `analise_banco_producao_2026-11-03.md`; requer janela de manutenção para migração.
 
 ## Ações Necessárias no Servidor
 
