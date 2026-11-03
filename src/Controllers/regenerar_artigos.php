@@ -15,6 +15,10 @@ if (empty($_SESSION['usuario_id']) || ($_SESSION['usuario_tipo'] ?? '') !== 'ges
     die('Acesso negado. Apenas gestores podem usar esta ferramenta.');
 }
 
+if (($_GET['confirmar'] ?? '') !== 'sim') {
+    die('<p>Para executar, acesse com: <strong>?confirmar=sim</strong></p>');
+}
+
 // ── buscar todos os artigos existentes ──────────────────────────────────
 $ids = $pdo->query("
     SELECT a.especie_id, e.nome_cientifico

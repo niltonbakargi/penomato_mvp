@@ -46,6 +46,10 @@ if (empty($token) || !ctype_xdigit($token) || strlen($token) !== 64) {
 $erro    = $_SESSION['mensagem_erro']    ?? '';
 $sucesso = $_SESSION['mensagem_sucesso'] ?? '';
 unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
+
+if ($token_valido && empty($_SESSION['csrf_redefinir_senha'])) {
+    $_SESSION['csrf_redefinir_senha'] = bin2hex(random_bytes(32));
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -164,6 +168,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
                       method="POST" id="formRedefinir" novalidate>
 
                     <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_redefinir_senha'], ENT_QUOTES); ?>">
 
                     <div class="form-group">
                         <label for="nova_senha">

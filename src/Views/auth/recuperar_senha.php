@@ -20,6 +20,10 @@ if (isset($_SESSION['usuario_id'])) {
 $erro    = $_SESSION['mensagem_erro']    ?? '';
 $sucesso = $_SESSION['mensagem_sucesso'] ?? '';
 unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
+
+if (empty($_SESSION['csrf_recuperar_senha'])) {
+    $_SESSION['csrf_recuperar_senha'] = bin2hex(random_bytes(32));
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -88,6 +92,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
 
                 <form action="<?= APP_BASE ?>/src/Controllers/auth/recuperar_senha_controlador.php"
                       method="POST" novalidate>
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_recuperar_senha'], ENT_QUOTES); ?>">
 
                     <div class="form-group">
                         <label for="email"><i class="fas fa-envelope" style="color:var(--cor-primaria);margin-right:6px;"></i>E-mail cadastrado</label>

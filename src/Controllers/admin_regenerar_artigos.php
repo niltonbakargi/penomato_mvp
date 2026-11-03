@@ -12,6 +12,10 @@ if (empty($_SESSION['usuario_id']) || ($_SESSION['usuario_tipo'] ?? '') !== 'ges
     die('Acesso negado.');
 }
 
+if (($_GET['confirmar'] ?? '') !== 'sim') {
+    die('<p>Para executar, acesse: <strong>?confirmar=sim</strong></p>');
+}
+
 $ids = $pdo->query("SELECT especie_id FROM artigos ORDER BY especie_id")->fetchAll(PDO::FETCH_COLUMN);
 
 $ok  = 0;

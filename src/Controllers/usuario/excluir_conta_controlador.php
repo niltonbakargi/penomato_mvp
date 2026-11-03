@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // ============================================================
 $csrf = $_POST['csrf_token'] ?? '';
 
-if (empty($csrf) || $csrf !== ($_SESSION['csrf_token_exclusao'] ?? '')) {
+if (!hash_equals($_SESSION['csrf_token_exclusao'] ?? '', $csrf)) {
     $_SESSION['mensagem_erro'] = "Requisição inválida. Tente novamente.";
     header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
     exit;

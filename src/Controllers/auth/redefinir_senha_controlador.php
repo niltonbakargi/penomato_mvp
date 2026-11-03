@@ -17,6 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// ── CSRF ─────────────────────────────────────────────────────
+$csrf = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_redefinir_senha'] ?? '', $csrf)) {
+    $_SESSION['mensagem_erro'] = "Requisição inválida. Tente novamente.";
+    $token_raw = trim($_POST['token'] ?? '');
+    $redir = (ctype_xdigit($token_raw) && strlen($token_raw) === 64)
+        ? APP_BASE . '/src/Views/auth/redefinir_senha.php?token=' . urlencode($token_raw)
+        : APP_BASE . '/src/Views/auth/recuperar_senha.php';
+    header('Location: ' . $redir);
+    exit;
+}
+$_SESSION['csrf_redefinir_senha'] = bin2hex(random_bytes(32));
+
 // ============================================================
 // RECEBER DADOS
 // ============================================================

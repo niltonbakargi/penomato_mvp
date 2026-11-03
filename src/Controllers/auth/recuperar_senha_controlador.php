@@ -18,6 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// ── CSRF ─────────────────────────────────────────────────────
+$csrf = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_recuperar_senha'] ?? '', $csrf)) {
+    $_SESSION['mensagem_erro'] = "Requisição inválida. Tente novamente.";
+    header('Location: ' . APP_BASE . '/src/Views/auth/recuperar_senha.php');
+    exit;
+}
+$_SESSION['csrf_recuperar_senha'] = bin2hex(random_bytes(32));
+
 // ============================================================
 // RECEBER E VALIDAR EMAIL
 // ============================================================

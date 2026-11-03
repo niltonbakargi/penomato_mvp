@@ -432,7 +432,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                   method="POST" id="formExcluirConta">
 
                 <input type="hidden" name="csrf_token"
-                       value="<?php echo $_SESSION['csrf_token_exclusao']; ?>">
+                       value="<?php echo htmlspecialchars($_SESSION['csrf_token_exclusao'], ENT_QUOTES); ?>">
 
                 <div class="modal-body">
                     <div class="text-center mb-4">
