@@ -661,8 +661,7 @@ $url_painel = ($tipo === 'gestor')
                     <div class="footer">
                         © <?php echo date('Y'); ?> Penomato<br>
                         Desenvolvido como Projeto Integrador do Curso de Tecnologia da Informação da UFMS,
-                        em parceria com o Grupo de Estudos em Botânica e Recursos Florestais da UEMS,
-                        com orientação e apoio do Prof. Dr. Norton Hayd Rêgo.
+                        em parceria com o Grupo de Estudos em Botânica e Recursos Florestais da UEMS.
                     </div>
 
                 </div>

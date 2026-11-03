@@ -197,8 +197,7 @@ $versao_sistema = 'MVP 1.0';
                 <div class="col-12 text-center mb-2">
                     <p class="mb-0 footer-credito-institucional">
                         Desenvolvido como Projeto Integrador do Curso de Tecnologia da Informação da UFMS,
-                        em parceria com o Grupo de Estudos em Botânica e Recursos Florestais da UEMS,
-                        com orientação e apoio do Prof. Dr. Norton Hayd Rêgo.
+                        em parceria com o Grupo de Estudos em Botânica e Recursos Florestais da UEMS.
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-start">
