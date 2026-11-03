@@ -64,8 +64,6 @@ if ($is_prod) {
 }
 
 // ── HTTP Security Headers ─────────────────────────────────────
-if (!headers_sent()) {
-    header('X-Frame-Options: SAMEORIGIN');
-    header('X-Content-Type-Options: nosniff');
-    header('Referrer-Policy: strict-origin-when-cross-origin');
-}
+// Definidos via .htaccess (Header always set) com valores iguais ou mais
+// restritivos (X-Frame-Options: DENY). Não redefinir aqui para evitar
+// que headers duplicados sobrescrevam a versão mais restritiva do .htaccess.

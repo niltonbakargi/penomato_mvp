@@ -40,7 +40,7 @@ ini_set('memory_limit', '256M');
 // ── Arquivo temporário dentro do projeto (Hostgator) ─────────
 $data    = date('Y-m-d_H-i');
 $zipName = "backup_penomato_{$data}.zip";
-$zipTemp = __DIR__ . '/../../uploads/' . $zipName;
+$zipTemp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $zipName;
 
 $zip = new ZipArchive();
 if ($zip->open($zipTemp, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
