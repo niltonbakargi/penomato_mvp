@@ -1,7 +1,4 @@
 <?php
-// Ativar exibição de erros (apenas para desenvolvimento)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 $id = $_GET['id'] ?? null;
 $nome_cientifico = '';

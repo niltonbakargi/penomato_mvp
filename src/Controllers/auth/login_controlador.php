@@ -155,7 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // ------------------------------------------------
             // REDIRECIONAR — usa redirect se informado, senão painel padrão
             // ------------------------------------------------
-            if (!empty($redirect)) {
+            // Validar redirect: apenas caminhos relativos internos (sem protocolo)
+            if (!empty($redirect) && str_starts_with($redirect, '/') && strpos($redirect, '://') === false) {
                 header('Location: ' . $redirect);
             } elseif ($usuario['categoria'] === 'gestor') {
                 header('Location: ' . APP_BASE . '/src/Controllers/controlador_gestor.php');
