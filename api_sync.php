@@ -18,12 +18,11 @@ if (!defined('BACKUP_SECRET') || BACKUP_SECRET === '' || BACKUP_SECRET === 'COLE
 }
 define('BACKUP_TOKEN', BACKUP_SECRET);
 
-// Aceita token via POST body (preferido), header ou query string (legado)
+// Aceita token via POST body (preferido) ou header Authorization
 $token = $_POST['token']
       ?? $_SERVER['HTTP_X_BACKUP_TOKEN']
-      ?? $_GET['token']
       ?? '';
-if ($token !== BACKUP_TOKEN) {
+if (!hash_equals(BACKUP_TOKEN, $token)) {
     http_response_code(403);
     echo json_encode(['erro' => 'Token inválido']);
     exit;

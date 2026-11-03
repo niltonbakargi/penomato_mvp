@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // ============================================================
 $csrf_token = $_POST['csrf_token'] ?? '';
 
-if (empty($csrf_token) || $csrf_token !== ($_SESSION['csrf_token'] ?? '')) {
+if (empty($csrf_token) || !hash_equals($_SESSION['csrf_token'] ?? '', $csrf_token)) {
     $_SESSION['mensagem_erro'] = "Requisição inválida. Tente novamente.";
     header('Location: ' . APP_BASE . '/src/Views/usuario/alterar_senha.php');
     exit;

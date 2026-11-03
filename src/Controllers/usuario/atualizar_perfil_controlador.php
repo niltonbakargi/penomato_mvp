@@ -49,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // VALIDAR TOKEN CSRF
 // ============================================================
 
-if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || 
-    $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) ||
+    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
     
     $_SESSION['mensagem_erro'] = "Erro de segurança. Tente novamente.";
     header('Location: ' . APP_BASE . '/src/Views/usuario/editar_perfil.php');
