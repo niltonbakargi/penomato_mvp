@@ -10,6 +10,11 @@ if (!isset($_SESSION['usuario_id']) || ($_SESSION['usuario_tipo'] ?? '') !== 'ge
 
 $gestor_id = $_SESSION['usuario_id'];
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_aprovacao_acoes'])) {
+    $_SESSION['csrf_aprovacao_acoes'] = bin2hex(random_bytes(32));
+}
+
 $labels_tipo = [
     'dados_internet' => 'Dados da Internet',
     'confirmacao'    => 'Confirmação',
@@ -22,6 +27,14 @@ $labels_tipo = [
 // PROCESSAR DECISÃO (POST)
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_aprovacao_acoes'] ?? '', $csrf)) {
+        mensagemErro('Requisição inválida. Tente novamente.');
+        header('Location: aprovacao_acoes.php');
+        exit;
+    }
+    $_SESSION['csrf_aprovacao_acoes'] = bin2hex(random_bytes(32));
+
     $acao       = $_POST['acao']       ?? '';
     $item_id    = (int)($_POST['item_id'] ?? 0);
     $motivo     = trim($_POST['motivo'] ?? '');
@@ -474,6 +487,7 @@ $labels_status_esp = [
                     <!-- Botões de decisão -->
                     <div class="card-actions">
                         <form method="POST" action="aprovacao_acoes.php" style="display:contents;">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_aprovacao_acoes'], ENT_QUOTES); ?>">
                             <input type="hidden" name="item_id" value="<?php echo $item['id']; ?>">
                             <input type="text" name="motivo" class="input-motivo" placeholder="Motivo (opcional para aprovação, recomendado para rejeição)">
                             <button type="submit" name="acao" value="aprovar" class="btn-aprovar">✅ Aprovar</button>

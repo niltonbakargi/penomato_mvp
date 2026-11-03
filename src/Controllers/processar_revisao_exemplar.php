@@ -19,6 +19,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// ── CSRF ────────────────────────────────────────
+$csrf = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_revisao_exemplar'] ?? '', $csrf)) {
+    $filtro = in_array($_POST['filtro'] ?? '', ['aguardando_revisao','aprovado','rejeitado','todos'])
+              ? $_POST['filtro'] : 'aguardando_revisao';
+    header('Location: ' . APP_BASE . '/src/Views/revisor/revisar_exemplar.php?filtro=' . $filtro
+           . '&erro=' . urlencode('Requisição inválida. Tente novamente.'));
+    exit;
+}
+$_SESSION['csrf_revisao_exemplar'] = bin2hex(random_bytes(32));
+
 $usuario_id  = (int)$_SESSION['usuario_id'];
 $exemplar_id = (int)($_POST['exemplar_id'] ?? 0);
 $acao        = trim($_POST['acao']         ?? '');

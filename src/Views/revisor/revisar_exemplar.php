@@ -13,6 +13,11 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id   = (int)$_SESSION['usuario_id'];
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Especialista';
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_revisao_exemplar'])) {
+    $_SESSION['csrf_revisao_exemplar'] = bin2hex(random_bytes(32));
+}
+
 // ── Filtro de status ──────────────────────────────────────────────────────────
 $filtro = $_GET['filtro'] ?? 'aguardando_revisao';
 $filtros_validos = ['aguardando_revisao', 'aprovado', 'rejeitado', 'todos'];
@@ -441,6 +446,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
                     <form method="POST"
                           action="<?= APP_BASE ?>/src/Controllers/processar_revisao_exemplar.php"
                           onsubmit="return confirm('Confirma a aprovação do exemplar <?= $ex['codigo'] ?>?')">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_revisao_exemplar'], ENT_QUOTES) ?>">
                         <input type="hidden" name="exemplar_id" value="<?= $ex['id'] ?>">
                         <input type="hidden" name="acao" value="aprovar">
                         <input type="hidden" name="filtro" value="<?= $filtro ?>">
@@ -456,6 +462,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
                         <form method="POST"
                               action="<?= APP_BASE ?>/src/Controllers/processar_revisao_exemplar.php"
                               id="form-rejeitar-<?= $ex['id'] ?>">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_revisao_exemplar'], ENT_QUOTES) ?>">
                             <input type="hidden" name="exemplar_id" value="<?= $ex['id'] ?>">
                             <input type="hidden" name="acao" value="rejeitar">
                             <input type="hidden" name="filtro" value="<?= $filtro ?>">
