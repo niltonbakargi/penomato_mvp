@@ -7,8 +7,12 @@
 
 require_once __DIR__ . '/autores_artigo.php';
 
-// Observações por campo — preenchido por regenerarArtigoEspecie antes de gerar
-$GLOBALS['_art_obs'] = $GLOBALS['_art_obs'] ?? [];
+/** Getter/setter das observações por campo. Evita variável global. */
+function _art_obs_ctx(?array $obs = null): array {
+    static $atual = [];
+    if ($obs !== null) $atual = $obs;
+    return $atual;
+}
 
 // ── Vocabulário botânico ─────────────────────────────────────
 
@@ -37,7 +41,7 @@ function _art_vr(string $atrib, ?string $campo, string $ref = ''): ?string {
         if ($nums) $out .= '<sup class="art-ref">[' . implode(',', $nums) . ']</sup>';
     }
     // Observação do campo (salva em especies_caracteristicas_obs)
-    $obs = trim($GLOBALS['_art_obs'][$atrib] ?? '');
+    $obs = trim(_art_obs_ctx()[$atrib] ?? '');
     if ($obs !== '') {
         $out .= ' <em class="art-obs">(' . htmlspecialchars($obs) . ')</em>';
     }
@@ -296,7 +300,7 @@ function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs, PDO $pdo): s
         echo '<h3 class="art-secao">Prancha Fotográfica</h3><div class="art-galeria">';
         foreach ($imgs as $img) {
             echo '<figure class="art-figura">';
-            echo '<img src="<?= APP_BASE ?>/' . $h($img['caminho_imagem']) . '" alt="' . $h($img['parte_planta']) . '">';
+            echo '<img src="' . APP_BASE . '/' . $h($img['caminho_imagem']) . '" alt="' . $h($img['parte_planta']) . '">';
             echo '<figcaption>' . ucfirst($h($img['parte_planta']));
             if (!empty($img['autor_imagem'])) echo ' — ' . $h($img['autor_imagem']);
             if (!empty($img['licenca']))      echo ' (' . $h($img['licenca']) . ')';
@@ -349,13 +353,14 @@ function regenerarArtigoEspecie(PDO $pdo, int $especie_id): void {
         $stmt->execute([$especie_id]);
         $c = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-        // Carrega observações por campo e injeta no gerador via global
+        // Carrega observações por campo e injeta no gerador via contexto estático
         $stmt_obs = $pdo->prepare("SELECT campo, observacao FROM especies_caracteristicas_obs WHERE especie_id = ?");
         $stmt_obs->execute([$especie_id]);
-        $GLOBALS['_art_obs'] = [];
+        $obs_map = [];
         foreach ($stmt_obs->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $GLOBALS['_art_obs'][$row['campo']] = $row['observacao'];
+            $obs_map[$row['campo']] = $row['observacao'];
         }
+        _art_obs_ctx($obs_map);
 
         $stmt = $pdo->prepare("
             SELECT parte_planta, caminho_imagem, autor_imagem, licenca, fonte_nome, fonte_url
