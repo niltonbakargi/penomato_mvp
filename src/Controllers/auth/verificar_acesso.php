@@ -230,9 +230,16 @@ function usuarioEhProprietario($id_recurso, $tabela, $coluna_usuario = 'autor_da
     if (!estaLogado()) {
         return false;
     }
-    
+
+    // Allowlist para evitar SQL injection caso os parâmetros venham de input externo
+    $tabelas_validas  = ['especies_administrativo', 'especies_caracteristicas', 'exemplares', 'especies_imagens', 'artigos', 'matrizes'];
+    $colunas_validas  = ['autor_dados_internet_id', 'cadastrado_por', 'id_usuario_identificador', 'coletor_id', 'autor_registrada_id'];
+    if (!in_array($tabela, $tabelas_validas, true) || !in_array($coluna_usuario, $colunas_validas, true)) {
+        return false;
+    }
+
     require_once __DIR__ . '/../../../config/banco_de_dados.php';
-    
+
     $dono = buscarUm(
         "SELECT $coluna_usuario FROM $tabela WHERE id = :id",
         [':id' => $id_recurso]
