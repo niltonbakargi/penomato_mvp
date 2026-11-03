@@ -20,11 +20,13 @@ $tipos_permitidos = ['image/jpeg', 'image/png', 'image/webp'];
 $partes_opcionais = ['folha', 'flor', 'fruto', 'caule', 'semente'];
 
 // ── Valida GPS ────────────────────────────────────────────────
-$lat = $_POST['latitude']  ?? '';
-$lon = $_POST['longitude'] ?? '';
+$lat = floatval($_POST['latitude']  ?? '');
+$lon = floatval($_POST['longitude'] ?? '');
 
-if (empty($lat) || empty($lon)) {
-    mensagemErro('As coordenadas GPS são obrigatórias.');
+if ($lat === 0.0 && $lon === 0.0 ||
+    $lat < -90 || $lat > 90 || $lon < -180 || $lon > 180
+) {
+    mensagemErro('Coordenadas GPS inválidas.');
     header('Location: ' . APP_BASE . '/src/Views/matrizes/registrar.php');
     exit;
 }
