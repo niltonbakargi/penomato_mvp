@@ -67,3 +67,10 @@ desktop.ini
 *.pem
 *.crt
 *.key
+
+# ================================
+# Dados / Binários grandes
+# ================================
+*.xlsx
+*.xls
+*.csv

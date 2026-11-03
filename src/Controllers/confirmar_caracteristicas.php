@@ -98,7 +98,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_campo') {
 
     // Campos aceitos: ENUMs da fonte de verdade + campos texto-livre
     $whitelist = array_merge(
-        array_keys(require __DIR__ . '/../Config/enums_caracteristicas.php'),
+        array_keys(require_once __DIR__ . '/../Config/enums_caracteristicas.php'),
         ['nome_cientifico_completo', 'sinonimos', 'nome_popular', 'familia', 'biomas', 'estados_ocorrencia']
     );
 
@@ -161,7 +161,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_obs') {
 
     // Campos ENUM derivados da fonte de verdade + campos texto-livre permitidos
     $whitelist_obs = array_merge(
-        array_keys(require __DIR__ . '/../Config/enums_caracteristicas.php'),
+        array_keys(require_once __DIR__ . '/../Config/enums_caracteristicas.php'),
         ['nome_cientifico_completo', 'sinonimos', 'nome_popular', 'familia', 'biomas', 'estados_ocorrencia']
     );
 

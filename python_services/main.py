@@ -9,12 +9,14 @@ import base64
 import io
 import json
 import os
+import secrets
 from pathlib import Path
 from typing import Optional
 
 import faiss
 import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Security
+from fastapi.security.api_key import APIKeyHeader
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from pydantic import BaseModel
@@ -25,6 +27,20 @@ import torch
 BASE_DIR   = Path(__file__).parent
 INDEX_PATH = BASE_DIR / "storage" / "faiss" / "penomato.index"
 META_PATH  = BASE_DIR / "storage" / "faiss" / "meta.json"
+
+# ── Autenticação por API key ──────────────────────────────────────────────────
+# Defina PENOMATO_API_KEY no ambiente antes de iniciar o serviço.
+# Exemplo: export PENOMATO_API_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
+_API_KEY = os.environ.get("PENOMATO_API_KEY", "")
+if not _API_KEY:
+    raise RuntimeError("PENOMATO_API_KEY não definida. Configure a variável de ambiente antes de iniciar.")
+
+_api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+def verificar_api_key(key: Optional[str] = Security(_api_key_header)) -> str:
+    if not key or not secrets.compare_digest(key, _API_KEY):
+        raise HTTPException(status_code=401, detail="API key inválida ou ausente.")
+    return key
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(title="Penomato Embeddings", version="1.0.0")
@@ -108,7 +124,7 @@ def health():
 
 
 @app.post("/embed")
-def embed(req: EmbedRequest):
+def embed(req: EmbedRequest, _: str = Security(verificar_api_key)):
     """
     Recebe recorte de parte da planta em base64.
     Extrai embedding DINOv2, salva no FAISS e retorna confirmação.
@@ -146,7 +162,7 @@ def embed(req: EmbedRequest):
 
 
 @app.post("/search")
-def search(req: SearchRequest):
+def search(req: SearchRequest, _: str = Security(verificar_api_key)):
     """
     Recebe foto de parte da planta em base64.
     Retorna top-K espécies mais similares.
