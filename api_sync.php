@@ -9,8 +9,14 @@ require_once __DIR__ . '/config/banco_de_dados.php';
 header('Content-Type: application/json; charset=utf-8');
 
 // ── Autenticação por token secreto ───────────────────────────
-// Defina um token forte aqui e coloque o mesmo no script Python
-define('BACKUP_TOKEN', 'penomato_backup_2026_' . md5(DB_PASS ?? 'token'));
+// Defina BACKUP_SECRET em config/dev_local.php (dev) ou config/producao.php (prod).
+// Gere um valor forte: php -r "echo bin2hex(random_bytes(24));"
+if (!defined('BACKUP_SECRET') || BACKUP_SECRET === '' || BACKUP_SECRET === 'COLE_UM_TOKEN_FORTE_AQUI') {
+    http_response_code(503);
+    echo json_encode(['erro' => 'BACKUP_SECRET não configurado.']);
+    exit;
+}
+define('BACKUP_TOKEN', BACKUP_SECRET);
 
 // Aceita token via POST body (preferido), header ou query string (legado)
 $token = $_POST['token']

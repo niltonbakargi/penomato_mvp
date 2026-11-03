@@ -7,10 +7,6 @@
 // processar_upload_temporario.php e finalizar_upload_temporario.php
 // ================================================
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
 ob_start();
 
@@ -197,8 +193,9 @@ if ($especie_id <= 0) {
     exit;
 }
 
-if (empty($parte_planta)) {
-    header("Location: ../Views/enviar_imagem.php?especie_id=" . $especie_id . "&erro=" . urlencode("Parte da planta não informada."));
+$partes_validas = ['habito', 'folha', 'flor', 'fruto', 'caule', 'semente', 'exsicata_completa', 'detalhe'];
+if (empty($parte_planta) || !in_array($parte_planta, $partes_validas, true)) {
+    header("Location: ../Views/enviar_imagem.php?especie_id=" . $especie_id . "&erro=" . urlencode("Parte da planta inválida."));
     exit;
 }
 
