@@ -95,6 +95,26 @@ foreach ($atribuicoes as $atr) {
         continue;
     }
 
+    // --- Validar URL contra SSRF ---
+    if (!filter_var($url_foto, FILTER_VALIDATE_URL)) {
+        $erros[] = "URL inválida para parte='$parte'";
+        continue;
+    }
+    $esquema = strtolower(parse_url($url_foto, PHP_URL_SCHEME) ?? '');
+    if (!in_array($esquema, ['http', 'https'], true)) {
+        $erros[] = "Esquema de URL não permitido para parte='$parte'";
+        continue;
+    }
+    $host = strtolower(parse_url($url_foto, PHP_URL_HOST) ?? '');
+    // Bloquear localhost e ranges de IP privado/link-local
+    if (
+        $host === 'localhost' ||
+        preg_match('/^127\.|^10\.|^192\.168\.|^172\.(1[6-9]|2[0-9]|3[01])\.|^169\.254\.|^::1$|^\[::1\]$/', $host)
+    ) {
+        $erros[] = "URL aponta para rede interna (bloqueado): parte='$parte'";
+        continue;
+    }
+
     // --- Baixar imagem ---
     $ch = curl_init();
     curl_setopt_array($ch, [
