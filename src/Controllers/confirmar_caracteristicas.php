@@ -117,18 +117,11 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'salvar_obs') {
     $campo      = trim($_POST['campo'] ?? '');
     $observacao = trim($_POST['observacao'] ?? '');
 
-    $whitelist_obs = [
-        'nome_cientifico_completo','sinonimos','nome_popular','familia',
-        'forma_vida','origem','endemismo','biomas','estados_ocorrencia',
-        'forma_folha','filotaxia_folha','tipo_folha','divisao_folha','paridade_pinnacao',
-        'tamanho_folha','textura_folha',
-        'margem_folha','venacao_folha','cor_flores','simetria_floral','numero_petalas',
-        'disposicao_flores','aroma','tamanho_flor','tipo_fruto','tamanho_fruto',
-        'cor_fruto','textura_fruto','dispersao_fruto','aroma_fruto','tipo_semente',
-        'tamanho_semente','cor_semente','textura_semente','quantidade_sementes',
-        'tipo_caule','textura_caule','cor_caule','forma_caule','modificacao_caule',
-        'ramificacao_caule','possui_espinhos','possui_latex','possui_seiva','possui_resina',
-    ];
+    // Campos ENUM derivados da fonte de verdade + campos texto-livre permitidos
+    $whitelist_obs = array_merge(
+        array_keys(require __DIR__ . '/../../Config/enums_caracteristicas.php'),
+        ['nome_cientifico_completo', 'sinonimos', 'nome_popular', 'familia', 'biomas', 'estados_ocorrencia']
+    );
 
     if (!$especie_id || !in_array($campo, $whitelist_obs, true)) {
         echo json_encode(['ok' => false, 'erro' => 'Campo inválido.']); exit;
