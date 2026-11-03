@@ -8,8 +8,8 @@ $stmt = $pdo->prepare("SELECT categoria FROM usuarios WHERE id = ? LIMIT 1");
 $stmt->execute([(int)$_SESSION['usuario_id']]);
 if ($stmt->fetchColumn() !== 'gestor') { http_response_code(403); die('Acesso restrito.'); }
 
-// Token da API de backup (mesmo cálculo do api_backup.php)
-$backup_token = 'penomato_backup_2026_' . md5(DB_PASS ?? 'token');
+// Token da API de backup (lido de BACKUP_SECRET, configurado em config/producao.php ou dev_local.php)
+$backup_token = defined('BACKUP_SECRET') ? BACKUP_SECRET : '';
 
 // Contagens para exibir
 $total_especies = $pdo->query("SELECT COUNT(*) FROM especies_administrativo")->fetchColumn();

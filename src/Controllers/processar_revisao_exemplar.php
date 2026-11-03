@@ -10,6 +10,10 @@ if (!isset($_SESSION['usuario_id'])) {
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
+if (!in_array($_SESSION['usuario_tipo'] ?? '', ['revisor', 'gestor'])) {
+    http_response_code(403);
+    die('Acesso restrito.');
+}
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . APP_BASE . '/src/Views/revisor/revisar_exemplar.php');
     exit;

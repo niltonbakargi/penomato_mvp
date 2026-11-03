@@ -6,6 +6,10 @@ if (!isset($_SESSION['usuario_id'])) {
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
+if (($_SESSION['usuario_tipo'] ?? '') !== 'gestor') {
+    http_response_code(403);
+    die('Acesso restrito.');
+}
 
 // Parâmetros de filtro (clamped: dias entre 1–365, limite entre 1–100)
 $dias_sem_dados = max(1, min(365, (int)($_GET['dias_sem_dados'] ?? 30)));

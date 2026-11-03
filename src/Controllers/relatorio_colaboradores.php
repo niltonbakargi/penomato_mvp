@@ -6,6 +6,10 @@ if (!isset($_SESSION['usuario_id'])) {
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
+if (($_SESSION['usuario_tipo'] ?? '') !== 'gestor') {
+    http_response_code(403);
+    die('Acesso restrito.');
+}
 
 // ================================================
 // CONTRIBUIÇÕES POR COLABORADOR
