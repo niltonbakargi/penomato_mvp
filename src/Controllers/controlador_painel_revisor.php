@@ -9,9 +9,9 @@ session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 require_once __DIR__ . '/../helpers/gerador_artigo.php';
 
-// Verificar se usuário está logado
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: ' . APP_BASE . '/index.php');
+// Verificar se usuário está logado e tem role adequado
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_tipo'] ?? '', ['revisor', 'gestor'])) {
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 

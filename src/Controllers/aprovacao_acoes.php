@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config/banco_de_dados.php';
 require_once __DIR__ . '/../../config/email.php';
 
-if (!isset($_SESSION['usuario_id'])) {
+if (!isset($_SESSION['usuario_id']) || ($_SESSION['usuario_tipo'] ?? '') !== 'gestor') {
     header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
