@@ -287,45 +287,45 @@ function permitirApenasSubtipo($subtipos, $mensagem = 'Acesso negado. Você não
 function getMenuPorTipo() {
     $menu = [
         'publico' => [
-            ['nome' => 'Buscar Espécies', 'url' => '/penomato_mvp/src/Views/publico/busca_caracteristicas.php', 'icone' => '🔍'],
-            ['nome' => 'Sobre', 'url' => '/penomato_mvp/src/Views/publico/sobre.php', 'icone' => 'ℹ️'],
-            ['nome' => 'Contato', 'url' => '/penomato_mvp/src/Views/publico/contato.php', 'icone' => '📧']
+            ['nome' => 'Buscar Espécies', 'url' => APP_BASE . '/src/Views/publico/busca_caracteristicas.php', 'icone' => '🔍'],
+            ['nome' => 'Sobre', 'url' => APP_BASE . '/src/Views/publico/sobre.php', 'icone' => 'ℹ️'],
+            ['nome' => 'Contato', 'url' => APP_BASE . '/src/Views/publico/contato.php', 'icone' => '📧']
         ]
     ];
     
     if (!estaLogado()) {
-        $menu['publico'][] = ['nome' => 'Login', 'url' => '/penomato_mvp/src/Views/auth/login.php', 'icone' => '🔐'];
-        $menu['publico'][] = ['nome' => 'Cadastro', 'url' => '/penomato_mvp/src/Views/auth/cadastro.php', 'icone' => '📝'];
+        $menu['publico'][] = ['nome' => 'Login', 'url' => APP_BASE . '/src/Views/auth/login.php', 'icone' => '🔐'];
+        $menu['publico'][] = ['nome' => 'Cadastro', 'url' => APP_BASE . '/src/Views/auth/cadastro.php', 'icone' => '📝'];
         return $menu['publico'];
     }
     
     // Menu base para todos logados
     $menu_logado = [
-        ['nome' => 'Meu Perfil', 'url' => '/penomato_mvp/src/Views/usuario/meu_perfil.php', 'icone' => '👤'],
-        ['nome' => 'Minhas Contribuições', 'url' => '/penomato_mvp/src/Views/usuario/minhas_contribuicoes.php', 'icone' => '📊'],
-        ['nome' => 'Buscar Espécies', 'url' => '/penomato_mvp/src/Views/publico/busca_caracteristicas.php', 'icone' => '🔍'],
+        ['nome' => 'Meu Perfil', 'url' => APP_BASE . '/src/Views/usuario/meu_perfil.php', 'icone' => '👤'],
+        ['nome' => 'Minhas Contribuições', 'url' => APP_BASE . '/src/Views/usuario/minhas_contribuicoes.php', 'icone' => '📊'],
+        ['nome' => 'Buscar Espécies', 'url' => APP_BASE . '/src/Views/publico/busca_caracteristicas.php', 'icone' => '🔍'],
     ];
     
     // Adicionar itens por tipo
     switch ($_SESSION['usuario_tipo']) {
         case 'gestor':
-            $menu_logado[] = ['nome' => 'Painel Gestor', 'url' => '/penomato_mvp/src/Views/gestor/painel_gestor.php', 'icone' => '📋'];
-            $menu_logado[] = ['nome' => 'Gerenciar Usuários', 'url' => '/penomato_mvp/src/Views/gestor/gerenciar_usuarios.php', 'icone' => '👥'];
-            $menu_logado[] = ['nome' => 'Relatórios', 'url' => '/penomato_mvp/src/Views/gestor/relatorios.php', 'icone' => '📈'];
+            $menu_logado[] = ['nome' => 'Painel Gestor', 'url' => APP_BASE . '/src/Views/gestor/painel_gestor.php', 'icone' => '📋'];
+            $menu_logado[] = ['nome' => 'Gerenciar Usuários', 'url' => APP_BASE . '/src/Views/gestor/gerenciar_usuarios.php', 'icone' => '👥'];
+            $menu_logado[] = ['nome' => 'Relatórios', 'url' => APP_BASE . '/src/Views/gestor/relatorios.php', 'icone' => '📈'];
             break;
             
         case 'revisor':
-            $menu_logado[] = ['nome' => 'Painel Revisor', 'url' => '/penomato_mvp/src/Views/revisor/painel_revisor.php', 'icone' => '✅'];
+            $menu_logado[] = ['nome' => 'Painel Revisor', 'url' => APP_BASE . '/src/Views/revisor/painel_revisor.php', 'icone' => '✅'];
             break;
             
         case 'colaborador':
-            $menu_logado[] = ['nome' => 'Cadastrar Espécie', 'url' => '/penomato_mvp/src/Views/colaborador/cadastrar_caracteristicas.php', 'icone' => '📝'];
-            $menu_logado[] = ['nome' => 'Upload Imagens', 'url' => '/penomato_mvp/src/Views/colaborador/upload_imagem.php', 'icone' => '📸'];
+            $menu_logado[] = ['nome' => 'Cadastrar Espécie', 'url' => APP_BASE . '/src/Views/colaborador/cadastrar_caracteristicas.php', 'icone' => '📝'];
+            $menu_logado[] = ['nome' => 'Upload Imagens', 'url' => APP_BASE . '/src/Views/colaborador/upload_imagem.php', 'icone' => '📸'];
             break;
     }
     
     // Sempre adicionar Sair no final
-    $menu_logado[] = ['nome' => 'Sair', 'url' => '/penomato_mvp/src/Controllers/auth/logout_controlador.php', 'icone' => '🚪'];
+    $menu_logado[] = ['nome' => 'Sair', 'url' => APP_BASE . '/src/Controllers/auth/logout_controlador.php', 'icone' => '🚪'];
     
     return $menu_logado;
 }

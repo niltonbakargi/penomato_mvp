@@ -296,7 +296,7 @@ function gerarHtmlArtigoRascunho(array $adm, array $c, array $imgs, PDO $pdo): s
         echo '<h3 class="art-secao">Prancha Fotográfica</h3><div class="art-galeria">';
         foreach ($imgs as $img) {
             echo '<figure class="art-figura">';
-            echo '<img src="/penomato_mvp/' . $h($img['caminho_imagem']) . '" alt="' . $h($img['parte_planta']) . '">';
+            echo '<img src="<?= APP_BASE ?>/' . $h($img['caminho_imagem']) . '" alt="' . $h($img['parte_planta']) . '">';
             echo '<figcaption>' . ucfirst($h($img['parte_planta']));
             if (!empty($img['autor_imagem'])) echo ' — ' . $h($img['autor_imagem']);
             if (!empty($img['licenca']))      echo ' (' . $h($img['licenca']) . ')';

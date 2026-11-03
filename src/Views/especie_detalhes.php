@@ -336,7 +336,7 @@ ob_end_clean();
         
         <!-- BREADCRUMB CORRIGIDO -->
         <div class="breadcrumb">
-            <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php">Busca de Espécies</a>
+            <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php">Busca de Espécies</a>
             <span>›</span>
             <span style="color: var(--cor-primaria); font-weight: 600;">
                 <?php echo $especie ? htmlspecialchars($especie['nome_cientifico']) : 'Detalhes'; ?>
@@ -348,7 +348,7 @@ ob_end_clean();
                 <div style="font-size: 4rem; margin-bottom: 20px;">🌿</div>
                 <h2><?php echo htmlspecialchars($erro); ?></h2>
                 <p>Não foi possível carregar as informações desta espécie.</p>
-                <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php" class="btn-voltar" style="display: inline-block;">
+                <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php" class="btn-voltar" style="display: inline-block;">
                     ← Voltar para a busca
                 </a>
             </div>
@@ -359,7 +359,7 @@ ob_end_clean();
                 <div class="titulo-principal">
                     <span>📋</span> Ficha Técnica da Espécie
                 </div>
-                <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php" class="btn-voltar">
+                <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php" class="btn-voltar">
                     ← Voltar para a busca
                 </a>
             </div>

@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Gestor - Penomato</title>
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background-color: #e8ede8;
@@ -206,7 +206,7 @@
     </div>
 
     <div class="btn-grid">
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/gerenciar_membros.php'">
+        <div class="action-btn" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/gerenciar_membros.php'">
             <?php if (count($membros_pendentes) > 0): ?>
                 <span class="notif-badge"><?= count($membros_pendentes) ?></span>
             <?php endif; ?>
@@ -217,37 +217,37 @@
             <span class="icon">🌿</span>
             Adicionar Espécies de Interesse
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/gestao_especies.php'">
+        <div class="action-btn" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/gestao_especies.php'">
             <span class="icon">📋</span>
             Gestão de Espécies
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/aprovacao_acoes.php'">
+        <div class="action-btn" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/aprovacao_acoes.php'">
             <?php if ($acoes_pendentes > 0): ?>
                 <span class="notif-badge"><?= $acoes_pendentes ?></span>
             <?php endif; ?>
             <span class="icon">✅</span>
             Aprovação de Ações
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/monitoramento.php'">
+        <div class="action-btn" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/monitoramento.php'">
             <span class="icon">📡</span>
             Monitoramento
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/relatorio_colaboradores.php'">
+        <div class="action-btn" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/relatorio_colaboradores.php'">
             <span class="icon">📊</span>
             Relatório de Colaboradores
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/artigos_fila.php'">
+        <div class="action-btn" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/artigos_fila.php'">
             <?php if ($artigos_pendentes > 0): ?>
                 <span class="notif-badge"><?= $artigos_pendentes ?></span>
             <?php endif; ?>
             <span class="icon">📄</span>
             Artigos
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Controllers/gestao_artigos_gestor.php'">
+        <div class="action-btn" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/gestao_artigos_gestor.php'">
             <span class="icon">🗂️</span>
             Gestão de Artigos
         </div>
-        <div class="action-btn" onclick="window.location.href='/penomato_mvp/src/Views/entrar_colaborador.php'">
+        <div class="action-btn" onclick="window.location.href='<?= APP_BASE ?>/src/Views/entrar_colaborador.php'">
             <span class="icon">👤</span>
             Perfil Colaborador
         </div>
@@ -255,13 +255,13 @@
             <span class="icon">💾</span>
             Backup
         </div>
-        <div class="action-btn danger" onclick="window.location.href='/penomato_mvp/src/Views/matrizes/gerenciar_matrizes.php'">
+        <div class="action-btn danger" onclick="window.location.href='<?= APP_BASE ?>/src/Views/matrizes/gerenciar_matrizes.php'">
             <span class="icon">🌳</span>
             Gerenciar Matrizes
         </div>
     </div>
 
-    <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
+    <button class="btn-sair" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/auth/logout_controlador.php'">
         🚪 Sair
     </button>
 
@@ -276,7 +276,7 @@
                 <div class="msg-<?php echo $m['tipo']; ?>"><?php echo htmlspecialchars($m['texto']); ?></div>
             <?php endforeach; endif; ?>
 
-            <form method="POST" action="/penomato_mvp/src/Controllers/controlador_gestor.php">
+            <form method="POST" action="<?= APP_BASE ?>/src/Controllers/controlador_gestor.php">
                 <label>Uma ou várias espécies (uma por linha)</label>
                 <textarea name="lista_especies" rows="8" placeholder="Acca sellowiana
 Euterpe oleracea

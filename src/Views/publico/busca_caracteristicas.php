@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Busca de Espécies - Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         /* ── Página ── */
         body { padding: 30px 20px; }
@@ -314,7 +314,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
     <div class="container">
         <div class="header">
             <h1>🔍 Busca de Espécies</h1>
-            <a href="/penomato_mvp/index.php" class="btn-voltar">
+            <a href="<?= APP_BASE ?>/index.php" class="btn-voltar">
                 <i class="fas fa-arrow-left"></i> Voltar ao Início
             </a>
         </div>
@@ -326,7 +326,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="/penomato_mvp/src/Views/publico/resultados_busca.php" class="form-busca">
+        <form method="POST" action="<?= APP_BASE ?>/src/Views/publico/resultados_busca.php" class="form-busca">
 
             <!-- Barra sticky de ação -->
             <div class="barra-sticky">
@@ -334,7 +334,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
                 <button type="submit" class="btn btn-buscar">
                     🔎 BUSCAR ESPÉCIES
                 </button>
-                <button type="button" class="btn btn-limpar" onclick="window.location.href='/penomato_mvp/src/Views/publico/busca_caracteristicas.php'">
+                <button type="button" class="btn btn-limpar" onclick="window.location.href='<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php'">
                     🧹 LIMPAR
                 </button>
             </div>
@@ -827,7 +827,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
                 <button type="submit" class="btn btn-buscar">
                     🔎 BUSCAR ESPÉCIES
                 </button>
-                <button type="button" class="btn btn-limpar" onclick="window.location.href='/penomato_mvp/src/Views/publico/busca_caracteristicas.php'">
+                <button type="button" class="btn btn-limpar" onclick="window.location.href='<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php'">
                     🧹 LIMPAR FILTROS
                 </button>
             </div>

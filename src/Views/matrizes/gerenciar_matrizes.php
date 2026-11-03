@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 require_once __DIR__ . '/../../Controllers/auth/verificar_acesso.php';
 
 if (!estaLogado() || getTipoUsuario() !== 'gestor') {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remover_id'])) {
         mensagemSucesso("Matriz removida do mapa com sucesso.");
     }
 
-    header('Location: /penomato_mvp/src/Views/matrizes/gerenciar_matrizes.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/gerenciar_matrizes.php');
     exit;
 }
 
@@ -301,7 +301,7 @@ include __DIR__ . '/../includes/cabecalho.php';
 
     <div class="page-header">
         <h2><i class="fas fa-tree text-success me-2"></i>Gerenciar Matrizes</h2>
-        <a href="/penomato_mvp/src/Controllers/controlador_gestor.php"
+        <a href="<?= APP_BASE ?>/src/Controllers/controlador_gestor.php"
            class="text-muted small text-decoration-none">
             <i class="fas fa-arrow-left me-1"></i>Painel do Gestor
         </a>
@@ -335,8 +335,8 @@ include __DIR__ . '/../includes/cabecalho.php';
             $cient = ($m['especie_nome'] && $m['especie_nome_popular']) ? $m['especie_nome'] : '';
         ?>
         <div class="matriz-row">
-            <a href="/penomato_mvp/src/Views/matrizes/ficha.php?id=<?php echo $m['id']; ?>">
-                <img src="/penomato_mvp/<?php echo htmlspecialchars($m['foto_geral']); ?>"
+            <a href="<?= APP_BASE ?>/src/Views/matrizes/ficha.php?id=<?php echo $m['id']; ?>">
+                <img src="<?= APP_BASE ?>/<?php echo htmlspecialchars($m['foto_geral']); ?>"
                      alt="<?php echo htmlspecialchars($nome); ?>"
                      class="matriz-thumb">
             </a>
@@ -357,7 +357,7 @@ include __DIR__ . '/../includes/cabecalho.php';
                     onclick="abrirModal(
                         <?php echo $m['id']; ?>,
                         '<?php echo addslashes(htmlspecialchars($nome)); ?>',
-                        '/penomato_mvp/<?php echo addslashes($m['foto_geral']); ?>'
+                        APP_BASE . '/<?php echo addslashes($m['foto_geral']); ?>'
                     )">
                 <i class="fas fa-trash"></i> Remover
             </button>

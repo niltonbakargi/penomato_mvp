@@ -59,7 +59,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
 
     <style>
         body {
@@ -232,7 +232,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
         <div class="user-pill">
             <i class="fas fa-user-circle"></i>
             <span><?= htmlspecialchars($usuario_nome) ?></span>
-            <a href="/penomato_mvp/src/Controllers/auth/logout_controlador.php"
+            <a href="<?= APP_BASE ?>/src/Controllers/auth/logout_controlador.php"
                class="btn-sair" onclick="return confirm('Deseja sair?')">
                 <i class="fas fa-sign-out-alt"></i>
             </a>
@@ -246,7 +246,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
             <div class="alerta alerta-success" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
                 <span><i class="fas fa-check-circle"></i> <?= htmlspecialchars($mensagem_sucesso) ?></span>
                 <?php if ($novo_exemplar_id > 0): ?>
-                    <a href="/penomato_mvp/src/Views/enviar_imagem.php?exemplar_id=<?= $novo_exemplar_id ?>&especie_id=<?= $especie_pre ?>"
+                    <a href="<?= APP_BASE ?>/src/Views/enviar_imagem.php?exemplar_id=<?= $novo_exemplar_id ?>&especie_id=<?= $especie_pre ?>"
                        style="background:var(--cor-primaria);color:#fff;padding:6px 16px;border-radius:20px;text-decoration:none;font-size:0.88em;font-weight:600;white-space:nowrap;">
                         <i class="fas fa-camera"></i> Adicionar imagens
                     </a>
@@ -261,7 +261,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
         <?php endif; ?>
 
         <form method="POST"
-              action="/penomato_mvp/src/Controllers/processar_cadastro_exemplar.php"
+              action="<?= APP_BASE ?>/src/Controllers/processar_cadastro_exemplar.php"
               enctype="multipart/form-data"
               id="form-exemplar">
 
@@ -455,7 +455,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
 
             <!-- Rodapé -->
             <div class="rodape">
-                <a href="/penomato_mvp/src/Views/entrar_colaborador.php" class="btn-voltar">
+                <a href="<?= APP_BASE ?>/src/Views/entrar_colaborador.php" class="btn-voltar">
                     <i class="fas fa-arrow-left"></i> Voltar ao Painel
                 </a>
                 <button type="submit" class="btn-salvar" id="btn-salvar">

@@ -7,12 +7,12 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 require_once __DIR__ . '/../auth/verificar_acesso.php';
 
 if (!estaLogado()) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/matrizes/mapa.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/mapa.php');
     exit;
 }
 
@@ -21,14 +21,14 @@ $texto     = trim($_POST['texto'] ?? '');
 
 if (!$matriz_id || empty($texto)) {
     mensagemErro('Comentário inválido.');
-    header("Location: /penomato_mvp/src/Views/matrizes/ficha.php?id={$matriz_id}");
+    header("Location: " . APP_BASE . "/src/Views/matrizes/ficha.php?id={$matriz_id}");
     exit;
 }
 
 // Verifica se a matriz existe
 $matriz = buscarUm("SELECT id FROM matrizes WHERE id = ? AND status = 'ativo'", [$matriz_id]);
 if (!$matriz) {
-    header('Location: /penomato_mvp/src/Views/matrizes/mapa.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/mapa.php');
     exit;
 }
 
@@ -39,5 +39,5 @@ inserir('matrizes_comentarios', [
 ]);
 
 mensagemSucesso('Comentário enviado.');
-header("Location: /penomato_mvp/src/Views/matrizes/ficha.php?id={$matriz_id}");
+header("Location: " . APP_BASE . "/src/Views/matrizes/ficha.php?id={$matriz_id}");
 exit;

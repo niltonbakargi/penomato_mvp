@@ -28,7 +28,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recuperar Senha - Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
@@ -86,7 +86,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
                     Enviaremos um link para você criar uma nova senha.
                 </p>
 
-                <form action="/penomato_mvp/src/Controllers/auth/recuperar_senha_controlador.php"
+                <form action="<?= APP_BASE ?>/src/Controllers/auth/recuperar_senha_controlador.php"
                       method="POST" novalidate>
 
                     <div class="form-group">
@@ -109,11 +109,11 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
             <?php endif; ?>
 
             <div class="links">
-                <a href="/penomato_mvp/src/Views/auth/login.php">
+                <a href="<?= APP_BASE ?>/src/Views/auth/login.php">
                     <i class="fas fa-arrow-left" style="margin-right:4px;"></i>Voltar ao login
                 </a>
                 <span class="sep">|</span>
-                <a href="/penomato_mvp/src/Views/auth/cadastro.php">Criar conta</a>
+                <a href="<?= APP_BASE ?>/src/Views/auth/cadastro.php">Criar conta</a>
             </div>
 
         </div>

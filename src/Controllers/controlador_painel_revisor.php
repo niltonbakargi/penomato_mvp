@@ -318,7 +318,7 @@ if ($acao === 'iniciar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         
         echo json_encode([
             'sucesso' => true,
-            'redirect' => '/penomato_mvp/src/Views/artigo_revisao.php?id=' . $especie_id
+            'redirect' => APP_BASE . '/src/Views/artigo_revisao.php?id=' . $especie_id
         ]);
         
     } catch (Exception $e) {

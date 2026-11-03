@@ -43,7 +43,7 @@ $markers = [];
 foreach ($exemplares as $ex) {
     if ($ex['latitude'] === null || $ex['longitude'] === null) continue;
     $foto_url = $ex['foto_identificacao']
-        ? '/penomato_mvp/' . $ex['foto_identificacao']
+        ? APP_BASE . '/' . $ex['foto_identificacao']
         : null;
     $markers[] = [
         'id'        => $ex['id'],
@@ -75,7 +75,7 @@ $statusBadge = ['aguardando_revisao' => 'warning', 'aprovado' => 'success', 'rej
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
-<link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+<link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
 <style>
   body { background: var(--cinza-50); }
   #mapa-principal { height: 480px; border-radius: 12px; z-index: 0; }
@@ -98,7 +98,7 @@ $statusBadge = ['aguardando_revisao' => 'warning', 'aprovado' => 'success', 'rej
 
   <!-- Cabeçalho -->
   <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="/penomato_mvp/src/Views/revisor/revisar_exemplar.php" class="btn btn-outline-secondary btn-sm">
+    <a href="<?= APP_BASE ?>/src/Views/revisor/revisar_exemplar.php" class="btn btn-outline-secondary btn-sm">
       <i class="fa fa-arrow-left"></i>
     </a>
     <div>
@@ -220,7 +220,7 @@ $statusBadge = ['aguardando_revisao' => 'warning', 'aprovado' => 'success', 'rej
                 </button>
               <?php endif; ?>
               <?php if ($ex['status'] === 'aguardando_revisao'): ?>
-                <a href="/penomato_mvp/src/Views/revisor/revisar_exemplar.php?filtro=aguardando_revisao#exemplar-<?= $ex['id'] ?>"
+                <a href="<?= APP_BASE ?>/src/Views/revisor/revisar_exemplar.php?filtro=aguardando_revisao#exemplar-<?= $ex['id'] ?>"
                    class="btn btn-warning btn-sm" title="Revisar">
                   <i class="fa fa-eye"></i>
                 </a>
@@ -307,7 +307,7 @@ if (markers.length > 0) {
             <i class="fa fa-calendar"></i> ${m.data}`;
 
         if (m.status === 'aguardando_revisao') {
-            popupHtml += `<br><a href="/penomato_mvp/src/Views/revisor/revisar_exemplar.php?filtro=aguardando_revisao#exemplar-${m.id}"
+            popupHtml += `<br><a href="<?= APP_BASE ?>/src/Views/revisor/revisar_exemplar.php?filtro=aguardando_revisao#exemplar-${m.id}"
                 class="btn btn-warning btn-sm mt-2 w-100">
                 <i class="fa fa-eye"></i> Revisar
             </a>`;

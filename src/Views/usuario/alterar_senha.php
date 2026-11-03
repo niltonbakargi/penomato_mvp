@@ -28,7 +28,7 @@ $titulo_pagina = "Alterar Senha - Penomato";
 $descricao_pagina = "Altere sua senha de acesso ao sistema";
 $mostrar_breadcrumb = true;
 $breadcrumb_itens = [
-    ['nome' => 'Perfil', 'url' => '/penomato_mvp/src/Views/usuario/meu_perfil.php'],
+    ['nome' => 'Perfil', 'url' => APP_BASE . '/src/Views/usuario/meu_perfil.php'],
     ['nome' => 'Alterar Senha']
 ];
 
@@ -127,7 +127,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     <!-- FORMULÁRIO DE ALTERAÇÃO DE SENHA -->
                     <!-- ============================================== -->
                     
-                    <form action="/penomato_mvp/src/Controllers/usuario/alterar_senha_controlador.php" 
+                    <form action="<?= APP_BASE ?>/src/Controllers/usuario/alterar_senha_controlador.php" 
                           method="POST" 
                           id="formAlterarSenha"
                           novalidate>
@@ -260,7 +260,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                         <hr class="my-4">
                         
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="/penomato_mvp/src/Views/usuario/meu_perfil.php" class="btn btn-outline-secondary">
+                            <a href="<?= APP_BASE ?>/src/Views/usuario/meu_perfil.php" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>Voltar ao Perfil
                             </a>
                             
@@ -281,7 +281,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     <p class="mb-0">
                         <i class="fas fa-question-circle me-1"></i>
                         Esqueceu sua senha? 
-                        <a href="/penomato_mvp/src/Views/auth/recuperar_senha.php" class="text-decoration-none">
+                        <a href="<?= APP_BASE ?>/src/Views/auth/recuperar_senha.php" class="text-decoration-none">
                             Clique aqui para recuperar
                         </a>
                     </p>

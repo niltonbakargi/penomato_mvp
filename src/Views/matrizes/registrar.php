@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../Controllers/auth/verificar_acesso.php';
 if (!estaLogado()) {
     $url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
          . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-    header('Location: /penomato_mvp/src/Views/auth/login.php?redirect=' . urlencode($url));
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php?redirect=' . urlencode($url));
     exit;
 }
 
@@ -289,7 +289,7 @@ include __DIR__ . '/../includes/cabecalho.php';
         <p>Foto da árvore inteira e GPS são obrigatórios. Os demais campos são opcionais.</p>
     </div>
 
-    <form action="/penomato_mvp/src/Controllers/matrizes/processar_registro.php"
+    <form action="<?= APP_BASE ?>/src/Controllers/matrizes/processar_registro.php"
           method="POST" enctype="multipart/form-data" id="form-matriz">
 
         <!-- 1. Fotos -->
@@ -457,7 +457,7 @@ include __DIR__ . '/../includes/cabecalho.php';
     </form>
 
     <div class="text-center mt-3 mb-4">
-        <a href="/penomato_mvp/src/Views/matrizes/index.php" class="text-muted small">
+        <a href="<?= APP_BASE ?>/src/Views/matrizes/index.php" class="text-muted small">
             <i class="fas fa-arrow-left me-1"></i> Cancelar
         </a>
     </div>
@@ -776,7 +776,7 @@ document.getElementById('select-popular').addEventListener('change', function ()
 
     if (!val) return;
 
-    fetch('/penomato_mvp/src/Controllers/matrizes/buscar_cientifico.php?popular=' + encodeURIComponent(val))
+    fetch(APP_BASE . '/src/Controllers/matrizes/buscar_cientifico.php?popular=' + encodeURIComponent(val))
         .then(function (r) { return r.json(); })
         .then(function (d) {
             if (d.nome) document.getElementById('especie-busca').value = d.nome;
@@ -794,7 +794,7 @@ inputBusca.addEventListener('input', function () {
     if (q.length < 3) { lista.style.display = 'none'; return; }
 
     debounce = setTimeout(function () {
-        fetch('/penomato_mvp/src/Controllers/matrizes/buscar_especie.php?q=' + encodeURIComponent(q))
+        fetch(APP_BASE . '/src/Controllers/matrizes/buscar_especie.php?q=' + encodeURIComponent(q))
             .then(function (r) { return r.json(); })
             .then(function (dados) {
                 lista.innerHTML = '';

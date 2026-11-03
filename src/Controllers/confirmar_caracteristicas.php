@@ -828,7 +828,7 @@ ob_end_clean();
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Confirmar Identificação - Penomato</title>
-  <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+  <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f0; margin: 0; padding: 24px 16px; color: #1e2e1e; }
@@ -1076,7 +1076,7 @@ ob_end_clean();
 
 <div class="page-header">
   <h1><?php echo $modo_pagina === 'confirmar' ? '✅ Confirmar Dados da Espécie' : '✏️ Editar Características da Espécie'; ?></h1>
-  <a class="back-link" href="<?php echo $modo_pagina === 'confirmar' ? '/penomato_mvp/src/Views/entrar_colaborador.php' : 'gestao_especies.php'; ?>">← Voltar ao painel</a>
+  <a class="back-link" href="<?php echo $modo_pagina === 'confirmar' ? APP_BASE . '/src/Views/entrar_colaborador.php' : 'gestao_especies.php'; ?>">← Voltar ao painel</a>
 </div>
 
 <div class="sticky-save" id="sticky-save">
@@ -1092,7 +1092,7 @@ ob_end_clean();
     <div style="font-size:2.5rem;margin-bottom:12px">✅</div>
     <p style="font-size:1.1rem;font-weight:600;color:#166534;margin:0 0 24px"><?php echo htmlspecialchars($_SESSION['msg_sucesso']); unset($_SESSION['msg_sucesso']); ?></p>
     <?php $modo_s = $_SESSION['modo_sucesso'] ?? 'gestor'; unset($_SESSION['modo_sucesso']); ?>
-    <a href="<?php echo $modo_s === 'confirmar' ? '/penomato_mvp/src/Views/entrar_colaborador.php' : 'gestao_especies.php'; ?>"
+    <a href="<?php echo $modo_s === 'confirmar' ? APP_BASE . '/src/Views/entrar_colaborador.php' : 'gestao_especies.php'; ?>"
        style="display:inline-block;background:var(--cor-primaria);color:#fff;padding:11px 28px;border-radius:40px;text-decoration:none;font-weight:600;font-size:1rem">
       ← <?php echo $modo_s === 'confirmar' ? 'Voltar ao painel' : 'Voltar à gestão'; ?>
     </a>

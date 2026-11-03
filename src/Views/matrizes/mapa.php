@@ -285,17 +285,17 @@ body { padding-top: 80px; }
 
     <div class="page-header">
         <h4><i class="fas fa-tree text-success me-2"></i>Banco de Matrizes</h4>
-        <a href="/penomato_mvp/src/Views/matrizes/index.php">
+        <a href="<?= APP_BASE ?>/src/Views/matrizes/index.php">
             <i class="fas fa-arrow-left me-1"></i>Voltar
         </a>
     </div>
 
     <?php if (estaLogado()): ?>
-    <a href="/penomato_mvp/src/Views/matrizes/registrar.php" class="btn-nova-lista">
+    <a href="<?= APP_BASE ?>/src/Views/matrizes/registrar.php" class="btn-nova-lista">
         <i class="fas fa-plus me-2"></i>Registrar nova matriz
     </a>
     <?php else: ?>
-    <a href="/penomato_mvp/src/Views/auth/login.php" class="btn-nova-lista">
+    <a href="<?= APP_BASE ?>/src/Views/auth/login.php" class="btn-nova-lista">
         <i class="fas fa-plus me-2"></i>Entrar para registrar
     </a>
     <?php endif; ?>
@@ -332,9 +332,9 @@ body { padding-top: 80px; }
              data-busca="<?php echo htmlspecialchars($busca); ?>">
             <div class="matriz-card">
                 <!-- clique na foto/info vai para ficha -->
-                <a href="/penomato_mvp/src/Views/matrizes/ficha.php?id=<?php echo $m['id']; ?>"
+                <a href="<?= APP_BASE ?>/src/Views/matrizes/ficha.php?id=<?php echo $m['id']; ?>"
                    style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-decoration:none;color:inherit;">
-                    <img src="/penomato_mvp/<?php echo htmlspecialchars($m['foto_geral']); ?>"
+                    <img src="<?= APP_BASE ?>/<?php echo htmlspecialchars($m['foto_geral']); ?>"
                          alt="<?php echo htmlspecialchars($nome); ?>"
                          class="matriz-thumb"
                          loading="lazy">
@@ -352,7 +352,7 @@ body { padding-top: 80px; }
                 </a>
                 <!-- botão ver no mapa -->
                 <button class="btn-mini-mapa"
-                        onclick="abrirMapaUnico(<?php echo $m['id']; ?>, <?php echo $m['latitude']; ?>, <?php echo $m['longitude']; ?>, '<?php echo addslashes(htmlspecialchars($nome)); ?>', '<?php echo $m['codigo']; ?>', '/penomato_mvp/<?php echo addslashes($m['foto_geral']); ?>')">
+                        onclick="abrirMapaUnico(<?php echo $m['id']; ?>, <?php echo $m['latitude']; ?>, <?php echo $m['longitude']; ?>, '<?php echo addslashes(htmlspecialchars($nome)); ?>', '<?php echo $m['codigo']; ?>', APP_BASE . '/<?php echo addslashes($m['foto_geral']); ?>')">
                     <i class="fas fa-map-marker-alt"></i>
                     Mapa
                 </button>
@@ -442,11 +442,11 @@ function limparMarcadores() {
 
 function popupHTML(d) {
     return '<div style="min-width:160px">'
-        + '<img src="/penomato_mvp/' + d.foto + '" style="width:100%;height:90px;object-fit:cover;border-radius:6px;margin-bottom:6px">'
+        + '<img src="<?= APP_BASE ?>/' + d.foto + '" style="width:100%;height:90px;object-fit:cover;border-radius:6px;margin-bottom:6px">'
         + '<strong style="display:block;font-size:0.9rem">' + d.nome + '</strong>'
         + (d.cient && d.cient !== d.nome ? '<em style="font-size:0.75rem;color:#666">' + d.cient + '</em><br>' : '')
         + '<small style="color:#999">' + d.codigo + ' · ' + d.data + '</small><br>'
-        + '<a href="/penomato_mvp/src/Views/matrizes/ficha.php?id=' + d.id + '" '
+        + '<a href="<?= APP_BASE ?>/src/Views/matrizes/ficha.php?id=' + d.id + '" '
         + 'style="display:inline-block;margin-top:6px;background:#0b5e42;color:white;padding:4px 12px;border-radius:6px;font-size:0.78rem;text-decoration:none">'
         + 'Ver ficha</a>'
         + '</div>';

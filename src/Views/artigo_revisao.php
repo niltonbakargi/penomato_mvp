@@ -173,7 +173,7 @@ $nomes_partes = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Revisão: <?php echo htmlspecialchars($especie['nome_cientifico']); ?></title>
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background-color: var(--cinza-50);
@@ -576,7 +576,7 @@ $nomes_partes = [
 <body>
     <div class="container">
         <!-- LINK VOLTAR -->
-        <a href="/penomato_mvp/src/Controllers/controlador_painel_revisor.php" class="back-link">← Voltar ao painel</a>
+        <a href="<?= APP_BASE ?>/src/Controllers/controlador_painel_revisor.php" class="back-link">← Voltar ao painel</a>
 
         <!-- CABEÇALHO -->
         <div class="header">
@@ -1023,12 +1023,12 @@ $nomes_partes = [
                                 <div class="imagens-grid">
                                     <?php foreach ($imagens[$parte] as $img): ?>
                                     <div class="imagem-card">
-                                        <div class="imagem-preview" onclick="abrirImagem('<?php echo '/penomato_mvp/' . $img['caminho_imagem']; ?>')">
+                                        <div class="imagem-preview" onclick="abrirImagem('<?php echo APP_BASE . '/' . $img['caminho_imagem']; ?>')">
                                             <?php 
-                                            $caminho_completo = $_SERVER['DOCUMENT_ROOT'] . '/penomato_mvp/' . $img['caminho_imagem'];
+                                            $caminho_completo = $_SERVER['DOCUMENT_ROOT'] . APP_BASE . '/' . $img['caminho_imagem'];
                                             if (file_exists($caminho_completo)): 
                                             ?>
-                                                <img src="<?php echo '/penomato_mvp/' . $img['caminho_imagem']; ?>" alt="Imagem">
+                                                <img src="<?php echo APP_BASE . '/' . $img['caminho_imagem']; ?>" alt="Imagem">
                                             <?php else: ?>
                                                 <span>🖼️</span>
                                             <?php endif; ?>
@@ -1108,7 +1108,7 @@ $nomes_partes = [
                     <button type="submit" name="acao" value="contestar" class="btn btn-danger" onclick="return validarDecisao('contestar')">
                         ❌ CONFIRMAR REJEIÇÃO
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/penomato_mvp/src/Controllers/artigos_fila.php'">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/artigos_fila.php'">
                         CANCELAR
                     </button>
                 </div>
@@ -1117,7 +1117,7 @@ $nomes_partes = [
         <?php else: ?>
         <div style="text-align:center; padding: var(--esp-8) 0; color: var(--cinza-400);">
             <p>Você está no modo de visualização. Para revisar este artigo, volte à fila e clique em <strong>Revisar</strong>.</p>
-            <a href="/penomato_mvp/src/Controllers/artigos_fila.php" style="color: var(--cor-primaria);">← Voltar à fila</a>
+            <a href="<?= APP_BASE ?>/src/Controllers/artigos_fila.php" style="color: var(--cor-primaria);">← Voltar à fila</a>
         </div>
         <?php endif; ?>
     </div>

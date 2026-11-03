@@ -33,7 +33,7 @@ unset($_SESSION['dados_cadastro']);
     <title>Cadastro - Penomato</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
@@ -69,7 +69,7 @@ unset($_SESSION['dados_cadastro']);
                 <div class="alert alert-success"><?php echo htmlspecialchars($mensagem_sucesso, ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php endif; ?>
                 
-                <form action="/penomato_mvp/src/Controllers/auth/cadastro_controlador.php" method="POST">
+                <form action="<?= APP_BASE ?>/src/Controllers/auth/cadastro_controlador.php" method="POST">
                     
                     <!-- Dados básicos -->
                     <h4 class="mb-3 text-success">📋 Dados Básicos</h4>
@@ -143,7 +143,7 @@ unset($_SESSION['dados_cadastro']);
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="termos" id="termos" required>
                                 <label class="form-check-label texto-termos" for="termos">
-                                    Li e aceito os <a href="/penomato_mvp/src/Views/publico/termos.php" target="_blank">Termos de Uso</a> *
+                                    Li e aceito os <a href="<?= APP_BASE ?>/src/Views/publico/termos.php" target="_blank">Termos de Uso</a> *
                                 </label>
                             </div>
                         </div>
@@ -156,7 +156,7 @@ unset($_SESSION['dados_cadastro']);
                     
                     <!-- Link para login -->
                     <div class="text-center mt-4">
-                        Já tem uma conta? <a href="/penomato_mvp/src/Views/auth/login.php" class="text-success">Faça login</a>
+                        Já tem uma conta? <a href="<?= APP_BASE ?>/src/Views/auth/login.php" class="text-success">Faça login</a>
                     </div>
                     
                 </form>

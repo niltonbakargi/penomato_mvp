@@ -74,27 +74,27 @@ $versao_sistema = 'MVP 1.0';
                     <h5 class="footer-title">Links Rápidos</h5>
                     <ul class="footer-links">
                         <li>
-                            <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php">
+                            <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php">
                                 <i class="fas fa-chevron-right"></i> Buscar Espécies
                             </a>
                         </li>
                         <li>
-                            <a href="/penomato_mvp/src/Views/publico/sobre.php">
+                            <a href="<?= APP_BASE ?>/src/Views/publico/sobre.php">
                                 <i class="fas fa-chevron-right"></i> Sobre o Projeto
                             </a>
                         </li>
                         <li>
-                            <a href="/penomato_mvp/src/Views/publico/contato.php">
+                            <a href="<?= APP_BASE ?>/src/Views/publico/contato.php">
                                 <i class="fas fa-chevron-right"></i> Contato
                             </a>
                         </li>
                         <li>
-                            <a href="/penomato_mvp/src/Views/publico/faq.php">
+                            <a href="<?= APP_BASE ?>/src/Views/publico/faq.php">
                                 <i class="fas fa-chevron-right"></i> Perguntas Frequentes
                             </a>
                         </li>
                         <li>
-                            <a href="/penomato_mvp/src/Views/publico/equipe.php">
+                            <a href="<?= APP_BASE ?>/src/Views/publico/equipe.php">
                                 <i class="fas fa-chevron-right"></i> Equipe
                             </a>
                         </li>
@@ -106,27 +106,27 @@ $versao_sistema = 'MVP 1.0';
                     <h5 class="footer-title">Para Colaboradores</h5>
                     <ul class="footer-links">
                         <li>
-                            <a href="/penomato_mvp/src/Views/auth/cadastro.php">
+                            <a href="<?= APP_BASE ?>/src/Views/auth/cadastro.php">
                                 <i class="fas fa-chevron-right"></i> Criar Conta
                             </a>
                         </li>
                         <li>
-                            <a href="/penomato_mvp/src/Views/auth/login.php">
+                            <a href="<?= APP_BASE ?>/src/Views/auth/login.php">
                                 <i class="fas fa-chevron-right"></i> Acessar Sistema
                             </a>
                         </li>
                         <li>
-                            <a href="/penomato_mvp/src/Views/publico/tutorial.php">
+                            <a href="<?= APP_BASE ?>/src/Views/publico/tutorial.php">
                                 <i class="fas fa-chevron-right"></i> Tutorial de Uso
                             </a>
                         </li>
                         <li>
-                            <a href="/penomato_mvp/src/Views/publico/manual-identificador.php">
+                            <a href="<?= APP_BASE ?>/src/Views/publico/manual-identificador.php">
                                 <i class="fas fa-chevron-right"></i> Manual do Identificador
                             </a>
                         </li>
                         <li>
-                            <a href="/penomato_mvp/src/Views/publico/politica-upload.php">
+                            <a href="<?= APP_BASE ?>/src/Views/publico/politica-upload.php">
                                 <i class="fas fa-chevron-right"></i> Política de Imagens
                             </a>
                         </li>
@@ -173,15 +173,15 @@ $versao_sistema = 'MVP 1.0';
                     
                     <!-- Selos de parceria -->
                     <div class="partner-badges mt-3">
-                        <img src="/penomato_mvp/assets/imagens/logo-uems.png" 
+                        <img src="<?= APP_BASE ?>/assets/imagens/logo-uems.png" 
                              alt="UEMS" 
                              class="partner-logo"
                              onerror="this.style.display='none'">
-                        <img src="/penomato_mvp/assets/imagens/logo-cnpq.png" 
+                        <img src="<?= APP_BASE ?>/assets/imagens/logo-cnpq.png" 
                              alt="CNPq" 
                              class="partner-logo"
                              onerror="this.style.display='none'">
-                        <img src="/penomato_mvp/assets/imagens/logo-capes.png" 
+                        <img src="<?= APP_BASE ?>/assets/imagens/logo-capes.png" 
                              alt="CAPES" 
                              class="partner-logo"
                              onerror="this.style.display='none'">
@@ -207,9 +207,9 @@ $versao_sistema = 'MVP 1.0';
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <p class="mb-0">
-                        <a href="/penomato_mvp/src/Views/publico/privacidade.php">Política de Privacidade</a>
+                        <a href="<?= APP_BASE ?>/src/Views/publico/privacidade.php">Política de Privacidade</a>
                         <span class="mx-2">|</span>
-                        <a href="/penomato_mvp/src/Views/publico/termos.php">Termos de Uso</a>
+                        <a href="<?= APP_BASE ?>/src/Views/publico/termos.php">Termos de Uso</a>
                         <span class="mx-2">|</span>
                         <span>v<?php echo $versao_sistema; ?></span>
                     </p>
@@ -229,9 +229,9 @@ $versao_sistema = 'MVP 1.0';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     
     <!-- Scripts customizados do Penomato -->
-    <script src="/penomato_mvp/assets/js/validacoes.js"></script>
-    <script src="/penomato_mvp/assets/js/busca_ajax.js"></script>
-    <script src="/penomato_mvp/assets/js/upload_preview.js"></script>
+    <script src="<?= APP_BASE ?>/assets/js/validacoes.js"></script>
+    <script src="<?= APP_BASE ?>/assets/js/busca_ajax.js"></script>
+    <script src="<?= APP_BASE ?>/assets/js/upload_preview.js"></script>
     
     <!-- Script para botão de voltar ao topo -->
     <script>

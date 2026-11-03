@@ -36,19 +36,19 @@ $todos_botoes = [
         'icon'  => '🌐',
         'label' => 'Dados da Internet',
         'desc'  => 'Importe dados científicos via JSON (Flora do Brasil, Lorenzi, etc.)',
-        'link'  => '/penomato_mvp/src/Views/escolher_especie.php',
+        'link'  => APP_BASE . '/src/Views/escolher_especie.php',
     ],
     'confirmar' => [
         'icon'  => '✅',
         'label' => 'Confirmar Identificação',
         'desc'  => 'Verifique e confirme as informações vindas da internet antes de registrá-las.',
-        'link'  => '/penomato_mvp/src/Controllers/confirmar_caracteristicas.php?modo=confirmar',
+        'link'  => APP_BASE . '/src/Controllers/confirmar_caracteristicas.php?modo=confirmar',
     ],
     'cadastrar_exemplar' => [
         'icon'  => '🌿',
         'label' => 'Cadastrar Exemplar',
         'desc'  => 'Registre um indivíduo de campo com localização e foto antes de enviar fotos das partes.',
-        'link'  => '/penomato_mvp/src/Views/cadastrar_exemplar.php',
+        'link'  => APP_BASE . '/src/Views/cadastrar_exemplar.php',
     ],
     'registrar_imagens' => [
         'icon'    => '📷',
@@ -61,40 +61,47 @@ $todos_botoes = [
         'icon'  => '⚠️',
         'label' => 'Contestar Informação',
         'desc'  => 'Sinalize inconsistências ou sugira correções em dados existentes.',
-        'link'  => '/penomato_mvp/src/Controllers/contestar_informacao.php',
+        'link'  => APP_BASE . '/src/Controllers/contestar_informacao.php',
     ],
     'dev_tools' => [
         'icon'  => '⚙️',
         'label' => 'Ferramentas DEV',
         'desc'  => 'Kanban do projeto, backlog e histórico de desenvolvimento.',
-        'link'  => '/penomato_mvp/penomato_kanban.html',
+        'link'  => APP_BASE . '/penomato_kanban.html',
     ],
     'revisar_artigo' => [
         'icon'  => '📝',
         'label' => 'Revisar Artigos',
         'desc'  => 'Revise artigos gerados automaticamente — fila por status (rascunho → revisão → aprovado).',
-        'link'  => '/penomato_mvp/src/Controllers/artigos_fila.php',
+        'link'  => APP_BASE . '/src/Controllers/artigos_fila.php',
+    ],
+    'impressao_digital' => [
+        'icon'  => '🧬',
+        'label' => 'Impressão Digital Vegetal',
+        'desc'  => 'Gere perfis visuais por parte da planta para identificação por similaridade.',
+        'link'  => APP_BASE . '/src/Views/impressao_digital_vegetal.php',
+        'breve' => true,
     ],
     'sugestoes' => [
         'icon'  => '💡',
         'label' => 'Sugestões',
         'desc'  => 'Envie ideias e feedbacks para a equipe gestora e de desenvolvimento.',
-        'link'  => '/penomato_mvp/src/Views/sugestoes.php',
+        'link'  => APP_BASE . '/src/Views/sugestoes.php',
     ],
     'minhas_acoes' => [
         'icon'  => '↩',
         'label' => 'Minhas Ações',
         'desc'  => 'Desfaça ações em até 24h. Após o prazo, solicite ao gestor com justificativa.',
-        'link'  => '/penomato_mvp/src/Controllers/minhas_acoes.php',
+        'link'  => APP_BASE . '/src/Controllers/minhas_acoes.php',
     ],
 ];
 
 // Permissões por subtipo
 $permissoes = [
     'identificador' => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'sugestoes', 'minhas_acoes'],
-    'dev'           => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'dev_tools', 'sugestoes', 'minhas_acoes'],
-    'especialista'  => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'sugestoes', 'minhas_acoes'],
-    'gestor'        => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'sugestoes', 'minhas_acoes'],
+    'dev'           => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'dev_tools', 'impressao_digital', 'sugestoes', 'minhas_acoes'],
+    'especialista'  => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'impressao_digital', 'sugestoes', 'minhas_acoes'],
+    'gestor'        => ['dados_internet', 'confirmar', 'cadastrar_exemplar', 'registrar_imagens', 'contestar', 'revisar_artigo', 'dev_tools', 'impressao_digital', 'sugestoes', 'minhas_acoes'],
 ];
 
 // Gestor (por categoria ou subtipo) acessa tudo
@@ -129,7 +136,7 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $titulo_painel; ?> — Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background: var(--cinza-100);
@@ -263,7 +270,7 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
 <body>
 
     <?php if ($tipo_usuario === 'gestor' || $subtipo === 'gestor'): ?>
-        <a href="/penomato_mvp/src/Controllers/controlador_gestor.php"
+        <a href="<?= APP_BASE ?>/src/Controllers/controlador_gestor.php"
            style="display:inline-block;margin-bottom:12px;font-size:.85rem;color:var(--cor-primaria);text-decoration:none;font-weight:600;">
             ← Voltar ao painel do gestor
         </a>
@@ -321,7 +328,7 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
         <?php endforeach; ?>
     </div>
 
-    <button class="btn-sair" onclick="window.location.href='/penomato_mvp/src/Controllers/auth/logout_controlador.php'">
+    <button class="btn-sair" onclick="window.location.href='<?= APP_BASE ?>/src/Controllers/auth/logout_controlador.php'">
         🚪 Sair
     </button>
 
@@ -353,7 +360,7 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--esp-4);">
 
-            <a href="/penomato_mvp/src/Views/adicionar_imagens_internet.php"
+            <a href="<?= APP_BASE ?>/src/Views/adicionar_imagens_internet.php"
                style="
                 border:2px solid var(--cor-primaria); border-radius:var(--raio-lg);
                 padding:var(--esp-6) var(--esp-4); text-align:center;
@@ -369,7 +376,7 @@ $titulo_painel = $titulos_painel[$subtipo] ?? 'Painel do Colaborador';
                 </div>
             </a>
 
-            <a href="/penomato_mvp/src/Views/enviar_imagem.php"
+            <a href="<?= APP_BASE ?>/src/Views/enviar_imagem.php"
                style="
                 border:2px solid var(--cor-primaria); border-radius:var(--raio-lg);
                 padding:var(--esp-6) var(--esp-4); text-align:center;

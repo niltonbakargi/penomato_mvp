@@ -87,7 +87,7 @@ $parte_ativa      = isset($_GET['parte'])   ? $_GET['parte']              : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imagens da Internet — Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body { background: var(--cinza-50); color: var(--cinza-800); padding: var(--esp-8) var(--esp-5); }
         .container { max-width: 1100px; margin: 0 auto; }
@@ -207,7 +207,7 @@ $parte_ativa      = isset($_GET['parte'])   ? $_GET['parte']              : '';
         <div class="user-pill">
             <i class="fas fa-user-circle"></i>
             <span><?= htmlspecialchars($usuario_nome) ?></span>
-            <a href="/penomato_mvp/src/Controllers/auth/logout_controlador.php"
+            <a href="<?= APP_BASE ?>/src/Controllers/auth/logout_controlador.php"
                class="btn-sair" onclick="return confirm('Deseja sair?')">
                 <i class="fas fa-sign-out-alt"></i>
             </a>
@@ -290,7 +290,7 @@ $parte_ativa      = isset($_GET['parte'])   ? $_GET['parte']              : '';
                     ?>
                     <div class="foto-card">
                         <div class="foto-preview">
-                            <img src="/penomato_mvp/<?= htmlspecialchars($foto['caminho_imagem']) ?>"
+                            <img src="<?= APP_BASE ?>/<?= htmlspecialchars($foto['caminho_imagem']) ?>"
                                  alt="<?= $cfg2['nome'] ?>"
                                  onerror="this.parentElement.innerHTML='<span style=color:#aaa;font-size:2rem>🖼️</span>'">
                         </div>
@@ -337,7 +337,7 @@ $parte_ativa      = isset($_GET['parte'])   ? $_GET['parte']              : '';
         <?php endif; ?>
 
         <div class="rodape-botoes">
-            <a href="/penomato_mvp/src/Views/entrar_colaborador.php" class="btn-voltar">
+            <a href="<?= APP_BASE ?>/src/Views/entrar_colaborador.php" class="btn-voltar">
                 <i class="fas fa-arrow-left"></i> Voltar ao Painel
             </a>
         </div>
@@ -352,7 +352,7 @@ $parte_ativa      = isset($_GET['parte'])   ? $_GET['parte']              : '';
         <h3 id="modal-titulo">🌐 Adicionar imagem da internet</h3>
 
         <form method="POST"
-              action="/penomato_mvp/src/Controllers/processar_adicionar_imagem_internet.php"
+              action="<?= APP_BASE ?>/src/Controllers/processar_adicionar_imagem_internet.php"
               enctype="multipart/form-data" id="form-upload">
             <input type="hidden" name="especie_id"   value="<?= $especie_id ?>">
             <input type="hidden" name="parte_planta" id="input-parte">

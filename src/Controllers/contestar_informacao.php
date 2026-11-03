@@ -307,7 +307,7 @@ $labels_status = [
 
     <div class="header">
         <h1>⚠️ Contestar Informação</h1>
-        <a href="/penomato_mvp/src/Views/entrar_colaborador.php" class="btn-voltar">← Voltar</a>
+        <a href="<?= APP_BASE ?>/src/Views/entrar_colaborador.php" class="btn-voltar">← Voltar</a>
     </div>
 
     <div class="layout">
@@ -496,8 +496,8 @@ $labels_status = [
                     <div class="galeria" id="galeria">
                         <?php foreach ($imagens as $img): ?>
                         <div class="galeria-item" onclick="selecionarImagem(this, '<?php echo $img['id']; ?>', '<?php echo htmlspecialchars($img['parte_planta']); ?>')">
-                            <img src="/penomato_mvp/<?php echo htmlspecialchars($img['caminho_imagem']); ?>"
-                                 onerror="this.src='/penomato_mvp/assets/img-placeholder.png'"
+                            <img src="<?= APP_BASE ?>/<?php echo htmlspecialchars($img['caminho_imagem']); ?>"
+                                 onerror="this.src='<?= APP_BASE ?>/assets/img-placeholder.png'"
                                  alt="<?php echo htmlspecialchars($img['parte_planta']); ?>">
                             <div class="parte"><?php echo htmlspecialchars($img['parte_planta']); ?></div>
                         </div>

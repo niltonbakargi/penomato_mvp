@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagramas de Ideação — Banco de Matrizes Florestais</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f4f6f0;
+      color: #1a2e1a;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #2d6a2d;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: #556b55;
+      font-size: 1rem;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #2d6a2d;
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.8rem;
+      border-radius: 99px;
+      margin-top: 0.7rem;
+    }
+
+    /* ── layout: coluna única, cada card em sua página ── */
+    .diagrams {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: #2d6a2d;
+      color: #fff;
+      padding: 1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .card-header .num {
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .card-header h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .card-header small {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* ── SVG preenche a largura disponível ── */
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+
+    .mermaid svg {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 100%;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2.5rem;
+      color: #778877;
+      font-size: 0.82rem;
+    }
+
+    /* ── impressão: cada card numa página ── */
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      header {
+        padding: 2rem 2rem 1.5rem;
+        page-break-after: always;
+      }
+
+      .diagrams { gap: 0; }
+
+      .card {
+        border-radius: 0;
+        box-shadow: none;
+        page-break-before: always;
+        page-break-inside: avoid;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-body {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+      }
+
+      .mermaid {
+        width: 100%;
+      }
+
+      footer {
+        page-break-before: always;
+        padding: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🌳 Banco de Matrizes Florestais</h1>
+  <p>Módulo colaborativo do Penomato para mapeamento de indivíduos arbóreos com potencial para coleta de material propagativo</p>
+  <span class="badge">Diagramas de Ideação — MVP</span>
+</header>
+
+<div class="diagrams">
+
+  <!-- 1. Contexto -->
+  <div class="card">
+    <div class="card-header">
+      <span class="num">1</span>
+      <h2>Diagrama de Contexto</h2>
+      <small>Problema → Solução → Valor</small>
+    </div>
+    <div class="card-body">
+      <div class="mermaid">
+graph TD
+    PROB["🌳 Problema\nEngenheiro florestal não sabe onde\nencontrar sementes de uma espécie\nespecífica agora"]
+    SOL["📍 Solução — BMF\nMapa colaborativo de matrizes\nregistradas por qualquer pessoa\ncom smartphone"]
+    VAL["✅ Valor gerado\n'Onde acho sementes de aroeira hoje?'"]
+
+    PROB --> SOL --> VAL
+
+    SOL --> C1["📌 Dados\ngeorreferenciados\npor espécie"]
+    SOL --> C2["📷 Fotos das\npartes da planta"]
+    SOL --> C3["🔍 Consulta pública\nsem login"]
+    SOL --> C4["🤖 Identificação\nautomática via REFLORA"]
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Casos de uso -->
+  <div class="card">
+    <div class="card-header">
+      <span class="num">2</span>
+      <h2>Atores e Casos de Uso</h2>
+      <small>Quem faz o quê</small>
+    </div>
+    <div class="card-body">
+      <div class="mermaid">
+graph LR
+    V(["👤 Visitante\nsem login"])
+    C(["👤 Colaborador\ncom login"])
+    G(["👤 Gestor"])
+    REFLORA(["🌐 REFLORA\nAPI externa"])
+
+    subgraph BMF ["Banco de Matrizes Florestais"]
+        UC1["Ver lista de matrizes"]
+        UC2["Ver mapa interativo"]
+        UC3["Ver ficha da matriz"]
+        UC4["Registrar nova matriz"]
+        UC5["Enviar foto de parte"]
+        UC6["Filtrar por espécie"]
+        UC7["Remover matriz"]
+        UC8["Buscar nome científico"]
+    end
+
+    V --> UC1 & UC2 & UC3 & UC6
+    C --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6
+    G --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7
+    UC8 --> REFLORA
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Fluxo registrar -->
+  <div class="card">
+    <div class="card-header">
+      <span class="num">3</span>
+      <h2>Fluxo — Registrar uma Matriz</h2>
+      <small>Jornada do colaborador no campo</small>
+    </div>
+    <div class="card-body">
+      <div class="mermaid">
+flowchart TD
+    START([Colaborador identifica\nárvore de interesse])
+    LOGIN{Tem sessão?}
+    REDIR["Redireciona para login\n?redirect=matrizes/registrar"]
+    FORM["Abre formulário\nmobile-first"]
+    GPS{GPS disponível?}
+    GPSCAP["Captura lat/lon\nautomaticamente"]
+    GPSMANUAL["Usuário digita\nlat/lon manualmente"]
+    ESPECIE["Digita nome popular\n↓ AJAX → REFLORA\n↓ Preenche nome científico"]
+    FOTO["Tira foto geral (obrigatória)\n+ partes opcionais\nfolha · flor · fruto · caule · semente"]
+    VALID{Foto geral\npresente?}
+    ERRO["Alerta JS:\nfoto geral obrigatória"]
+    SALVA["Salva: matriz MT###\nfotos · coordenadas · espécie"]
+    FIM([Matriz no mapa])
+
+    START --> LOGIN
+    LOGIN -- Não --> REDIR --> FORM
+    LOGIN -- Sim --> FORM
+    FORM --> GPS
+    GPS -- Sim --> GPSCAP --> ESPECIE
+    GPS -- Não --> GPSMANUAL --> ESPECIE
+    ESPECIE --> FOTO --> VALID
+    VALID -- Não --> ERRO --> FOTO
+    VALID -- Sim --> SALVA --> FIM
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Fluxo consultar -->
+  <div class="card">
+    <div class="card-header">
+      <span class="num">4</span>
+      <h2>Fluxo — Consultar o Mapa</h2>
+      <small>Jornada de quem busca matrizes</small>
+    </div>
+    <div class="card-body">
+      <div class="mermaid">
+flowchart TD
+    START([Acessa BMF\nsem login necessário])
+    LIST["Lista de cards\nthumb · nome · código · data"]
+    FILTER["Filtra por nome popular\nou científico"]
+    MAPA["Abre mapa fullscreen\nLeaflet overlay"]
+    PIN["Pins SVG de árvore\npor localização"]
+    FICHA["Ficha pública da matriz\nnome · fotos · partes · data"]
+    FOTO{Quer adicionar\nfoto de parte?}
+    LOGIN["Login com redirect\nde volta à matriz"]
+    ADD["Adiciona foto\nà matriz existente"]
+    FIM([Contribuição registrada])
+
+    START --> LIST
+    LIST --> FILTER --> MAPA
+    LIST --> MAPA
+    MAPA --> PIN --> FICHA
+    FICHA --> FOTO
+    FOTO -- Não --> FIM
+    FOTO -- Sem login --> LOGIN --> ADD --> FIM
+    FOTO -- Com login --> ADD --> FIM
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. ER -->
+  <div class="card">
+    <div class="card-header">
+      <span class="num">5</span>
+      <h2>Modelo de Dados (ER)</h2>
+      <small>3 tabelas + usuários</small>
+    </div>
+    <div class="card-body">
+      <div class="mermaid">
+erDiagram
+    usuarios {
+        int id PK
+        string nome
+        string email
+        string tipo
+    }
+    matrizes {
+        int id PK
+        varchar codigo "MT001…"
+        varchar especie_nome
+        varchar especie_nome_popular
+        decimal latitude
+        decimal longitude
+        varchar foto_geral
+        text observacoes
+        int cadastrado_por FK
+        datetime data_cadastro
+        enum status "ativo|inativo"
+    }
+    matrizes_fotos {
+        int id PK
+        int matriz_id FK
+        enum parte "folha|flor|fruto|caule|semente"
+        varchar caminho_foto
+        int enviada_por FK
+        datetime data_envio
+    }
+    matrizes_comentarios {
+        int id PK
+        int matriz_id FK
+        int usuario_id FK
+        text texto
+        datetime data
+    }
+
+    usuarios ||--o{ matrizes : "cadastra"
+    usuarios ||--o{ matrizes_fotos : "envia"
+    usuarios ||--o{ matrizes_comentarios : "comenta"
+    matrizes ||--o{ matrizes_fotos : "tem"
+    matrizes ||--o{ matrizes_comentarios : "recebe"
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Arquitetura -->
+  <div class="card">
+    <div class="card-header">
+      <span class="num">6</span>
+      <h2>Arquitetura do Sistema</h2>
+      <small>Cliente · PHP · MySQL · REFLORA</small>
+    </div>
+    <div class="card-body">
+      <div class="mermaid">
+graph TD
+    classDef secao fill:#2d6a2d,color:#fff,stroke:#1a4a1a,font-weight:bold,font-size:15px
+    classDef item  fill:#e8f5e8,color:#1a2e1a,stroke:#2d6a2d,font-size:14px
+
+    CLIENTE["📱 Cliente — Browser / Mobile"]:::secao
+    UI["Interface HTML/CSS · Bootstrap 5 · tokens CSS"]:::item
+    JS["JavaScript · GPS · FileReader · Leaflet · filtros"]:::item
+
+    PHP["🖥️ Servidor PHP"]:::secao
+    AUTH["Auth · sessão PHP · ?redirect= pós-login"]:::item
+    VIEWS["Views — index · registrar · mapa · ficha · adicionar_foto · gerenciar_matrizes"]:::item
+    CTRL["Controllers — processar_registro · processar_foto_parte · buscar_cientifico · buscar_especie"]:::item
+    UPLOAD["📁 /uploads/matrizes/"]:::item
+
+    BD["🗄️ MySQL"]:::secao
+    TABELAS["matrizes · matrizes_fotos · matrizes_comentarios · usuarios"]:::item
+
+    API["🌐 REFLORA / JBRJ · nome popular → científico · autocomplete"]:::secao
+
+    CLIENTE --> UI --> JS --> PHP --> AUTH --> VIEWS --> CTRL --> UPLOAD --> BD --> TABELAS --> API
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Penomato · Banco de Matrizes Florestais · Disciplina de Extensão</p>
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    themeVariables: {
+      primaryColor: '#e8f5e8',
+      primaryTextColor: '#1a2e1a',
+      primaryBorderColor: '#2d6a2d',
+      lineColor: '#2d6a2d',
+      secondaryColor: '#f4f6f0',
+      tertiaryColor: '#fff',
+      edgeLabelBackground: '#f4f6f0',
+      fontSize: '16px',
+    },
+    flowchart: { curve: 'basis', nodeSpacing: 60, rankSpacing: 60 },
+    er: { diagramPadding: 30, fontSize: 14 },
+  });
+</script>
+
+</body>
+</html>

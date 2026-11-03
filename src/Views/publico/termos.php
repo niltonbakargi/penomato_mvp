@@ -133,7 +133,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
             </button>
             <span class="text-muted small">
                 Dúvidas?
-                <a href="/penomato_mvp/src/Views/publico/contato.php" style="color: var(--cor-primaria);">Entre em contato</a>
+                <a href="<?= APP_BASE ?>/src/Views/publico/contato.php" style="color: var(--cor-primaria);">Entre em contato</a>
             </span>
         </div>
 

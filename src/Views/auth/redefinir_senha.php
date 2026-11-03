@@ -54,7 +54,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redefinir Senha - Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background:linear-gradient(135deg,var(--cor-primaria) 0%,var(--verde-600) 100%);
@@ -153,14 +153,14 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
                     <span><?php echo htmlspecialchars($erro_token); ?></span>
                 </div>
                 <div class="links">
-                    <a href="/penomato_mvp/src/Views/auth/recuperar_senha.php">
+                    <a href="<?= APP_BASE ?>/src/Views/auth/recuperar_senha.php">
                         <i class="fas fa-redo" style="margin-right:4px;"></i>Solicitar novo link
                     </a>
                 </div>
 
             <?php else: ?>
 
-                <form action="/penomato_mvp/src/Controllers/auth/redefinir_senha_controlador.php"
+                <form action="<?= APP_BASE ?>/src/Controllers/auth/redefinir_senha_controlador.php"
                       method="POST" id="formRedefinir" novalidate>
 
                     <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
@@ -205,7 +205,7 @@ unset($_SESSION['mensagem_erro'], $_SESSION['mensagem_sucesso']);
             <?php endif; ?>
 
             <div class="links">
-                <a href="/penomato_mvp/src/Views/auth/login.php">
+                <a href="<?= APP_BASE ?>/src/Views/auth/login.php">
                     <i class="fas fa-arrow-left" style="margin-right:4px;"></i>Voltar ao login
                 </a>
             </div>

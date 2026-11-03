@@ -223,7 +223,7 @@ $total_contrib  = array_sum(array_column($colaboradores, 'total_especies'));
         <h1>👥 Contribuições por Colaborador</h1>
         <div class="header-right">
             <a href="relatorio_colaboradores.php?csv=1" class="btn-csv">⬇ Exportar CSV</a>
-            <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar</a>
+            <a href="<?= APP_BASE ?>/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar</a>
         </div>
     </div>
 

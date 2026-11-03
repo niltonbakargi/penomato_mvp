@@ -544,7 +544,7 @@ include __DIR__ . '/../includes/cabecalho.php';
                             · <strong style="color:var(--cor-primaria)">Endêmica do Brasil</strong>
                         <?php endif; ?>
                     </span>
-                    <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php?nome_cientifico_completo=<?php echo urlencode($p['nome_cientifico']); ?>"
+                    <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php?nome_cientifico_completo=<?php echo urlencode($p['nome_cientifico']); ?>"
                        class="btn-penomato">
                         <i class="fas fa-leaf"></i> Ver exemplares no Penomato
                     </a>

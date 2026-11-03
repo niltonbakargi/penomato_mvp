@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../Controllers/auth/verificar_acesso.php';
 $id = intval($_GET['id'] ?? 0);
 
 if (!$id) {
-    header('Location: /penomato_mvp/src/Views/matrizes/mapa.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/mapa.php');
     exit;
 }
 
@@ -22,7 +22,7 @@ $matriz = buscarUm(
 );
 
 if (!$matriz) {
-    header('Location: /penomato_mvp/src/Views/matrizes/mapa.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/mapa.php');
     exit;
 }
 
@@ -312,7 +312,7 @@ include __DIR__ . '/../includes/cabecalho.php';
 <div class="ficha-wrap">
 
     <!-- Foto principal -->
-    <img src="/penomato_mvp/<?php echo htmlspecialchars($matriz['foto_geral']); ?>"
+    <img src="<?= APP_BASE ?>/<?php echo htmlspecialchars($matriz['foto_geral']); ?>"
          alt="Foto da matriz <?php echo htmlspecialchars($matriz['codigo']); ?>"
          class="ficha-foto-principal"
          onclick="abrirLightbox(this.src)">
@@ -370,7 +370,7 @@ include __DIR__ . '/../includes/cabecalho.php';
                 <?php if (!empty($fotos_por_parte[$parte])): ?>
                     <?php $foto = $fotos_por_parte[$parte][0]; ?>
                     <div class="parte-card">
-                        <img src="/penomato_mvp/<?php echo htmlspecialchars($foto['caminho_foto']); ?>"
+                        <img src="<?= APP_BASE ?>/<?php echo htmlspecialchars($foto['caminho_foto']); ?>"
                              alt="<?php echo ucfirst($parte); ?>"
                              onclick="abrirLightbox(this.src)">
                         <div class="parte-label">
@@ -393,7 +393,7 @@ include __DIR__ . '/../includes/cabecalho.php';
 
         <?php if (estaLogado()): ?>
         <div class="mt-3">
-            <a href="/penomato_mvp/src/Views/matrizes/adicionar_foto.php?id=<?php echo $id; ?>"
+            <a href="<?= APP_BASE ?>/src/Views/matrizes/adicionar_foto.php?id=<?php echo $id; ?>"
                class="btn-add-parte">
                 <i class="fas fa-plus"></i> Adicionar foto de parte
             </a>
@@ -422,7 +422,7 @@ include __DIR__ . '/../includes/cabecalho.php';
         <?php endif; ?>
 
         <?php if (estaLogado()): ?>
-        <form action="/penomato_mvp/src/Controllers/matrizes/processar_comentario.php"
+        <form action="<?= APP_BASE ?>/src/Controllers/matrizes/processar_comentario.php"
               method="POST" class="form-comentario mt-3">
             <input type="hidden" name="matriz_id" value="<?php echo $id; ?>">
             <textarea class="form-control mb-2" name="texto" rows="2"
@@ -433,13 +433,13 @@ include __DIR__ . '/../includes/cabecalho.php';
         </form>
         <?php else: ?>
         <p class="text-muted small mt-3">
-            <a href="/penomato_mvp/src/Views/auth/login.php">Faça login</a> para comentar.
+            <a href="<?= APP_BASE ?>/src/Views/auth/login.php">Faça login</a> para comentar.
         </p>
         <?php endif; ?>
     </div>
 
     <div class="text-center">
-        <a href="/penomato_mvp/src/Views/matrizes/mapa.php" class="text-muted small">
+        <a href="<?= APP_BASE ?>/src/Views/matrizes/mapa.php" class="text-muted small">
             <i class="fas fa-arrow-left me-1"></i> Ver todas as matrizes no mapa
         </a>
     </div>

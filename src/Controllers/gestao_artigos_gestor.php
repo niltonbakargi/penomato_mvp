@@ -157,7 +157,7 @@ $info_status = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de Artigos · Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body { background: var(--cinza-100); padding: var(--esp-8) var(--esp-5); }
         .container { max-width: 1100px; margin: 0 auto; }
@@ -373,13 +373,13 @@ $info_status = [
             <p>Todos os artigos do sistema — orientadores e status</p>
         </div>
         <div style="display:flex;gap:var(--esp-3);flex-wrap:wrap;align-items:center;">
-            <a href="/penomato_mvp/src/Controllers/admin_regenerar_artigos.php"
+            <a href="<?= APP_BASE ?>/src/Controllers/admin_regenerar_artigos.php"
                class="btn-header"
                onclick="return confirm('Regenerar o HTML de todos os artigos com os dados atuais do banco?')"
                title="Regera o texto de todos os artigos com os dados mais recentes das espécies">
                 <i class="fas fa-rotate"></i> Regenerar artigos
             </a>
-            <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn-header">
+            <a href="<?= APP_BASE ?>/src/Controllers/controlador_gestor.php" class="btn-header">
                 <i class="fas fa-arrow-left"></i> Voltar
             </a>
         </div>
@@ -505,7 +505,7 @@ $info_status = [
                 </td>
                 <td>
                     <div class="btns-acao">
-                        <a href="/penomato_mvp/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=ver"
+                        <a href="<?= APP_BASE ?>/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=ver"
                            class="btn-acao btn-ver">
                             <i class="fas fa-eye"></i> Ver
                         </a>
@@ -520,7 +520,7 @@ $info_status = [
 
                         <?php if ($a['status'] === 'revisado'): ?>
                         <form method="POST"
-                              action="/penomato_mvp/src/Controllers/controlador_painel_revisor.php"
+                              action="<?= APP_BASE ?>/src/Controllers/controlador_painel_revisor.php"
                               style="display:inline;"
                               onsubmit="return confirm('Publicar o artigo de <?php echo htmlspecialchars($a['nome_cientifico'], ENT_QUOTES); ?>?')">
                             <input type="hidden" name="acao"       value="publicar">

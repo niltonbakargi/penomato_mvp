@@ -64,8 +64,8 @@ try {
 
 // Painel destino baseado no tipo
 $url_painel = ($tipo === 'gestor')
-    ? '/penomato_mvp/src/Controllers/controlador_gestor.php'
-    : '/penomato_mvp/src/Views/entrar_colaborador.php';
+    ? APP_BASE . '/src/Controllers/controlador_gestor.php'
+    : APP_BASE . '/src/Views/entrar_colaborador.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -550,7 +550,7 @@ $url_painel = ($tipo === 'gestor')
                 <div class="home-body">
 
                     <!-- Card de pesquisa -->
-                    <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php" class="search-card">
+                    <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php" class="search-card">
                         <div class="search-icon">
                             <i class="fas fa-search"></i>
                         </div>
@@ -564,7 +564,7 @@ $url_painel = ($tipo === 'gestor')
                     </a>
 
                     <!-- Card Banco de Matrizes -->
-                    <a href="/penomato_mvp/src/Views/matrizes/index.php" class="search-card" style="background:#f0fdf6; border-color:#a7d7bf; margin-top:-16px">
+                    <a href="<?= APP_BASE ?>/src/Views/matrizes/index.php" class="search-card" style="background:#f0fdf6; border-color:#a7d7bf; margin-top:-16px">
                         <div class="search-icon" style="color:#1a7a5a">
                             <i class="fas fa-tree"></i>
                         </div>
@@ -578,7 +578,7 @@ $url_painel = ($tipo === 'gestor')
                     </a>
 
                     <!-- Card REFLORA -->
-                    <a href="/penomato_mvp/src/Views/publico/flora_cerrado.php" class="search-card reflora-card">
+                    <a href="<?= APP_BASE ?>/src/Views/publico/flora_cerrado.php" class="search-card reflora-card">
                         <div class="search-icon">
                             <i class="fas fa-database"></i>
                         </div>
@@ -600,10 +600,10 @@ $url_painel = ($tipo === 'gestor')
 
                         <!-- Não logado -->
                         <div class="auth-buttons">
-                            <a href="/penomato_mvp/src/Views/auth/login.php" class="btn-auth btn-auth-outline">
+                            <a href="<?= APP_BASE ?>/src/Views/auth/login.php" class="btn-auth btn-auth-outline">
                                 <i class="fas fa-sign-in-alt"></i> Entrar
                             </a>
-                            <a href="/penomato_mvp/src/Views/auth/cadastro.php" class="btn-auth btn-auth-filled">
+                            <a href="<?= APP_BASE ?>/src/Views/auth/cadastro.php" class="btn-auth btn-auth-filled">
                                 <i class="fas fa-user-plus"></i> Cadastrar-se
                             </a>
                         </div>
@@ -628,10 +628,10 @@ $url_painel = ($tipo === 'gestor')
                                 <i class="fas fa-tachometer-alt"></i>
                                 <?php echo $tipo === 'gestor' ? 'Painel do Gestor' : 'Meu Painel'; ?>
                             </a>
-                            <a href="/penomato_mvp/src/Views/usuario/meu_perfil.php" class="btn-auth btn-auth-outline">
+                            <a href="<?= APP_BASE ?>/src/Views/usuario/meu_perfil.php" class="btn-auth btn-auth-outline">
                                 <i class="fas fa-user"></i> Meu Perfil
                             </a>
-                            <a href="/penomato_mvp/src/Controllers/auth/logout_controlador.php" class="btn-auth btn-auth-danger">
+                            <a href="<?= APP_BASE ?>/src/Controllers/auth/logout_controlador.php" class="btn-auth btn-auth-danger">
                                 <i class="fas fa-sign-out-alt"></i> Sair
                             </a>
                         </div>
@@ -639,17 +639,17 @@ $url_painel = ($tipo === 'gestor')
                         <!-- Links rápidos por tipo -->
                         <?php if (in_array($tipo, ['colaborador', 'gestor'])): ?>
                         <div class="quick-links">
-                            <a href="/penomato_mvp/src/Views/colaborador/upload_imagem.php">
+                            <a href="<?= APP_BASE ?>/src/Views/colaborador/upload_imagem.php">
                                 <i class="fas fa-camera"></i> Upload de Imagens
                             </a>
                             <span class="sep">|</span>
-                            <a href="/penomato_mvp/src/Views/colaborador/cadastrar_caracteristicas.php">
+                            <a href="<?= APP_BASE ?>/src/Views/colaborador/cadastrar_caracteristicas.php">
                                 <i class="fas fa-pen-fancy"></i> Descrever Espécie
                             </a>
                         </div>
                         <?php elseif ($tipo === 'revisor'): ?>
                         <div class="quick-links">
-                            <a href="/penomato_mvp/src/Views/revisor/painel_revisor.php">
+                            <a href="<?= APP_BASE ?>/src/Views/revisor/painel_revisor.php">
                                 <i class="fas fa-clipboard-check"></i> Fila de Revisão
                             </a>
                         </div>

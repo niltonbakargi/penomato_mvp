@@ -62,7 +62,7 @@ $labels_status = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sugestões — Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background: var(--cinza-100);
@@ -252,7 +252,7 @@ $labels_status = [
             <h1>💡 Sugestões</h1>
             <p>Envie ideias e feedbacks para a equipe gestora e de desenvolvimento</p>
         </div>
-        <a href="/penomato_mvp/src/Views/entrar_colaborador.php" class="btn btn-outline-branco">
+        <a href="<?= APP_BASE ?>/src/Views/entrar_colaborador.php" class="btn btn-outline-branco">
             <i class="fas fa-arrow-left"></i> Voltar
         </a>
     </div>

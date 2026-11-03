@@ -199,10 +199,10 @@ include __DIR__ . '/../includes/cabecalho.php';
     <?php
         $url_atual = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
                    . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $url_login_matrizes = '/penomato_mvp/src/Views/auth/login.php?redirect=' . urlencode($url_atual);
+        $url_login_matrizes = APP_BASE . '/src/Views/auth/login.php?redirect=' . urlencode($url_atual);
     ?>
     <?php if (estaLogado()): ?>
-        <a href="/penomato_mvp/src/Views/matrizes/registrar.php" class="btn-modulo btn-nova-matriz">
+        <a href="<?= APP_BASE ?>/src/Views/matrizes/registrar.php" class="btn-modulo btn-nova-matriz">
             <div class="icone-btn"><i class="fas fa-plus"></i></div>
             <div class="texto-btn">
                 <strong>Nova Matriz</strong>
@@ -219,7 +219,7 @@ include __DIR__ . '/../includes/cabecalho.php';
         </a>
     <?php endif; ?>
 
-    <a href="/penomato_mvp/src/Views/matrizes/mapa.php" class="btn-modulo btn-ver-mapa">
+    <a href="<?= APP_BASE ?>/src/Views/matrizes/mapa.php" class="btn-modulo btn-ver-mapa">
         <div class="icone-btn"><i class="fas fa-map-marked-alt"></i></div>
         <div class="texto-btn">
             <strong>Ver no Mapa</strong>
@@ -230,11 +230,11 @@ include __DIR__ . '/../includes/cabecalho.php';
     <?php if (!estaLogado()): ?>
     <div class="aviso-login mt-2">
         <i class="fas fa-info-circle"></i>
-        Para registrar matrizes, <a href="<?php echo htmlspecialchars($url_login_matrizes); ?>" class="fw-bold">faça login</a> ou <a href="/penomato_mvp/src/Views/auth/cadastro.php" class="fw-bold">crie uma conta</a>.
+        Para registrar matrizes, <a href="<?php echo htmlspecialchars($url_login_matrizes); ?>" class="fw-bold">faça login</a> ou <a href="<?= APP_BASE ?>/src/Views/auth/cadastro.php" class="fw-bold">crie uma conta</a>.
     </div>
     <?php endif; ?>
 
-    <a href="/penomato_mvp/" class="btn-modulo btn-sair mt-2">
+    <a href="<?= APP_BASE ?>/" class="btn-modulo btn-sair mt-2">
         <i class="fas fa-arrow-left me-2"></i> Voltar ao Penomato
     </a>
 

@@ -73,7 +73,7 @@ if ($total > 0) {
     $imgs_por_esp   = [];
     foreach ($stmt_img->fetchAll(PDO::FETCH_ASSOC) as $img) {
         if (!file_exists($raiz_fisica . $img['caminho_imagem'])) continue;
-        $imgs_por_esp[$img['especie_id']][$img['parte_planta']][] = '/penomato_mvp/' . $img['caminho_imagem'];
+        $imgs_por_esp[$img['especie_id']][$img['parte_planta']][] = APP_BASE . '/' . $img['caminho_imagem'];
     }
 
     // Monta slides na ordem das espécies da lista

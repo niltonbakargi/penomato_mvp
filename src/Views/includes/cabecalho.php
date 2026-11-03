@@ -63,8 +63,8 @@ function menuAtivo($url, $pagina_atual) {
     <meta name="theme-color" content="#0b5e42">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/penomato_mvp/assets/imagens/favicon.ico">
-    <link rel="apple-touch-icon" href="/penomato_mvp/assets/imagens/logo-apple.png">
+    <link rel="icon" type="image/x-icon" href="<?= APP_BASE ?>/assets/imagens/favicon.ico">
+    <link rel="apple-touch-icon" href="<?= APP_BASE ?>/assets/imagens/logo-apple.png">
     
     <title><?php echo $titulo_pagina; ?></title>
     
@@ -78,8 +78,8 @@ function menuAtivo($url, $pagina_atual) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/bootstrap-ajustes.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/bootstrap-ajustes.css">
     
     <style>
         /* Estilos do cabeçalho e menu */
@@ -389,7 +389,7 @@ function menuAtivo($url, $pagina_atual) {
 <nav class="navbar navbar-expand-lg navbar-dark navbar-penomato" id="mainNavbar">
     <div class="container-fluid">
         <!-- Logo -->
-        <a class="navbar-brand" href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php">
+        <a class="navbar-brand" href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php">
             <i class="fas fa-leaf"></i>
             <span>Penomato</span>
         </a>
@@ -406,36 +406,36 @@ function menuAtivo($url, $pagina_atual) {
             <ul class="navbar-nav me-auto">
                 <!-- Menu público - sempre visível -->
                 <li class="nav-item">
-                    <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/publico/busca_caracteristicas.php', $pagina_atual); ?>" 
-                       href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php">
+                    <a class="nav-link <?php echo menuAtivo(APP_BASE . '/src/Views/publico/busca_caracteristicas.php', $pagina_atual); ?>" 
+                       href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php">
                         <i class="fas fa-search"></i> Buscar Espécies
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/publico/flora_cerrado.php', $pagina_atual); ?>"
-                       href="/penomato_mvp/src/Views/publico/flora_cerrado.php">
+                    <a class="nav-link <?php echo menuAtivo(APP_BASE . '/src/Views/publico/flora_cerrado.php', $pagina_atual); ?>"
+                       href="<?= APP_BASE ?>/src/Views/publico/flora_cerrado.php">
                         <i class="fas fa-seedling"></i> Flora do Cerrado
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/matrizes/index.php', $pagina_atual); ?>"
-                       href="/penomato_mvp/src/Views/matrizes/index.php">
+                    <a class="nav-link <?php echo menuAtivo(APP_BASE . '/src/Views/matrizes/index.php', $pagina_atual); ?>"
+                       href="<?= APP_BASE ?>/src/Views/matrizes/index.php">
                         <i class="fas fa-tree"></i> Matrizes
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/publico/sobre.php', $pagina_atual); ?>"
-                       href="/penomato_mvp/src/Views/publico/sobre.php">
+                    <a class="nav-link <?php echo menuAtivo(APP_BASE . '/src/Views/publico/sobre.php', $pagina_atual); ?>"
+                       href="<?= APP_BASE ?>/src/Views/publico/sobre.php">
                         <i class="fas fa-info-circle"></i> Sobre
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/publico/contato.php', $pagina_atual); ?>" 
-                       href="/penomato_mvp/src/Views/publico/contato.php">
+                    <a class="nav-link <?php echo menuAtivo(APP_BASE . '/src/Views/publico/contato.php', $pagina_atual); ?>" 
+                       href="<?= APP_BASE ?>/src/Views/publico/contato.php">
                         <i class="fas fa-envelope"></i> Contato
                     </a>
                 </li>
@@ -449,12 +449,12 @@ function menuAtivo($url, $pagina_atual) {
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="colaboradorDropdown">
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/colaborador/cadastrar_caracteristicas.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/colaborador/cadastrar_caracteristicas.php">
                                 <i class="fas fa-pen"></i> Cadastrar Características
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/colaborador/upload_imagem.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/colaborador/upload_imagem.php">
                                 <i class="fas fa-camera"></i> Upload de Imagens
                             </a>
                         </li>
@@ -465,8 +465,8 @@ function menuAtivo($url, $pagina_atual) {
                 <!-- Menu para REVISOR -->
                 <?php if (estaLogado() && in_array(getTipoUsuario(), ['revisor', 'gestor'])): ?>
                 <li class="nav-item">
-                    <a class="nav-link <?php echo menuAtivo('/penomato_mvp/src/Views/revisor/painel_revisor.php', $pagina_atual); ?>" 
-                       href="/penomato_mvp/src/Views/revisor/painel_revisor.php">
+                    <a class="nav-link <?php echo menuAtivo(APP_BASE . '/src/Views/revisor/painel_revisor.php', $pagina_atual); ?>" 
+                       href="<?= APP_BASE ?>/src/Views/revisor/painel_revisor.php">
                         <i class="fas fa-check-circle"></i> Painel Revisor
                         <?php if (temPendenciasRevisao()): ?>
                         <span class="badge-notification"><?php echo contarPendenciasRevisao(); ?></span>
@@ -484,22 +484,22 @@ function menuAtivo($url, $pagina_atual) {
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="gestorDropdown">
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/gestor/painel_gestor.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/gestor/painel_gestor.php">
                                 <i class="fas fa-chart-line"></i> Dashboard
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/gestor/gerenciar_usuarios.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/gestor/gerenciar_usuarios.php">
                                 <i class="fas fa-users"></i> Gerenciar Usuários
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/gestor/relatorios.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/gestor/relatorios.php">
                                 <i class="fas fa-file-alt"></i> Relatórios
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/gestor/configuracoes.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/gestor/configuracoes.php">
                                 <i class="fas fa-sliders-h"></i> Configurações
                             </a>
                         </li>
@@ -517,7 +517,7 @@ function menuAtivo($url, $pagina_atual) {
                        data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="user-avatar">
                             <?php if (file_exists(__DIR__ . '/../../../uploads/fotos_perfil/' . $_SESSION['usuario_id'] . '.jpg')): ?>
-                                <img src="/penomato_mvp/uploads/fotos_perfil/<?php echo $_SESSION['usuario_id']; ?>.jpg" 
+                                <img src="<?= APP_BASE ?>/uploads/fotos_perfil/<?php echo $_SESSION['usuario_id']; ?>.jpg" 
                                      alt="<?php echo htmlspecialchars(getNomeUsuario()); ?>">
                             <?php else: ?>
                                 <i class="fas fa-user"></i>
@@ -530,28 +530,28 @@ function menuAtivo($url, $pagina_atual) {
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/usuario/meu_perfil.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/usuario/meu_perfil.php">
                                 <i class="fas fa-user-circle"></i> Meu Perfil
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/usuario/minhas_contribuicoes.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/usuario/minhas_contribuicoes.php">
                                 <i class="fas fa-chart-bar"></i> Minhas Contribuições
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/usuario/editar_perfil.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/usuario/editar_perfil.php">
                                 <i class="fas fa-edit"></i> Editar Perfil
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/penomato_mvp/src/Views/usuario/alterar_senha.php">
+                            <a class="dropdown-item" href="<?= APP_BASE ?>/src/Views/usuario/alterar_senha.php">
                                 <i class="fas fa-key"></i> Alterar Senha
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item text-danger" href="/penomato_mvp/src/Controllers/auth/logout_controlador.php">
+                            <a class="dropdown-item text-danger" href="<?= APP_BASE ?>/src/Controllers/auth/logout_controlador.php">
                                 <i class="fas fa-sign-out-alt"></i> Sair
                             </a>
                         </li>
@@ -561,12 +561,12 @@ function menuAtivo($url, $pagina_atual) {
                 <?php else: ?>
                 <!-- Usuário não logado -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/penomato_mvp/src/Views/auth/login.php">
+                    <a class="nav-link" href="<?= APP_BASE ?>/src/Views/auth/login.php">
                         <i class="fas fa-sign-in-alt"></i> Entrar
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/penomato_mvp/src/Views/auth/cadastro.php">
+                    <a class="nav-link" href="<?= APP_BASE ?>/src/Views/auth/cadastro.php">
                         <i class="fas fa-user-plus"></i> Cadastrar
                     </a>
                 </li>
@@ -583,7 +583,7 @@ function menuAtivo($url, $pagina_atual) {
 <?php if (isset($mostrar_breadcrumb) && $mostrar_breadcrumb): ?>
 <div class="breadcrumb-custom">
     <div class="container-fluid">
-        <a href="/penomato_mvp/src/Views/publico/busca_caracteristicas.php">Home</a>
+        <a href="<?= APP_BASE ?>/src/Views/publico/busca_caracteristicas.php">Home</a>
         <?php if (isset($breadcrumb_itens) && is_array($breadcrumb_itens)): ?>
             <?php foreach ($breadcrumb_itens as $item): ?>
                 <i class="fas fa-chevron-right mx-2" style="font-size: 0.8rem; color: #999;"></i>

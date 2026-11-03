@@ -40,7 +40,7 @@ unset($_SESSION['email_tentativa']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--verde-600) 100%);
@@ -230,7 +230,7 @@ unset($_SESSION['email_tentativa']);
                 <?php endif; ?>
                 
                 <!-- Formulário de login -->
-                <form action="/penomato_mvp/src/Controllers/auth/login_controlador.php" method="POST">
+                <form action="<?= APP_BASE ?>/src/Controllers/auth/login_controlador.php" method="POST">
                     
                     <!-- Campo redirect oculto -->
                     <?php if ($redirect): ?>
@@ -271,18 +271,18 @@ unset($_SESSION['email_tentativa']);
                 
                 <!-- Links -->
                 <div class="links">
-                    <a href="/penomato_mvp/src/Views/auth/recuperar_senha.php?email=<?php echo urlencode($email_tentativa); ?>">
+                    <a href="<?= APP_BASE ?>/src/Views/auth/recuperar_senha.php?email=<?php echo urlencode($email_tentativa); ?>">
                         <i class="fas fa-key"></i> Esqueceu sua senha?
                     </a>
                     &nbsp;·&nbsp;
-                    <a href="/penomato_mvp/src/Views/auth/cadastro.php">
+                    <a href="<?= APP_BASE ?>/src/Views/auth/cadastro.php">
                         <i class="fas fa-user-plus"></i> Criar nova conta
                     </a>
                 </div>
                 
                 <!-- Link voltar -->
                 <div class="back-link">
-                    <a href="/penomato_mvp/index.php">
+                    <a href="<?= APP_BASE ?>/index.php">
                         <i class="fas fa-arrow-left"></i> Voltar para página inicial
                     </a>
                 </div>

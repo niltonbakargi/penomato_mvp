@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 require_once __DIR__ . '/../../Controllers/auth/verificar_acesso.php';
 
 if (!estaLogado()) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
@@ -18,7 +18,7 @@ $matriz = buscarUm(
 );
 
 if (!$matriz) {
-    header('Location: /penomato_mvp/src/Views/matrizes/mapa.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/mapa.php');
     exit;
 }
 
@@ -109,7 +109,7 @@ include __DIR__ . '/../includes/cabecalho.php';
     </div>
 
     <div class="card-secao">
-        <form action="/penomato_mvp/src/Controllers/matrizes/processar_foto_parte.php"
+        <form action="<?= APP_BASE ?>/src/Controllers/matrizes/processar_foto_parte.php"
               method="POST" enctype="multipart/form-data">
             <input type="hidden" name="matriz_id" value="<?php echo $id; ?>">
 
@@ -142,7 +142,7 @@ include __DIR__ . '/../includes/cabecalho.php';
     </div>
 
     <div class="text-center mt-3">
-        <a href="/penomato_mvp/src/Views/matrizes/ficha.php?id=<?php echo $id; ?>"
+        <a href="<?= APP_BASE ?>/src/Views/matrizes/ficha.php?id=<?php echo $id; ?>"
            class="text-muted small">
             <i class="fas fa-arrow-left me-1"></i> Voltar à ficha
         </a>

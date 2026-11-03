@@ -28,7 +28,7 @@ $titulo_pagina = "Editar Perfil - Penomato";
 $descricao_pagina = "Atualize suas informações pessoais e acadêmicas";
 $mostrar_breadcrumb = true;
 $breadcrumb_itens = [
-    ['nome' => 'Perfil', 'url' => '/penomato_mvp/src/Views/usuario/meu_perfil.php'],
+    ['nome' => 'Perfil', 'url' => APP_BASE . '/src/Views/usuario/meu_perfil.php'],
     ['nome' => 'Editar Perfil']
 ];
 
@@ -121,7 +121,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     <!-- FORMULÁRIO DE EDIÇÃO -->
                     <!-- ============================================== -->
                     
-                    <form action="/penomato_mvp/src/Controllers/usuario/atualizar_perfil_controlador.php" 
+                    <form action="<?= APP_BASE ?>/src/Controllers/usuario/atualizar_perfil_controlador.php" 
                           method="POST" 
                           id="formEditarPerfil"
                           enctype="multipart/form-data"
@@ -145,13 +145,13 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                                 <!-- Preview da foto atual -->
                                 <div class="profile-photo-preview">
                                     <?php if (file_exists(__DIR__ . '/../../../uploads/fotos_perfil/' . $usuario_id . '.jpg')): ?>
-                                        <img src="/penomato_mvp/uploads/fotos_perfil/<?php echo $usuario_id; ?>.jpg?t=<?php echo time(); ?>" 
+                                        <img src="<?= APP_BASE ?>/uploads/fotos_perfil/<?php echo $usuario_id; ?>.jpg?t=<?php echo time(); ?>" 
                                              alt="Foto de perfil atual"
                                              id="fotoPreview"
                                              class="img-fluid rounded-circle"
                                              style="width: 150px; height: 150px; object-fit: cover; border: 4px solid var(--cor-primaria);">
                                     <?php elseif (file_exists(__DIR__ . '/../../../uploads/fotos_perfil/' . $usuario_id . '.png')): ?>
-                                        <img src="/penomato_mvp/uploads/fotos_perfil/<?php echo $usuario_id; ?>.png?t=<?php echo time(); ?>" 
+                                        <img src="<?= APP_BASE ?>/uploads/fotos_perfil/<?php echo $usuario_id; ?>.png?t=<?php echo time(); ?>" 
                                              alt="Foto de perfil atual"
                                              id="fotoPreview"
                                              class="img-fluid rounded-circle"
@@ -232,7 +232,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                                 <div class="form-text">
                                     <i class="fas fa-lock"></i> 
                                     O e-mail não pode ser alterado. 
-                                    <a href="/penomato_mvp/src/Views/auth/solicitar_alteracao_email.php">Solicitar alteração</a>
+                                    <a href="<?= APP_BASE ?>/src/Views/auth/solicitar_alteracao_email.php">Solicitar alteração</a>
                                 </div>
                             </div>
                             
@@ -363,12 +363,12 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                         <hr class="my-4">
                         
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="/penomato_mvp/src/Views/usuario/meu_perfil.php" class="btn btn-outline-secondary">
+                            <a href="<?= APP_BASE ?>/src/Views/usuario/meu_perfil.php" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>Voltar ao Perfil
                             </a>
                             
                             <div>
-                                <a href="/penomato_mvp/src/Views/usuario/alterar_senha.php" class="btn btn-outline-warning me-2">
+                                <a href="<?= APP_BASE ?>/src/Views/usuario/alterar_senha.php" class="btn btn-outline-warning me-2">
                                     <i class="fas fa-key me-2"></i>Alterar Senha
                                 </a>
                                 
@@ -428,7 +428,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="/penomato_mvp/src/Controllers/usuario/excluir_conta_controlador.php"
+            <form action="<?= APP_BASE ?>/src/Controllers/usuario/excluir_conta_controlador.php"
                   method="POST" id="formExcluirConta">
 
                 <input type="hidden" name="csrf_token"

@@ -44,7 +44,7 @@ foreach ($rows_img as $cam) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Backup — Penomato</title>
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body { background:#f0f4f0; font-family:'Segoe UI',sans-serif; padding:32px 20px; color:#1e2e1e; }
         .container { max-width:600px; margin:0 auto; }
@@ -81,7 +81,7 @@ foreach ($rows_img as $cam) {
 
     <div class="header">
         <h1>💾 Backup do Sistema</h1>
-        <a href="/penomato_mvp/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar</a>
+        <a href="<?= APP_BASE ?>/src/Controllers/controlador_gestor.php" class="btn-voltar">← Voltar</a>
     </div>
 
     <div class="info-card">
@@ -174,7 +174,7 @@ function baixarBanco() {
     btn.disabled = true;
     setStatus('status-banco', 'run', '⏳ Gerando exportação do banco…');
 
-    fetch('/penomato_mvp/src/Controllers/backup_banco.php')
+    fetch(APP_BASE . '/src/Controllers/backup_banco.php')
         .then(function(res) {
             if (!res.ok) return res.text().then(function(t) { throw new Error(t); });
             return res.blob();
@@ -201,7 +201,7 @@ function baixarImagens() {
     btn.disabled = true;
     setStatus('status-imgs', 'run', '⏳ Compactando imagens…');
 
-    fetch('/penomato_mvp/src/Controllers/backup_imagens.php')
+    fetch(APP_BASE . '/src/Controllers/backup_imagens.php')
         .then(function(res) {
             if (res.status === 204) {
                 btn.disabled = false;

@@ -11,7 +11,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Revisor - Penomato</title>
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background-color: #f0f4f0;
@@ -211,8 +211,8 @@
         <div class="actions-bar">
             <button class="btn" onclick="abrirModalNovaRevisao()">➕ NOVA REVISÃO</button>
             <button class="btn btn-secondary" onclick="carregarRevisoesAndamento()">📂 CONTINUAR</button>
-            <a href="/penomato_mvp/src/Views/revisor/revisar_exemplar.php" class="btn btn-outline">🔬 Revisar Exemplares</a>
-            <a href="/penomato_mvp/src/Views/revisor/mapa_exemplares.php" class="btn btn-outline">🗺️ Mapa de Exemplares</a>
+            <a href="<?= APP_BASE ?>/src/Views/revisor/revisar_exemplar.php" class="btn btn-outline">🔬 Revisar Exemplares</a>
+            <a href="<?= APP_BASE ?>/src/Views/revisor/mapa_exemplares.php" class="btn btn-outline">🗺️ Mapa de Exemplares</a>
         </div>
 
         <!-- CONTEÚDO PRINCIPAL -->
@@ -262,7 +262,7 @@
             const lista = document.getElementById('modalLista');
             lista.innerHTML = '<div class="loading">Carregando espécies...</div>';
             
-            fetch('/penomato_mvp/src/Controllers/controlador_painel_revisor.php?acao=listar_pendentes')
+            fetch(APP_BASE . '/src/Controllers/controlador_painel_revisor.php?acao=listar_pendentes')
                 .then(response => response.json())
                 .then(data => {
                     if (data.erro) {
@@ -326,7 +326,7 @@
 
         // Iniciar revisão (chama API)
         function iniciarRevisao(id) {
-            fetch('/penomato_mvp/src/Controllers/controlador_painel_revisor.php?acao=iniciar', {
+            fetch(APP_BASE . '/src/Controllers/controlador_painel_revisor.php?acao=iniciar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'especie_id=' + id
@@ -351,7 +351,7 @@
             const main = document.getElementById('mainContent');
             main.innerHTML = '<div class="loading">Carregando revisões...</div>';
             
-            fetch('/penomato_mvp/src/Controllers/controlador_painel_revisor.php?acao=listar_andamento')
+            fetch(APP_BASE . '/src/Controllers/controlador_painel_revisor.php?acao=listar_andamento')
                 .then(response => response.json())
                 .then(data => {
                     if (data.erro) {

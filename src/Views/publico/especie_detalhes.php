@@ -178,7 +178,7 @@ if (!empty($ids)) {
         // Só exibe imagens cujo arquivo existe em disco
         if (!file_exists($raiz_fisica . $img['caminho_imagem'])) continue;
         $imagens[$img['especie_id']][$img['parte_planta']][] = [
-            'url'       => '/penomato_mvp/' . $img['caminho_imagem'],
+            'url'       => APP_BASE . '/' . $img['caminho_imagem'],
             'fonte'     => $img['fonte_nome']    ?? '',
             'fonte_url' => $img['fonte_url']     ?? '',
             'autor'     => $img['autor_imagem']  ?? '',

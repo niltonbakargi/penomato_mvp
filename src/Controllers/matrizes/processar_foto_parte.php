@@ -7,12 +7,12 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 require_once __DIR__ . '/../auth/verificar_acesso.php';
 
 if (!estaLogado()) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/matrizes/mapa.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/mapa.php');
     exit;
 }
 
@@ -22,13 +22,13 @@ $partes_validas = ['folha', 'flor', 'fruto', 'caule', 'semente'];
 
 if (!$matriz_id || !in_array($parte, $partes_validas)) {
     mensagemErro('Dados inválidos.');
-    header("Location: /penomato_mvp/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
+    header("Location: " . APP_BASE . "/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
     exit;
 }
 
 if (!isset($_FILES['foto_parte']) || $_FILES['foto_parte']['error'] !== UPLOAD_ERR_OK) {
     mensagemErro('Erro no upload da foto.');
-    header("Location: /penomato_mvp/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
+    header("Location: " . APP_BASE . "/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
     exit;
 }
 
@@ -40,13 +40,13 @@ finfo_close($finfo);
 
 if (!in_array($tipo_real, $tipos_permitidos)) {
     mensagemErro('Formato inválido. Use JPG ou PNG.');
-    header("Location: /penomato_mvp/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
+    header("Location: " . APP_BASE . "/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
     exit;
 }
 
 if ($foto['size'] > 10 * 1024 * 1024) {
     mensagemErro('A foto deve ter no máximo 10 MB.');
-    header("Location: /penomato_mvp/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
+    header("Location: " . APP_BASE . "/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
     exit;
 }
 
@@ -60,7 +60,7 @@ $nome_arquivo = uniqid("mt{$matriz_id}_{$parte}_") . '.' . $ext;
 
 if (!move_uploaded_file($foto['tmp_name'], $dir_upload . $nome_arquivo)) {
     mensagemErro('Erro ao salvar a foto.');
-    header("Location: /penomato_mvp/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
+    header("Location: " . APP_BASE . "/src/Views/matrizes/adicionar_foto.php?id={$matriz_id}");
     exit;
 }
 
@@ -72,5 +72,5 @@ inserir('matrizes_fotos', [
 ]);
 
 mensagemSucesso('Foto de ' . ucfirst($parte) . ' adicionada.');
-header("Location: /penomato_mvp/src/Views/matrizes/ficha.php?id={$matriz_id}");
+header("Location: " . APP_BASE . "/src/Views/matrizes/ficha.php?id={$matriz_id}");
 exit;

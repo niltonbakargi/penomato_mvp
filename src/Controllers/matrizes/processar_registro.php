@@ -7,12 +7,12 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
 require_once __DIR__ . '/../auth/verificar_acesso.php';
 
 if (!estaLogado()) {
-    header('Location: /penomato_mvp/src/Views/auth/login.php');
+    header('Location: ' . APP_BASE . '/src/Views/auth/login.php');
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/registrar.php');
     exit;
 }
 
@@ -25,14 +25,14 @@ $lon = $_POST['longitude'] ?? '';
 
 if (empty($lat) || empty($lon)) {
     mensagemErro('As coordenadas GPS são obrigatórias.');
-    header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/registrar.php');
     exit;
 }
 
 // ── Valida foto geral ─────────────────────────────────────────
 if (!isset($_FILES['foto_geral']) || $_FILES['foto_geral']['error'] !== UPLOAD_ERR_OK) {
     mensagemErro('A foto da árvore inteira é obrigatória.');
-    header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/registrar.php');
     exit;
 }
 
@@ -62,7 +62,7 @@ $nome_geral = salvarFoto($_FILES['foto_geral'], $dir_geral);
 
 if (!$nome_geral) {
     mensagemErro('Erro ao salvar a foto. Verifique o formato (JPG/PNG) e tamanho (máx. 10 MB).');
-    header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/registrar.php');
     exit;
 }
 
@@ -99,7 +99,7 @@ $id = inserir('matrizes', [
 
 if (!$id) {
     mensagemErro('Erro ao registrar a matriz. Tente novamente.');
-    header('Location: /penomato_mvp/src/Views/matrizes/registrar.php');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/registrar.php');
     exit;
 }
 
@@ -123,5 +123,5 @@ foreach ($partes_opcionais as $parte) {
 }
 
 mensagemSucesso("Matriz <strong>{$codigo}</strong> registrada com sucesso!");
-header("Location: /penomato_mvp/src/Views/matrizes/ficha.php?id={$id}");
+header("Location: " . APP_BASE . "/src/Views/matrizes/ficha.php?id={$id}");
 exit;

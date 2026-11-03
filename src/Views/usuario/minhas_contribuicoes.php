@@ -28,7 +28,7 @@ $titulo_pagina = "Minhas Contribuições - Penomato";
 $descricao_pagina = "Histórico completo de suas contribuições no Penomato";
 $mostrar_breadcrumb = true;
 $breadcrumb_itens = [
-    ['nome' => 'Perfil', 'url' => '/penomato_mvp/src/Views/usuario/meu_perfil.php'],
+    ['nome' => 'Perfil', 'url' => APP_BASE . '/src/Views/usuario/meu_perfil.php'],
     ['nome' => 'Minhas Contribuições']
 ];
 
@@ -290,7 +290,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         </div>
         
         <div>
-            <a href="/penomato_mvp/src/Views/usuario/meu_perfil.php" class="btn btn-outline-secondary">
+            <a href="<?= APP_BASE ?>/src/Views/usuario/meu_perfil.php" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Voltar ao Perfil
             </a>
         </div>
@@ -424,10 +424,10 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                 </p>
                 
                 <div class="action-buttons">
-                    <a href="/penomato_mvp/src/Views/colaborador/cadastrar_caracteristicas.php" class="btn btn-success me-2">
+                    <a href="<?= APP_BASE ?>/src/Views/colaborador/cadastrar_caracteristicas.php" class="btn btn-success me-2">
                         <i class="fas fa-plus-circle me-2"></i>Cadastrar Espécie
                     </a>
-                    <a href="/penomato_mvp/src/Views/colaborador/upload_imagem.php" class="btn btn-outline-success">
+                    <a href="<?= APP_BASE ?>/src/Views/colaborador/upload_imagem.php" class="btn btn-outline-success">
                         <i class="fas fa-upload me-2"></i>Enviar Imagem
                     </a>
                 </div>
@@ -518,7 +518,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                             <!-- Ações -->
                             <td>
                                 <?php if ($item['tipo'] == 'especie'): ?>
-                                    <a href="/penomato_mvp/src/Views/publico/especie_detalhes.php?id=<?php echo $item['especie_id']; ?>" 
+                                    <a href="<?= APP_BASE ?>/src/Views/publico/especie_detalhes.php?id=<?php echo $item['especie_id']; ?>" 
                                        class="btn-icon" title="Visualizar">
                                         <i class="fas fa-eye"></i>
                                     </a>
@@ -528,7 +528,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                                         <i class="fas fa-image"></i>
                                     </a>
                                 <?php elseif ($item['tipo'] == 'revisao'): ?>
-                                    <a href="/penomato_mvp/src/Views/revisor/artigo_revisao.php?id=<?php echo $item['especie_id']; ?>" 
+                                    <a href="<?= APP_BASE ?>/src/Views/revisor/artigo_revisao.php?id=<?php echo $item['especie_id']; ?>" 
                                        class="btn-icon" title="Ver revisão">
                                         <i class="fas fa-search"></i>
                                     </a>
@@ -802,7 +802,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
         const conteudo = document.getElementById('modalImagemConteudo');
         
         // Carregar imagem via AJAX
-        fetch(`/penomato_mvp/src/Controllers/imagem/buscar_imagem.php?id=${imagemId}`)
+        fetch(`<?= APP_BASE ?>/src/Controllers/imagem/buscar_imagem.php?id=${imagemId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -865,7 +865,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
     // ============================================================
     
     // Buscar dados de atividade por mês
-    fetch(`/penomato_mvp/src/Controllers/usuario/atividade_mensal.php?id=<?php echo $usuario_id; ?>`)
+    fetch(`<?= APP_BASE ?>/src/Controllers/usuario/atividade_mensal.php?id=<?php echo $usuario_id; ?>`)
         .then(response => response.json())
         .then(data => {
             const ctxLinha = document.getElementById('graficoLinha').getContext('2d');

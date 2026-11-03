@@ -188,8 +188,8 @@ if ($is_gestor) {
 }
 
 $voltar_url = $is_gestor
-    ? '/penomato_mvp/src/Controllers/controlador_gestor.php'
-    : '/penomato_mvp/src/Views/entrar_colaborador.php';
+    ? APP_BASE . '/src/Controllers/controlador_gestor.php'
+    : APP_BASE . '/src/Views/entrar_colaborador.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -198,7 +198,7 @@ $voltar_url = $is_gestor
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artigos — Fila de Revisão · Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body { background: var(--cinza-100); padding: var(--esp-8) var(--esp-5); }
         .container { max-width: 960px; margin: 0 auto; }
@@ -388,25 +388,25 @@ $voltar_url = $is_gestor
                 </td>
                 <td>
                     <div class="btns-acao">
-                        <a href="/penomato_mvp/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=ver"
+                        <a href="<?= APP_BASE ?>/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=ver"
                            class="btn-acao btn-ver">
                             <i class="fas fa-eye"></i> Ver
                         </a>
 
                         <?php if ($a['status'] === 'registrado'): ?>
-                        <a href="/penomato_mvp/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=revisar"
+                        <a href="<?= APP_BASE ?>/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=revisar"
                            class="btn-acao btn-revisar">
                             <i class="fas fa-pen"></i> Iniciar revisão
                         </a>
 
                         <?php elseif ($a['status'] === 'revisando'): ?>
-                        <a href="/penomato_mvp/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=revisar"
+                        <a href="<?= APP_BASE ?>/src/Views/artigo_revisao.php?id=<?php echo $a['especie_id']; ?>&modo=revisar"
                            class="btn-acao btn-revisar">
                             <i class="fas fa-pen"></i> Continuar revisão
                         </a>
 
                         <?php elseif ($a['status'] === 'revisado' && $is_gestor): ?>
-                        <form method="POST" action="/penomato_mvp/src/Controllers/controlador_painel_revisor.php"
+                        <form method="POST" action="<?= APP_BASE ?>/src/Controllers/controlador_painel_revisor.php"
                               style="display:inline;"
                               onsubmit="return confirm('Publicar o artigo de <?php echo htmlspecialchars($a['nome_cientifico'], ENT_QUOTES); ?>?')">
                             <input type="hidden" name="acao"       value="publicar">

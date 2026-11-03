@@ -30,7 +30,7 @@ if (!isset($_SESSION['csrf_token_email'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alterar E-mail - Penomato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
     <style>
         body {
             background:linear-gradient(135deg,var(--cor-primaria) 0%,var(--verde-600) 100%);
@@ -140,7 +140,7 @@ if (!isset($_SESSION['csrf_token_email'])) {
                 A alteração só é efetivada após a confirmação.</span>
             </div>
 
-            <form action="/penomato_mvp/src/Controllers/auth/solicitar_alteracao_email_controlador.php"
+            <form action="<?= APP_BASE ?>/src/Controllers/auth/solicitar_alteracao_email_controlador.php"
                   method="POST" novalidate>
 
                 <input type="hidden" name="csrf_token"
@@ -190,7 +190,7 @@ if (!isset($_SESSION['csrf_token_email'])) {
             </form>
 
             <div class="links">
-                <a href="/penomato_mvp/src/Views/usuario/editar_perfil.php">
+                <a href="<?= APP_BASE ?>/src/Views/usuario/editar_perfil.php">
                     <i class="fas fa-arrow-left" style="margin-right:4px;"></i>Voltar ao perfil
                 </a>
             </div>

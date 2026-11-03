@@ -123,10 +123,10 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     
                     <div class="profile-avatar">
                         <?php if ($usuario && file_exists(__DIR__ . '/../../../uploads/fotos_perfil/' . $usuario_id . '.jpg')): ?>
-                            <img src="/penomato_mvp/uploads/fotos_perfil/<?php echo $usuario_id; ?>.jpg" 
+                            <img src="<?= APP_BASE ?>/uploads/fotos_perfil/<?php echo $usuario_id; ?>.jpg" 
                                  alt="<?php echo htmlspecialchars($usuario['nome']); ?>">
                         <?php elseif ($usuario && file_exists(__DIR__ . '/../../../uploads/fotos_perfil/' . $usuario_id . '.png')): ?>
-                            <img src="/penomato_mvp/uploads/fotos_perfil/<?php echo $usuario_id; ?>.png" 
+                            <img src="<?= APP_BASE ?>/uploads/fotos_perfil/<?php echo $usuario_id; ?>.png" 
                                  alt="<?php echo htmlspecialchars($usuario['nome']); ?>">
                         <?php else: ?>
                             <div class="avatar-placeholder">
@@ -134,7 +134,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                             </div>
                         <?php endif; ?>
                         
-                        <a href="/penomato_mvp/src/Views/usuario/editar_perfil.php" 
+                        <a href="<?= APP_BASE ?>/src/Views/usuario/editar_perfil.php" 
                            class="avatar-edit" 
                            title="Editar foto">
                             <i class="fas fa-camera"></i>
@@ -186,10 +186,10 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                 </div>
                 
                 <div class="profile-actions">
-                    <a href="/penomato_mvp/src/Views/usuario/editar_perfil.php" class="btn-profile">
+                    <a href="<?= APP_BASE ?>/src/Views/usuario/editar_perfil.php" class="btn-profile">
                         <i class="fas fa-edit"></i> Editar Perfil
                     </a>
-                    <a href="/penomato_mvp/src/Views/usuario/alterar_senha.php" class="btn-profile">
+                    <a href="<?= APP_BASE ?>/src/Views/usuario/alterar_senha.php" class="btn-profile">
                         <i class="fas fa-key"></i> Alterar Senha
                     </a>
                 </div>
@@ -339,7 +339,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
             <div class="card recent-contributions mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class="fas fa-leaf"></i> Últimas Espécies Cadastradas</h5>
-                    <a href="/penomato_mvp/src/Views/usuario/minhas_contribuicoes.php?tipo=especies" class="btn-sm btn-outline">
+                    <a href="<?= APP_BASE ?>/src/Views/usuario/minhas_contribuicoes.php?tipo=especies" class="btn-sm btn-outline">
                         Ver todas
                     </a>
                 </div>
@@ -348,7 +348,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     <div class="card-body text-center py-4">
                         <i class="fas fa-seedling fa-3x text-muted mb-3"></i>
                         <p class="text-muted">Você ainda não cadastrou nenhuma espécie.</p>
-                        <a href="/penomato_mvp/src/Views/colaborador/cadastrar_caracteristicas.php" class="btn btn-primary">
+                        <a href="<?= APP_BASE ?>/src/Views/colaborador/cadastrar_caracteristicas.php" class="btn btn-primary">
                             <i class="fas fa-plus-circle"></i> Cadastrar Primeira Espécie
                         </a>
                     </div>
@@ -374,12 +374,12 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                                         <?php echo badgeStatus($especie['status']); ?>
                                     </td>
                                     <td>
-                                        <a href="/penomato_mvp/src/Views/publico/especie_detalhes.php?id=<?php echo $especie['especie_id']; ?>" 
+                                        <a href="<?= APP_BASE ?>/src/Views/publico/especie_detalhes.php?id=<?php echo $especie['especie_id']; ?>" 
                                            class="btn-icon" title="Visualizar">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         <?php if ($especie['status'] == 'sem_dados' || $especie['status'] == 'dados_internet'): ?>
-                                        <a href="/penomato_mvp/src/Views/colaborador/editar_caracteristicas.php?id=<?php echo $especie['id']; ?>" 
+                                        <a href="<?= APP_BASE ?>/src/Views/colaborador/editar_caracteristicas.php?id=<?php echo $especie['id']; ?>" 
                                            class="btn-icon" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
@@ -397,7 +397,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
             <div class="card recent-images mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class="fas fa-images"></i> Últimas Imagens Enviadas</h5>
-                    <a href="/penomato_mvp/src/Views/usuario/minhas_contribuicoes.php?tipo=imagens" class="btn-sm btn-outline">
+                    <a href="<?= APP_BASE ?>/src/Views/usuario/minhas_contribuicoes.php?tipo=imagens" class="btn-sm btn-outline">
                         Ver todas
                     </a>
                 </div>
@@ -406,7 +406,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     <div class="card-body text-center py-4">
                         <i class="fas fa-image fa-3x text-muted mb-3"></i>
                         <p class="text-muted">Você ainda não enviou nenhuma imagem.</p>
-                        <a href="/penomato_mvp/src/Views/colaborador/upload_imagem.php" class="btn btn-primary">
+                        <a href="<?= APP_BASE ?>/src/Views/colaborador/upload_imagem.php" class="btn btn-primary">
                             <i class="fas fa-upload"></i> Enviar Primeira Imagem
                         </a>
                     </div>
@@ -417,7 +417,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                             <div class="image-card">
                                 <div class="image-preview">
                                     <?php if (file_exists(__DIR__ . '/../../../uploads/exsicatas/' . $imagem['especie_id'] . '/' . basename($imagem['caminho_imagem']))): ?>
-                                        <img src="/penomato_mvp/uploads/exsicatas/<?php echo $imagem['especie_id']; ?>/<?php echo basename($imagem['caminho_imagem']); ?>" 
+                                        <img src="<?= APP_BASE ?>/uploads/exsicatas/<?php echo $imagem['especie_id']; ?>/<?php echo basename($imagem['caminho_imagem']); ?>" 
                                              alt="<?php echo htmlspecialchars($imagem['descricao'] ?? 'Imagem'); ?>"
                                              class="img-fluid">
                                     <?php else: ?>
@@ -458,20 +458,20 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                     <h5><i class="fas fa-rocket"></i> Acesso Rápido</h5>
                 </div>
                 <div class="list-group list-group-flush">
-                    <a href="/penomato_mvp/src/Views/colaborador/cadastrar_caracteristicas.php" class="list-group-item">
+                    <a href="<?= APP_BASE ?>/src/Views/colaborador/cadastrar_caracteristicas.php" class="list-group-item">
                         <i class="fas fa-plus-circle text-success"></i>
                         <span>Nova Espécie</span>
                         <i class="fas fa-chevron-right ms-auto"></i>
                     </a>
                     
-                    <a href="/penomato_mvp/src/Views/colaborador/upload_imagem.php" class="list-group-item">
+                    <a href="<?= APP_BASE ?>/src/Views/colaborador/upload_imagem.php" class="list-group-item">
                         <i class="fas fa-camera text-info"></i>
                         <span>Upload de Imagens</span>
                         <i class="fas fa-chevron-right ms-auto"></i>
                     </a>
                     
                     <?php if (in_array(getTipoUsuario(), ['revisor', 'gestor'])): ?>
-                    <a href="/penomato_mvp/src/Views/revisor/painel_revisor.php" class="list-group-item">
+                    <a href="<?= APP_BASE ?>/src/Views/revisor/painel_revisor.php" class="list-group-item">
                         <i class="fas fa-check-circle text-warning"></i>
                         <span>Revisões Pendentes</span>
                         <span class="badge bg-danger rounded-pill ms-auto"><?php echo contarPendenciasRevisao(); ?></span>

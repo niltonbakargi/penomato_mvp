@@ -73,7 +73,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha384-blOohCVdhjmtROpu8+CfTnUWham9nkX7P7OZQMst+RUnhtoY/9qemFAkIKOYxDI3" crossorigin="anonymous">
-    <link rel="stylesheet" href="/penomato_mvp/assets/css/estilo.css">
+    <link rel="stylesheet" href="<?= APP_BASE ?>/assets/css/estilo.css">
 
     <style>
         body {
@@ -269,7 +269,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
             <div class="sub">Exemplares aguardando sua avaliação antes do registro fotográfico</div>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <a href="/penomato_mvp/src/Views/revisor/mapa_exemplares.php"
+            <a href="<?= APP_BASE ?>/src/Views/revisor/mapa_exemplares.php"
                class="btn btn-outline-primary btn-sm"
                title="Ver mapa de todos os exemplares">
                 <i class="fas fa-map-marked-alt"></i> Mapa
@@ -277,7 +277,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
             <div class="user-pill">
                 <i class="fas fa-user-circle"></i>
                 <span><?= htmlspecialchars($usuario_nome) ?></span>
-                <a href="/penomato_mvp/src/Controllers/auth/logout_controlador.php"
+                <a href="<?= APP_BASE ?>/src/Controllers/auth/logout_controlador.php"
                    class="btn-sair" onclick="return confirm('Deseja sair?')">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
@@ -376,7 +376,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
                     <!-- Foto -->
                     <div>
                         <?php if ($ex['foto_identificacao']): ?>
-                            <img src="/penomato_mvp/<?= htmlspecialchars($ex['foto_identificacao']) ?>"
+                            <img src="<?= APP_BASE ?>/<?= htmlspecialchars($ex['foto_identificacao']) ?>"
                                  class="foto-id" alt="Foto de identificação"
                                  onerror="this.parentElement.innerHTML='<div class=foto-placeholder><i class=fas fa-image></i></div>'">
                         <?php else: ?>
@@ -439,7 +439,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
 
                     <!-- Aprovar -->
                     <form method="POST"
-                          action="/penomato_mvp/src/Controllers/processar_revisao_exemplar.php"
+                          action="<?= APP_BASE ?>/src/Controllers/processar_revisao_exemplar.php"
                           onsubmit="return confirm('Confirma a aprovação do exemplar <?= $ex['codigo'] ?>?')">
                         <input type="hidden" name="exemplar_id" value="<?= $ex['id'] ?>">
                         <input type="hidden" name="acao" value="aprovar">
@@ -454,7 +454,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
                         <textarea id="motivo-<?= $ex['id'] ?>"
                                   placeholder="Descreva o motivo da rejeição antes de rejeitar..."></textarea>
                         <form method="POST"
-                              action="/penomato_mvp/src/Controllers/processar_revisao_exemplar.php"
+                              action="<?= APP_BASE ?>/src/Controllers/processar_revisao_exemplar.php"
                               id="form-rejeitar-<?= $ex['id'] ?>">
                             <input type="hidden" name="exemplar_id" value="<?= $ex['id'] ?>">
                             <input type="hidden" name="acao" value="rejeitar">
@@ -489,7 +489,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
 
         <!-- Rodapé -->
         <div class="rodape">
-            <a href="/penomato_mvp/src/Views/entrada_revisor.php" class="btn-voltar">
+            <a href="<?= APP_BASE ?>/src/Views/entrada_revisor.php" class="btn-voltar">
                 <i class="fas fa-arrow-left"></i> Voltar ao Painel
             </a>
         </div>
@@ -545,7 +545,7 @@ if (comGeo.length > 0 && document.getElementById('mapa-geral')) {
 
         const marcador = L.marker([ex.lat, ex.lng], { icon: icone }).addTo(mapaGeral);
         const fotoHtml = ex.foto
-            ? `<img src="/penomato_mvp/${ex.foto}"
+            ? `<img src="<?= APP_BASE ?>/${ex.foto}"
                     style="width:100%;height:80px;object-fit:cover;border-radius:4px;margin-bottom:6px">`
             : '';
         marcador.bindPopup(`
