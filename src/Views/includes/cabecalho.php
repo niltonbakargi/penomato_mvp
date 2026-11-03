@@ -606,27 +606,27 @@ function menuAtivo($url, $pagina_atual) {
     <?php if (!empty($mensagens['sucesso'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle"></i>
-            <?php echo $mensagens['sucesso']; ?>
+            <?php echo htmlspecialchars($mensagens['sucesso']); ?>
             <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
     <?php endif; ?>
-    
+
     <?php if (!empty($mensagens['erro'])): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle"></i>
-            <?php echo $mensagens['erro']; ?>
+            <?php echo htmlspecialchars($mensagens['erro']); ?>
             <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
     <?php endif; ?>
-    
+
     <?php if (!empty($mensagens['alerta'])): ?>
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-triangle"></i>
-            <?php echo $mensagens['alerta']; ?>
+            <?php echo htmlspecialchars($mensagens['alerta']); ?>
             <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
                 <i class="fas fa-times"></i>
             </button>

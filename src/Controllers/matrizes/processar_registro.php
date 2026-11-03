@@ -16,6 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// ── CSRF ────────────────────────────────────────
+$csrf = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_registrar_matriz'] ?? '', $csrf)) {
+    mensagemErro('Requisição inválida. Tente novamente.');
+    header('Location: ' . APP_BASE . '/src/Views/matrizes/registrar.php');
+    exit;
+}
+$_SESSION['csrf_registrar_matriz'] = bin2hex(random_bytes(32));
+
 $tipos_permitidos = ['image/jpeg', 'image/png', 'image/webp'];
 $partes_opcionais = ['folha', 'flor', 'fruto', 'caule', 'semente'];
 
@@ -124,6 +133,6 @@ foreach ($partes_opcionais as $parte) {
     ]);
 }
 
-mensagemSucesso("Matriz <strong>{$codigo}</strong> registrada com sucesso!");
+mensagemSucesso("Matriz {$codigo} registrada com sucesso!");
 header("Location: " . APP_BASE . "/src/Views/matrizes/ficha.php?id={$id}");
 exit;

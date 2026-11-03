@@ -13,6 +13,11 @@ if (!estaLogado()) {
     exit;
 }
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_registrar_matriz'])) {
+    $_SESSION['csrf_registrar_matriz'] = bin2hex(random_bytes(32));
+}
+
 $titulo_pagina = 'Registrar Matriz — Banco de Matrizes';
 
 $nomes_populares = [
@@ -291,6 +296,7 @@ include __DIR__ . '/../includes/cabecalho.php';
 
     <form action="<?= APP_BASE ?>/src/Controllers/matrizes/processar_registro.php"
           method="POST" enctype="multipart/form-data" id="form-matriz">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_registrar_matriz'], ENT_QUOTES); ?>">
 
         <!-- 1. Fotos -->
         <div class="card-secao">

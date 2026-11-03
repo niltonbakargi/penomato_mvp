@@ -14,6 +14,15 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $usuario_id = (int)$_SESSION['usuario_id'];
 
+// ── CSRF ────────────────────────────────────────
+$csrf = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_adicionar_imagem'] ?? '', $csrf)) {
+    $eid = (int)($_POST['especie_id'] ?? 0);
+    header('Location: ' . APP_BASE . '/src/Views/adicionar_imagens_internet.php?especie_id=' . $eid . '&erro=' . urlencode('Requisição inválida. Tente novamente.'));
+    exit;
+}
+$_SESSION['csrf_adicionar_imagem'] = bin2hex(random_bytes(32));
+
 // ── Configurações ─────────────────────────────────────────────────────────────
 $tamanho_maximo     = 10 * 1024 * 1024; // 10 MB
 $formatos_permitidos = ['image/jpeg', 'image/png', 'image/jpg'];

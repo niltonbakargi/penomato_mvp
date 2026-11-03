@@ -277,6 +277,7 @@
             <?php endforeach; endif; ?>
 
             <form method="POST" action="<?= APP_BASE ?>/src/Controllers/controlador_gestor.php">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_gestor_inserir'] ?? '', ENT_QUOTES); ?>">
                 <label>Uma ou várias espécies (uma por linha)</label>
                 <textarea name="lista_especies" rows="8" placeholder="Acca sellowiana
 Euterpe oleracea

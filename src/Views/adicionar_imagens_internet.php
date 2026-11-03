@@ -13,6 +13,11 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id   = (int)$_SESSION['usuario_id'];
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Usuário';
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_adicionar_imagem'])) {
+    $_SESSION['csrf_adicionar_imagem'] = bin2hex(random_bytes(32));
+}
+
 $especie_id = isset($_GET['especie_id']) ? (int)$_GET['especie_id'] : 0;
 
 // ── Espécies disponíveis ──────────────────────────────────────────────────────
@@ -354,6 +359,7 @@ $parte_ativa      = isset($_GET['parte'])   ? $_GET['parte']              : '';
         <form method="POST"
               action="<?= APP_BASE ?>/src/Controllers/processar_adicionar_imagem_internet.php"
               enctype="multipart/form-data" id="form-upload">
+            <input type="hidden" name="csrf_token"   value="<?php echo htmlspecialchars($_SESSION['csrf_adicionar_imagem'], ENT_QUOTES); ?>">
             <input type="hidden" name="especie_id"   value="<?= $especie_id ?>">
             <input type="hidden" name="parte_planta" id="input-parte">
 

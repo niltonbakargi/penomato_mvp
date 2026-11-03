@@ -51,12 +51,23 @@ $nome_cientifico = $stmt_nome->fetchColumn() ?: 'Espécie desconhecida';
 // ================================================
 $opcoes_validas = require_once __DIR__ . '/../Config/enums_caracteristicas.php';
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_inserir_dados'])) {
+    $_SESSION['csrf_inserir_dados'] = bin2hex(random_bytes(32));
+}
+
 // ================================================
 // PROCESSAR O ENVIO DO FORMULÁRIO (FINALIZAR)
 // ================================================
 $erro = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'])) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_inserir_dados'] ?? '', $csrf)) {
+        $erro = 'Requisição inválida. Tente novamente.';
+        goto fim_post_inserir;
+    }
+    $_SESSION['csrf_inserir_dados'] = bin2hex(random_bytes(32));
     
     // Pega os dados do JSON do POST (campos ocultos gerados pelo JavaScript)
     $dados_caracteristicas = [];
@@ -106,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
     header("Location: finalizar_upload_temporario.php?temp_id=" . urlencode($temp_id));
     exit;
 }
+fim_post_inserir:
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -809,6 +821,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['finalizar_importacao'
             </div>
 
             <form method="POST" action="" id="form_principal">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_inserir_dados'], ENT_QUOTES); ?>">
                 <input type="hidden" name="temp_id" value="<?php echo htmlspecialchars($temp_id); ?>">
 
                 <!-- ── IDENTIFICAÇÃO BÁSICA ── -->

@@ -44,11 +44,22 @@ try {
     $total_usuarios = 0;
 }
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_gestor_inserir'])) {
+    $_SESSION['csrf_gestor_inserir'] = bin2hex(random_bytes(32));
+}
+
 // ================================================
 // PROCESSAR INSERÇÃO DE ESPÉCIES DE INTERESSE
 // ================================================
 $msg_especies = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inserir_especies'])) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_gestor_inserir'] ?? '', $csrf)) {
+        $msg_especies[] = ['tipo' => 'err', 'texto' => 'Requisição inválida. Tente novamente.'];
+        goto fim_post_gestor;
+    }
+    $_SESSION['csrf_gestor_inserir'] = bin2hex(random_bytes(32));
     $linhas = explode("\n", $_POST['lista_especies'] ?? '');
     $adicionadas = 0;
     $duplicadas  = 0;
@@ -88,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['inserir_especies'])) 
     $stmt = $pdo->query("SELECT COUNT(*) FROM especies_administrativo");
     $total_especies = $stmt->fetchColumn();
 }
+fim_post_gestor:
 
 // ================================================
 // CONTADORES PARA BADGES
