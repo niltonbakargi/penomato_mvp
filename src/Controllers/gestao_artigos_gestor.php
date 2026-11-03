@@ -536,6 +536,7 @@ $info_status = [
                               action="<?= APP_BASE ?>/src/Controllers/controlador_painel_revisor.php"
                               style="display:inline;"
                               onsubmit="return confirm('Publicar o artigo de <?php echo htmlspecialchars($a['nome_cientifico'], ENT_QUOTES); ?>?')">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_painel_revisor'], ENT_QUOTES); ?>">
                             <input type="hidden" name="acao"       value="publicar">
                             <input type="hidden" name="especie_id" value="<?php echo $a['especie_id']; ?>">
                             <button type="submit" class="btn-acao btn-publicar">

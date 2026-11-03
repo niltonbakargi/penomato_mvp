@@ -27,6 +27,11 @@ if ($usuario_tipo !== 'revisor' && $usuario_tipo !== 'gestor') {
     die('Acesso negado. Apenas revisores podem acessar esta página.');
 }
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_painel_revisor'])) {
+    $_SESSION['csrf_painel_revisor'] = bin2hex(random_bytes(32));
+}
+
 // ================================================
 // PARÂMETROS
 // ================================================
@@ -1084,6 +1089,7 @@ $nomes_partes = [
             <div class="decision-title">⚖️ DECISÃO DA REVISÃO</div>
 
             <form id="formDecisao" method="POST" action="<?php echo APP_BASE; ?>/src/Controllers/controlador_painel_revisor.php">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_painel_revisor'], ENT_QUOTES); ?>">
                 <input type="hidden" name="especie_id" value="<?php echo $especie_id; ?>">
 
                 <div class="radio-group">

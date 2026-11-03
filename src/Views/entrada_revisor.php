@@ -242,6 +242,7 @@
         // ============================================
         // VARIÁVEIS GLOBAIS
         // ============================================
+        const CSRF_TOKEN = '<?php echo htmlspecialchars($_SESSION['csrf_painel_revisor'] ?? '', ENT_QUOTES); ?>';
         let especiesPendentes = [];
         let revisoesAndamento = [];
 
@@ -329,7 +330,7 @@
             fetch(APP_BASE . '/src/Controllers/controlador_painel_revisor.php?acao=iniciar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'especie_id=' + id
+                body: 'especie_id=' + id + '&csrf_token=' + encodeURIComponent(CSRF_TOKEN)
             })
             .then(response => response.json())
             .then(data => {

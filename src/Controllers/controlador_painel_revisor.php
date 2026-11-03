@@ -20,6 +20,22 @@ $usuario_nome = $_SESSION['usuario_nome'] ?? 'Revisor';
 $usuario_instituicao = $_SESSION['usuario_instituicao'] ?? '';
 $usuario_tipo = $_SESSION['usuario_tipo'] ?? '';
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_painel_revisor'])) {
+    $_SESSION['csrf_painel_revisor'] = bin2hex(random_bytes(32));
+}
+
+// ── Validar CSRF em qualquer POST HTML (aprovar / contestar / publicar)
+$_acoes_html = ['aprovar', 'contestar', 'publicar'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['acao'] ?? '', $_acoes_html)) {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_painel_revisor'] ?? '', $csrf)) {
+        header('Location: ' . APP_BASE . '/src/Controllers/controlador_painel_revisor.php?erro=' . urlencode('Requisição inválida. Tente novamente.'));
+        exit;
+    }
+    $_SESSION['csrf_painel_revisor'] = bin2hex(random_bytes(32));
+}
+
 // Processar ações via GET/POST
 $acao = $_GET['acao'] ?? '';
 
@@ -287,10 +303,17 @@ if ($acao === 'listar_pendentes') {
 // ============================================
 if ($acao === 'iniciar' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
-    
+
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_painel_revisor'] ?? '', $csrf)) {
+        echo json_encode(['erro' => 'Requisição inválida. Recarregue a página e tente novamente.']);
+        exit;
+    }
+    $_SESSION['csrf_painel_revisor'] = bin2hex(random_bytes(32));
+
     $especie_id = $_POST['especie_id'] ?? 0;
     $usuario_id = $_SESSION['usuario_id'] ?? 0;
-    
+
     if (!$especie_id || !$usuario_id) {
         echo json_encode(['erro' => 'Dados inválidos']);
         exit;
