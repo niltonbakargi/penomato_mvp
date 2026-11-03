@@ -37,11 +37,11 @@ try {
     $total_usuarios = $stmt->fetchColumn();
     
 } catch (Exception $e) {
-    // Valores padrão em caso de erro
-    $total_especies = 12;
-    $em_revisao = 3;
-    $validadas = 5;
-    $total_usuarios = 8;
+    error_log("controlador_gestor: falha ao buscar estatísticas — " . $e->getMessage());
+    $total_especies = 0;
+    $em_revisao     = 0;
+    $validadas      = 0;
+    $total_usuarios = 0;
 }
 
 // ================================================

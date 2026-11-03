@@ -40,10 +40,6 @@ $dados_caracteristicas = $dados_temporarios['dados'] ?? [];
 // ================================================
 // LOG INICIAL
 // ================================================
-error_log("========== INICIANDO FINALIZAÇÃO ==========");
-error_log("Temp ID: " . $temp_id);
-error_log("Espécie ID: " . $especie_id);
-error_log("Total campos características: " . count($dados_caracteristicas));
 
 // ================================================
 // VERIFICAR PERMISSÃO
@@ -73,22 +69,16 @@ if (empty($dados_caracteristicas)) {
 // ================================================
 // INICIAR TRANSAÇÃO
 // ================================================
-error_log("Conectado ao banco com sucesso");
 $pdo->beginTransaction();
-error_log("Transação iniciada");
 
 try {
-    
+
     // ================================================
     // 1. SALVAR DADOS DAS CARACTERÍSTICAS
     // ================================================
-    error_log("--- Salvando características ---");
-
     $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM especies_caracteristicas WHERE especie_id = ?");
     $stmt_check->execute([$especie_id]);
     $ja_existe = (int) $stmt_check->fetchColumn() > 0;
-
-    error_log("Características já existem? " . ($ja_existe ? "SIM" : "NÃO"));
 
     if ($ja_existe) {
         $sets    = [];
@@ -100,29 +90,23 @@ try {
             }
         }
         $valores[] = $especie_id;
-        $sql = "UPDATE especies_caracteristicas SET " . implode(', ', $sets) . " WHERE especie_id = ?";
-        error_log("SQL UPDATE: " . $sql);
-        $pdo->prepare($sql)->execute($valores);
-        error_log("UPDATE realizado com sucesso");
+        $pdo->prepare("UPDATE especies_caracteristicas SET " . implode(', ', $sets) . " WHERE especie_id = ?")
+            ->execute($valores);
     } else {
         $colunas      = implode(', ', array_keys($dados_caracteristicas));
         $placeholders = implode(', ', array_fill(0, count($dados_caracteristicas), '?'));
-        $sql = "INSERT INTO especies_caracteristicas ($colunas) VALUES ($placeholders)";
-        error_log("SQL INSERT: " . $sql);
-        $pdo->prepare($sql)->execute(array_values($dados_caracteristicas));
-        error_log("INSERT realizado com sucesso");
+        $pdo->prepare("INSERT INTO especies_caracteristicas ($colunas) VALUES ($placeholders)")
+            ->execute(array_values($dados_caracteristicas));
     }
 
     // ================================================
     // 2. ATUALIZAR STATUS DA ESPÉCIE (dados_internet)
     // ================================================
-    error_log("--- Atualizando status da espécie ---");
     $pdo->prepare(
         "UPDATE especies_administrativo
          SET status = 'dados_internet', autor_dados_internet_id = ?, data_dados_internet = NOW()
          WHERE id = ?"
     )->execute([$id_usuario, $especie_id]);
-    error_log("Status atualizado para 'dados_internet'");
 
     // ================================================
     // 3. (IMAGENS JÁ SALVAS) — verificar se há ao menos uma imagem
@@ -139,13 +123,10 @@ try {
         exit;
     }
 
-    error_log("Imagem confirmada no banco");
-
     // ================================================
     // COMMIT - TUDO OK
     // ================================================
     $pdo->commit();
-    error_log("COMMIT realizado com sucesso");
 
     // Registrar no histórico para permitir desfazer
     $pdo->prepare("
@@ -157,7 +138,6 @@ try {
     // ================================================
     // 4. GERAR ARTIGO RASCUNHO AUTOMATICAMENTE
     // ================================================
-    error_log("--- Gerando artigo rascunho ---");
     try {
         $stmt_c = $pdo->prepare("SELECT * FROM especies_caracteristicas WHERE especie_id = ? LIMIT 1");
         $stmt_c->execute([$especie_id]);
@@ -177,6 +157,15 @@ try {
         $imgs_art = $stmt_i->fetchAll();
 
         if ($c_art && $adm_art) {
+            // Carregar observações de campo no contexto estático antes de gerar
+            $stmt_obs = $pdo->prepare("SELECT campo, observacao FROM especies_caracteristicas_obs WHERE especie_id = ?");
+            $stmt_obs->execute([$especie_id]);
+            $obs_map = [];
+            foreach ($stmt_obs->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $obs_map[$row['campo']] = $row['observacao'];
+            }
+            _art_obs_ctx($obs_map);
+
             $html_art = gerarHtmlArtigoRascunho($adm_art, $c_art, $imgs_art, $pdo);
 
             $pdo->prepare("
@@ -184,19 +173,15 @@ try {
                 VALUES (?, ?, 'rascunho', NOW())
                 ON DUPLICATE KEY UPDATE texto_html = VALUES(texto_html), atualizado_em = NOW(), status = 'rascunho'
             ")->execute([$especie_id, $html_art]);
-            error_log("Artigo rascunho gerado: " . strlen($html_art) . " bytes");
-        } else {
-            error_log("Artigo não gerado: características ou dados administrativos ausentes");
         }
     } catch (Exception $e) {
-        error_log("Aviso: Falha ao gerar artigo rascunho: " . $e->getMessage());
+        error_log("finalizar_upload: falha ao gerar artigo ID={$especie_id} — " . $e->getMessage());
         // Não crítico — dados já foram salvos com sucesso
     }
 
     // ================================================
     // 5. NOTIFICAR ORIENTADOR(ES) POR E-MAIL
     // ================================================
-    error_log("--- Enviando notificações ---");
     try {
         require_once __DIR__ . '/../../config/email.php';
 
@@ -237,7 +222,6 @@ try {
                     {$conteudo_email}
                 ");
                 enviarEmail($or['email'], "Penomato — {$nome_especie} aguarda sua revisão", $corpo);
-                error_log("E-mail enviado para orientador: " . $or['email']);
             }
         } else {
             // Sem orientação: notificar todos os especialistas
@@ -246,7 +230,6 @@ try {
                  WHERE categoria IN ('revisor') AND ativo = 1
                    AND status_verificacao = 'verificado'"
             )->fetchAll();
-            $enviados = 0;
             foreach ($res_todos as $esp) {
                 $corpo = templateEmail("Nova espécie disponível para orientação", "
                     <p>Olá, <strong>" . htmlspecialchars($esp['nome']) . "</strong>!</p>
@@ -255,12 +238,10 @@ try {
                     {$conteudo_email}
                 ");
                 enviarEmail($esp['email'], "Penomato — {$nome_especie} sem orientador (disponível)", $corpo);
-                $enviados++;
             }
-            error_log("E-mails enviados para {$enviados} especialistas (sem orientação)");
         }
     } catch (Exception $e) {
-        error_log("Aviso: Falha ao enviar notificações: " . $e->getMessage());
+        error_log("finalizar_upload: falha ao enviar notificações ID={$especie_id} — " . $e->getMessage());
         // Não crítico — dados já salvos
     }
 
@@ -276,8 +257,6 @@ try {
     $imagens_salvas = max(0, $total_atual - $imagens_antes);
 
     unset($_SESSION['importacao_temporaria']);
-    error_log("Sessão temporária limpa");
-    error_log("========== FINALIZAÇÃO CONCLUÍDA COM SUCESSO ==========");
 
     // ================================================
     // REDIRECIONAR PARA PÁGINA DE SUCESSO
@@ -292,8 +271,7 @@ try {
     $pdo->rollBack();
     
     $erro = "Erro ao salvar dados: " . $e->getMessage();
-    error_log("ERRO NA TRANSAÇÃO: " . $erro);
-    error_log("========== FINALIZAÇÃO FALHOU ==========");
+    error_log("finalizar_upload: erro na transação ID={$especie_id} — " . $e->getMessage());
     
     header("Location: ../Views/upload_imagens_internet.php?temp_id=" . urlencode($temp_id) . "&erro=" . urlencode($erro));
     exit;

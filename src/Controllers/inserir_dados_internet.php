@@ -33,7 +33,8 @@ if (empty($temp_id) || !isset($_SESSION['importacao_temporaria']) || $_SESSION['
 
 // Verificar se o usuário da sessão é o mesmo
 if ($_SESSION['importacao_temporaria']['usuario_id'] != $id_usuario) {
-    die("Você não tem permissão para acessar esta importação.");
+    header("Location: escolher_especie.php?erro=" . urlencode("Você não tem permissão para acessar esta importação."));
+    exit;
 }
 
 $dados_temporarios = $_SESSION['importacao_temporaria'];
