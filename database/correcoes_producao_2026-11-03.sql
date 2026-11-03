@@ -96,3 +96,20 @@ ALTER TABLE usuarios MODIFY categoria
   COLLATE utf8mb4_general_ci DEFAULT 'visitante';
 
 SET foreign_key_checks = 1;
+
+-- ============================================================
+-- CORREÇÕES ADICIONAIS — ENUMs de especies_caracteristicas
+-- Adicionadas em: 2026-11-03 (após auditoria de consistência)
+-- ============================================================
+
+-- modificacao_caule: remover 'Espinhos' (pertence a possui_espinhos),
+--   adicionar Gavinha, Bulbo, Sapopema, Nenhuma
+UPDATE especies_caracteristicas SET modificacao_caule = NULL WHERE modificacao_caule = 'Espinhos';
+ALTER TABLE especies_caracteristicas
+  MODIFY modificacao_caule ENUM('Estolão','Cladódio','Rizoma','Tubérculo','Gavinha','Bulbo','Sapopema','Nenhuma')
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;
+
+-- tamanho_flor: adicionar 'Grande'
+ALTER TABLE especies_caracteristicas
+  MODIFY tamanho_flor ENUM('Pequena','Média','Grande')
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL;

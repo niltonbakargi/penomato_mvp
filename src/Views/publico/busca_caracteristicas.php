@@ -495,14 +495,18 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
                         <label>Cor</label>
                         <select name="cor_flores">
                             <option value="todos" <?php echo (!isset($_POST['cor_flores']) || $_POST['cor_flores'] == 'todos') ? 'selected' : ''; ?>>Todas as cores</option>
-                            <option value="Brancas" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Brancas') ? 'selected' : ''; ?>>Brancas</option>
-                            <option value="Amarelas" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Amarelas') ? 'selected' : ''; ?>>Amarelas</option>
-                            <option value="Vermelhas" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Vermelhas') ? 'selected' : ''; ?>>Vermelhas</option>
-                            <option value="Rosadas" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Rosadas') ? 'selected' : ''; ?>>Rosadas</option>
-                            <option value="Roxas" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Roxas') ? 'selected' : ''; ?>>Roxas</option>
-                            <option value="Azuis" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Azuis') ? 'selected' : ''; ?>>Azuis</option>
-                            <option value="Laranjas" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Laranjas') ? 'selected' : ''; ?>>Laranjas</option>
-                            <option value="Verdes" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Verdes') ? 'selected' : ''; ?>>Verdes</option>
+                            <option value="Alaranjada" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Alaranjada') ? 'selected' : ''; ?>>Alaranjada</option>
+                            <option value="Amarela" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Amarela') ? 'selected' : ''; ?>>Amarela</option>
+                            <option value="Avermelhada" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Avermelhada') ? 'selected' : ''; ?>>Avermelhada</option>
+                            <option value="Azul" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Azul') ? 'selected' : ''; ?>>Azul</option>
+                            <option value="Branca" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Branca') ? 'selected' : ''; ?>>Branca</option>
+                            <option value="Esverdeada" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Esverdeada') ? 'selected' : ''; ?>>Esverdeada</option>
+                            <option value="Lilás" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Lilás') ? 'selected' : ''; ?>>Lilás</option>
+                            <option value="Púrpura" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Púrpura') ? 'selected' : ''; ?>>Púrpura</option>
+                            <option value="Rósea" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Rósea') ? 'selected' : ''; ?>>Rósea</option>
+                            <option value="Roxa" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Roxa') ? 'selected' : ''; ?>>Roxa</option>
+                            <option value="Vermelha" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Vermelha') ? 'selected' : ''; ?>>Vermelha</option>
+                            <option value="Vinácea" <?php echo (isset($_POST['cor_flores']) && $_POST['cor_flores'] == 'Vinácea') ? 'selected' : ''; ?>>Vinácea</option>
                         </select>
                     </div>
                     
@@ -523,7 +527,9 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
                             <option value="3 pétalas" <?php echo (isset($_POST['numero_petalas']) && $_POST['numero_petalas'] == '3 pétalas') ? 'selected' : ''; ?>>3 pétalas</option>
                             <option value="4 pétalas" <?php echo (isset($_POST['numero_petalas']) && $_POST['numero_petalas'] == '4 pétalas') ? 'selected' : ''; ?>>4 pétalas</option>
                             <option value="5 pétalas" <?php echo (isset($_POST['numero_petalas']) && $_POST['numero_petalas'] == '5 pétalas') ? 'selected' : ''; ?>>5 pétalas</option>
+                            <option value="6 pétalas" <?php echo (isset($_POST['numero_petalas']) && $_POST['numero_petalas'] == '6 pétalas') ? 'selected' : ''; ?>>6 pétalas</option>
                             <option value="Muitas pétalas" <?php echo (isset($_POST['numero_petalas']) && $_POST['numero_petalas'] == 'Muitas pétalas') ? 'selected' : ''; ?>>Muitas pétalas</option>
+                            <option value="Ausentes" <?php echo (isset($_POST['numero_petalas']) && $_POST['numero_petalas'] == 'Ausentes') ? 'selected' : ''; ?>>Ausentes</option>
                         </select>
                     </div>
                     
@@ -540,8 +546,14 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
                         <label>Disposição</label>
                         <select name="disposicao_flores">
                             <option value="todos" <?php echo (!isset($_POST['disposicao_flores']) || $_POST['disposicao_flores'] == 'todos') ? 'selected' : ''; ?>>Todas</option>
-                            <option value="Isoladas" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Isoladas') ? 'selected' : ''; ?>>Isoladas</option>
-                            <option value="Inflorescência" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Inflorescência') ? 'selected' : ''; ?>>Inflorescência</option>
+                            <option value="Solitária" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Solitária') ? 'selected' : ''; ?>>Solitária</option>
+                            <option value="Capítulo" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Capítulo') ? 'selected' : ''; ?>>Capítulo</option>
+                            <option value="Cacho" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Cacho') ? 'selected' : ''; ?>>Cacho</option>
+                            <option value="Corimbo" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Corimbo') ? 'selected' : ''; ?>>Corimbo</option>
+                            <option value="Espádice" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Espádice') ? 'selected' : ''; ?>>Espádice</option>
+                            <option value="Espiga" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Espiga') ? 'selected' : ''; ?>>Espiga</option>
+                            <option value="Panícula" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Panícula') ? 'selected' : ''; ?>>Panícula</option>
+                            <option value="Umbela" <?php echo (isset($_POST['disposicao_flores']) && $_POST['disposicao_flores'] == 'Umbela') ? 'selected' : ''; ?>>Umbela</option>
                         </select>
                     </div>
                     
@@ -549,10 +561,12 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
                         <label>Aroma</label>
                         <select name="aroma">
                             <option value="todos" <?php echo (!isset($_POST['aroma']) || $_POST['aroma'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
-                            <option value="Sem cheiro" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Sem cheiro') ? 'selected' : ''; ?>>Sem cheiro</option>
-                            <option value="Aroma suave" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Aroma suave') ? 'selected' : ''; ?>>Aroma suave</option>
-                            <option value="Aroma forte" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Aroma forte') ? 'selected' : ''; ?>>Aroma forte</option>
-                            <option value="Aroma desagradável" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Aroma desagradável') ? 'selected' : ''; ?>>Aroma desagradável</option>
+                            <option value="Ausente" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Ausente') ? 'selected' : ''; ?>>Ausente</option>
+                            <option value="Suave" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Suave') ? 'selected' : ''; ?>>Suave</option>
+                            <option value="Forte" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Forte') ? 'selected' : ''; ?>>Forte</option>
+                            <option value="Desagradável" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Desagradável') ? 'selected' : ''; ?>>Desagradável</option>
+                            <option value="Adocicada" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Adocicada') ? 'selected' : ''; ?>>Adocicada</option>
+                            <option value="Cítrica" <?php echo (isset($_POST['aroma']) && $_POST['aroma'] == 'Cítrica') ? 'selected' : ''; ?>>Cítrica</option>
                         </select>
                     </div>
                 </div>
@@ -634,10 +648,12 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
                         <label>Aroma do fruto</label>
                         <select name="aroma_fruto">
                             <option value="todos" <?php echo (!isset($_POST['aroma_fruto']) || $_POST['aroma_fruto'] == 'todos') ? 'selected' : ''; ?>>Todos</option>
-                            <option value="Sem cheiro" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Sem cheiro') ? 'selected' : ''; ?>>Sem cheiro</option>
-                            <option value="Aroma suave" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Aroma suave') ? 'selected' : ''; ?>>Aroma suave</option>
-                            <option value="Aroma forte" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Aroma forte') ? 'selected' : ''; ?>>Aroma forte</option>
-                            <option value="Aroma desagradável" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Aroma desagradável') ? 'selected' : ''; ?>>Aroma desagradável</option>
+                            <option value="Ausente" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Ausente') ? 'selected' : ''; ?>>Ausente</option>
+                            <option value="Suave" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Suave') ? 'selected' : ''; ?>>Suave</option>
+                            <option value="Forte" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Forte') ? 'selected' : ''; ?>>Forte</option>
+                            <option value="Adocicado" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Adocicado') ? 'selected' : ''; ?>>Adocicado</option>
+                            <option value="Cítrico" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Cítrico') ? 'selected' : ''; ?>>Cítrico</option>
+                            <option value="Desagradável" <?php echo (isset($_POST['aroma_fruto']) && $_POST['aroma_fruto'] == 'Desagradável') ? 'selected' : ''; ?>>Desagradável</option>
                         </select>
                     </div>
                 </div>
@@ -715,7 +731,10 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
                             <option value="Cladódio" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Cladódio') ? 'selected' : ''; ?>>Cladódio</option>
                             <option value="Rizoma" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Rizoma') ? 'selected' : ''; ?>>Rizoma</option>
                             <option value="Tubérculo" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Tubérculo') ? 'selected' : ''; ?>>Tubérculo</option>
-                            <option value="Espinhos" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Espinhos') ? 'selected' : ''; ?>>Espinhos</option>
+                            <option value="Gavinha" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Gavinha') ? 'selected' : ''; ?>>Gavinha</option>
+                            <option value="Bulbo" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Bulbo') ? 'selected' : ''; ?>>Bulbo</option>
+                            <option value="Sapopema" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Sapopema') ? 'selected' : ''; ?>>Sapopema</option>
+                            <option value="Nenhuma" <?php echo (isset($_POST['modificacao_caule']) && $_POST['modificacao_caule'] == 'Nenhuma') ? 'selected' : ''; ?>>Nenhuma</option>
                         </select>
                     </div>
                 </div>
