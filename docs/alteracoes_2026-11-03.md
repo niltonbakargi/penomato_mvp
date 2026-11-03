@@ -11,12 +11,12 @@ Todas as alterações foram commitadas e publicadas no branch `main`.
 |---|---|---|
 | Segurança (controle de acesso) | 4 | 10 |
 | Segurança (validação de entrada) | 4 | 6 |
-| Segurança (tokens e criptografia) | 3 | 9 |
+| Segurança (tokens e criptografia) | 4 | 26 |
 | Correções de bugs funcionais | 3 | 6 |
 | Refatoração e limpeza | 5 | 80+ |
 | Banco de dados (análise + correções) | 2 | 3 |
 | Consistência de ENUMs | 1 | 2 |
-| **Total** | **22** | **~117** |
+| **Total** | **23** | **~135** |
 
 ---
 
@@ -348,6 +348,35 @@ Padrão aplicado em todos: geração com `bin2hex(random_bytes(32))`, validaçã
 
 ---
 
+### 23. `193df32` — security: CSRF em 9 controllers MEDIUM + correções XSS/output encoding
+
+**Arquivos:** 17 arquivos (ver Mapa abaixo)
+
+**a) CSRF adicionado em 9 grupos de arquivos (prioridade MEDIUM)**
+
+| Arquivo(s) | Token de sessão | Formulários protegidos |
+|---|---|---|
+| `gestao_especies.php` | `csrf_gestao_especies` | 2 forms inline (prioridade / atribuir colaborador) |
+| `gestao_artigos_gestor.php` | `csrf_gestao_artigos` | Modal de atribuição de orientador |
+| `contestar_informacao.php` | `csrf_contestar` | Form de nova contestação |
+| `minhas_acoes.php` + `desfazer_acao.php` | `csrf_desfazer` | Desfazer ação + solicitar ao gestor |
+| `ficha.php` + `processar_comentario.php` | `csrf_comentario_matriz` | Comentário em ficha de matriz |
+| `adicionar_foto.php` + `processar_foto_parte.php` | `csrf_foto_parte` | Upload de foto de parte da planta |
+| `cadastrar_exemplar.php` + `processar_cadastro_exemplar.php` | `csrf_cadastro_exemplar` | Cadastro de exemplar |
+| `enviar_imagem.php` + `processar_upload_exsicata.php` | `csrf_upload_exsicata` | Upload de exsicata/foto de campo |
+
+Padrão aplicado: geração `bin2hex(random_bytes(32))` na view, validação `hash_equals()` no controller, rotação pós-uso, `htmlspecialchars(..., ENT_QUOTES)` no hidden input.
+
+**b) XSS — `artigo_revisao.php` (campos `_ref`)**
+- Linhas 969–983: `$carac['possui_espinhos_ref']`, `$carac['possui_latex_ref']`, `$carac['possui_espinhos']`, `$carac['possui_latex']` foram escapados com `htmlspecialchars()` (incluindo o atributo `data-ref` com `ENT_QUOTES`).
+
+**c) Output encoding — 3 pontos adicionais (LOW)**
+- `alterar_senha.php:337` — `$acesso['ip']` agora escapado com `htmlspecialchars()`
+- `cabecalho.php:591` — breadcrumb `$item['url']` e `$item['nome']` agora escapados
+- `solicitar_alteracao_email.php:147` — token CSRF existente sem `ENT_QUOTES`; corrigido
+
+---
+
 ### 21. `975cd6f` + `0832e46` — fix: SSRF, controlador legado e GPS
 **Arquivos:** `src/Controllers/salvar_atribuicoes.php`, `src/Controllers/upload_imagem_controlador.php`, `src/Controllers/matrizes/processar_registro.php`
 
@@ -398,13 +427,22 @@ if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) { ... }
 | `limpar_importacao_especie.php` | security (especie_id via sessão apenas) |
 | `finalizar_upload_temporario.php` | bugfix (obs artigo, debug logs, display_errors) |
 | `inserir_dados_internet.php` | bugfix (die → redirect, display_errors) |
-| `gerenciar_especie.php` | security (role gestor) |
-| `aprovacao_acoes.php` | security (role gestor) |
-| `gestao_especies.php` | security (role gestor) |
+| `gerenciar_especie.php` | security (role gestor + CSRF csrf_gerenciar_especie) |
+| `aprovacao_acoes.php` | security (role gestor + CSRF csrf_aprovacao_acoes) |
+| `gestao_especies.php` | security (role gestor + CSRF csrf_gestao_especies) |
+| `gestao_artigos_gestor.php` | security (CSRF csrf_gestao_artigos) |
+| `contestar_informacao.php` | security (CSRF csrf_contestar) |
+| `desfazer_acao.php` | security (CSRF csrf_desfazer) |
+| `minhas_acoes.php` | security (CSRF csrf_desfazer) |
+| `matrizes/processar_comentario.php` | security (CSRF csrf_comentario_matriz) |
+| `matrizes/processar_foto_parte.php` | security (CSRF csrf_foto_parte) |
+| `processar_cadastro_exemplar.php` | security (CSRF csrf_cadastro_exemplar) |
+| `processar_upload_exsicata.php` | security (CSRF csrf_upload_exsicata) |
+| `processar_revisao_exemplar.php` | security (role revisor/gestor + CSRF csrf_revisao_exemplar) |
+| `gerenciar_membros.php` | security (CSRF csrf_gerenciar_membros) |
 | `controlador_painel_revisor.php` | security (role revisor/gestor) |
 | `relatorio_colaboradores.php` | security (role gestor) |
 | `monitoramento.php` | security (role gestor) |
-| `processar_revisao_exemplar.php` | security (role revisor/gestor) |
 | `backup_painel.php` | security (token BACKUP_SECRET) |
 | `controlador_gestor.php` | bugfix (stats hardcoded → zeros) |
 | `buscar_dados_especie_ai.php` | security (SSL DeepSeek) |
@@ -460,6 +498,15 @@ if ($lat < -90 || $lat > 90 || $lon < -180 || $lon > 180) { ... }
 | `src/Views/escolher_especie.php` | security (CSRF csrf_escolher_especie) |
 | `src/Views/cadastro_caracteristicas.php` | security (CSRF csrf_cadastro_caract) |
 | `src/Views/matrizes/gerenciar_matrizes.php` | security (CSRF csrf_remover_matriz) |
+| `src/Views/matrizes/ficha.php` | security (CSRF csrf_comentario_matriz) |
+| `src/Views/matrizes/adicionar_foto.php` | security (CSRF csrf_foto_parte) |
+| `src/Views/cadastrar_exemplar.php` | security (CSRF csrf_cadastro_exemplar) |
+| `src/Views/enviar_imagem.php` | security (CSRF csrf_upload_exsicata) |
+| `src/Views/revisor/revisar_exemplar.php` | security (CSRF csrf_revisao_exemplar) |
+| `src/Views/artigo_revisao.php` | security (XSS — escapar campos _ref) |
+| `src/Views/auth/solicitar_alteracao_email.php` | security (ENT_QUOTES no token CSRF) |
+| `src/Views/includes/cabecalho.php` | security (XSS — escapar breadcrumb url/nome) |
+| `src/Views/usuario/alterar_senha.php` | security (XSS — escapar IP de acesso) |
 
 ---
 
@@ -469,11 +516,13 @@ Os itens abaixo foram identificados durante a sessão mas não corrigidos (por s
 
 1. **`confirmar_caracteristicas.php` — ownership de edição** — qualquer colaborador autenticado pode editar características de qualquer espécie sem cheque de ownership. Comportamento colaborativo intencional, mas sem rastreio de quem editou o quê por espécie atribuída.
 
-2. **`confirmar_caracteristicas.php` — AJAX sem CSRF token** — As ações AJAX (`salvar_campo`, `salvar_obs`, `salvar_referencias`, `buscar_ref_campo`, `buscar_atributo_multi`) não verificam CSRF. Mitigação parcial via `SameSite=Lax` nos cookies de sessão. CSRF completo em AJAX exigiria um meta-tag com token ou header customizado no frontend.
+2. **CSRF em requisições AJAX** — As ações AJAX de `confirmar_caracteristicas.php` (`salvar_campo`, `salvar_obs`, etc.) e o endpoint `iniciar` em `controlador_painel_revisor.php` (fetch POST de `entrada_revisor.php`) não verificam CSRF. Mitigação parcial via `SameSite=Lax`. CSRF em AJAX exige meta-tag com token ou header `X-CSRF-Token` no frontend.
 
-3. **CSP (Content-Security-Policy)** — não adicionado. Requer levantamento de todos os CDNs, scripts inline e estilos usados no projeto antes de implementar sem quebrar páginas.
+3. **`controlador_painel_revisor.php` — CSRF nos formulários HTML** — Forms que postam para este controller existem em `artigo_revisao.php`, `artigos_fila.php` e `gestao_artigos_gestor.php` (ação "publicar"). CSRF não foi adicionado por envolver 3 views distintas; requer token compartilhado ou por-ação.
 
-4. **Colações mistas no banco** — `general_ci` vs `unicode_ci` em tabelas diferentes. Documentado em `analise_banco_producao_2026-11-03.md`; requer janela de manutenção para migração.
+4. **CSP (Content-Security-Policy)** — não adicionado. Requer levantamento de todos os CDNs, scripts inline e estilos usados no projeto antes de implementar sem quebrar páginas.
+
+5. **Colações mistas no banco** — `general_ci` vs `unicode_ci` em tabelas diferentes. Documentado em `analise_banco_producao_2026-11-03.md`; requer janela de manutenção para migração.
 
 ## Ações Necessárias no Servidor
 
