@@ -11,6 +11,11 @@ if (!estaLogado()) {
     exit;
 }
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_foto_parte'])) {
+    $_SESSION['csrf_foto_parte'] = bin2hex(random_bytes(32));
+}
+
 $id = intval($_GET['id'] ?? 0);
 $matriz = buscarUm(
     "SELECT id, codigo, especie_nome, especie_nome_popular FROM matrizes WHERE id = ? AND status = 'ativo'",
@@ -111,6 +116,7 @@ include __DIR__ . '/../includes/cabecalho.php';
     <div class="card-secao">
         <form action="<?= APP_BASE ?>/src/Controllers/matrizes/processar_foto_parte.php"
               method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_foto_parte'], ENT_QUOTES); ?>">
             <input type="hidden" name="matriz_id" value="<?php echo $id; ?>">
 
             <div class="mb-3">

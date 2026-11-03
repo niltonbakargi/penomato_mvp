@@ -144,7 +144,7 @@ if (!isset($_SESSION['csrf_token_email'])) {
                   method="POST" novalidate>
 
                 <input type="hidden" name="csrf_token"
-                       value="<?php echo $_SESSION['csrf_token_email']; ?>">
+                       value="<?php echo htmlspecialchars($_SESSION['csrf_token_email'], ENT_QUOTES); ?>">
 
                 <div class="form-group">
                     <label for="novo_email">

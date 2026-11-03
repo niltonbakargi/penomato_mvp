@@ -10,10 +10,22 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = $_SESSION['usuario_id'];
 $msgs = [];
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_contestar'])) {
+    $_SESSION['csrf_contestar'] = bin2hex(random_bytes(32));
+}
+
 // ================================================
 // PROCESSAR ENVIO
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_contestar'] ?? '', $csrf)) {
+        $msgs[] = ['tipo' => 'err', 'texto' => 'Requisição inválida. Tente novamente.'];
+        goto fim_post_contestar;
+    }
+    $_SESSION['csrf_contestar'] = bin2hex(random_bytes(32));
+
     $especie_id       = (int)($_POST['especie_id'] ?? 0);
     $subtipo          = $_POST['subtipo'] ?? '';
     $conteudo_atual   = trim($_POST['conteudo_atual'] ?? '');
@@ -53,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msgs[] = ['tipo' => 'ok', 'texto' => 'Contestação enviada. O gestor será notificado para análise.'];
     }
 }
+fim_post_contestar:
 
 // ================================================
 // DADOS
@@ -323,6 +336,7 @@ $labels_status = [
                     <?php endforeach; ?>
 
                     <form method="POST" action="contestar_informacao.php" id="form-contestacao">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_contestar'], ENT_QUOTES); ?>">
                         <input type="hidden" name="subtipo" id="subtipo-hidden">
 
                         <label>Espécie</label>

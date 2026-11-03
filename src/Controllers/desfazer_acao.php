@@ -12,9 +12,17 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 $usuario_id = (int)$_SESSION['usuario_id'];
-$hist_id    = (int)($_POST['hist_id'] ?? 0);
 $redirect   = APP_BASE . '/src/Controllers/minhas_acoes.php';
 
+// ── CSRF ────────────────────────────────────────
+$csrf = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_desfazer'] ?? '', $csrf)) {
+    header("Location: $redirect?erro=" . urlencode('Requisição inválida. Tente novamente.'));
+    exit;
+}
+$_SESSION['csrf_desfazer'] = bin2hex(random_bytes(32));
+
+$hist_id    = (int)($_POST['hist_id'] ?? 0);
 $acoes_validas = ['solicitar', 'desfazer'];
 $acao_raw = $_POST['acao'] ?? '';
 $acao = in_array($acao_raw, $acoes_validas) ? $acao_raw : '';

@@ -966,9 +966,9 @@ $nomes_partes = [
                                 <div class="char-item">
                                     <div class="char-label">Espinhos</div>
                                     <div class="char-value">
-                                        <?php echo $carac['possui_espinhos']; ?>
+                                        <?php echo htmlspecialchars($carac['possui_espinhos']); ?>
                                         <?php if (!empty($carac['possui_espinhos_ref'])): ?>
-                                            <span class='ref-link' data-ref='<?php echo $carac['possui_espinhos_ref']; ?>'>[<?php echo $carac['possui_espinhos_ref']; ?>]</span>
+                                            <span class='ref-link' data-ref='<?php echo htmlspecialchars($carac['possui_espinhos_ref'], ENT_QUOTES); ?>'>[<?php echo htmlspecialchars($carac['possui_espinhos_ref']); ?>]</span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -978,9 +978,9 @@ $nomes_partes = [
                                 <div class="char-item">
                                     <div class="char-label">Látex</div>
                                     <div class="char-value">
-                                        <?php echo $carac['possui_latex']; ?>
+                                        <?php echo htmlspecialchars($carac['possui_latex']); ?>
                                         <?php if (!empty($carac['possui_latex_ref'])): ?>
-                                            <span class='ref-link' data-ref='<?php echo $carac['possui_latex_ref']; ?>'>[<?php echo $carac['possui_latex_ref']; ?>]</span>
+                                            <span class='ref-link' data-ref='<?php echo htmlspecialchars($carac['possui_latex_ref'], ENT_QUOTES); ?>'>[<?php echo htmlspecialchars($carac['possui_latex_ref']); ?>]</span>
                                         <?php endif; ?>
                                     </div>
                                 </div>

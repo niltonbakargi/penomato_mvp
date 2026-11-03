@@ -13,6 +13,11 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $usuario_id = (int)$_SESSION['usuario_id'];
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_desfazer'])) {
+    $_SESSION['csrf_desfazer'] = bin2hex(random_bytes(32));
+}
+
 // ── Verificação lazy: notificar colaborador quando janela de correção expirou ──
 // (revisor desfez aprovação há +1 dia e espécie ainda está em em_revisao)
 try {
@@ -323,6 +328,7 @@ function prazoInfo(string $data_alteracao): array {
             <span class="prazo-chip prazo-ok">⏱ <?= $prazo['texto'] ?></span>
             <form method="POST" action="desfazer_acao.php"
                   onsubmit="return confirm('Desfazer: <?= htmlspecialchars(addslashes($descricao)) ?>?');">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_desfazer'], ENT_QUOTES); ?>">
                 <input type="hidden" name="acao" value="desfazer">
                 <input type="hidden" name="hist_id" value="<?= $h['id'] ?>">
                 <button type="submit" class="btn btn-desfazer">↩ Desfazer</button>
@@ -348,6 +354,7 @@ function prazoInfo(string $data_alteracao): array {
         <div class="modal-titulo">Solicitar desfazer ao gestor</div>
         <div class="modal-sub" id="modal-descricao"></div>
         <form method="POST" action="desfazer_acao.php">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_desfazer'], ENT_QUOTES); ?>">
             <input type="hidden" name="acao" value="solicitar">
             <input type="hidden" name="hist_id" id="modal-hist-id" value="">
             <textarea name="justificativa" placeholder="Explique o motivo da solicitação…" required></textarea>

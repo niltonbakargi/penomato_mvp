@@ -13,11 +13,23 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'gestor') {
 
 $gestor_id = (int)$_SESSION['usuario_id'];
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_gestao_artigos'])) {
+    $_SESSION['csrf_gestao_artigos'] = bin2hex(random_bytes(32));
+}
+
 // ================================================
 // POST: atribuir orientador
 // ================================================
 $msg = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'atribuir') {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_gestao_artigos'] ?? '', $csrf)) {
+        $msg = ['tipo' => 'err', 'texto' => 'Requisição inválida. Tente novamente.'];
+        goto fim_post_artigos;
+    }
+    $_SESSION['csrf_gestao_artigos'] = bin2hex(random_bytes(32));
+
     $especie_id   = (int)($_POST['especie_id']   ?? 0);
     $orientador_id = (int)($_POST['orientador_id'] ?? 0);
 
@@ -29,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
         $msg = ['tipo' => 'err', 'texto' => 'Selecione um orientador válido.'];
     }
 }
+fim_post_artigos:
 
 // ================================================
 // FILTROS
@@ -549,6 +562,7 @@ $info_status = [
         <form method="POST">
             <input type="hidden" name="acao"       value="atribuir">
             <input type="hidden" name="especie_id" id="modal-especie-id">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_gestao_artigos'], ENT_QUOTES); ?>">
             <label>Selecione o orientador</label>
             <select name="orientador_id" required>
                 <option value="">— escolha —</option>

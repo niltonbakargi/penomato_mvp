@@ -13,6 +13,11 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id   = (int)$_SESSION['usuario_id'];
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Usuário';
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_cadastro_exemplar'])) {
+    $_SESSION['csrf_cadastro_exemplar'] = bin2hex(random_bytes(32));
+}
+
 // ── Espécies disponíveis ──────────────────────────────────────────────────────
 $especies = $pdo->query("
     SELECT id, nome_cientifico
@@ -264,6 +269,7 @@ $proximo_codigo = 'PN' . str_pad($proximo_num, 3, '0', STR_PAD_LEFT);
               action="<?= APP_BASE ?>/src/Controllers/processar_cadastro_exemplar.php"
               enctype="multipart/form-data"
               id="form-exemplar">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_cadastro_exemplar'], ENT_QUOTES); ?>">
 
             <!-- ── SEÇÃO 1: Espécie ──────────────────────────────────── -->
             <div class="secao">

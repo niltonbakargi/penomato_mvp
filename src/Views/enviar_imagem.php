@@ -13,6 +13,11 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id   = (int)$_SESSION['usuario_id'];
 $usuario_nome = $_SESSION['usuario_nome'] ?? 'Usuário';
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_upload_exsicata'])) {
+    $_SESSION['csrf_upload_exsicata'] = bin2hex(random_bytes(32));
+}
+
 $especie_id  = isset($_GET['especie_id'])  ? (int)$_GET['especie_id']  : 0;
 $exemplar_id = isset($_GET['exemplar_id']) ? (int)$_GET['exemplar_id'] : 0;
 
@@ -607,6 +612,7 @@ $mensagem_erro    = isset($_GET['erro'])    ? urldecode($_GET['erro'])    : '';
         <form method="POST"
               action="<?= APP_BASE ?>/src/Controllers/processar_upload_exsicata.php"
               enctype="multipart/form-data" id="form-upload">
+            <input type="hidden" name="csrf_token"   value="<?php echo htmlspecialchars($_SESSION['csrf_upload_exsicata'], ENT_QUOTES); ?>">
             <input type="hidden" name="especie_id"   value="<?= $especie_id ?>">
             <input type="hidden" name="exemplar_id"  value="<?= $exemplar_id ?>">
             <input type="hidden" name="parte_planta" id="input-parte">

@@ -16,6 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// ── CSRF ────────────────────────────────────────
+$csrf = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_comentario_matriz'] ?? '', $csrf)) {
+    $mid = intval($_POST['matriz_id'] ?? 0);
+    mensagemErro('Requisição inválida. Tente novamente.');
+    header("Location: " . APP_BASE . "/src/Views/matrizes/ficha.php?id={$mid}");
+    exit;
+}
+$_SESSION['csrf_comentario_matriz'] = bin2hex(random_bytes(32));
+
 $matriz_id = intval($_POST['matriz_id'] ?? 0);
 $texto     = trim($_POST['texto'] ?? '');
 

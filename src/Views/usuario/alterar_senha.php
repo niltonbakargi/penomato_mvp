@@ -334,7 +334,7 @@ require_once __DIR__ . '/../includes/cabecalho.php';
                                     <?php foreach ($ultimos_acessos as $acesso): ?>
                                     <tr>
                                         <td><?php echo date('d/m/Y H:i', strtotime($acesso['data_acesso'])); ?></td>
-                                        <td><?php echo $acesso['ip']; ?></td>
+                                        <td><?php echo htmlspecialchars($acesso['ip']); ?></td>
                                         <td>
                                             <?php 
                                             $agente = $acesso['user_agent'] ?? '';

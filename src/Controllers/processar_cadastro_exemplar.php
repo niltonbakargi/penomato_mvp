@@ -15,6 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// ── CSRF ────────────────────────────────────────
+$csrf = $_POST['csrf_token'] ?? '';
+if (!hash_equals($_SESSION['csrf_cadastro_exemplar'] ?? '', $csrf)) {
+    header('Location: ' . APP_BASE . '/src/Views/cadastrar_exemplar.php?erro=' . urlencode('Requisição inválida. Tente novamente.'));
+    exit;
+}
+$_SESSION['csrf_cadastro_exemplar'] = bin2hex(random_bytes(32));
+
 $usuario_id   = (int)$_SESSION['usuario_id'];
 $usuario_nome = $_SESSION['usuario_nome'] ?? '';
 

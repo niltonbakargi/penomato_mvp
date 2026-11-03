@@ -6,6 +6,11 @@
 require_once __DIR__ . '/../../../config/banco_de_dados.php';
 require_once __DIR__ . '/../../Controllers/auth/verificar_acesso.php';
 
+// ── CSRF para comentário ─────────────────────────
+if (estaLogado() && empty($_SESSION['csrf_comentario_matriz'])) {
+    $_SESSION['csrf_comentario_matriz'] = bin2hex(random_bytes(32));
+}
+
 $id = intval($_GET['id'] ?? 0);
 
 if (!$id) {
@@ -424,6 +429,7 @@ include __DIR__ . '/../includes/cabecalho.php';
         <?php if (estaLogado()): ?>
         <form action="<?= APP_BASE ?>/src/Controllers/matrizes/processar_comentario.php"
               method="POST" class="form-comentario mt-3">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_comentario_matriz'], ENT_QUOTES); ?>">
             <input type="hidden" name="matriz_id" value="<?php echo $id; ?>">
             <textarea class="form-control mb-2" name="texto" rows="2"
                       placeholder="Escreva um comentário ou ajude a identificar esta espécie..." required></textarea>

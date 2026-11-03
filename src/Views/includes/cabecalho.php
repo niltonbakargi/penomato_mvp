@@ -588,9 +588,9 @@ function menuAtivo($url, $pagina_atual) {
             <?php foreach ($breadcrumb_itens as $item): ?>
                 <i class="fas fa-chevron-right mx-2" style="font-size: 0.8rem; color: #999;"></i>
                 <?php if (isset($item['url'])): ?>
-                    <a href="<?php echo $item['url']; ?>"><?php echo $item['nome']; ?></a>
+                    <a href="<?php echo htmlspecialchars($item['url'], ENT_QUOTES); ?>"><?php echo htmlspecialchars($item['nome']); ?></a>
                 <?php else: ?>
-                    <span><?php echo $item['nome']; ?></span>
+                    <span><?php echo htmlspecialchars($item['nome']); ?></span>
                 <?php endif; ?>
             <?php endforeach; ?>
         <?php endif; ?>

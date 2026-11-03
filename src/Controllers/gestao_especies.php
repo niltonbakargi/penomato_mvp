@@ -10,10 +10,21 @@ if (!isset($_SESSION['usuario_id']) || ($_SESSION['usuario_tipo'] ?? '') !== 'ge
 $status_validos     = ['sem_dados', 'dados_internet', 'identificado', 'registrada', 'em_revisao', 'revisada', 'contestado', 'publicado'];
 $prioridades_validas = ['baixa', 'media', 'alta', 'urgente'];
 
+// ── CSRF ────────────────────────────────────────
+if (empty($_SESSION['csrf_gestao_especies'])) {
+    $_SESSION['csrf_gestao_especies'] = bin2hex(random_bytes(32));
+}
+
 // ================================================
 // PROCESSAR AÇÕES (POST)
 // ================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrf = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_gestao_especies'] ?? '', $csrf)) {
+        header('Location: gestao_especies.php');
+        exit;
+    }
+    $_SESSION['csrf_gestao_especies'] = bin2hex(random_bytes(32));
     $acao       = $_POST['acao'] ?? '';
     $especie_id = (int)($_POST['especie_id'] ?? 0);
 
@@ -288,6 +299,7 @@ $colaboradores = $pdo->query("
                             <input type="hidden" name="acao" value="prioridade">
                             <input type="hidden" name="especie_id" value="<?php echo $e['id']; ?>">
                             <input type="hidden" name="filtro_status" value="<?php echo htmlspecialchars($filtro_status); ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_gestao_especies'], ENT_QUOTES); ?>">
                             <select name="prioridade" class="sel-prioridade prio-<?php echo $e['prioridade']; ?>"
                                     onchange="this.form.submit()">
                                 <option value="baixa"   <?php echo $e['prioridade']==='baixa'   ?'selected':''; ?>>⬇ Baixa</option>
@@ -304,6 +316,7 @@ $colaboradores = $pdo->query("
                             <input type="hidden" name="acao" value="atribuir">
                             <input type="hidden" name="especie_id" value="<?php echo $e['id']; ?>">
                             <input type="hidden" name="filtro_status" value="<?php echo htmlspecialchars($filtro_status); ?>">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_gestao_especies'], ENT_QUOTES); ?>">
                             <select name="atribuido_a" class="sel-atribuir" onchange="this.form.submit()">
                                 <option value="">— Ninguém —</option>
                                 <?php foreach ($colaboradores as $c): ?>
