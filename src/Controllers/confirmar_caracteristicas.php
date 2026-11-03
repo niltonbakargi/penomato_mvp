@@ -311,7 +311,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_ref_campo') {
             JSON_UNESCAPED_UNICODE);
         $ch = curl_init('https://api.deepseek.com/chat/completions');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 110, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_TIMEOUT => 110, CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
         $r = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
         if ($code !== 200) { $erro_api = 'DeepSeek HTTP ' . $code; } else { $d = json_decode($r, true); $texto = $d['choices'][0]['message']['content'] ?? null; }
@@ -469,7 +469,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_atributo_multi') {
             'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido sem markdown.'], ['role' => 'user', 'content' => $prompt]]], JSON_UNESCAPED_UNICODE);
         $ch = curl_init('https://api.deepseek.com/chat/completions');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 60, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_TIMEOUT => 60, CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
         $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
         if ($code !== 200) $erro_api = 'DeepSeek HTTP ' . $code;
@@ -678,7 +678,7 @@ if (isset($_POST['acao']) && $_POST['acao'] === 'buscar_distribuicao_ia') {
             'messages' => [['role' => 'system', 'content' => 'Responda em JSON válido sem markdown.'], ['role' => 'user', 'content' => $prompt]]], JSON_UNESCAPED_UNICODE);
         $ch = curl_init('https://api.deepseek.com/chat/completions');
         curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 60, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_TIMEOUT => 60, CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $api_key]]);
         $res = curl_exec($ch); $code = curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
         if ($code !== 200) $erro_api = 'DeepSeek HTTP ' . $code;

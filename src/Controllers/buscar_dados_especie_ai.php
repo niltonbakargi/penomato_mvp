@@ -351,8 +351,8 @@ if ($provider === 'claude') {
             CURLOPT_POSTFIELDS     => $payload,
             CURLOPT_TIMEOUT        => 110,
             CURLOPT_CONNECTTIMEOUT => 10,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $api_key,

@@ -25,12 +25,14 @@ $parte_planta = trim($_POST['parte_planta'] ?? '');
 
 $redirect_base = '../Views/adicionar_imagens_internet.php?especie_id=' . $especie_id;
 
+$partes_validas = ['folha','flor','fruto','caule','semente','habito','exsicata_completa','detalhe'];
+
 if ($especie_id <= 0) {
     header('Location: ../Views/adicionar_imagens_internet.php?erro=' . urlencode('Espécie não informada.'));
     exit;
 }
-if (empty($parte_planta)) {
-    header('Location: ' . $redirect_base . '&erro=' . urlencode('Parte da planta não informada.'));
+if (!in_array($parte_planta, $partes_validas, true)) {
+    header('Location: ' . $redirect_base . '&erro=' . urlencode('Parte da planta inválida.'));
     exit;
 }
 if (!isset($_FILES['imagens']) || empty($_FILES['imagens']['name'][0])) {
