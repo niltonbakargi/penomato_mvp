@@ -13,14 +13,14 @@ $tamanhos_validos = ['A4', 'A3', 'A2', 'A1', 'A0'];
 $tamanho = strtoupper($_GET['tamanho'] ?? 'A4');
 if (!in_array($tamanho, $tamanhos_validos)) $tamanho = 'A4';
 
-// Dimensões em mm · grade escalonada por tamanho · margem · caixa da etiqueta (cols × rows)
+// Dimensões em mm · grade escalonada por tamanho
 $config = [
-    //          w     h    grid  margin  lbl_cols  lbl_rows
-    'A4' => ['w'=>210, 'h'=>297, 'grid'=>10, 'margin'=>15, 'lc'=>7,  'lr'=>4 ],
-    'A3' => ['w'=>297, 'h'=>420, 'grid'=>10, 'margin'=>15, 'lc'=>10, 'lr'=>5 ],
-    'A2' => ['w'=>420, 'h'=>594, 'grid'=>20, 'margin'=>20, 'lc'=>6,  'lr'=>4 ],
-    'A1' => ['w'=>594, 'h'=>841, 'grid'=>50, 'margin'=>22, 'lc'=>3,  'lr'=>2 ],
-    'A0' => ['w'=>841, 'h'=>1189,'grid'=>100,'margin'=>30, 'lc'=>2,  'lr'=>2 ],
+    //          w     h    grid  margin
+    'A4' => ['w'=>210, 'h'=>297, 'grid'=>10,  'margin'=>15],
+    'A3' => ['w'=>297, 'h'=>420, 'grid'=>10,  'margin'=>15],
+    'A2' => ['w'=>420, 'h'=>594, 'grid'=>20,  'margin'=>20],
+    'A1' => ['w'=>594, 'h'=>841, 'grid'=>50,  'margin'=>22],
+    'A0' => ['w'=>841, 'h'=>1189,'grid'=>100, 'margin'=>30],
 ];
 
 $c      = $config[$tamanho];
@@ -28,8 +28,12 @@ $w      = $c['w'];
 $h      = $c['h'];
 $grid   = $c['grid'];
 $margin = $c['margin'];
-$lc     = $c['lc'];   // colunas da caixa de etiqueta
-$lr     = $c['lr'];   // linhas da caixa de etiqueta
+// Caixa de etiqueta: tamanho físico fixo ~10cm × 6cm, calculado em células
+// ficará menor proporcionalmente nas folhas maiores (A0 = 1×1 célula)
+$label_w_mm = 100; // 10 cm
+$label_h_mm = 60;  // 6 cm
+$lc = max(1, (int) round($label_w_mm / $grid));
+$lr = max(1, (int) round($label_h_mm / $grid));
 
 // Grade preenche toda a área útil
 $area_w = $w - 2 * $margin;
