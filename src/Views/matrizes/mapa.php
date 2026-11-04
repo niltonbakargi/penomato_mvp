@@ -352,7 +352,7 @@ body { padding-top: 80px; }
                 </a>
                 <!-- botão ver no mapa -->
                 <button class="btn-mini-mapa"
-                        onclick="abrirMapaUnico(<?php echo $m['id']; ?>, <?php echo $m['latitude']; ?>, <?php echo $m['longitude']; ?>, '<?php echo addslashes(htmlspecialchars($nome)); ?>', '<?php echo $m['codigo']; ?>', APP_BASE . '/<?php echo addslashes($m['foto_geral']); ?>')">
+                        onclick="abrirMapaUnico(<?php echo $m['id']; ?>, <?php echo $m['latitude']; ?>, <?php echo $m['longitude']; ?>, <?php echo json_encode($nome, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT); ?>, <?php echo json_encode($m['codigo'], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT); ?>, APP_BASE + <?php echo json_encode('/' . ltrim($m['foto_geral'] ?? '', '/'), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT); ?>)">
                     <i class="fas fa-map-marker-alt"></i>
                     Mapa
                 </button>

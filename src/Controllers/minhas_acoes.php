@@ -327,7 +327,7 @@ function prazoInfo(string $data_alteracao): array {
         <?php elseif ($prazo['dentro']): ?>
             <span class="prazo-chip prazo-ok">⏱ <?= $prazo['texto'] ?></span>
             <form method="POST" action="desfazer_acao.php"
-                  onsubmit="return confirm('Desfazer: <?= htmlspecialchars(addslashes($descricao)) ?>?');">
+                  onsubmit="return confirm('Desfazer: ' + <?= json_encode($descricao, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT) ?> + '?');">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_desfazer'], ENT_QUOTES); ?>">
                 <input type="hidden" name="acao" value="desfazer">
                 <input type="hidden" name="hist_id" value="<?= $h['id'] ?>">
@@ -337,7 +337,7 @@ function prazoInfo(string $data_alteracao): array {
         <?php else: ?>
             <span class="prazo-chip prazo-vencido">⌛ <?= $prazo['texto'] ?></span>
             <button class="btn btn-solicitar"
-                    onclick="abrirModal(<?= $h['id'] ?>, '<?= htmlspecialchars(addslashes($descricao)) ?>')">
+                    onclick="abrirModal(<?= $h['id'] ?>, <?= json_encode($descricao, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT) ?>)">
                 📩 Solicitar ao gestor
             </button>
         <?php endif; ?>

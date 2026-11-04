@@ -465,7 +465,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(mapa);
 
 L.marker([lat, lon]).addTo(mapa)
-    .bindPopup('<strong><?php echo htmlspecialchars(addslashes($nome_exibir)); ?></strong><br>Matriz <?php echo $matriz['codigo']; ?>')
+    .bindPopup('<strong>' + <?php echo json_encode($nome_exibir, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT); ?> + '<\/strong><br>Matriz <?php echo htmlspecialchars($matriz['codigo']); ?>')
     .openPopup();
 
 // ── Lightbox ──────────────────────────────────────────────────
