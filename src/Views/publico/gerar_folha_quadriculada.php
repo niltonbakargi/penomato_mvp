@@ -14,13 +14,14 @@ $tamanho = strtoupper($_GET['tamanho'] ?? 'A4');
 if (!in_array($tamanho, $tamanhos_validos)) $tamanho = 'A4';
 
 // Dimensões em mm · espaçamento da grade · margem · caixa da etiqueta (cols × rows)
+// Margens generosas para evitar overflow no DomPDF
 $config = [
     //          w     h    grid  margin  lbl_cols  lbl_rows
-    'A4' => ['w'=>210, 'h'=>297, 'grid'=>10, 'margin'=>8, 'lc'=>7,  'lr'=>4 ],
-    'A3' => ['w'=>297, 'h'=>420, 'grid'=>10, 'margin'=>8, 'lc'=>10, 'lr'=>5 ],
-    'A2' => ['w'=>420, 'h'=>594, 'grid'=>10, 'margin'=>10,'lc'=>12, 'lr'=>7 ],
-    'A1' => ['w'=>594, 'h'=>841, 'grid'=>50, 'margin'=>12,'lc'=>3,  'lr'=>2 ],
-    'A0' => ['w'=>841, 'h'=>1189,'grid'=>100,'margin'=>15,'lc'=>2,  'lr'=>2 ],
+    'A4' => ['w'=>210, 'h'=>297, 'grid'=>10, 'margin'=>15, 'lc'=>7,  'lr'=>4 ],
+    'A3' => ['w'=>297, 'h'=>420, 'grid'=>10, 'margin'=>15, 'lc'=>10, 'lr'=>5 ],
+    'A2' => ['w'=>420, 'h'=>594, 'grid'=>10, 'margin'=>20, 'lc'=>12, 'lr'=>7 ],
+    'A1' => ['w'=>594, 'h'=>841, 'grid'=>50, 'margin'=>22, 'lc'=>3,  'lr'=>2 ],
+    'A0' => ['w'=>841, 'h'=>1189,'grid'=>100,'margin'=>30, 'lc'=>2,  'lr'=>2 ],
 ];
 
 $c      = $config[$tamanho];
@@ -100,7 +101,7 @@ body {
 }
 
 .grade {
-    width: 100%;
+    width: <?= ($cols * $grid) ?>mm;
     border-collapse: collapse;
     table-layout: fixed;
 }
