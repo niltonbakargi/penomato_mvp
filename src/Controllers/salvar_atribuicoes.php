@@ -123,8 +123,7 @@ foreach ($atribuicoes as $atr) {
         CURLOPT_TIMEOUT        => 30,
         CURLOPT_CONNECTTIMEOUT => 10,
         CURLOPT_USERAGENT      => 'Penomato/1.0 (penomato.app.br)',
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_MAXREDIRS      => 3,
+        CURLOPT_FOLLOWLOCATION => false,
         CURLOPT_SSL_VERIFYPEER => true,
     ]);
     $conteudo  = curl_exec($ch);

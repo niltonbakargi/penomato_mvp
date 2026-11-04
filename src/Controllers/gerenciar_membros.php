@@ -410,7 +410,7 @@ try {
                 <?php if ($u['id'] !== $gestor_id): ?>
                 <div class="form-inline" id="excluir-<?= $u['id'] ?>">
                     <form method="POST" action="<?= APP_BASE ?>/src/Controllers/gerenciar_membros.php"
-                          onsubmit="return confirm('Remover <?= htmlspecialchars(addslashes($u['nome'])) ?> permanentemente?')">
+                          onsubmit="return confirm('Remover ' + <?= json_encode($u['nome'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) ?> + ' permanentemente?')">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_gerenciar_membros'], ENT_QUOTES) ?>">
                         <input type="hidden" name="membro_excluir_id" value="<?= $u['id'] ?>">
                         <label>Motivo da remoção (opcional)</label>

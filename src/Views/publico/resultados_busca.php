@@ -91,7 +91,7 @@ if ($total > 0) {
     }
 }
 
-$j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$j_slides = json_encode($slides, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
