@@ -84,7 +84,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
         /* ── Botões de ação principais ── */
         .acoes-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: var(--esp-4);
         }
         .acao-btn {
@@ -228,7 +228,7 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
             line-height: 1.5;
         }
 
-        @media (max-width: 540px) {
+        @media (max-width: 600px) {
             .acoes-grid { grid-template-columns: 1fr; }
             .downloads-grid { grid-template-columns: repeat(3, 1fr); }
             .cartao-info { grid-template-columns: 1fr; }
@@ -256,13 +256,19 @@ require_once __DIR__ . '/../../../config/banco_de_dados.php';
             <a href="<?= APP_BASE ?>/src/Views/adicionar_imagens_internet.php" class="acao-btn">
                 <span class="icon">🌐</span>
                 Imagens da Internet
-                <div class="desc">Adicione imagens com fonte, URL e licença de uso.</div>
+                <div class="desc">Adicione fotos da internet a uma espécie já cadastrada, com fonte, URL e licença.</div>
+            </a>
+
+            <a href="<?= APP_BASE ?>/src/Views/cadastrar_exemplar.php" class="acao-btn">
+                <span class="icon">🌿</span>
+                Criar Exemplar
+                <div class="desc">Registre um indivíduo de campo com localização GPS. As exsicatas pertencem a ele.</div>
             </a>
 
             <a href="<?= APP_BASE ?>/src/Views/enviar_imagem.php" class="acao-btn">
-                <span class="icon">🌿</span>
-                Registrar Exsicata Digital
-                <div class="desc">Fotos de campo por partes do exemplar, seguindo o protocolo.</div>
+                <span class="icon">📸</span>
+                Adicionar Exsicatas
+                <div class="desc">Adicione fotos de partes da planta a um exemplar de campo já registrado.</div>
             </a>
 
         </div>
