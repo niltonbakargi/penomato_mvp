@@ -562,8 +562,12 @@ function carregarEspecie(id) {
 }
 
 // Restaurar tipo selecionado no POST
-<?php if (!empty($_POST['subtipo'])): ?>
-const btnRestore = document.querySelector('[data-val="<?php echo htmlspecialchars($_POST['subtipo']); ?>"]');
+<?php
+$_subtipos_js = ['contestar_informacao', 'contestar_imagem', 'erro_sistema', 'outros'];
+$_subtipo_post = in_array($_POST['subtipo'] ?? '', $_subtipos_js, true) ? $_POST['subtipo'] : '';
+if ($_subtipo_post):
+?>
+const btnRestore = document.querySelector('[data-val=' + <?= json_encode($_subtipo_post, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT) ?> + ']');
 if (btnRestore) selecionarTipo(btnRestore);
 <?php endif; ?>
 </script>
