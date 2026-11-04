@@ -88,16 +88,18 @@ ob_start();
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
+html, body {
     width: <?= $w ?>mm;
     height: <?= $h ?>mm;
+    overflow: hidden;
     background: #fff;
+    page-break-after: avoid;
 }
 
 .pagina {
     width: <?= $w ?>mm;
-    height: <?= $h ?>mm;
     padding: <?= $margin ?>mm;
+    overflow: hidden;
 }
 
 .grade {
